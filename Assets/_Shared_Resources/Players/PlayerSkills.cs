@@ -1,108 +1,99 @@
 using UnityEngine;
 using Unity.Netcode;
+using System.Collections.Generic;
+
+[System.Serializable]
+public class SkillSlot
+{
+    public string slotName = "New Skill"; 
+    public SkillData data;                
+    public BaseSkillComponent logicScript;
+}
 
 public class PlayerSkills : NetworkBehaviour
 {
     private PlayerController controller;
+    private NetworkEntity entity;
 
-    [Header("Quản lý Kỹ năng")]
-    [Tooltip("Cấp độ Skill được phép dùng (Do Server quyết định dựa vào số lượng cừu)")]
+    // Cấp độ bầy cừu (0: Không có cừu, 1: 3 cừu, 2: 6 cừu, 3: 10 cừu)
     public NetworkVariable<int> unlockedSkillTier = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+
+    [Header("Bảng Kỹ Năng Đang Lắp (Kéo thả vào đây)")]
+    public List<SkillSlot> equippedSkills = new List<SkillSlot>();
+
+    private Dictionary<int, float> lastCastTimes = new Dictionary<int, float>();
 
     void Awake()
     {
-        // Tìm PlayerController (có thể nằm ở chính GameObject này hoặc GameObject cha)
         controller = GetComponentInParent<PlayerController>();
+        if (controller == null) controller = GetComponentInChildren<PlayerController>();
         
-        if (controller == null)
-        {
-            Debug.LogError("❌ [LỖI] PlayerSkills không tìm thấy PlayerController!");
-        }
+        entity = GetComponentInParent<NetworkEntity>();
     }
 
     public override void OnNetworkSpawn()
     {
-        if (IsOwner && controller != null)
-        {
-            // Đăng ký nhận sự kiện bấm nút Skill từ Controller tổng
-            controller.OnSkillActivated += TryCastSkill;
-        }
+        if (IsOwner && controller != null) controller.OnSkillActivated += TryCastSkill;
     }
 
-    // -------------------------------------------------------------------
-    // XỬ LÝ PHÍA CLIENT (Máy người chơi)
-    // -------------------------------------------------------------------
+    private SkillSlot GetSkillSlot(int skillId)
+    {
+        return equippedSkills.Find(slot => slot.data != null && slot.data.skillId == skillId);
+    }
+
     private void TryCastSkill(int skillId)
     {
-        // 1. Bức tường số 1 (Chặn nội bộ):
-        // Ngăn không cho Client gửi yêu cầu rác lên Server nếu chưa đủ điều kiện
-        if (skillId > unlockedSkillTier.Value)
+        SkillSlot slot = GetSkillSlot(skillId);
+        if (slot == null || slot.data == null || slot.logicScript == null) return;
+
+        // BƯỚC 1: KIỂM TRA ĐIỀU KIỆN UNLOCK TỰ ĐỘNG
+        // Vì Đánh thường có skillId = 0, và unlockedSkillTier luôn >= 0, nó sẽ luôn luôn lọt qua bài Test này!
+        if (skillId > unlockedSkillTier.Value) return;
+
+        // BƯỚC 2: CHECK COOLDOWN (Tốc độ đánh)
+        if (lastCastTimes.TryGetValue(skillId, out float lastTime))
         {
-            Debug.Log($"🛡️ [CLIENT] Từ chối! Chưa đủ số lượng cừu để tung Skill {skillId}. Cấp bầy hiện tại: {unlockedSkillTier.Value}");
-            return;
+            if (Time.time < lastTime + slot.data.cooldown) return; 
         }
 
-        // Nếu hợp lệ, xin phép Server kích hoạt chiêu
+        lastCastTimes[skillId] = Time.time;
         CastSkillServerRpc(skillId);
     }
 
-    // -------------------------------------------------------------------
-    // XỬ LÝ PHÍA SERVER (Máy chủ nắm quyền)
-    // -------------------------------------------------------------------
     [ServerRpc]
     private void CastSkillServerRpc(int skillId)
     {
-        // 2. Bức tường số 2 (Chống Hack/Cheat):
-        // Nếu Client cố tình dùng tool sửa bộ nhớ để vượt qua bức tường 1, Server sẽ bắt tại trận ở đây
-        if (skillId > unlockedSkillTier.Value)
+        SkillSlot slot = GetSkillSlot(skillId);
+        if (slot == null || slot.data == null || slot.logicScript == null) return;
+
+        // Kiểm tra lại trên Server chống Hack
+        if (skillId > unlockedSkillTier.Value) return;
+
+        // BƯỚC 3: TRỪ MANA (Nếu skill đó có set manaCost > 0)
+        if (slot.data.manaCost > 0)
         {
-            Debug.LogWarning($"🚨 [SERVER] PHÁT HIỆN GIAN LẬN: Player {OwnerClientId} cố tình gửi lệnh xài Skill {skillId} khi chưa mở khóa!");
-            return;
+            if (entity != null && !entity.ConsumeMana((int)slot.data.manaCost)) return;
         }
 
-        // Lấy ID của máy gửi lệnh để phân biệt ai đang dùng skill
-        ulong casterId = OwnerClientId; 
+        // BƯỚC 4: KÍCH HOẠT LOGIC TRÊN SERVER (Đánh thường, Rắm, Lướt, v.v.)
+        slot.logicScript.ServerExecute(slot.data, entity, controller);
 
-        switch (skillId)
+        // BƯỚC 5: PHÁT ĐỘNG HÌNH ẢNH TRÊN MỌI CLIENT
+        PlaySkillVisualClientRpc(skillId);
+    }
+
+    [ClientRpc]
+    private void PlaySkillVisualClientRpc(int skillId)
+    {
+        SkillSlot slot = GetSkillSlot(skillId);
+        if (slot != null && slot.logicScript != null)
         {
-            case 1:
-                ExecuteSkill1(casterId);
-                break;
-            case 2:
-                ExecuteSkill2(casterId);
-                break;
-            case 3:
-                ExecuteSkill3(casterId);
-                break;
+            slot.logicScript.ClientPlayVisual(slot.data);
         }
-    }
-
-    // ---- KHU VỰC THỰC THI CHIÊU THỨC TRÊN SERVER ----
-
-    private void ExecuteSkill1(ulong casterId)
-    {
-        Debug.Log($"⚔️ [SERVER] Player {casterId} tung SKILL 1 (Bắn đạn thẳng)");
-        // TODO: Viết code Spawn viên đạn tại đây
-    }
-
-    private void ExecuteSkill2(ulong casterId)
-    {
-        Debug.Log($"💨 [SERVER] Player {casterId} tung SKILL 2 (Kỹ năng lướt/Hồi máu)");
-        // TODO: Viết code thay đổi vận tốc Rigidbody hoặc buff tại đây
-    }
-
-    private void ExecuteSkill3(ulong casterId)
-    {
-        Debug.Log($"💥 [SERVER] Player {casterId} tung SKILL 3 (CHIÊU CUỐI - AOE)");
-        // TODO: Viết code tạo vùng nổ sát thương diện rộng tại đây
     }
 
     public override void OnNetworkDespawn()
     {
-        if (IsOwner && controller != null)
-        {
-            // Hủy đăng ký sự kiện khi nhân vật bị hủy để tránh lỗi rò rỉ bộ nhớ (Memory Leak)
-            controller.OnSkillActivated -= TryCastSkill;
-        }
+        if (IsOwner && controller != null) controller.OnSkillActivated -= TryCastSkill;
     }
 }

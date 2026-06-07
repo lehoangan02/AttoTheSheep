@@ -12,8 +12,10 @@ GameObject:
   - component: {fileID: 2829388708694339466}
   - component: {fileID: 1327437119388973305}
   - component: {fileID: 7893653434999359422}
+  - component: {fileID: 5333559977776328818}
   - component: {fileID: 9168083285006988034}
   - component: {fileID: 6930791931804656902}
+  - component: {fileID: 6814204379493297835}
   m_Layer: 0
   m_Name: Lamb
   m_TagString: Untagged
@@ -158,6 +160,31 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
   m_Radius: 0.235
+--- !u!114 &5333559977776328818
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4784860766754900265}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
+  GlobalObjectIdHash: 0
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!114 &9168083285006988034
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -170,7 +197,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4bc1d077e748d534caeb4814e9ba277a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LambAI
-  moveSpeed: 4
+  ShowTopMostFoldoutHeaderGroup: 1
   stoppingDistance: 0.1
   slowingRadius: 2
   accelerationRate: 3
@@ -197,3 +224,34 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &6814204379493297835
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4784860766754900265}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1786f4e4dbb12a246b8865aa622d72af, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NetworkEntity
+  ShowTopMostFoldoutHeaderGroup: 1
+  baseMaxHealth: 100
+  baseMaxMana: 50
+  baseMoveSpeed: 5
+  currentHealth:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 0
+  currentMana:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 0
+  currentMoveSpeed:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 0

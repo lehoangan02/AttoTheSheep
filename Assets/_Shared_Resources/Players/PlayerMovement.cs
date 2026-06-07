@@ -3,32 +3,41 @@ using Unity.Netcode;
 
 public class PlayerMovement : NetworkBehaviour
 {
-    [SerializeField] private float moveSpeed = 5f;
-    
     private Rigidbody2D rb;
     private PlayerController controller;
+    private NetworkEntity entity; // Kéo lõi chỉ số từ Cha
     private SpriteRenderer spriteRenderer;
     private Animator animator;
+    private Coroutine speedBoostRoutine;
 
-    // Biến mạng đồng bộ Input di chuyển từ Server xuống các Client
+    public bool isMovementLocked = false; 
+
     private NetworkVariable<Vector2> netMoveInput = new NetworkVariable<Vector2>(
         Vector2.zero, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server
     );
 
     void Awake()
     {
-        // Tìm ngược lên GameObject gốc Atto để lấy các thành phần cốt lõi
+        // Tìm các thành phần cốt lõi ở Object Cha (Atto)
         rb = GetComponentInParent<Rigidbody2D>();
         controller = GetComponentInParent<PlayerController>();
-        
-        // Tìm sang anh em hoặc chính nó để lấy hình ảnh
-        spriteRenderer = GetComponentInParent<PlayerController>().GetComponentInChildren<SpriteRenderer>();
-        animator = GetComponentInParent<PlayerController>().GetComponentInChildren<Animator>();
+        entity = GetComponentInParent<NetworkEntity>();
+
+        // Tìm kiếm hình ảnh và hoạt ảnh trong toàn bộ các Object con của Atto
+        if (transform.parent != null)
+        {
+            spriteRenderer = transform.parent.GetComponentInChildren<SpriteRenderer>();
+            animator = transform.parent.GetComponentInChildren<Animator>();
+        }
+
+        // Bẫy lỗi tự động để check nhanh trong Inspector
+        if (rb == null) Debug.LogError($"[{gameObject.name}]: Thiếu Rigidbody2D trên Object Cha!");
+        if (entity == null) Debug.LogError($"[{gameObject.name}]: Thiếu NetworkEntity trên Object Cha!");
     }
+
     public override void OnNetworkSpawn()
     {
-        // Đăng ký nhận Input từ Controller tổng
-        if (IsOwner)
+        if (IsOwner && controller != null)
         {
             controller.OnMoveInputChanged += SendInputToServer;
         }
@@ -36,7 +45,6 @@ public class PlayerMovement : NetworkBehaviour
 
     void Update()
     {
-        // Đồng bộ hiệu ứng hình ảnh (Chạy được ở cả máy Owner và các máy Client khác)
         if (animator != null) animator.SetBool("IsMoving", netMoveInput.Value != Vector2.zero);
         
         if (spriteRenderer != null)
@@ -48,15 +56,17 @@ public class PlayerMovement : NetworkBehaviour
 
     void FixedUpdate()
     {
-        // Chỉ Server mới được tính toán vật lý di chuyển
-        if (!IsServer) return;
-        rb.linearVelocity = netMoveInput.Value * moveSpeed;
+        if (!IsServer || isMovementLocked || rb == null) return;
+
+        // Lấy tốc độ từ NetworkEntity của cha, nếu cha chưa có thì dùng tạm tốc độ mặc định là 5
+        float currentSpeed = (entity != null) ? entity.currentMoveSpeed.Value : 5f;
+        
+        rb.linearVelocity = netMoveInput.Value * currentSpeed;
     }
 
     private void SendInputToServer(Vector2 moveInput)
     {
-        // Gửi tọa độ nút bấm lên Server thông qua RPC
-        SetMoveInputServerRpc(moveInput);
+        if (IsSpawned) SetMoveInputServerRpc(moveInput);
     }
 
     [ServerRpc]
@@ -65,11 +75,52 @@ public class PlayerMovement : NetworkBehaviour
         netMoveInput.Value = input;
     }
 
+    public void ApplyTemporarySpeedMultiplier(float multiplier, float duration, float accelerationDuration = 0f)
+    {
+        if (!IsServer || entity == null) return;
+
+        if (speedBoostRoutine != null)
+        {
+            StopCoroutine(speedBoostRoutine);
+            entity.currentMoveSpeed.Value = entity.BaseMoveSpeed;
+        }
+
+        speedBoostRoutine = StartCoroutine(SpeedBoostRoutine(multiplier, duration, accelerationDuration));
+    }
+
+    private System.Collections.IEnumerator SpeedBoostRoutine(float multiplier, float duration, float accelerationDuration)
+    {
+        float baseSpeed = entity.BaseMoveSpeed;
+        float boostedSpeed = baseSpeed * multiplier;
+        float effectiveAccelerationDuration = Mathf.Min(accelerationDuration, duration);
+
+        if (effectiveAccelerationDuration > 0f)
+        {
+            float elapsed = 0f;
+            while (elapsed < effectiveAccelerationDuration)
+            {
+                elapsed += Time.deltaTime;
+                float progress = Mathf.Clamp01(elapsed / effectiveAccelerationDuration);
+                entity.currentMoveSpeed.Value = Mathf.Lerp(baseSpeed, boostedSpeed, progress);
+                yield return null;
+            }
+        }
+
+        entity.currentMoveSpeed.Value = boostedSpeed;
+        yield return new WaitForSeconds(Mathf.Max(0f, duration - effectiveAccelerationDuration));
+
+        entity.currentMoveSpeed.Value = baseSpeed;
+        speedBoostRoutine = null;
+    }
+
     public override void OnNetworkDespawn()
     {
         if (IsOwner && controller != null)
         {
             controller.OnMoveInputChanged -= SendInputToServer;
         }
+
+        if (speedBoostRoutine != null) StopCoroutine(speedBoostRoutine);
+        if (IsServer && entity != null) entity.currentMoveSpeed.Value = entity.BaseMoveSpeed;
     }
 }
