@@ -13,7 +13,6 @@ public class LoadPlayerUseCase
     {
         var profile = await _repository.LoadAsync();
         
-        // If it's a new player, return a fresh profile.
         return profile ?? new PlayerProfile(); 
     }
 }
