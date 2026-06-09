@@ -9,10 +9,8 @@ public class EnemyData : ScriptableObject
 
     [Header("Stats")]
     public int maxHealth = 150;
-    public EnemySpeedTier speedTier = EnemySpeedTier.Basic;
+    public float moveSpeed = 5f;
     public int attackDamage = 20;
     public float attackRange = 1.2f;
     public float attackCooldown = 1.25f;
-
-    public float MoveSpeed => speedTier.ToMoveSpeed();
 }

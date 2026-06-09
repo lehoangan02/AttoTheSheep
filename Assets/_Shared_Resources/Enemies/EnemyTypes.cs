@@ -10,35 +10,14 @@ public enum StageId
 
 public enum EnemyKind
 {
-    GreenSoldier,
-    BlackSoldier,
+    BlueKnight,
+    BlackKnight,
     PoisonSnake,
     PoisonSpider,
     Skeleton,
     Goblin,
     Wizard,
     GreatDemon
-}
-
-public enum EnemySpeedTier
-{
-    Slow,
-    Basic,
-    Fast
-}
-
-public static class EnemySpeedTierExtensions
-{
-    public static float ToMoveSpeed(this EnemySpeedTier tier)
-    {
-        return tier switch
-        {
-            EnemySpeedTier.Slow => 3.5f,
-            EnemySpeedTier.Basic => 5f,
-            EnemySpeedTier.Fast => 7f,
-            _ => throw new ArgumentOutOfRangeException(nameof(tier), tier, null)
-        };
-    }
 }
 
 [Serializable]
@@ -65,8 +44,8 @@ public static class EnemySpawnRuleCatalog
     {
         return new List<EnemySpawnRule>
         {
-            Create(EnemyKind.GreenSoldier, StageId.Farm, 1, 0, 10),
-            Create(EnemyKind.BlackSoldier, StageId.Farm, 3, 0, 10),
+            Create(EnemyKind.BlueKnight, StageId.Farm, 1, 0, 10),
+            Create(EnemyKind.BlackKnight, StageId.Farm, 3, 0, 10),
 
             Create(EnemyKind.PoisonSnake, StageId.DeepForest, 1, 0, 10),
             Create(EnemyKind.PoisonSpider, StageId.DeepForest, 4, 0, 10),

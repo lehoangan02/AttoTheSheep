@@ -6,7 +6,7 @@ public class EnemyEntity : NetworkEntity
     [SerializeField] private EnemyData data;
 
     public EnemyData Data => data;
-    public EnemyKind EnemyKind => data != null ? data.enemyKind : EnemyKind.GreenSoldier;
+    public EnemyKind EnemyKind => data != null ? data.enemyKind : EnemyKind.BlueKnight;
     public int AttackDamage => data != null ? data.attackDamage : 20;
     public float AttackRange => data != null ? data.attackRange : 1.2f;
     public float AttackCooldown => data != null ? data.attackCooldown : 1.25f;
@@ -35,7 +35,7 @@ public class EnemyEntity : NetworkEntity
         if (data == null) return;
 
         baseMaxHealth = data.maxHealth;
-        baseMoveSpeed = data.MoveSpeed;
+        baseMoveSpeed = data.moveSpeed;
         baseAttackDamage = data.attackDamage;
         baseAttackRange = data.attackRange;
     }
