@@ -29,16 +29,18 @@ public class EnemyTargeting : MonoBehaviour
     private static bool IsValidTarget(NetworkEntity candidate)
     {
         if (candidate == null) return false;
-        if (candidate is EnemyEntity) return false;
-        if (candidate.currentHealth.Value <= 0) return false;
+        // if (candidate is EnemyEntity) return false;
+        // if (candidate.currentHealth.Value <= 0) return false;
 
-        string tag = candidate.gameObject.tag;
+        // string tag = candidate.gameObject.tag;
 
-        return candidate.GetComponent<PlayerEntity>() != null
-            || candidate.GetComponentInChildren<PlayerController>() != null
-            || candidate.GetComponent<LambAI>() != null
-            || tag == "Player"
-            || tag == "Lamb"
-            || tag == "Sheep";
+        // return candidate.GetComponent<PlayerEntity>() != null
+        //     || candidate.GetComponentInChildren<PlayerController>() != null
+        //     || candidate.GetComponent<LambAI>() != null
+        //     || tag == "Player"
+        //     || tag == "Lamb"
+        //     || tag == "Sheep";
+
+        return candidate.CompareTag("Player");
     }
 }

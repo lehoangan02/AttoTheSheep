@@ -22,13 +22,14 @@ public class EnemyBrain : NetworkBehaviour
 
     private void FixedUpdate()
     {
-        if (!IsServer) return;
+        // if (!IsServer) return;
 
-        if (entity == null || !entity.IsAlive)
-        {
-            movement?.Stop();
-            return;
-        }
+        // if (entity == null || !entity.IsAlive)
+        // {
+        //     Debug.Log("EnemyBrain: Entity is null or not alive. Stopping movement.");
+        //     movement?.Stop();
+        //     return;
+        // }
 
         NetworkEntity target = targeting.FindNearestTarget(transform.position);
         if (target == null)
@@ -45,6 +46,7 @@ public class EnemyBrain : NetworkBehaviour
             return;
         }
 
-        movement.MoveToward(target.transform.position, entity.currentMoveSpeed.Value);
+        float moveSpeed = IsServer ? entity.currentMoveSpeed.Value : 5f;;
+        movement.MoveToward(target.transform.position, moveSpeed);
     }
 }
