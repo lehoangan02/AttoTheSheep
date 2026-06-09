@@ -15,6 +15,8 @@ public class PlayerMovement : NetworkBehaviour
     private NetworkVariable<Vector2> netMoveInput = new NetworkVariable<Vector2>(
         Vector2.zero, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server
     );
+    
+    private Vector2 localMoveInput;
 
     void Awake()
     {
@@ -45,27 +47,31 @@ public class PlayerMovement : NetworkBehaviour
 
     void Update()
     {
-        if (animator != null) animator.SetBool("IsMoving", netMoveInput.Value != Vector2.zero);
+        // Nếu là Owner thì dùng input nội bộ cho mượt, người khác nhìn vào thì dùng input mạng
+        Vector2 currentInput = IsOwner ? localMoveInput : netMoveInput.Value;
+        if (animator != null) animator.SetBool("IsMoving", currentInput != Vector2.zero);
         
         if (spriteRenderer != null)
         {
-            if (netMoveInput.Value.x > 0) spriteRenderer.flipX = false;
-            else if (netMoveInput.Value.x < 0) spriteRenderer.flipX = true;
+            if (currentInput.x > 0) spriteRenderer.flipX = false;
+            else if (currentInput.x < 0) spriteRenderer.flipX = true;
         }
     }
 
     void FixedUpdate()
     {
-        if (!IsServer || isMovementLocked || rb == null) return;
+        // Đổi IsServer thành IsOwner để khớp với Authority Mode: Owner trên NetworkTransform
+        if (!IsOwner || isMovementLocked || rb == null) return;
 
         // Lấy tốc độ từ NetworkEntity của cha, nếu cha chưa có thì dùng tạm tốc độ mặc định là 5
         float currentSpeed = (entity != null) ? entity.currentMoveSpeed.Value : 5f;
         
-        rb.linearVelocity = netMoveInput.Value * currentSpeed;
+        rb.linearVelocity = localMoveInput * currentSpeed;
     }
 
     private void SendInputToServer(Vector2 moveInput)
     {
+        localMoveInput = moveInput; // Lưu ngay lại trên máy Client để di chuyển tức thời
         if (IsSpawned) SetMoveInputServerRpc(moveInput);
     }
 
