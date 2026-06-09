@@ -4,6 +4,10 @@ using Unity.Netcode.Transports.UTP;
 using System.Net;
 using System.Net.Sockets;
 
+#if UNITY_EDITOR
+using ParrelSync;
+#endif
+
 public class NetworkDebugger : MonoBehaviour
 {
     [Header("Cài đặt Host Tự Động")]
@@ -13,6 +17,17 @@ public class NetworkDebugger : MonoBehaviour
 
     void Start()
     {
+#if UNITY_EDITOR
+        // Nếu đang chạy trong màn hình ParrelSync Clone -> Tự động Join làm Client
+        if (ClonesManager.IsClone())
+        {
+            Debug.Log("🔵 [DEBUGGER] Đây là màn hình Clone. Tự động kết nối làm Client...");
+            NetworkManager.Singleton.GetComponent<UnityTransport>().ConnectionData.Port = hostPort;
+            NetworkManager.Singleton.StartClient();
+            return;
+        }
+#endif
+
         Debug.Log("🟡 [DEBUGGER] 1. Khởi động game. Bắt đầu tự động Host...");
 
         if (NetworkManager.Singleton == null)
