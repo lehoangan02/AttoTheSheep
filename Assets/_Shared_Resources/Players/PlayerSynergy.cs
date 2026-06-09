@@ -42,27 +42,42 @@ public class PlayerSynergy : NetworkBehaviour
     {
         if (myFlock == null) return;
         
-        // Xem người chơi có đứng trong vòng sáng của bầy cừu không
+        // Xem người chơi có đứng trong vùng nào của bầy cừu không
         Vector3 parentPos = transform.parent != null ? transform.parent.position : transform.position;
-        bool isInsideFlock = myFlock.IsPositionInsideFlock(parentPos);
+        bool isInsideHealZone = myFlock.IsPositionInsideHealZone(parentPos);
+        bool isInsideSkillZone = myFlock.IsPositionInsideSkillZone(parentPos);
         
-        // Gửi thông tin (Số lượng cừu, Cấp độ bầy, Có đứng trong bầy không) lên Server
-        UpdateSynergyServerRpc(myFlock.activeLambs.Count, myFlock.GetFlockTier(), isInsideFlock);
+        // Gửi thông tin lên Server
+        UpdateSynergyServerRpc(myFlock.activeLambs.Count, myFlock.GetFlockTier(), isInsideHealZone, isInsideSkillZone, myFlock.HealScale, myFlock.ManaScale);
     }
 
     [ServerRpc]
-    private void UpdateSynergyServerRpc(int clientFlockSize, int flockTier, bool isClientInsideFlock)
+    private void UpdateSynergyServerRpc(int clientFlockSize, int flockTier, bool isInsideHealZone, bool isInsideSkillZone, float healScale, float manaScale)
     {
-        // 1. MỞ KHÓA CHIÊU THỨC: Nạp Cấp độ bầy vào Bảng Kỹ Năng
-        if (skills != null)
-        {
-            skills.unlockedSkillTier.Value = flockTier;
-        }
+        if (skills == null) return;
 
-        // 2. HỒI MÁU: Chỉ hồi khi đứng trong vòng của đàn cừu
-        if (isClientInsideFlock && clientFlockSize > 0 && entity != null)
+        // 0. CẬP NHẬT trạng thái "đang ở trong vùng skill" cho PlayerSkills
+        skills.isInsideFlock.Value = isInsideSkillZone;
+
+        // 1. MỞ KHÓA CHIÊU THỨC
+        skills.unlockedSkillTier.Value = flockTier;
+
+        // 2. HỒI PHỤC: Chỉ hồi khi đứng trong vùng heal của đàn cừu
+        if (isInsideHealZone && clientFlockSize > 0 && entity != null)
         {
-            entity.Heal(baseHealAmount + clientFlockSize);
+            // Hồi máu nếu chưa đầy
+            if (entity.currentHealth.Value < entity.BaseMaxHealth)
+            {
+                int healAmount = Mathf.RoundToInt(healScale * clientFlockSize);
+                entity.Heal(Mathf.Max(1, healAmount));
+            }
+
+            // Hồi mana nếu chưa đầy
+            if (entity.currentMana.Value < entity.BaseMaxMana)
+            {
+                int manaAmount = Mathf.RoundToInt(manaScale * clientFlockSize);
+                entity.RestoreMana(Mathf.Max(1, manaAmount));
+            }
         }
     }
 

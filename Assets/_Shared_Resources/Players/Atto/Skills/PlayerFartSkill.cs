@@ -78,12 +78,13 @@ public class PlayerFartSkill : BaseSkillComponent
                     NetworkHealth enemyHealth = hit.GetComponent<NetworkHealth>();
                     if (enemyHealth != null) enemyHealth.TakeDamage((int)data.damage);
 
-                    // Hất tung quái
+                    // Hất tung quái (topdown: hất theo hướng dash ra xa)
                     Rigidbody2D enemyRb = hit.GetComponent<Rigidbody2D>();
                     if (enemyRb != null)
                     {
                         enemyRb.linearVelocity = Vector2.zero; 
-                        enemyRb.AddForce(Vector2.up * data.knockupForce, ForceMode2D.Impulse);
+                        // Hất enemy bay xa theo hướng dash — phù hợp với game topdown
+                        enemyRb.AddForce(dashDir * data.knockupForce, ForceMode2D.Impulse);
                     }
                 }
             }

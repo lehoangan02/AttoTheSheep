@@ -8,6 +8,7 @@ public class PlayerRollingSkill : BaseSkillComponent
     [Header("Graphics References")]
     [SerializeField] private GameObject normalVisual;
     [SerializeField] private GameObject dustVisual;
+    [SerializeField] private Transform spinningPart; // Chỉ xoay child này, không xoay cả dustVisual
 
     [Header("Effects")]
     [SerializeField] private ParticleSystem dustParticle; 
@@ -28,7 +29,11 @@ public class PlayerRollingSkill : BaseSkillComponent
             );
 
             float dynamicRotationSpeed = currentData.baseRotationSpeed * currentSpeedMultiplier;
-            dustVisual.transform.Rotate(0, 0, -dynamicRotationSpeed * Time.deltaTime);
+            
+            // Chỉ xoay spinningPart (child bên trong dustVisual), không xoay dustVisual gốc
+            // để normalVisual (nếu là sibling) không bị ảnh hưởng
+            Transform target = spinningPart != null ? spinningPart : dustVisual.transform;
+            target.Rotate(0, 0, -dynamicRotationSpeed * Time.deltaTime);
         }
     }
 

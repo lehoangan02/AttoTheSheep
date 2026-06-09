@@ -33,6 +33,8 @@ public class NetworkEntity : NetworkBehaviour
     public float BaseMoveSpeed => baseMoveSpeed;
     public float BaseAttackRange => baseAttackRange;
     public float BaseAttackDamage => baseAttackDamage;
+    public int BaseMaxHealth => baseMaxHealth;
+    public int BaseMaxMana => baseMaxMana;
 
     public override void OnNetworkSpawn()
     {
@@ -41,6 +43,7 @@ public class NetworkEntity : NetworkBehaviour
             // Khởi tạo chỉ số gốc trên Server
             currentMoveSpeed.Value = baseMoveSpeed;
             currentHealth.Value = baseMaxHealth;
+            currentMana.Value = baseMaxMana;
         }
     }
 
