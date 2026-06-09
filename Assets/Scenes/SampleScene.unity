@@ -506,6 +506,23 @@ MonoBehaviour:
       MinSecondsBetweenUpdates: 0
       MaxSecondsBetweenUpdates: 0
     m_InternalValue: 0
+--- !u!114 &1767403256
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1767403248}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80d7c879794dfda4687da0e400131852, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.Components.NetworkRigidbody2D
+  ShowTopMostFoldoutHeaderGroup: 1
+  NetworkRigidbodyBaseExpanded: 0
+  UseRigidBodyForMotion: 0
+  AutoUpdateKinematicState: 1
+  AutoSetKinematicOnDespawn: 1
 --- !u!1 &1950565717
 GameObject:
   m_ObjectHideFlags: 0
@@ -803,6 +820,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 3163058720056023937, guid: 2383655e9508b453cbdd91bfb5669ff8, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1767403255}
+    - targetCorrespondingSourceObject: {fileID: 3163058720056023937, guid: 2383655e9508b453cbdd91bfb5669ff8, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1767403256}
   m_SourcePrefab: {fileID: 100100000, guid: 2383655e9508b453cbdd91bfb5669ff8, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
