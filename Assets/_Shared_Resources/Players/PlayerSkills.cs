@@ -18,6 +18,9 @@ public class PlayerSkills : NetworkBehaviour
     // Cấp độ bầy cừu (0: Không có cừu, 1: 3 cừu, 2: 6 cừu, 3: 10 cừu)
     public NetworkVariable<int> unlockedSkillTier = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
+    // Player có đang đứng trong vòng bán kính của bầy cừu không
+    public NetworkVariable<bool> isInsideFlock = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+
     [Header("Bảng Kỹ Năng Đang Lắp (Kéo thả vào đây)")]
     public List<SkillSlot> equippedSkills = new List<SkillSlot>();
 
@@ -46,6 +49,9 @@ public class PlayerSkills : NetworkBehaviour
         SkillSlot slot = GetSkillSlot(skillId);
         if (slot == null || slot.data == null || slot.logicScript == null) return;
 
+        // BƯỚC 0: KIỂM TRA PHẠM VI BẦY CỪU — Chỉ được dùng skill khi đứng trong vòng bán kính
+        if (!isInsideFlock.Value) return;
+
         // BƯỚC 1: KIỂM TRA ĐIỀU KIỆN UNLOCK TỰ ĐỘNG
         // Vì Đánh thường có skillId = 0, và unlockedSkillTier luôn >= 0, nó sẽ luôn luôn lọt qua bài Test này!
         if (skillId > unlockedSkillTier.Value) return;
@@ -65,6 +71,9 @@ public class PlayerSkills : NetworkBehaviour
     {
         SkillSlot slot = GetSkillSlot(skillId);
         if (slot == null || slot.data == null || slot.logicScript == null) return;
+
+        // Kiểm tra phạm vi bầy cừu trên Server (chống Hack)
+        if (!isInsideFlock.Value) return;
 
         // Kiểm tra lại trên Server chống Hack
         if (skillId > unlockedSkillTier.Value) return;
