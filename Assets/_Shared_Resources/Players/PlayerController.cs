@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Unity.Netcode;
 using System;
+using Unity.Collections;
 
 public class PlayerController : NetworkBehaviour
 {
@@ -61,5 +62,63 @@ public class PlayerController : NetworkBehaviour
             Vector2 mouseWorldPos = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
             OnMapClicked?.Invoke(mouseWorldPos);
         }
+    }
+
+
+    // section by lehoangan02
+    // shared variables
+    public struct PlayerPublicData : INetworkSerializable, IEquatable<PlayerPublicData>
+    {
+        public FixedString64Bytes playerName;
+        public void NetworkSerialize<T> (BufferSerializer<T> serializer) where T: IReaderWriter
+        {
+            serializer.SerializeValue(ref playerName);
+        }
+
+        // Bắt buộc phải có để NetworkVariable so sánh dữ liệu mới/cũ chính xác
+        public bool Equals(PlayerPublicData other)
+        {
+            return playerName == other.playerName;
+        }
+    }
+
+    public NetworkVariable<PlayerPublicData> netPlayerPublicData = new NetworkVariable<PlayerPublicData>(
+        new PlayerPublicData(), 
+        NetworkVariableReadPermission.Everyone, 
+        NetworkVariableWritePermission.Server
+    );
+
+    public override void OnNetworkSpawn()
+    {
+        Debug.Log($"[PlayerController] OnNetworkSpawn đang chạy trên: {gameObject.name}. IsOwner: {IsOwner}");
+        if (IsOwner)
+        {
+            // Tự động cấp một cái tên ngẫu nhiên ngay khi vừa spawn vào game
+            TestSetRandomName();
+        }
+    }
+
+    // --- TESTING SECTION ---
+    [ContextMenu("Test Set Random Name")]
+    public void TestSetRandomName()
+    {
+        Debug.Log($"[PlayerController] Thực thi lệnh TestSetRandomName. IsOwner của object này là: {IsOwner}");
+        if (IsOwner)
+        {
+            FixedString64Bytes newName = $"Player {UnityEngine.Random.Range(1000, 9999)}";
+            SetPlayerNameRpc(newName);
+            Debug.Log($"🟢 [LOCAL] Đã gửi yêu cầu Server đổi tên thành: {newName}");
+        }
+        else
+        {
+            Debug.LogWarning("🟡 [PlayerController] Bạn không phải Owner của Player này, không thể đổi tên!");
+        }
+    }
+
+    [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Owner)]
+    public void SetPlayerNameRpc(FixedString64Bytes newName)
+    {
+        netPlayerPublicData.Value = new PlayerPublicData { playerName = newName };
+        Debug.Log($"[SERVER] Đã phê duyệt và cập nhật tên thành {newName}");
     }
 }
