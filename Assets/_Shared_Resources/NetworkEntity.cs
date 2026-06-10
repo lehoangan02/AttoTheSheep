@@ -2,7 +2,7 @@ using UnityEngine;
 using Unity.Netcode;
 using System;
 
-// Lớp cha dùng chung cho mọi thực thể sống trong game
+// Common base class for all living entities in the game
 public class NetworkEntity : NetworkBehaviour
 {
     [Header("Base Entity Stats")]
@@ -40,14 +40,14 @@ public class NetworkEntity : NetworkBehaviour
     {
         if (IsServer)
         {
-            // Khởi tạo chỉ số gốc trên Server
+            // Initialize base stats on the Server
             currentMoveSpeed.Value = baseMoveSpeed;
             currentHealth.Value = baseMaxHealth;
             currentMana.Value = baseMaxMana;
         }
     }
 
-    // Các hàm tương tác cơ bản (Virtual để các class con có thể ghi đè/thay đổi)
+    // Basic interaction functions (Virtual so child classes can override/modify)
     public virtual void TakeDamage(int damage)
     {
         if (!IsServer || currentHealth.Value <= 0) return;
@@ -59,23 +59,23 @@ public class NetworkEntity : NetworkBehaviour
             Die();
         }
     }
-    // Hàm trừ Mana khi tung chiêu (Chỉ Server được trừ)
+    // Mana deduction function for casting skills (Only Server can deduct)
     public virtual bool ConsumeMana(int amount)
     {
         if (!IsServer) return false;
 
-        // Nếu đủ mana thì trừ và cho phép tung chiêu (trả về true)
+        // If enough mana, deduct and allow casting skill (return true)
         if (currentMana.Value >= amount)
         {
             currentMana.Value -= amount;
             return true;
         }
         
-        // Nếu không đủ mana thì báo false
+        // If not enough mana, return false
         return false;
     }
 
-    // Hàm hồi Mana (dùng cho bình thuốc hoặc tự hồi phục sau này)
+    // Mana restoration function (used for potions or auto-regen later)
     public virtual void RestoreMana(int amount)
     {
         if (!IsServer || currentHealth.Value <= 0) return;
@@ -94,7 +94,7 @@ public class NetworkEntity : NetworkBehaviour
     protected virtual void Die()
     {
         OnDied?.Invoke();
-        // Mặc định entity chết thì hủy trên mạng
+        // Default behavior: destroy entity on network when dead
         if (NetworkObject.IsSpawned)
         {
             NetworkObject.Despawn(true);

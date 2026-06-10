@@ -12,10 +12,10 @@ public class PlayerSynergy : NetworkBehaviour
 
     void Awake()
     {
-        // Tìm lõi chỉ số để hồi máu
+        // Find the stat core for healing
         entity = GetComponentInParent<NetworkEntity>();
         
-        // Tìm bảng Kỹ năng nằm cùng Object để mở khóa chiêu
+        // Find the Skill list on the same Object to unlock skills
         skills = GetComponent<PlayerSkills>(); 
     }
 
@@ -23,16 +23,16 @@ public class PlayerSynergy : NetworkBehaviour
     {
         if (IsOwner)
         {
-            myFlock = FindFirstObjectByType<FlockManager>();
+                myFlock = FindFirstObjectByType<FlockManager>();
 
             if (myFlock != null)
             {
-                // Bắt đầu vòng lặp kiểm tra bầy cừu (Mặc định 1 giây 1 lần)
+                // Start the flock checking loop (Defaults to once per second)
                 InvokeRepeating(nameof(CheckFlockSynergy), buffCheckInterval, buffCheckInterval);
             }
             else
             {
-                // [CHẾ ĐỘ MULTIPLAYER] Nếu không có cừu trên map, tự động mở khóa full chiêu (Tier 10)
+                // [MULTIPLAYER MODE] If there are no lambs on the map, automatically unlock all skills (Tier 10)
                 UpdateSkillTierServerRpc(10);
             }
         }
@@ -42,12 +42,12 @@ public class PlayerSynergy : NetworkBehaviour
     {
         if (myFlock == null) return;
         
-        // Xem người chơi có đứng trong vùng nào của bầy cừu không
+        // Check if the player is standing inside any flock zone
         Vector3 parentPos = transform.parent != null ? transform.parent.position : transform.position;
         bool isInsideHealZone = myFlock.IsPositionInsideHealZone(parentPos);
         bool isInsideSkillZone = myFlock.IsPositionInsideSkillZone(parentPos);
         
-        // Gửi thông tin lên Server
+        // Send information to the Server
         UpdateSynergyServerRpc(myFlock.activeLambs.Count, myFlock.GetFlockTier(), isInsideHealZone, isInsideSkillZone, myFlock.HealScale, myFlock.ManaScale);
     }
 
@@ -56,23 +56,23 @@ public class PlayerSynergy : NetworkBehaviour
     {
         if (skills == null) return;
 
-        // 0. CẬP NHẬT trạng thái "đang ở trong vùng skill" cho PlayerSkills
+        // 0. UPDATE "is inside skill zone" status for PlayerSkills
         skills.isInsideFlock.Value = isInsideSkillZone;
 
-        // 1. MỞ KHÓA CHIÊU THỨC
+        // 1. UNLOCK SKILLS
         skills.unlockedSkillTier.Value = flockTier;
 
-        // 2. HỒI PHỤC: Chỉ hồi khi đứng trong vùng heal của đàn cừu
+        // 2. RESTORE: Only heal when standing inside the flock's heal zone
         if (isInsideHealZone && clientFlockSize > 0 && entity != null)
         {
-            // Hồi máu nếu chưa đầy
+            // Heal if not full
             if (entity.currentHealth.Value < entity.BaseMaxHealth)
             {
                 int healAmount = Mathf.RoundToInt(healScale * clientFlockSize);
                 entity.Heal(Mathf.Max(1, healAmount));
             }
 
-            // Hồi mana nếu chưa đầy
+            // Restore mana if not full
             if (entity.currentMana.Value < entity.BaseMaxMana)
             {
                 int manaAmount = Mathf.RoundToInt(manaScale * clientFlockSize);
@@ -81,7 +81,7 @@ public class PlayerSynergy : NetworkBehaviour
         }
     }
 
-    // Hàm phụ trợ cho chế độ không có cừu
+    // Helper function for no-flock mode
     [ServerRpc]
     private void UpdateSkillTierServerRpc(int tier)
     {

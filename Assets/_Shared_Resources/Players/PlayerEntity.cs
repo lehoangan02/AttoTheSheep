@@ -1,24 +1,24 @@
 using UnityEngine;
 using Unity.Netcode;
 
-// KẾ THỪA TỪ LỚP CHUNG: Có sẵn mọi biến máu, tốc độ của NetworkEntity
+// INHERIT FROM COMMON CLASS: Has all health and speed variables from NetworkEntity
 public class PlayerEntity : NetworkEntity
 {
     public override void OnNetworkSpawn()
     {
-        base.OnNetworkSpawn(); // Vẫn gọi setup chỉ số gốc của lớp cha
+        base.OnNetworkSpawn(); // Still calls the parent class's base stat setup
         
         if (IsOwner)
         {
-            Debug.Log("Player Entity đã được spawn!");
+            Debug.Log("Player Entity has been spawned!");
         }
     }
 
-    // GHI ĐÈ LỚP CHA: Player chết thì báo Game Over thay vì xóa object
+    // OVERRIDE PARENT CLASS: Show Game Over when Player dies instead of deleting the object
     protected override void Die()
     {
         base.Die();
-        Debug.Log("Player đã bay màu! Hiện màn hình Game Over...");
-        // Logic hồi sinh, trừ tiền, v.v.
+        Debug.Log("Player has been defeated! Showing Game Over screen...");
+        // Logic for reviving, deducting coins, etc.
     }
 }

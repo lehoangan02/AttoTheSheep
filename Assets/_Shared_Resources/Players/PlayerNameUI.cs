@@ -19,13 +19,13 @@ public class PlayerNameUI : NetworkBehaviour
     {
         if (controller == null)
         {
-            Debug.LogError($"🔴 [PlayerNameUI] Không tìm thấy PlayerController ở Object cha của {gameObject.name}");
+            Debug.LogError($"🔴 [PlayerNameUI] Could not find PlayerController on parent Object of {gameObject.name}");
             return;
         }
 
         if (nameText == null)
         {
-            Debug.LogError($"🔴 [PlayerNameUI] Chưa kéo thả Text (TMP) vào biến 'Name Text' trong Inspector của {gameObject.name}");
+            Debug.LogError($"🔴 [PlayerNameUI] Text (TMP) is not assigned to the 'Name Text' variable in the Inspector for {gameObject.name}");
             return;
         }
 
@@ -43,7 +43,7 @@ public class PlayerNameUI : NetworkBehaviour
             string newNameStr = newValue.playerName.ToString();
             // Convert the FixedString64Bytes to a standard string
             nameText.text = newNameStr;
-            Debug.Log($"🟢 [PlayerNameUI] Cập nhật UI thành công: {newNameStr} cho {controller.gameObject.name}");
+            Debug.Log($"🟢 [PlayerNameUI] UI updated successfully: {newNameStr} for {controller.gameObject.name}");
         }
     }
 

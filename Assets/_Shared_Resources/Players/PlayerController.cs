@@ -6,13 +6,13 @@ using Unity.Collections;
 
 public class PlayerController : NetworkBehaviour
 {
-    // Các Event (Interface) để các component con cắm vào lấy dữ liệu
+    // Events (Interfaces) for child components to plug into and get data
     public event Action<Vector2> OnMoveInputChanged;
-    public event Action<int> OnSkillActivated; // Trả về ID của Skill (0, 1, 2, 3)
+    public event Action<int> OnSkillActivated; // Returns Skill ID (0, 1, 2, 3)
     public event Action<Vector2> OnMapClicked; 
 
     // ----------------------------------------------------
-    // NHẬN INPUT DI CHUYỂN
+    // RECEIVE MOVEMENT INPUT
     // ----------------------------------------------------
     public void OnMove(InputValue value)
     {
@@ -22,37 +22,37 @@ public class PlayerController : NetworkBehaviour
     }
 
     // ----------------------------------------------------
-    // NHẬN INPUT ĐÁNH THƯỜNG (SKILL 0) - Dòng này vừa được thêm!
+    // RECEIVE BASIC ATTACK INPUT (SKILL 0) - Recently added!
     // ----------------------------------------------------
     public void OnBasicAttack(InputValue value)
     {
         if (!IsOwner || !value.isPressed) return;
-        OnSkillActivated?.Invoke(0); // Gọi SkillSlot số 0
+        OnSkillActivated?.Invoke(0); // Call SkillSlot 0
     }
 
     // ----------------------------------------------------
-    // NHẬN INPUT CÁC KỸ NĂNG KHÁC (SKILL 1, 2, 3)
+    // RECEIVE OTHER SKILLS INPUT (SKILL 1, 2, 3)
     // ----------------------------------------------------
     public void OnSkill1(InputValue value)
     {
         if (!IsOwner || !value.isPressed) return;
-        OnSkillActivated?.Invoke(1); // Gọi SkillSlot số 1 (Lướt)
+        OnSkillActivated?.Invoke(1); // Call SkillSlot 1 (Dash)
     }
 
     public void OnSkill2(InputValue value)
     {
         if (!IsOwner || !value.isPressed) return;
-        OnSkillActivated?.Invoke(2); // Gọi SkillSlot số 2 (Đánh rắm)
+        OnSkillActivated?.Invoke(2); // Call SkillSlot 2 (Fart)
     }
 
     public void OnSkill3(InputValue value)
     {
         if (!IsOwner || !value.isPressed) return;
-        OnSkillActivated?.Invoke(3); // Gọi SkillSlot số 3 (Chiêu cuối)
+        OnSkillActivated?.Invoke(3); // Call SkillSlot 3 (Ultimate)
     }
 
     // ----------------------------------------------------
-    // NHẬN INPUT CLICK CHUỘT (Cho Bầy Cừu)
+    // RECEIVE MOUSE CLICK INPUT (For Flock)
     // ----------------------------------------------------
     public void OnClick(InputValue value)
     {
@@ -75,7 +75,7 @@ public class PlayerController : NetworkBehaviour
             serializer.SerializeValue(ref playerName);
         }
 
-        // Bắt buộc phải có để NetworkVariable so sánh dữ liệu mới/cũ chính xác
+        // Required for NetworkVariable to accurately compare old/new data
         public bool Equals(PlayerPublicData other)
         {
             return playerName == other.playerName;
@@ -90,10 +90,10 @@ public class PlayerController : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        Debug.Log($"[PlayerController] OnNetworkSpawn đang chạy trên: {gameObject.name}. IsOwner: {IsOwner}");
+        Debug.Log($"[PlayerController] OnNetworkSpawn is running on: {gameObject.name}. IsOwner: {IsOwner}");
         if (IsOwner)
         {
-            // Tự động cấp một cái tên ngẫu nhiên ngay khi vừa spawn vào game
+            // Automatically assign a random name upon spawning into the game
             TestSetRandomName();
         }
     }
@@ -102,16 +102,16 @@ public class PlayerController : NetworkBehaviour
     [ContextMenu("Test Set Random Name")]
     public void TestSetRandomName()
     {
-        Debug.Log($"[PlayerController] Thực thi lệnh TestSetRandomName. IsOwner của object này là: {IsOwner}");
+        Debug.Log($"[PlayerController] Executing TestSetRandomName command. IsOwner of this object is: {IsOwner}");
         if (IsOwner)
         {
             FixedString64Bytes newName = $"Player {UnityEngine.Random.Range(1000, 9999)}";
             SetPlayerNameRpc(newName);
-            Debug.Log($"🟢 [LOCAL] Đã gửi yêu cầu Server đổi tên thành: {newName}");
+            Debug.Log($"🟢 [LOCAL] Sent request to Server to change name to: {newName}");
         }
         else
         {
-            Debug.LogWarning("🟡 [PlayerController] Bạn không phải Owner của Player này, không thể đổi tên!");
+            Debug.LogWarning("🟡 [PlayerController] You are not the Owner of this Player, cannot change name!");
         }
     }
 
@@ -119,6 +119,6 @@ public class PlayerController : NetworkBehaviour
     public void SetPlayerNameRpc(FixedString64Bytes newName)
     {
         netPlayerPublicData.Value = new PlayerPublicData { playerName = newName };
-        Debug.Log($"[SERVER] Đã phê duyệt và cập nhật tên thành {newName}");
+        Debug.Log($"[SERVER] Approved and updated name to {newName}");
     }
 }

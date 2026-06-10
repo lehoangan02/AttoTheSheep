@@ -1,18 +1,16 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System;
-using Unity.Netcode;
 
-public class FlockManager : NetworkBehaviour
+public class FlockManager : MonoBehaviour
 {
     [Header("Flock Settings")]
     [SerializeField] private GameObject lambPrefab;
     [SerializeField] private int initialLambCount = 5;
     [SerializeField] private float baseRadius = 1f;
-    [SerializeField] private float radiusMultiplier = 0.5f;
-    [SerializeField] private float skillRadiusMultiplier = 2f;
+    [SerializeField] private float radiusMultiplier = 0.5f; 
 
-    [Header("Mốc Unlock Skill")]
+    [Header("Skill Unlock Milestones")]
     [SerializeField] private int lambsForSkill1 = 3;
     [SerializeField] private int lambsForSkill2 = 6;
     [SerializeField] private int lambsForSkill3 = 10;
@@ -20,39 +18,33 @@ public class FlockManager : NetworkBehaviour
     [Header("Auto Spawn Settings")]
     [SerializeField] private bool enableAutoSpawn = true;
     [SerializeField] private float autoSpawnInterval = 10f;
-    private float spawnTimer = 0f;
-
-    [Header("Regeneration Settings")]
-    [SerializeField] private float healScale = 5f;
-    [SerializeField] private float manaScale = 5f;
-
-    public float HealScale => healScale;
-    public float ManaScale => manaScale;
+    private float spawnTimer = 0f; 
 
     [Header("Debug Settings")]
     [SerializeField] private bool showDebugRadius = true;
 
     public List<LambAI> activeLambs { get; private set; } = new List<LambAI>();
-    public Vector2 currentFlockCenter { get; private set; }
+    public Vector2 currentFlockCenter { get; private set; } 
     public float currentFlockRadius { get; private set; }
-    public float currentSkillRadius { get; private set; }
+
+    [Header("Synergy Settings")]
+    [SerializeField] private float healScale = 1f;
+    [SerializeField] private float manaScale = 1f;
+    public float HealScale => healScale;
+    public float ManaScale => manaScale;
 
     public event Action<int> OnFlockTierChanged;
 
-    private PlayerController currentPlayer;
+    private PlayerController currentPlayer; // Store player reference to avoid redundant searches
 
-    public override void OnNetworkSpawn()
+    void Start()
     {
-        if (!IsServer) return;
-
         currentFlockCenter = transform.position;
         SpawnInitialFlock();
     }
 
     void Update()
     {
-        if (!IsServer) return;
-
         if (currentPlayer == null)
         {
             currentPlayer = FindFirstObjectByType<PlayerController>();
@@ -64,10 +56,10 @@ public class FlockManager : NetworkBehaviour
 
         if (enableAutoSpawn)
         {
-            spawnTimer += Time.deltaTime;
+            spawnTimer += Time.deltaTime; 
             if (spawnTimer >= autoSpawnInterval)
             {
-                spawnTimer = 0f;
+                spawnTimer = 0f; 
                 SpawnLamb(currentFlockCenter);
             }
         }
@@ -85,22 +77,11 @@ public class FlockManager : NetworkBehaviour
     public void SpawnLamb(Vector2 position)
     {
         GameObject lambObj = Instantiate(lambPrefab, position, Quaternion.identity);
-
-        NetworkObject netObj = lambObj.GetComponent<NetworkObject>();
-        if (netObj != null)
-        {
-            netObj.Spawn(true);
-        }
-        else
-        {
-            Debug.LogError("LambPrefab của bạn chưa được gắn Component NetworkObject!");
-            return;
-        }
-
+        
         LambAI lambAI = lambObj.GetComponent<LambAI>();
         if (lambAI != null)
         {
-            lambAI.Initialize(this);
+            lambAI.Initialize(this); 
             activeLambs.Add(lambAI);
             UpdateFlockRadius();
             OnFlockTierChanged?.Invoke(GetFlockTier());
@@ -119,10 +100,7 @@ public class FlockManager : NetworkBehaviour
 
     private void UpdateFlockRadius()
     {
-        // Vùng hồi máu + giới hạn di chuyển của cừu
         currentFlockRadius = baseRadius + (radiusMultiplier * Mathf.Sqrt(activeLambs.Count));
-        // Vùng cho phép dùng skill (rộng hơn)
-        currentSkillRadius = currentFlockRadius * skillRadiusMultiplier;
         CommandFlock(currentFlockCenter);
     }
 
@@ -149,35 +127,35 @@ public class FlockManager : NetworkBehaviour
         if (activeLambs.Count >= lambsForSkill3) return 3;
         if (activeLambs.Count >= lambsForSkill2) return 2;
         if (activeLambs.Count >= lambsForSkill1) return 1;
-        return 0;
+        return 0; 
     }
 
     private void OnDrawGizmos()
     {
         if (showDebugRadius)
         {
-            // Vùng hồi máu (màu vàng)
             Gizmos.color = Color.yellow;
             Gizmos.DrawWireSphere(currentFlockCenter, currentFlockRadius);
-            // Vùng skill (màu xanh cyan, rộng hơn)
-            Gizmos.color = Color.cyan;
-            Gizmos.DrawWireSphere(currentFlockCenter, currentSkillRadius);
         }
     }
 
-    public bool IsPositionInsideHealZone(Vector2 targetPosition)
+    public bool IsPositionInsideFlock(Vector2 targetPosition)
     {
         float dist = Vector2.Distance(targetPosition, currentFlockCenter);
         return dist <= currentFlockRadius;
     }
 
-    public bool IsPositionInsideSkillZone(Vector2 targetPosition)
+    public bool IsPositionInsideHealZone(Vector2 targetPosition)
     {
-        float dist = Vector2.Distance(targetPosition, currentFlockCenter);
-        return dist <= currentSkillRadius;
+        return IsPositionInsideFlock(targetPosition);
     }
 
-    public override void OnNetworkDespawn()
+    public bool IsPositionInsideSkillZone(Vector2 targetPosition)
+    {
+        return IsPositionInsideFlock(targetPosition);
+    }
+
+    void OnDestroy()
     {
         if (currentPlayer != null)
         {

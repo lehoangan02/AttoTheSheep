@@ -1,7 +1,7 @@
 using UnityEngine;
 using Unity.Netcode;
 
-[RequireComponent(typeof(NetworkEntity))] // Cừu vẫn dùng lõi OOP chung để có Máu/Tốc độ
+[RequireComponent(typeof(NetworkEntity))] // Lambs still use the common OOP core for Health/Speed
 public class LambAI : NetworkBehaviour
 {
     [Header("Movement Settings")]
@@ -46,7 +46,7 @@ public class LambAI : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        // Đăng ký sự kiện: Khi Entity báo máu = 0 -> Xóa khỏi bầy
+        // Register event: When Entity reports health = 0 -> Remove from flock
         entity.OnDied += HandleLambDeath;
     }
 
@@ -65,7 +65,7 @@ public class LambAI : NetworkBehaviour
 
     void FixedUpdate()
     {
-        // Chốt chặn an toàn: Nếu chưa kết nối mạng hoặc không phải máy chủ thì không tính toán
+        // Safety check: If not spawned or not the server, do not calculate
         if (!IsSpawned || !IsServer) return; 
 
         if (!hasTarget) 
@@ -82,7 +82,7 @@ public class LambAI : NetworkBehaviour
         {
             Vector2 direction = (actualTarget - (Vector2)transform.position).normalized;
             
-            // ĐỌC CHỈ SỐ: Lấy tốc độ từ lõi OOP NetworkEntity
+            // READ STATS: Get speed from the OOP core NetworkEntity
             float maxSpeedWithNoise = entity.currentMoveSpeed.Value * personalSpeedMultiplier;
             float targetSpeed = maxSpeedWithNoise;
             
@@ -93,7 +93,6 @@ public class LambAI : NetworkBehaviour
 
             Vector2 desiredVelocity = direction * targetSpeed;
             rb.linearVelocity = Vector2.Lerp(rb.linearVelocity, desiredVelocity, accelerationRate * Time.fixedDeltaTime);
-
             UpdateAnimationLocal(true);
         }
         else
@@ -105,7 +104,7 @@ public class LambAI : NetworkBehaviour
     }
 
     // ==========================================
-    // HÀM LOCAL: KHÔNG CẦN DÙNG RPC CHO SINGLEPLAYER
+    // LOCAL FUNCTION: NO NEED TO USE RPC
     // ==========================================
     private void UpdateAnimationLocal(bool isMoving)
     {
@@ -130,11 +129,11 @@ public class LambAI : NetworkBehaviour
     {
         if (!IsServer) return;
 
-        // Cơ chế OOP: Bị quái chạm vào sẽ mất máu (thay vì chết ngay)
+        // OOP Mechanism: Touching an enemy causes health loss (instead of instant death)
         if (collision.gameObject.CompareTag("Enemy"))
         {
-            // Trừ máu thông qua hàm của lớp cha NetworkEntity
-            // Bạn có thể lấy damage của Enemy truyền vào, ở đây ví dụ là 20 sát thương
+            // Deduct health through the parent class NetworkEntity's function
+            // You can pass the Enemy's damage in, here for example it is 20 damage
             entity.TakeDamage(20); 
         }
     }

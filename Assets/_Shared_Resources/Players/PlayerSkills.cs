@@ -15,13 +15,13 @@ public class PlayerSkills : NetworkBehaviour
     private PlayerController controller;
     private NetworkEntity entity;
 
-    // Cấp độ bầy cừu (0: Không có cừu, 1: 3 cừu, 2: 6 cừu, 3: 10 cừu)
+    // Flock tier (0: No flock, 1: 3 lambs, 2: 6 lambs, 3: 10 lambs)
     public NetworkVariable<int> unlockedSkillTier = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
-    // Player có đang đứng trong vòng bán kính của bầy cừu không
+    // Is the player standing within the flock's radius
     public NetworkVariable<bool> isInsideFlock = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
-    [Header("Bảng Kỹ Năng Đang Lắp (Kéo thả vào đây)")]
+    [Header("Equipped Skill Board (Drag and drop here)")]
     public List<SkillSlot> equippedSkills = new List<SkillSlot>();
 
     private Dictionary<int, float> lastCastTimes = new Dictionary<int, float>();
@@ -49,14 +49,14 @@ public class PlayerSkills : NetworkBehaviour
         SkillSlot slot = GetSkillSlot(skillId);
         if (slot == null || slot.data == null || slot.logicScript == null) return;
 
-        // BƯỚC 0: KIỂM TRA PHẠM VI BẦY CỪU — Chỉ được dùng skill khi đứng trong vòng bán kính
+        // STEP 0: CHECK FLOCK RANGE — Skills can only be used when inside the radius
         if (!isInsideFlock.Value) return;
 
-        // BƯỚC 1: KIỂM TRA ĐIỀU KIỆN UNLOCK TỰ ĐỘNG
-        // Vì Đánh thường có skillId = 0, và unlockedSkillTier luôn >= 0, nó sẽ luôn luôn lọt qua bài Test này!
+        // STEP 1: CHECK AUTO-UNLOCK CONDITION
+        // Since Basic Attack has skillId = 0, and unlockedSkillTier >= 0, it will always pass this test!
         if (skillId > unlockedSkillTier.Value) return;
 
-        // BƯỚC 2: CHECK COOLDOWN (Tốc độ đánh)
+        // STEP 2: CHECK COOLDOWN (Attack speed)
         if (lastCastTimes.TryGetValue(skillId, out float lastTime))
         {
             if (Time.time < lastTime + slot.data.cooldown) return; 
@@ -72,22 +72,22 @@ public class PlayerSkills : NetworkBehaviour
         SkillSlot slot = GetSkillSlot(skillId);
         if (slot == null || slot.data == null || slot.logicScript == null) return;
 
-        // Kiểm tra phạm vi bầy cừu trên Server (chống Hack)
+        // Check flock range on Server (Anti-hack)
         if (!isInsideFlock.Value) return;
 
-        // Kiểm tra lại trên Server chống Hack
+        // Double check on Server to prevent Hack
         if (skillId > unlockedSkillTier.Value) return;
 
-        // BƯỚC 3: TRỪ MANA (Nếu skill đó có set manaCost > 0)
+        // STEP 3: DEDUCT MANA (If skill has manaCost > 0)
         if (slot.data.manaCost > 0)
         {
             if (entity != null && !entity.ConsumeMana((int)slot.data.manaCost)) return;
         }
 
-        // BƯỚC 4: KÍCH HOẠT LOGIC TRÊN SERVER (Đánh thường, Rắm, Lướt, v.v.)
+        // STEP 4: TRIGGER SERVER LOGIC (Basic Attack, Fart, Dash, etc.)
         slot.logicScript.ServerExecute(slot.data, entity, controller);
 
-        // BƯỚC 5: PHÁT ĐỘNG HÌNH ẢNH TRÊN MỌI CLIENT
+        // STEP 5: TRIGGER VISUALS ON ALL CLIENTS
         PlaySkillVisualClientRpc(skillId);
     }
 

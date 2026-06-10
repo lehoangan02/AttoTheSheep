@@ -7,13 +7,13 @@ public class NetworkHealth : NetworkBehaviour
     public NetworkVariable<int> currentHealth = new NetworkVariable<int>(100, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
     [SerializeField] private int maxHealth = 100;
 
-    // Interface/Event cho các hệ thống UI cắm vào
+    // Interface/Event for UI systems to plug into
     public event Action<int, int> OnHealthChangedInterface;
 
     public override void OnNetworkSpawn()
     {
         currentHealth.OnValueChanged += OnHealthVariableChanged;
-        // Cập nhật UI phát đầu tiên
+        // Initial UI update
         OnHealthChangedInterface?.Invoke(currentHealth.Value, maxHealth);
     }
 
@@ -22,27 +22,27 @@ public class NetworkHealth : NetworkBehaviour
         OnHealthChangedInterface?.Invoke(newVal, maxHealth);
     }
 
-    // Hàm gọi từ Server khi dính chiêu từ PlayerSkills của đối thủ
+    // Function called from Server when hit by opponent's PlayerSkills
     public void TakeDamage(int damageAmount)
     {
         if (!IsServer) return;
 
         currentHealth.Value = Mathf.Max(0, currentHealth.Value - damageAmount);
-        Debug.Log($"[SERVER] Player {OwnerClientId} trúng {damageAmount} sát thương. Máu còn: {currentHealth.Value}");
+        Debug.Log($"[SERVER] Player {OwnerClientId} took {damageAmount} damage. Remaining HP: {currentHealth.Value}");
 
         if (currentHealth.Value <= 0)
         {
-            Debug.Log($"[SERVER] Player {OwnerClientId} ĐÃ CHẾT!");
+            Debug.Log($"[SERVER] Player {OwnerClientId} HAS DIED!");
         }
     }
-    // Hàm gọi từ Server để hồi máu (Do PlayerSynergy yêu cầu)
+    // Function called from Server to heal (Requested by PlayerSynergy)
     public void Heal(int healAmount)
     {
-        if (!IsServer) return; // Chỉ Server mới được phép đổi máu
+        if (!IsServer) return; // Only Server is allowed to change health
 
-        // Cộng máu nhưng không được vượt quá maxHealth
+        // Add health but do not exceed maxHealth
         currentHealth.Value = Mathf.Min(maxHealth, currentHealth.Value + healAmount);
-        Debug.Log($"[SERVER] Player {OwnerClientId} được hồi {healAmount} máu. Máu hiện tại: {currentHealth.Value}");
+        Debug.Log($"[SERVER] Player {OwnerClientId} was healed for {healAmount} HP. Current HP: {currentHealth.Value}");
     }
 
     public override void OnNetworkDespawn()

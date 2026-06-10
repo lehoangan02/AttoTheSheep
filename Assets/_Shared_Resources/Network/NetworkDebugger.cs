@@ -10,7 +10,7 @@ using ParrelSync;
 
 public class NetworkDebugger : MonoBehaviour
 {
-    [Header("Cài đặt Host Tự Động")]
+    [Header("Auto Host Settings")]
     [SerializeField] private ushort hostPort = 7777;
     [SerializeField] private bool autoFallbackPort = true;
     [SerializeField, Min(1)] private int fallbackPortAttempts = 10;
@@ -18,21 +18,21 @@ public class NetworkDebugger : MonoBehaviour
     void Start()
     {
 #if UNITY_EDITOR
-        // Nếu đang chạy trong màn hình ParrelSync Clone -> Tự động Join làm Client
+        // If running in ParrelSync Clone -> Automatically join as Client
         if (ClonesManager.IsClone())
         {
-            Debug.Log("🔵 [DEBUGGER] Đây là màn hình Clone. Tự động kết nối làm Client...");
+            Debug.Log("🔵 [DEBUGGER] This is a Clone window. Automatically connecting as Client...");
             NetworkManager.Singleton.GetComponent<UnityTransport>().ConnectionData.Port = hostPort;
             NetworkManager.Singleton.StartClient();
             return;
         }
 #endif
 
-        Debug.Log("🟡 [DEBUGGER] 1. Khởi động game. Bắt đầu tự động Host...");
+        Debug.Log("🟡 [DEBUGGER] 1. Starting game. Auto Hosting...");
 
         if (NetworkManager.Singleton == null)
         {
-            Debug.LogError("🔴 [DEBUGGER] LỖI TRÍ MẠNG: Không tìm thấy NetworkManager trong Scene! Hãy tạo NetworkManager ngay.");
+            Debug.LogError("🔴 [DEBUGGER] FATAL ERROR: NetworkManager not found in the Scene! Please create a NetworkManager.");
             return;
         }
 
@@ -43,18 +43,18 @@ public class NetworkDebugger : MonoBehaviour
     {
         if (NetworkManager.Singleton.IsClient || NetworkManager.Singleton.IsServer)
         {
-            Debug.LogWarning("🟡 [DEBUGGER] NetworkManager đã chạy rồi, bỏ qua lệnh Host mới.");
+            Debug.LogWarning("🟡 [DEBUGGER] NetworkManager is already running, skipping new Host command.");
             return;
         }
 
         UnityTransport transport = NetworkManager.Singleton.GetComponent<UnityTransport>();
         if (transport == null)
         {
-            Debug.LogError("🔴 [DEBUGGER] Không tìm thấy UnityTransport trên NetworkManager.");
+            Debug.LogError("🔴 [DEBUGGER] UnityTransport not found on NetworkManager.");
             return;
         }
 
-        // Tự động tìm cổng (port) đang rảnh để tránh lỗi "Address already in use"
+        // Automatically find a free port to avoid "Address already in use" error
         int attempts = autoFallbackPort ? Mathf.Max(1, fallbackPortAttempts) : 1;
         for (int i = 0; i < attempts; i++)
         {
@@ -64,29 +64,29 @@ public class NetworkDebugger : MonoBehaviour
             ushort portToTry = (ushort)portCandidate;
             if (!IsUdpPortAvailable(portToTry))
             {
-                Debug.LogWarning($"🟡 [DEBUGGER] Cổng UDP {portToTry} đang bận, thử cổng kế tiếp...");
+                Debug.LogWarning($"🟡 [DEBUGGER] UDP Port {portToTry} is busy, trying next port...");
                 continue;
             }
 
-            // Gán cổng rảnh cho transport và khởi động
+            // Assign free port to transport and start
             transport.ConnectionData.Port = portToTry;
-            Debug.Log($"🟡 [DEBUGGER] 2. Đang ra lệnh StartHost() trên cổng {portToTry}...");
+            Debug.Log($"🟡 [DEBUGGER] 2. Issuing StartHost() command on port {portToTry}...");
 
             if (NetworkManager.Singleton.StartHost())
             {
-                Debug.Log($"🟢 [DEBUGGER] 3. THÀNH CÔNG! Host đã khởi chạy. Kiểm tra xem Atto đã Spawn chưa?");
+                Debug.Log($"🟢 [DEBUGGER] 3. SUCCESS! Host has started. Check if Atto has Spawned.");
                 return;
             }
 
-            // Nếu thất bại dù cổng báo rảnh, tắt đi thử lại
+            // If failed despite port being free, shut down and retry
             NetworkManager.Singleton.Shutdown();
         }
 
         int lastPort = Mathf.Min(ushort.MaxValue, hostPort + attempts - 1);
-        Debug.LogError($"🔴 [DEBUGGER] 4. THẤT BẠI! Không bind được cổng nào từ {hostPort} đến {lastPort}. Hãy đóng các phần mềm khác đang chiếm cổng.");
+        Debug.LogError($"🔴 [DEBUGGER] 4. FAILED! Could not bind any port from {hostPort} to {lastPort}. Close other applications occupying the ports.");
     }
 
-    // Hàm kiểm tra xem Port có đang bị ứng dụng khác (hoặc Unity cũ) chiếm không
+    // Function to check if Port is currently occupied by another app (or older Unity instance)
     private static bool IsUdpPortAvailable(ushort port)
     {
         try

@@ -5,7 +5,7 @@ public class PlayerMovement : NetworkBehaviour
 {
     private Rigidbody2D rb;
     private PlayerController controller;
-    private NetworkEntity entity; // Kéo lõi chỉ số từ Cha
+    private NetworkEntity entity; // Get core stats from Parent
     private SpriteRenderer spriteRenderer;
     private Animator animator;
     private Coroutine speedBoostRoutine;
@@ -20,21 +20,21 @@ public class PlayerMovement : NetworkBehaviour
 
     void Awake()
     {
-        // Tìm các thành phần cốt lõi ở Object Cha (Atto)
+        // Find core components on the Parent Object (Atto)
         rb = GetComponentInParent<Rigidbody2D>();
         controller = GetComponentInParent<PlayerController>();
         entity = GetComponentInParent<NetworkEntity>();
 
-        // Tìm kiếm hình ảnh và hoạt ảnh trong toàn bộ các Object con của Atto
+        // Search for sprite and animator in all child Objects of Atto
         if (transform.parent != null)
         {
             spriteRenderer = transform.parent.GetComponentInChildren<SpriteRenderer>();
             animator = transform.parent.GetComponentInChildren<Animator>();
         }
 
-        // Bẫy lỗi tự động để check nhanh trong Inspector
-        if (rb == null) Debug.LogError($"[{gameObject.name}]: Thiếu Rigidbody2D trên Object Cha!");
-        if (entity == null) Debug.LogError($"[{gameObject.name}]: Thiếu NetworkEntity trên Object Cha!");
+        // Automatic error trapping for quick Inspector checks
+        if (rb == null) Debug.LogError($"[{gameObject.name}]: Missing Rigidbody2D on Parent Object!");
+        if (entity == null) Debug.LogError($"[{gameObject.name}]: Missing NetworkEntity on Parent Object!");
     }
 
     public override void OnNetworkSpawn()
@@ -47,7 +47,7 @@ public class PlayerMovement : NetworkBehaviour
 
     void Update()
     {
-        // Nếu là Owner thì dùng input nội bộ cho mượt, người khác nhìn vào thì dùng input mạng
+        // Use local input for smoothness if Owner, others use network input
         Vector2 currentInput = IsOwner ? localMoveInput : netMoveInput.Value;
         if (animator != null) animator.SetBool("IsMoving", currentInput != Vector2.zero);
         
@@ -60,10 +60,10 @@ public class PlayerMovement : NetworkBehaviour
 
     void FixedUpdate()
     {
-        // Đổi IsServer thành IsOwner để khớp với Authority Mode: Owner trên NetworkTransform
+        // Change IsServer to IsOwner to match Authority Mode: Owner on NetworkTransform
         if (!IsOwner || isMovementLocked || rb == null) return;
 
-        // Lấy tốc độ từ NetworkEntity của cha, nếu cha chưa có thì dùng tạm tốc độ mặc định là 5
+        // Get speed from parent's NetworkEntity, use default 5 if not available
         float currentSpeed = (entity != null) ? entity.currentMoveSpeed.Value : 5f;
         
         rb.linearVelocity = localMoveInput * currentSpeed;
@@ -71,7 +71,7 @@ public class PlayerMovement : NetworkBehaviour
 
     private void SendInputToServer(Vector2 moveInput)
     {
-        localMoveInput = moveInput; // Lưu ngay lại trên máy Client để di chuyển tức thời
+        localMoveInput = moveInput; // Save locally on Client for immediate movement
         if (IsSpawned) SetMoveInputServerRpc(moveInput);
     }
 
