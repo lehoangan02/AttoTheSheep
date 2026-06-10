@@ -75,8 +75,8 @@ public class PlayerFartSkill : BaseSkillComponent
                     Debug.Log($"💥 [LOGIC LOG] Tông trúng mục tiêu: {hit.gameObject.name}! Gây {data.damage} sát thương.");
                     
                     // Trừ máu quái
-                    NetworkEntity enemyEntity = hit.GetComponent<NetworkEntity>();
-                    if (enemyEntity != null) enemyEntity.TakeDamage((int)data.damage);
+                    NetworkHealth enemyHealth = hit.GetComponent<NetworkHealth>();
+                    if (enemyHealth != null) enemyHealth.TakeDamage((int)data.damage);
 
                     // Hất tung quái
                     Rigidbody2D enemyRb = hit.GetComponent<Rigidbody2D>();
