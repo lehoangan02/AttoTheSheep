@@ -1,7 +1,7 @@
 using UnityEngine;
 using Unity.Netcode;
 
-public class PlayerSynergy : NetworkBehaviour
+public class PlayerFlockBuffs : NetworkBehaviour
 {
     private FlockManager myFlock;
     private NetworkEntity entity; 
@@ -28,7 +28,7 @@ public class PlayerSynergy : NetworkBehaviour
             if (myFlock != null)
             {
                 // Start the flock checking loop (Defaults to once per second)
-                InvokeRepeating(nameof(CheckFlockSynergy), buffCheckInterval, buffCheckInterval);
+                InvokeRepeating(nameof(CheckFlockBuffs), buffCheckInterval, buffCheckInterval);
             }
             else
             {
@@ -38,7 +38,7 @@ public class PlayerSynergy : NetworkBehaviour
         }
     }
 
-    private void CheckFlockSynergy()
+    private void CheckFlockBuffs()
     {
         if (myFlock == null) return;
         
@@ -48,11 +48,11 @@ public class PlayerSynergy : NetworkBehaviour
         bool isInsideSkillZone = myFlock.IsPositionInsideSkillZone(parentPos);
         
         // Send information to the Server
-        UpdateSynergyServerRpc(myFlock.activeLambs.Count, myFlock.GetFlockTier(), isInsideHealZone, isInsideSkillZone, myFlock.HealScale, myFlock.ManaScale);
+        UpdateBuffsServerRpc(myFlock.activeLambs.Count, myFlock.GetFlockTier(), isInsideHealZone, isInsideSkillZone, myFlock.HealScale, myFlock.ManaScale);
     }
 
     [ServerRpc]
-    private void UpdateSynergyServerRpc(int clientFlockSize, int flockTier, bool isInsideHealZone, bool isInsideSkillZone, float healScale, float manaScale)
+    private void UpdateBuffsServerRpc(int clientFlockSize, int flockTier, bool isInsideHealZone, bool isInsideSkillZone, float healScale, float manaScale)
     {
         if (skills == null) return;
 

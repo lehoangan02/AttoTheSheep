@@ -35,7 +35,7 @@ public class NetworkHealth : NetworkBehaviour
             Debug.Log($"[SERVER] Player {OwnerClientId} HAS DIED!");
         }
     }
-    // Function called from Server to heal (Requested by PlayerSynergy)
+    // Function called from Server to heal (Requested by PlayerFlockBuffs)
     public void Heal(int healAmount)
     {
         if (!IsServer) return; // Only Server is allowed to change health

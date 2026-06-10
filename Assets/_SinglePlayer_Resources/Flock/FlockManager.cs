@@ -1,8 +1,9 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System;
+using Unity.Netcode;
 
-public class FlockManager : MonoBehaviour
+public class FlockManager : NetworkBehaviour
 {
     [Header("Flock Settings")]
     [SerializeField] private GameObject lambPrefab;
@@ -27,7 +28,7 @@ public class FlockManager : MonoBehaviour
     public Vector2 currentFlockCenter { get; private set; } 
     public float currentFlockRadius { get; private set; }
 
-    [Header("Synergy Settings")]
+    [Header("Flock Buff Settings")]
     [SerializeField] private float healScale = 1f;
     [SerializeField] private float manaScale = 1f;
     public float HealScale => healScale;
@@ -37,10 +38,13 @@ public class FlockManager : MonoBehaviour
 
     private PlayerController currentPlayer; // Store player reference to avoid redundant searches
 
-    void Start()
+    public override void OnNetworkSpawn()
     {
-        currentFlockCenter = transform.position;
-        SpawnInitialFlock();
+        if (IsServer)
+        {
+            currentFlockCenter = transform.position;
+            SpawnInitialFlock();
+        }
     }
 
     void Update()
@@ -76,8 +80,14 @@ public class FlockManager : MonoBehaviour
 
     public void SpawnLamb(Vector2 position)
     {
+        if (!IsServer) return;
+
         GameObject lambObj = Instantiate(lambPrefab, position, Quaternion.identity);
         
+        // Register the lamb with the network so it gets a unique ID and doesn't crash the scene sweep
+        NetworkObject netObj = lambObj.GetComponent<NetworkObject>();
+        if (netObj != null) netObj.Spawn(true);
+
         LambAI lambAI = lambObj.GetComponent<LambAI>();
         if (lambAI != null)
         {
@@ -155,7 +165,7 @@ public class FlockManager : MonoBehaviour
         return IsPositionInsideFlock(targetPosition);
     }
 
-    void OnDestroy()
+    public override void OnNetworkDespawn()
     {
         if (currentPlayer != null)
         {
