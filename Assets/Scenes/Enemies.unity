@@ -352,13 +352,11 @@ GameObject:
   - component: {fileID: 380390375}
   - component: {fileID: 380390368}
   - component: {fileID: 380390378}
-  - component: {fileID: 380390370}
-  - component: {fileID: 380390374}
-  - component: {fileID: 380390373}
-  - component: {fileID: 380390372}
-  - component: {fileID: 380390371}
   - component: {fileID: 380390376}
   - component: {fileID: 380390377}
+  - component: {fileID: 380390370}
+  - component: {fileID: 380390373}
+  - component: {fileID: 380390379}
   m_Layer: 0
   m_Name: BlueKnight
   m_TagString: Untagged
@@ -442,31 +440,6 @@ MonoBehaviour:
       MaxSecondsBetweenUpdates: 0
     m_InternalValue: 0
   data: {fileID: 11400000, guid: e8ed8b517b845fb9eb05b6f2fda2e70e, type: 2}
---- !u!114 &380390371
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 380390366}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b798ffd7265c4921599856fc5f1c55ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EnemyBrain
-  ShowTopMostFoldoutHeaderGroup: 1
---- !u!114 &380390372
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 380390366}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e81612311ef4b75b78a5eff2d59bac56, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EnemyAttack
 --- !u!114 &380390373
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -479,22 +452,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee5ab3adfe54fb24b8df6d126913f170, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyMovement
---- !u!114 &380390374
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 380390366}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e40fc000d9d5428b7b5d88e2172c5e0d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EnemyTargeting
-  scanRadius: 30
-  targetLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
 --- !u!114 &380390375
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -637,6 +594,28 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
   m_Radius: 0.5
+--- !u!114 &380390379
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 380390366}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 315dbe15957b4646a8a289929bfefc3c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MeleeEnemyAI
+  ShowTopMostFoldoutHeaderGroup: 1
+  currentState: 0
+  requireServerAuthority: 0
+  scanRadius: 30
+  targetLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  targetTag: Player
+  dealDamageOnAttack: 0
+  attackHitboxes: []
 --- !u!1 &1320970998
 GameObject:
   m_ObjectHideFlags: 0
@@ -647,6 +626,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1320970999}
   - component: {fileID: 1320971000}
+  - component: {fileID: 1320971003}
   - component: {fileID: 1320971001}
   - component: {fileID: 1320971002}
   m_Layer: 0
@@ -765,6 +745,33 @@ MonoBehaviour:
       MinSecondsBetweenUpdates: 0
       MaxSecondsBetweenUpdates: 0
     m_InternalValue: 0
+--- !u!50 &1320971003
+Rigidbody2D:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1320970998}
+  m_BodyType: 1
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

@@ -4,13 +4,11 @@ using UnityEngine;
 public class EnemyMovement : MonoBehaviour
 {
     private Rigidbody2D rb;
-    private Animator animator;
     private SpriteRenderer spriteRenderer;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
@@ -18,7 +16,6 @@ public class EnemyMovement : MonoBehaviour
     {
         Vector2 direction = (targetPosition - (Vector2)transform.position).normalized;
         rb.linearVelocity = direction * speed;
-        if (animator != null) animator.SetFloat("Speed", rb.linearVelocity.magnitude);
         if (spriteRenderer != null)
         {
             if (direction.x > 0) spriteRenderer.flipX = false;
@@ -29,6 +26,5 @@ public class EnemyMovement : MonoBehaviour
     public void Stop()
     {
         rb.linearVelocity = Vector2.zero;
-        if (animator != null) animator.SetFloat("Speed", 0);
     }
 }

@@ -5,7 +5,6 @@ public class EnemyData : ScriptableObject
 {
     [Header("Identity")]
     public EnemyKind enemyKind;
-    public string displayName;
 
     [Header("Stats")]
     public int maxHealth = 150;
