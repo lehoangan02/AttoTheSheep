@@ -1,0 +1,1361 @@
+Atto The Sheep
+I. Game Introduction
+1) Concept & Genre
+- Atto The Sheep là game rpg
+ 
+hành động
+ góc nhìn top-down, xoay quanh việc nhập vai 1 chú cừu và dùng các skills để combat với kẻ địch và bảo vệ đàn cừu khỏi kẻ 
+địch.
+2) Story
+- Ngày xửa ngày xưa ở một vương quốc nọ, nhân dịp nhà vua mừng sinh nhật tuổi 70, đã ra lệnh cho các chiến binh của mình ra trang trại và bắt đàn cừu về làm thịt đãi tiệc. Atto là 1 chú cừu đột biến có “siêu năng lực”, biết được gia đình cừu yêu dấu của mình sắp bị đem về cung điện để làm thịt, đã nổi loạn và đánh bại các chiến binh. Nhà vua tức giận, ra lệnh cho các chiến binh mạnh mẽ hơn nữa để 
+hạ gục con cừu quái dị này, nhưng vẫn tiếp tục bị Atto đánh bại. Sau 
+đó,
+ khi nhà vua triệu hồi cả 1 đội quân hùng mạnh hòng đánh bại Atto, thì Atto dẫn đoàn cừu vào rừng để lánh nạn. Khi màn đêm buông xuống,  Atto lại phải tiếp tục chiến đấu và bảo vệ đàn cừu khỏi các con thú hoang và quái vật trong rừng. Ở nơi rừng sâu nước độc này tương truyền có 1 con đại yêu quái thống trị cả khu rừng. Sau khi đại yêu quái biết được các đồ đệ quái vật của mình đã bị đánh bại bởi 1 chú cừu, đã nổi giận và trực tiếp đối mặt với Atto. Sau 
+1 trận chiến khó nhằn, Atto đã hạ gục được đại yêu quái và tiếp tục dẫn đàn cừu của mình ra khỏi khu rừng. Sau nhiều nỗ lực bảo vệ đàn cừu của mình thì Atto đã thành công dẫn cả đàn đến 1 khu vực đồng bằng yên bình không có dấu hiệu của loài người. Tại đây Atto cùng đại gia đình cừu của mình đã sống hạnh phúc đến mãi về sau.
+II.
+ 
+Game Progression & 
+Coreloop
+1) Game Progression
+Tutorial Stage
+Mục tiêu:
+ 
+Trình bày các 
+cut
+scenes và hội thoại câu 
+chuyện, g
+iới thiệu player cách chơi game, cách điều khiển Atto và bầy cừu, cách tấn công. 
+Kẻ địch:
+ Chủ trang trại
+Game Stage
+ 1: Trang trại (
+early 
+game
+)
+Mục tiêu:
+ 
+Trình bày các 
+cut
+scenes và hội thoại câu 
+chuyện, dẫn dắt người chơi làm quen với game qua việc đánh bại các wave kẻ địch
+.
+Kẻ địch:
+ 
+Lính Xanh, Lính Đen
+Game Stage 2: Khu rừng sâu (mid game, độ khó tăng dần)
+Mục tiêu:
+ 
+Trình bày các cutscenes và hội thoại câu 
+chuyện, t
+hử thách khả năng quản lý đàn cừu trong không gian hẹp của khu rừng, né tránh bẫy môi trường.
+ Kẻ địch mạnh hơn và nhiều hơn trước, đòi hỏi player phải tập trung hơn.
+Kẻ địch:
+ 
+Rắn Độc, Nhện Độc, Bộ Xương, Goblin
+Game Stage 3: Hang ổ Đại Yêu Quái (end 
+game, 
+boss fight)
+Mục tiêu:
+ 
+Trình bày các cutscenes và hội thoại câu 
+chuyện. Là t
+rận chiến đỉnh điểm, 
+player phải 
+vận dụng toàn bộ kỹ năng combat đã học để hạ gục 
+một số lượng rất lớn các wave quái và 
+Boss trong khi vẫn phải giữ cho đàn cừu sống sót.
+Kẻ địch:
+ 
+Rắn Độc, Nhện Độc, Bộ Xương, 
+Goblin, 
+Phù Thủy, 
+Đại Yêu Quái
+Kết thúc:
+ Đánh bại 
+toàn bộ kẻ địch và 
+đại yêu quái > đạt được điều kiện win game > mở khóa cutscene kết thúc (đồng bằng yên bình).
+2) Coreloop
+- 
+Coreloop:
+ 
+Atto dẫn đàn cừu đến vị trí
+ an toàn
+ > 
+1 
+wave
+ k
+ẻ địch xuất hiện
+ 
+> 
+Player đ
+iều khiển Atto di chuyển & 
+t
+ung chiêu
+ > 
+Tiêu diệt quái / Bảo vệ đàn cừu an toàn
+ > 
+Nhận phần thưởng (
+EXP
+/
+C
+oin
+)
+ > 
+Tiếp tục di chuyển (
+repeat lại coreloop
+)
+Hành động:
+ Di chuyển Atto, điều phối đàn cừu, dùng kỹ năng combat.
+Thử thách:
+ Các đợt enemies (waves) kéo đến tấn công Atto hoặc nhắm vào đàn cừu yếu ớt.
+Phần thưởng:
+ 
+enemies chết rơi ra EXP, hoàn thành 
+mỗi 
+wave nhận được 
+1 lượng 
+c
+oin.
+III.
+ Game Mechanics
+1) 
+Movement Mechanics
+- D
+ùng phím WASD
+/Mũi tên
+ trên PC 
+để điều khiển di 
+chuyển.
+- Dùng joystick ảo trên mobile để điều khiển di 
+chuyển.
+- Góc nhìn: ¾ top-down, camera khóa chặt theo chuyển động của 
+Atto.
+2) Combat Mechanics / Power System
+- 
+Đòn đánh 
+thường:
+ Atto húc đầu về phía trước gây
+ sát thương nhẹ. 
+Không tốn mana.
+Trên PC: 
+Dùng 
+phím 
+J
+ để kích hoạt
+Trên Mobile: Dùng nút bấm ảo [Attack] lớn nhất trong cụm UI Combat ở góc dưới bên phải màn hình.
+Hệ thống chiêu 
+thức:
+- Cơ chế Cooldown: 
+Atto có 1 thanh mana trên góc trái phía trên màn hình, mỗi khi sử dụng 1 chiêu thức sẽ tốn 1 lượng mana tương ứng với chiêu đó. 
+Atto hồi 
+5
+ Mana/s. 
+Mỗi chiêu sau khi vừa dùng xong sẽ có cooldown trong vài giây. 
+- 
+Cơ chế Mở khóa kỹ năng (Skill Progression):
+ Atto sẽ không sở hữu toàn bộ chiêu thức ngay từ đầu mà phải mở khóa dần qua các 
+Stages.
+Tutorial Stage: Chỉ có đánh thường.
+Hoàn thành Tutorial Stage: Mở khóa chiêu Đánh rắm.
+Hoàn thành Game Stage 1 (Trang trại): Mở khóa chiêu Lăn tròn.
+Hoàn thành Game Stage 2 (Khu rừng sâu): Mở khóa chiêu Hắt xì.
+- 
+Chiêu đánh rắm:
+ 
+Atto đánh rắm thật mạnh để dash bản thân về phía trước, 
+gâ
+y 
+80
+ DMG
+ và hiệu ứng hất tung cho kẻ địch trúng 
+phải.
+ 
+Tốn 30 Mana. 
+Cooldown trong 2s
+. 
+Trên PC: Dùng phím spacebar để kích hoạt
+Trên Mobile: 
+Nút ảo [Skill 
+Đánh Rắm
+] trong cụm UI Combat.
+- 
+Chiêu lăn tròn:
+ 
+Atto xù lông thật nhiều và cuộn tròn bản thân thành 1 quả bóng lớn di chuyển nhanh trong 
+4
+s. 
+Khi trong trạng thái Lăn tròn, Atto được miễn nhiễm toàn bộ sát thương từ bên ngoài và từ quái bên trong.
+ 
+Q
+uả bóng này có thể tạm thời nuốt chửng 
+nhiều 
+kẻ địch vào bên trong khi va 
+chạm, gây 
+50
+ 
+DMG/s
+ 
+cho mỗi kẻ địch 
+bị nuốt vào trong
+, 
+và sẽ nhả ra khi 
+timeout.
+ Tốn 70 Mana.
+ 
+Cooldown trong 10s.
+ 
+Trên PC: 
+Dùng phím 
+C
+ để kích hoạt
+Trên Mobile: 
+Nút ảo [Skill 
+Lăn Tròn
+] trong cụm UI Combat.
+- 
+Chiêu hắt xì:
+ Atto hắt xì thật mạnh, bắn tứ tung các giọt nước mũi theo diện rộng, gây 
+1
+50 DMG
+ cho 
+các 
+kẻ địch trúng phải, kèm hiệu ứng choáng trong 1,
+5s. 
+Tốn 70 Mana. 
+Cooldown trong 7s.
+ 
+Trên PC: 
+Dùng phím 
+V
+ để kích hoạt
+Trên Mobile: 
+Nút ảo [Skill 
+Hắt Xì
+] trong cụm UI Combat.
+- 
+Ghi chú cho UI Mobile:
+ 
+Cụm nút ảo gồm 4 nút (1 Attack lớn, 3 Skill nhỏ xung quanh) được bố trí theo hình vòng cung ở góc dưới bên phải màn hình để thuận tiện cho thao tác tay phải.
+ Nói chung là giống hoàn toàn với Liên Quân Mobile.
+3) Herd Mechanics
+- 
+AI Herd Mechanics của đàn cừu:
+ 
+Trên 
+PC:
+ người dùng click chuột vào vị trí nào trên map thì đàn cừu sẽ 
+chạy đến và 
+co cụm lại ở vị trí đó.
+ 
+Trên Mobile: 
+thay vì click chuột, người chơi sẽ 
+chạm
+ trực tiếp vào màn hình cảm ứng tại vị trí muốn đàn cừu đi tới
+ và co cụm ở vị trí đó
+.
+- 
+Autoplay button
+: Trên màn hình 
+PC/Mobile 
+có 1 nút để kích hoạt chế độ autoplay, khi ấn vào thì đàn cừu sẽ tự động di chuyển co cụm theo Atto mà không cần Player phải chỉ định. Mục đích của nút này là để cho Player không cần phải manually điều 
+khiển đàn cừu những lúc chưa cần thiết (ví dụ như lúc Atto và bầy cừu di chuyển trong khoảng thời gian ngắn an toàn giữa các wave enemies).
+- Vùng va chạm (Collision):
+ Các con cừu không thể đi xuyên qua nhau, khi tiến lại quá gần tụi nó sẽ đẩy nhau ra một chút (Tránh việc đàn cừu bị dính chùm vào một chỗ, khó nhìn). 
+- 
+Cơ chế nhận sát thương của đàn cừu: 
+Mỗi con cừu có 1 thanh HP 
+riêng và đều bằng nhau
+. Khi enemies tấn công vào cừu sẽ khiến cừu bị mất máu.
+- 
+Số lượng đàn cừu: 
+Mặc định 4 con.
+- 
+Cơ chế 
+S
+ức 
+M
+ạnh 
+Đ
+ồng 
+L
+oại: 
+Khi trong màn chơi vẫn còn đủ bầy cừu, Atto sẽ nhận được hiệu ứng buff “Sức Mạnh Đồng Loại”. Hiệu ứng này cho phép Atto được cộng tối đa 40% DMG vào đánh thường và chiêu thức. Khi số lượng bầy cừu giảm, hiệu ứng buff cũng sẽ giảm dần. Còn 3 con thì chỉ cộng 30% DMG. Còn 2 con thì chỉ cộng 20% DMG. Còn 1 con thì cộng 10% DMG. Và khi đàn cừu chết hết không còn con nào, thì hiệu ứng cũng sẽ 
+biến mất. Hiệu ứng này kéo dài xuyên suốt màn chơi cho đến khi con cừu cuối cùng trong bầy cừu chết đi (chỉ còn mỗi Atto còn sống).
+ Cơ chế này giúp cho Player có tâm lý phải chủ động bảo vệ đàn cừu để tối đa lượng sát thương có thể gây ra.
+4) Enemies System
+ 
+- Ở mỗi game stage, enemies sẽ tấn công theo waves. Trang trại có 5 waves. Khu rừng có 10 waves. Boss fight có 
+15
+ waves. Mỗi wave sẽ spam ra 1 lượng lớn enemies.
+- Enemies sẽ tấn công 
+con 
+cừu (Atto hoặc đàn cừu) ở vị trí gần với nó nhất. Tuy nhiên nếu Atto và đàn cừu cách enemies cùng 1 khoảng cách thì enemies sẽ ưu tiên tấn công đàn cừu.
+ Nếu enemies đang tấn công đàn cừu và Atto đột ngột nhảy vào tấn công enemies, enemies sẽ quay sang ưu tiên đánh Atto.
+- Enemies sẽ có hệ thống AI để tấn công theo hình thức bao vây, hoặc úp sọt từ phía bất kì.
+5) Eviromental Mechanics
+- Trong game stage Khu 
+R
+ừng
+ Sâu
+ và 
+Hang Ổ Yêu 
+Quái
+, sẽ có 1 số vũng nước độc. Khi Atto hoặc đàn cừu vô tình đạp phải sẽ bị hiệu ứng dính độc, hiệu ứng này sẽ có cơ chế trừ 
+5% 
+máu 
+mỗi giây trong 3 giây cho con cừu dính phải
+.
+- Trong cả 3 game stage đều có các vật thể chướng ngại 
+được đặt rải rác 
+mà Atto và đàn cừu không thể đi qua (ví dụ tảng đá, hàng cây,...)
+6) Consummable Item Mechanics
+- 
+Khi người chơi mua các lọ thuốc (Thuốc hồi máu, Thuốc chống độc) từ Shop, các vật phẩm này sẽ tự động được mang vào màn chơi.
+- 
+Hiển thị: Lọ thuốc (kèm số lượng đang sở hữu) sẽ xuất hiện ở góc dưới màn 
+hình.
+- 
+Thao tác sử dụng:
+Trên PC: Người chơi dùng chuột click trực tiếp vào icon lọ thuốc trên màn hình (Có thể bổ sung thêm phím tắt như phím 1, 2 để người chơi thao
+ tác nhanh hơn
+).
+Trên Mobile: Người chơi chạm (tap) trực tiếp vào icon lọ thuốc trên màn hình cảm ứng.
+- 
+Tiêu hao: Ngay sau khi click/tap, hiệu ứng của thuốc sẽ kích hoạt ngay lập tức và số lượng thuốc trên UI sẽ giảm đi 1.
+IV.
+ Gameplay
+1) Game Session Flow
+- 
+Bước 1 (Spawn):
+ 
+Player và đàn cừu xuất hiện tại điểm bắt đầu của Stage, camera khóa chặt vào Atto.
+- 
+Bước 2 (Explore):
+ 
+Player dùng phím di chuyển Atto dò đường, đồng thời click chuột điều phối đàn cừu di chuyển theo sau.
+- 
+Bước 3 (Trigger Wave):
+ 
+Khi đàn cừu bước vào khu vực chỉ định trên map, hệ 
+thống bắt đầu spam ra wave enemies đầu 
+tiên.
+- 
+Bước 4 (Combat):
+ 
+Player thực hiện Coreloop: Điều khiển Atto tung chiêu (đánh rắm, lăn tròn, hắt 
+xì,..
+) để tiêu diệt quái và bảo vệ đàn cừu.
+- 
+Bước 5 (Reward & Progress):
+ 
+Tiêu diệt sạch quái của Wave 
+đó, 
+Nhặt exp/item rơi 
+ra, 
+hệ thống tự động cộng 10 Coin thưởng hoàn thành 
+Wave, 
+người chơi tiếp tục dắt đàn cừu đi đến khu vực tiếp theo (Lặp lại Bước 3 cho đến wave cuối).
+- 
+Bước 6 (Session End):
++ 
+Trường hợp
+ Thắng:
+ Hoàn thành wave cuối 
+của màn đang chơi 
++ còn ít nhất 1 con cừu thường sống sót
+ > 
+Hiển thị UI Score Board (Hệ thống Sao)
+ và kích hoạt nhạc nền thắng trận > Mở khóa stage tiếp theo.
++ 
+Trường hợp
+ Thua: 
+Xảy ra ở một trong hai tình huống sau:
+Tình huống 1:
+ Atto hết HP (Hiển thị UI 
+Score Board 1 Sao/ 
+Game Over ngay lập tức tại thời điểm Atto chết).
+Tình huống 2:
+ Hoàn thành xong wave cuối cùng của màn chơi nhưng cả 4 con cừu thường đều đã chết (Hiển thị UI Score Board 1 Sao / Game Over tại thời điểm kết thúc màn).
+2) Điều kiện Win/Lose
+- 
+Điều kiện Win: 
+Hoàn thành 
+toàn bộ
+ 
+wave trong màn 
+và đạt từ 2 Sao trở lên kết màn
+ (tức là có ít nhất 1 con cừu 
+thường còn sống
+)
+.
+- 
+Điều kiện Lose:
+ 
+Rơi vào 1 trong 2 trường hợp:
+Trường hợp 1 (Instant Lose): 
+Atto hết HP 
+>
+ Xuất hiện UI Game Over ngay lập tức.
+Trường hợp 2 (End-game Lose):
+ Đạt 1 Sao khi kết màn do để chết cả 4 con cừu thường (Lưu ý: Khi 4 cừu chết hết, game không dừng lại ngay; Atto vẫn tiếp tục solo chiến đấu một mình cho đến wave cuối 
+cùng, rồi mới hiện Score Board
+).
+- 
+Cơ chế bảo toàn tài nguyên:
+ 
+Dù Thắng hay Thua, hệ thống 
+vẫn giữ lại
+ 100% lượng tài nguyên (EXP, Coin, 
+Items
+) mà người chơi đã nhặt được trong suốt màn chơi đó. 
+Điều này giúp cho người chơi dù có biết mình sắp thua (lỡ để chết cả 4 con cừu)
+ trước khi hoàn thành màn chơi
+ thì vẫn sẽ cố gắng hoàn thành màn chơi để farm tài nguyên gỡ gạc lại.
+- 
+Cơ chế Phạt:
+ 
+Không được mở khóa màn tiếp theo, phải chơi lại Stage đó từ đầu (Wave 1) nếu muốn đi tiếp.
+3) Score Board System
+- 
+Khi màn chơi kết thúc (Win/Lose), hệ thống sẽ 
+hiển thị UI Score Board
+ 5 sao
+Hệ thống UI 5 Sao (Dựa trên số lượng cừu 
+thường 
+sống sót
+ trong màn
+):
+5 Sao: 0 con cừu chết  > 
+Perfect, được tặng 50 coin
+4 Sao: 1 con cừu chết
+ > 
+Great, được tặng 40 coin
+3 Sao: 2 con cừu chết
+ > 
+Good, được tặng 30 coin
+2 Sao: 3 con cừu chết > 
+Average, m
+ức tối thiểu để qua 
+màn, được tặng 20 coin
+1 Sao: Cả 4 con cừu chết 
+hoặc Atto chết 
+> 
+Thua/Game Over
+, không được tặng coin
+4
+) Core Gameplay Experience Goal
+- 
+Cảm giác bận rộn & kịch tính:
+ Người chơi dùng tay trái 
+bấm phím
+ để di 
+chuyển, dùng chiêu thức và dùng tay phải
+ 
+click chuột liên tục để chạy "vị trí" cho đàn cừu (gần giống như vừa chơi game MOBA vừa chơi game RTS điều binh).
+V.
+ Characters
+1) Atto
+- 
+Chỉ số:
+ HP (
+1000
+), Mana (500), Speed (cơ bản)
+, Đánh Thường (
+70
+ DMG
+)
+- 
+Vai trò:
+ 
+Nhân vật chính do người chơi điều khiển, dùng bộ kỹ năng (Đánh rắm, Lăn tròn, Hắt 
+xì,..
+) để dọn quái và bảo vệ đàn.
+- 
+Chiêu thức:
+ 
+Chiêu đánh rắm:
+ Atto đánh rắm thật mạnh để dash bản thân về phía trước, gây 80 DMG và hiệu ứng hất tung cho kẻ địch trúng phải. Tốn 30 Mana. Cooldown trong 2s. 
+Chiêu lăn tròn:
+ Atto xù lông thật nhiều và cuộn tròn bản thân thành 1 quả bóng lớn di chuyển nhanh trong 
+4
+s. Khi trong trạng thái Lăn tròn, Atto được miễn nhiễm toàn bộ sát thương từ bên ngoài và từ quái bên trong. Quả bóng này có thể tạm thời nuốt chửng nhiều kẻ địch vào bên trong khi va chạm, gây 50 DMG/s cho mỗi kẻ địch bị nuốt vào trong, và sẽ nhả ra khi timeout. Tốn 70 Mana. Cooldown trong 10s. 
+Chiêu hắt xì:
+ Atto hắt xì thật mạnh, bắn tứ tung các giọt nước mũi theo diện rộng, gây 150 DMG cho các kẻ địch trúng phải, kèm hiệu ứng choáng trong 1,5s. Tốn 70 Mana. Cooldown trong 7s. 
+2) Cừu Thường
+- 
+Chỉ số:
+ HP (
+3
+00), Speed (cơ bản)
+- 
+Vai trò:
+ 
+Di chuyển co cụm theo vị trí click chuột của Player, không biết tấn công, 
+là 
+mục tiêu bảo vệ 
+chính của Atto.
+3) Lính Xanh 
+- 
+Chỉ số:
+ 
+HP (
+150
+) Speed (cơ bản)
+, 
+Đánh Thường (
+20
+ DMG
+)
+- 
+Vai trò:
+ 
+Là loại enemy cơ bản, dùng số lượng để áp đảo Atto và đàn cừu.
+- 
+Vị trí xuất hiện:
+ Xuất hiện trong stage Trang Trại từ wave 1 đến hết stage.
+- 
+Tần suất spawn:
+ Nhiều (10 con mỗi wave).
+4) Lính Đen
+- 
+Chỉ số:
+ 
+HP (
+200)
+, Speed (cơ bản)
+, 
+Đánh Thường (
+35
+ DMG
+)
+- 
+Vai trò:
+ 
+Là loại enemy cơ bản, dùng số lượng để áp đảo Atto và đàn cừu.
+- 
+Vị trí xuất hiện:
+ 
+Xuất hiện trong stage Trang Trại từ wave 
+3
+ đến hết stage.
+- 
+Tần suất spawn:
+ 
+Nhiều (10 con mỗi wave).
+5) Rắn Độc
+- 
+Chỉ số:
+ 
+HP (
+250
+), Speed (cơ bản)
+, 
+Đánh Thường (
+30
+ DMG
+)
+ kèm hiệu ứng độc trừ 
+10
+HP/s trong 3s cho con cừu trúng phải.
+- 
+Vai trò:
+ Là loại enemy nâng cao, có hiệu ứng độc gây khó khăn cho player.
+- 
+Vị trí xuất hiện:
+ Xuất hiện trong stage Khu Rừng Sâu 
+từ wave 
+1
+ trở đi, và trong stage Hang Ổ Đại Yêu Quái từ wave 
+1
+ trở đi.
+- 
+Tần suất spawn:
+ 
+Nhiều (10 con mỗi wave).
+6) Nhện Độc
+- 
+Chỉ số:
+ 
+HP (
+3
+00), Speed (cơ bản)
+, 
+Đánh Thường (
+40
+ DMG
+)
+ 
+kèm hiệu ứng độc trừ 
+15
+HP/s trong 
+3
+s cho con cừu trúng 
+phải.
+- 
+Vai trò:
+ 
+Là loại enemy nâng cao, có hiệu ứng độc gây khó khăn cho 
+player.
+- 
+Vị trí xuất hiện:
+ 
+Xuất hiện trong stage Khu Rừng Sâu từ wave 
+4
+ trở đi, và trong stage Hang Ổ Đại Yêu Quái từ wave 
+1
+ trở đi.
+- 
+Tần suất spawn:
+ 
+Nhiều (10 con mỗi wave).
+7) Bộ Xương
+- 
+Chỉ số:
+ 
+HP (
+250
+), Speed (
+nhanh
+)
+, 
+Đánh Thường (
+60
+ DMG
+)
+- 
+Vai trò:
+ 
+Là loại enemy 
+nâng cao, 
+có tốc độ di chuyển nhanh để úp sọt đàn cừu và áp đảo Atto.
+- 
+Vị trí xuất hiện:
+ 
+Xuất hiện trong stage Khu Rừng Sâu từ wave 6 trở đi, và trong stage Hang Ổ Đại Yêu Quái từ wave 3 trở đi.
+- 
+Tần suất spawn
+:
+ 
+nhiều
+ (8 con mỗi wave).
+8) 
+Goblin
+- 
+Chỉ số:
+ 
+HP (
+350
+), Speed (
+nhanh
+)
+, 
+Đánh Thường (
+75
+ DMG
+)
+- 
+Vai trò:
+ 
+Là loại enemy 
+nâng cao, 
+có tốc độ 
+di chuyển nhanh
+ để úp sọt đàn cừu và áp đảo Atto.
+- 
+Vị trí xuất hiện:
+ 
+Xuất hiện trong stage Khu Rừng Sâu từ wave 
+7
+ trở đi, và trong stage Hang Ổ Đại Yêu Quái từ wave 3 trở đi.
+- 
+Tần suất spawn:
+ 
+nhiều
+ (8 con mỗi wave).
+9) Phù Thủy
+- 
+Chỉ số:
+ 
+HP (
+1.
+5
+00), Speed (
+chậm
+)
+, 
+Đánh Thường (
+80
+ DMG
+)
+- 
+Vai trò:
+ Là 1 loại enemy mạnh, gây khó khăn lớn cho Atto và đàn cừu
+- 
+Vị trí xuất hiện:
+ X
+uất hiện trong stage Hang Ổ Đại Yêu Quái từ wave 9 trở đi.
+- 
+Tần suất spawn:
+ Ít (
+2
+ con mỗi wave).
+- 
+Chiêu thức:
++ 
+Quả 
+Cầu Lửa
+:
+ Phù thủy bắn ra 1 quả cầu lửa, gây 
+150
+ DMG kèm hiệu ứng cháy (trừ 
+20
+ 
+HP/s
+ trong 
+3
+s
+ cho con cừu trúng phải). Cooldown trong 10s.
++ 
+Quả 
+Cầu Băng
+:
+ 
+Phù thủy bắn ra 1 quả cầu 
+băng, 
+gây 
+150
+ DMG kèm hiệu ứng 
+đóng băng
+ (
+khiến con cừu trúng phải bị đóng băng trong 
+2
+s
+). Cooldown trong 10s.
+(
+Cho AI của Phù Thủy thiết lập thời gian bắt đầu chiêu lệch nhau. Ví dụ: Vào trận tung ngay Quả Cầu Lửa, 5 giây sau tung Quả Cầu Băng. Như vậy mỗi 5 giây Phù Thủy sẽ gây áp lực một lần, thay vì tung cả 2 chiêu cùng lúc rồi đứng chờ 10 giây.
+)
+10) Đại Yêu Quái
+- 
+Chỉ số:
+ 
+HP (
+12
+.000
+), Speed (
+chậm
+)
+, 
+Đánh Thường (
+150
+ DMG
+)
+- 
+Vai trò:
+ Là boss cuối của game, đẩy độ khó game lên mức cao nhất.
+- 
+Vị trí xuất hiện:
+ 
+Xuất hiện trong stage Hang Ổ Đại Yêu Quái 
+ở wave 15 (wave cuối cùng)
+.
+- 
+Tần suất spawn:
+ 1 lần duy nhất.
+ 
+- 
+Chiêu thức:
+ 
++ 
+Chày Từ Ta:
+ Đại Yêu Quái tung ra 1 cú đập chày cực mạnh xuống đất, gây 
+400
+ DMG diện rộng lên mọi con cừu trong bán kính của đòn đánh kèm hiệu ứng hất tung. Cooldown trong 15s.
++ 
+Lốc Xoáy 
+Chết Chóc
+:
+ Đại Yêu Quái xoay người thật nhanh khiến bản thân trở thành 1 cơn lốc xoáy, trong trạng thái này Đại Yêu Quái di chuyển nhanh và gây 100 
+DMG/
+s cho con cừu nào va chạm vào lốc xoáy
+. Cooldown trong 
+20
+s.
++ 
+Quả Bóng Tàn Khốc:
+ Đại Yêu Quái cuộn tròn bản thân thành hình 1 quả bóng, di chuyển 
+thật nhanh về hướng đã cảnh báo trước (UI cảnh báo trước hướng đi xuất hiện trong 
+2
+s trước khi chiêu thức khởi động), gây 
+450
+ DMG cho con cừu nào trúng phải, kèm hiệu ứng hất tung và sau đó là choáng (đứng yên trong 
+2
+s)
+. Cooldown trong 
+25
+s.
+(Tương tự phù thủy, dev sao cho AI của Đại Yêu Quái tung chiêu ra cách nhau một khoảng thời gian nhất định)
+VI.
+ Stages
+1) Tutorial Stage
+ 
+(First Time User Experience)
+Mô tả:
+ Giới thiệu player cách chơi game, cách điều khiển Atto và bầy cừu, cách tấn công.
+Môi trường:
+ Có các vật thể chướng ngại rải rác mà Atto và đàn cừu không thể đi qua (tảng đá, hàng cây). Không có vũng nước độc.
+Tiến trình 
+hướng dẫn:
+Bước 1 (Di chuyển):
+ Chỉ có Atto xuất hiện trên map. Game tạm dừng, màn hình tối đi và highlight khu vực phím WASD (PC) hoặc Joystick (Mobile). Text hướng dẫn: "Sử dụng phím điều hướng để di chuyển Atto". Yêu cầu người chơi di chuyển Atto đến một điểm sáng trên màn hình.
+Bước 2 (Quản lý bầy cừu):
+ Tại điểm sáng, 4 con cừu xuất hiện. Highlight hướng dẫn cơ chế chỉ định vị trí (Click chuột PC / Tap chạm Mobile). Text hướng dẫn: "Chỉ định vị trí để dắt bầy cừu đi theo. Chú ý: Bầy cừu càng đông, Atto càng nhận được nhiều Sức Mạnh Đồng Loại (
+tối đa 
++40% DMG)!". Yêu cầu người chơi dắt cừu đi 
+ra khỏi khu vực chuồng cừu
+.
+Bước 3 (Chiến đấu): 
+Vừa 
+bước ra khỏi 
+chuồng cừu, Chủ trang trại xuất hiện. Game tạm dừng, highlight nút [Attack] (Mobile) / Phím J (PC). Text hướng dẫn: "Bảo vệ bầy cừu! Nhấn nút Tấn công để húc đầu". Người chơi sử dụng đánh thường để hạ gục Chủ trang trại.
+Phần thưởng:
+ Mở khóa chiêu Đánh 
+R
+ắm khi hoàn thành.
+Âm nhạc:
+ Bài “Gaiety in the Golden Age” của Aaron Kenny.
+2) Game Stage 1: Trang Trại (Early Game)
+Mô tả:
+ Nơi Atto đánh bại các chiến binh của nhà vua. Dẫn dắt người chơi làm quen với việc đánh bại các wave kẻ địch.
+Môi trường:
+ Có các vật thể chướng ngại rải rác mà Atto và đàn cừu không thể đi qua.
+ Không có 
+vũng nước độc.
+Tiến trình Waves (Tổng cộng 5 Waves):
+Wave 1 - Wave 2: Spawn 10 Lính Xanh mỗi wave.
+Wave 3 - Wave 5: Spawn 10 Lính Xanh và 10 Lính Đen mỗi wave.
+Phần thưởng:
+ Hoàn thành toàn bộ wave nhận tổng 50 Coin. Mở khóa chiêu Lăn tròn.
+Âm nhạc:
+ (Cần bổ sung nhạc nền cho Stage này).
+3) Game Stage 2: Khu Rừng Sâu (Mid Game)
+Mô tả:
+ Thử thách khả năng quản lý đàn cừu trong không gian hẹp của khu rừng, né tránh bẫy môi trường.
+Môi trường:
+ 
+Có các vật thể chướng ngại rải 
+rác. 
+Có vũng nước độc, gây hiệu ứng dính độc trừ 5% 
+HP
+/giây trong 3 giây cho con cừu vô tình đạp phải.
+Tiến trình Waves (Tổng cộng 10 Waves):
+Wave 1 - Wave 3: Spawn 10 Rắn Độc mỗi wave.
+Wave 4 - Wave 5: Spawn 10 Rắn Độc và 10 Nhện Độc mỗi wave.
+Wave 6: Bổ sung thêm 8 Bộ Xương mỗi wave.
+Wave 7 - Wave 10: Bổ sung thêm 8 Goblin mỗi wave.
+Phần thưởng:
+ Hoàn thành toàn bộ wave nhận tổng 100 Coin. Mở khóa chiêu Hắt xì.
+Âm nhạc:
+ Bài “Mystic Force” của Kevin MacLeod.
+4) Game Stage 3: Hang Ổ Đại Yêu Quái (End Game & Boss Fight)
+Mô tả:
+ Trận chiến đỉnh điểm, yêu cầu vận dụng toàn bộ kỹ năng combat để hạ số lượng lớn wave quái và Boss.
+Môi trường:
+ Có chướng ngại vật rải rác và các vũng nước độc.
+Tiến trình Waves (Tổng cộng 15 Waves):
+Wave 1 - Wave 2: Spawn 10 Rắn Độc và 10 Nhện Độc mỗi wave.
+Wave 3 - Wave 8: Bổ sung thêm 8 Bộ Xương và 8 Goblin mỗi wave.
+Wave 9 - Wave 14: Bổ sung thêm 2 Phù Thủy mỗi wave.
+Wave 15: Chỉ spawn duy nhất 1 lần Boss Đại Yêu Quái.
+Phần thưởng:
+ Đạt điều kiện win game và mở khóa cutscene kết thúc tại đồng bằng yên bình.
+Âm nhạc:
+ Bài “Rynos Theme” của Kevin MacLeod.
+VII.
+ Features
+1) Shop
+- 
+Ở 
+Map Lobby
+, 
+Player có thể
+ ghé vào Shop của Ông Già, 
+dùng 
+số 
+coin tích tụ được sau hoàn thành xong
+ 
+màn 
+chơi 
+để mua các 
+Items:
++ 
+Lọ thuốc chống độc:
+ Khi dùng có thể 
+ngay lập tức loại bỏ hiệu ứng
+ độc (từ vũng nước độc, rắn độc và nhện độc)
+ cho Atto và cả đàn cừu, kèm hiệu ứng kháng độc cho Atto và cả đàn cừu trong 10s tới. Giá 40 coin.
+ Dùng 1 lần
++ 
+Lọ thuốc hồi máu:
+ Khi dùng có thể ngay lập tức hồi 
+50% HP tối đa
+ cho Atto và cả đàn cừu. Giá 60 coin.
+ Dùng 1 lần.
++ 
+Áo giáp bảo vệ:
+ Dùng để trang bị cho 
+Atto và cả
+ bầy cừu, 
++500 HP cho Atto và +200 HP cho mỗi con cừu thường
+. Giá 200 coin.
+ Dùng vĩnh viễn.
++ 
+Sừng bò
+:
+ 
+Dùng để trang bị cho 
+Atto,giúp mỗi đòn đánh thường được 
++25 DMG
+. Giá 100 coin.
+ Dùng vĩnh viễn.
+2) EXP Stat Upgrade System
+- 
+Cơ chế thu thập EXP:
+ Mỗi khi tiêu diệt 1 kẻ địch bất kỳ, người chơi sẽ tự động nhận được 1 điểm EXP. Số điểm EXP này sẽ được bảo toàn 100% dù người chơi Thắng hay Thua ở màn chơi đó.
+- 
+Mục đích sử dụng: 
+Người chơi sử dụng điểm EXP tích lũy được để nâng cấp vĩnh viễn các chỉ số 
+HP
+ và 
+DMG
+ thông qua một bảng UI Nâng Cấp riêng biệt ở Map 
+Lobby
+.
+- 
+Bảng quy đổi và Trọng số (Weighting):
+ Nhằm cân bằng game và tránh lạm phát sức mạnh, các chỉ số sẽ có chi phí EXP và giới hạn tối đa (Max Cap) khác nhau.
++ 
+Chỉ số Sát thương của Atto (Atto DMG):
+ Tốn 10 EXP để cộng thêm 1 DMG cho Atto. Chỉ số này chỉ được nâng tối đa 30 lần (Cộng tối đa 30 DMG).
++ 
+Chỉ số Sinh lực của Atto (Atto HP):
+ Tốn 10 EXP để cộng thêm 25 HP cho Atto. Chỉ số này chỉ được nâng tối đa 20 lần (Cộng tối đa 500 HP).
++ 
+Chỉ số Sinh lực Bầy Cừu (Herd HP):
+ Tốn 20 EXP để cộng thêm 15 HP cho toàn bộ bầy cừu (mỗi con cừu đều được cộng thêm 15 HP). Chỉ số này chỉ được nâng tối đa 10 lần (Cộng tối đa 150 HP cho mỗi con).
+- 
+Ghi chú cho Dev:
+ Khi nâng cấp HP cho Atto hoặc bầy cừu, hệ thống sẽ cộng vào "HP Tối Đa" (Max HP), và lượng máu hiện tại của chúng khi bắt đầu màn chơi mới sẽ tự động scale theo mức Max HP mới này
+ (kiểu như để tránh bị thâm hụt HP á)
+.
+3) Coin Economy System
+- 
+Cơ chế thu thập:
+ Coin 
+không
+ rơi ngẫu nhiên từ xác kẻ địch. Người chơi sẽ tự động nhận được 
+một số lượng 
+Coin thưởng ngay khi dọn sạch toàn bộ kẻ địch của một wave.
+- 
+Định mức thưởng Wave: 
+Thưởng cố định 10 Coin cho mỗi wave hoàn thành.
+Hoàn thành Stage Trang Trại (5 waves):
+ Nhận tổng 50 Coin từ việc clear wave.
+Hoàn thành Stage Khu Rừng Sâu (10 waves):
+ Nhận tổng 100 Coin từ việc clear wave.
+- 
+Định mức thưởng Score Board:
+ Thưởng thêm lượng Coin sau khi kết thúc màn chơi dựa trên hệ thống Sao (tối đa 50 Coin đối với mức 5 Sao).
+- 
+Mục đích sử dụng:
+ Mua các vật phẩm và trang bị vĩnh viễn trong Shop của Ông Già tại Map 
+Lobby
+.
+VIII.
+ UI
+1) Asset
+- 
+Asset chính của game là Tiny Swords.
+- Đối với những asset hoặc UI component thiếu, có thể dùng các asset miễn phí khác trên mạng, hoặc tự vẽ, hoặc dùng AI gen theo artstyle của bộ asset Tiny Swords.
+2) 
+Tittle Screen
+- 
+Mục đích:
+ Là 
+interactive screen
+ đầu tiên của người chơi sau khi load game thành công, dùng để điều hướng vào các tính năng chính của game.
+- 
+Thành phần hiển thị (Visual Elements):
+Tên game:
+ Hiển thị nổi 
+bật 
+dòng chữ "Atto The Sheep" ở vị trí dễ nhìn.
+Banner Art:
+ Hình ảnh minh họa chính của game (Cảnh Atto đang 
+chạy đến
+ bảo vệ đàn cừu khỏi 
+sự tấn công
+ của Lính).
+Các nút:
+[Start]:
+ Nút bắt đầu game. Khi bấm vào sẽ chuyển người chơi đến 
+Intro Cutscene rồi 
+tới 
+Tutorial Stage
+ 
+nếu là 
+first-time play. N
+ếu 
+player 
+đã qua
+ màn Tutorial Stage
+ thì nút Start này sẽ dẫn thẳng đến Map 
+Lobby
+ luôn.
+[Multiplayer Mode]:
+ Nút chọn chế độ chơi 
+2
+ người.
+[Setting]:
+ Mở Pop-up cài đặt. Cho phép người chơi điều chỉnh âm lượng (Nhạc nền, SFX) hoặc xem lại sơ đồ phím bấm.
+Âm thanh:
+ 
+Phát nhạc nền của Menu.
+3) Map Lobby Screen
+- 
+Mục đích:
+ Là sảnh chờ trung tâm, nơi người chơi nghỉ ngơi sau mỗi màn chiến đấu, tiến hành nâng cấp sức mạnh, mua sắm vật phẩm và lựa chọn Stage tiếp theo để khám phá cốt truyện.
+- 
+Môi trường:
+ 
+Hiển thị dưới góc nhìn từ trên cao nhìn xuống (top-down view) bao quát toàn cảnh thế giới trong game.
+ 
+Cảnh nền bao gồm các khu vực địa lý tương ứng với tiến trình game: Tòa lâu đài của nhà vua ở đằng xa
+ góc trái bên dưới màn hình
+, khu vực Trang trại 
+cừu
+ gần tòa lâu đài
+, Khu rừng sâu 
+cách tòa lâu đài một khoảng đồng bằng trống
+ 
+trải, 
+và Hang ổ yêu quái u ám
+ cư ngụ sâu bên trong Khu rừng sâu.
+- 
+Các thành phần tương tác (Interactive UI):
+Nút Chọn Màn (Stage Selectors):
+ Trên bản đồ có các hình tròn nhỏ đánh số 1, 2, 3 đặt ngay tại vị trí của Trang trại (Stage 1), Khu rừng sâu (Stage 2) và Hang ổ Đại Yêu Quái (Stage 3). Khi bấm vào sẽ kích hoạt Cutscene tương ứng và đưa người chơi vào trận. Nếu người chơi chưa hoàn thành màn trước đó, nút của màn tiếp theo sẽ có biểu tượng ổ khóa.
+Cửa hàng Ông Già:
+ Một mô hình tòa nhà/sạp hàng nhỏ nổi bật trên bản đồ. Khi bấm vào sẽ hiển thị Pop-up UI Cửa hàng (Shop Ông Già) để người chơi dùng Coin mua các Items như Lọ thuốc, Áo giáp, Sừng bò.
+Bảng Nâng Cấp Chỉ Số:
+ Nút bấm hiển thị cố định ở góc dưới màn hình. Khi bấm vào sẽ mở ra Pop-up UI Nâng cấp chỉ số (EXP Stat Upgrade System) để người chơi dùng điểm EXP nâng HP và DMG cho Atto cùng bầy cừu.
+Hiển thị tài nguyên:
+ Ở góc trên màn hình có UI nhỏ hiển thị số lượng Coin và số điểm EXP hiện có của người chơi để tiện theo dõi trước khi đưa ra quyết định nâng cấp hay mua sắm.
+Âm thanh:
+ Phát nhạc nền thư giãn (Bài “Enchanted Valley” của Kevin MacLeod).
+4
+) UI Flow
+-1270
+132813
+IX. 
+Sound
+1) 
+Nhạc nền
+ cho 
+các Stages
+- 
+Menu 
+Screen
+:
+- 
+Map 
+Lobby
+:
+ Bài “Enchanted Valley’’ của Kevin MacLeod
+- 
+Tutorial Stage:
+ Bài “
+Gaiety in the Golden 
+Age” của Aaron Kenny
+https://youtu.be/Dsv65NW0PmY?si=-mpi6owh8n5HEaWc
+-
+Stage Trang Trại:
+ 
+- 
+Stage Khu Rừng Sâu:
+ 
+Bài “Mystic Force” của Kevin MacLeod
+- 
+Stage Hang Ổ Yêu Quái:
+ Bài “Rynos Theme” của Kevin MacLeod
+2) Nhạc nền cho các Cutscenes
+- 
+Cutscene mở đầu game:
+- 
+Cutscene hoàn thành game
+ (cảnh đồng bằng yên bình)
+:
+ Bài “
+The Forest and the 
+Trees” của Kevin 
+MacL
+eod
+https://youtu.be/rWYtLAhUUjc?si=S0kXxwb2avAI4OKo
+3) Nhạc nền khác
+- 
+Nhạc nền khi hiện Score Board
+ (Win version)
+:
+ Bài “Take a Chance” của Kevin MacLeod
+(Khi Lose thì Score Board sẽ không phát nhạc)
+X. Multiplayer Stage (Co-op Survival)
+1) Concept & Matchmaking
+- 
+Chế độ:
+ 2 Players Co-op (Online).
+- 
+Matchmaking:
+ Người chơi 1 tạo phòng (Host) và nhận một mã Code. Người chơi 2 (Guest) nhập mã Code để 
+join phòng
+.
+- 
+Cả 2 Player sử dụng nguyên bộ Stat, Skill đã mở khóa và Item 
+hiện tại 
+từ 
+chế độ 
+Single-player của máy mình.
+2) Map & Môi trường
+- 
+Một Đấu trường vòng tròn rộng lớn
+ (giống C
+olosseum
+ ở Roma nước Ý).
+- 
+Không có bầy cừu. Thay vào đó, ở giữa map có một "Tượng Cừu Vàng"
+- Tượng Cừu Vàng 
+có 3500 HP. Khi Tượng chưa bị enemies phá hủy thì Tượng sẽ buff cho cả 2 player mỗi người 30% DMG lên đánh thường và chiêu thức.
+3) Game Progression & Trọng tâm
+- 
+Mục tiêu:
+ Sống sót trong vòng 
+2
+0 phút trước vô số 
+enemies waves
+ tràn vào liên tục từ mọi phía.
+- 
+Cơ chế Hồi sinh:
+ Nếu 
+1 
+Player chết
+ (màn hình bên Player này trở thành màu xám)
+, Player 
+còn lại
+ có thể di chuyển lại gần xác và đứng yên trong 3 giây để hồi sinh 
+lại Player
+ 
+đó, Player sau khi được hồi sinh sẽ có 
+30% HP
+ so với HP ban đầu
+. 
+- 
+Tiến trình Quái (20 Phút Sinh Tử):
+Phút 0 - Phút 5 (Khởi động - Làm nóng máy):
+Mục đích:
+ Để 2 người chơi làm quen với map và test các combo chiêu thức.
+Kẻ địch:
+ Chỉ có Lính Xanh và Lính Đen. Số lượng tăng từ từ. Chúng đi chậm nên chủ yếu làm "bao cát" để người chơi 
+đánh khởi động
+ dạo đầu.
+Phút 5 - Phút 10 (Áp lực Độc - Yêu cầu di chuyển):
+Mục đích:
+ Bắt đầu ép người chơi phải di chuyển liên tục, không được đứng yên một chỗ spam chiêu.
+Kẻ địch:
+ Rắn Độc và Nhện Độc bắt đầu xuất hiện dày đặc. Đến phút thứ 8, thả thêm một lượng nhỏ Bộ Xương để tạo các pha úp sọt bất ngờ.
+Phút 10 - Phút 15 (Cuộc săn lùng - Tốc độ cao):
+Mục đích: 
+Giai đoạn dễ "gãy" nhất. Số lượng quái trên màn hình lúc này phải rất đông.
+Kẻ địch:
+ Goblin và Bộ Xương là lực lượng chủ đạo. Tốc độ di chuyển nhanh của chúng yêu cầu 2 người chơi phải dồn damage (như dùng chiêu Hắt xì để làm choáng) phối hợp nhịp nhàng. Lính Xanh/Đen 
+cũng 
+xuất hiện 
+số lượng lớn
+.
+Phút 15 - Phút 20 (Sinh tồn đỉnh điểm):
+Mục đích: 
+Đ
+ẩy áp lực sinh tồn lên mức kịch trần trước khi hết giờ.
+Kẻ địch:
+ Từ phút 15, Phù Thủy xuất hiện liên tục ở các góc map, xả Quả Cầu Lửa và Quả Cầu Băng, bắt buộc người chơi phải căn thời gian dùng chiêu Lăn tròn (miễn nhiễm sát thương) 
+một cách 
+chuẩn xác để né tránh. Vòng vây cũng bị thu hẹp liên tục bởi lực lượng Nhện Độc, Bộ Xương và Goblin áp sát từ nhiều phía.  
+Trận chiến cuối cùng:
+ Khi đồng hồ điểm phút 
+18
+ (
+2
+ phút cuối), Boss Đại Yêu Quái sẽ giáng trần. Lúc này không bắt buộc hai người chơi phải tiêu diệt Boss (nếu 
+chỉ trụ qua dc 20p mà không hạ được thì hết giờ mỗi người nhận 100 coin, hạ dc thì mỗi người nhận 200 coin
+), mục tiêu cốt lõi là tập trung di chuyển, sống sót khỏi các đòn tấn công diện
+ rộng
+ như Chày Từ Ta hay Quả Bóng Tàn Khốc trong khi vẫn phải
+ tiêu diệt nốt các enemies
+ đang cản đường.
+4) Điều kiện Win/Lose & Phần thưởng
+- 
+Điều kiện Win (Sống sót thành công):
+ 
+Ít nhất 1 trong 2 Player sống sót cho đến khi đồng hồ đếm ngược hết 20 phút.
+ 
+Ngay khi hết giờ, hệ thống tự động dọn sạch toàn bộ kẻ địch trên map và hiển thị UI Victory.
+- 
+Điều kiện Lose (Toàn diệt):
+ 
+Cả 2 Player đều hết HP (màn hình xám) cùng một lúc trước khi thời gian 20 phút kết thúc. Lúc này không còn ai có thể đứng yên 3 giây gần xác đồng đội để kích hoạt cơ chế hồi sinh.
+ 
+Màn hình sẽ hiện UI Game Over ngay lập tức.
+- 
+Tình trạng của Tượng Cừu Vàng (Cơ chế phụ):
+ 
+Việc Tượng Cừu Vàng bị enemies phá hủy (mất sạch 3500 HP) không dẫn đến thua game.
+ 
+Trận đấu vẫn sẽ tiếp tục, nhưng cả 2 Player sẽ mất vĩnh viễn hiệu ứng buff 30% DMG lên đánh thường và chiêu thức trong phần thời gian còn lại. Điều này đóng vai trò như một hình phạt, đẩy độ khó sinh tồn lên mức cao hơn.
+- 
+Cơ chế Phần thưởng Tổng kết
+: Do chế độ Multiplayer không rớt điểm EXP và không rớt Coin theo wave, người chơi sẽ được thưởng một lần duy nhất lúc kết màn:
+Trường hợp Thắng (Không hạ Boss):
+ Trụ vững qua 20 phút nhưng Đại Yêu Quái vẫn còn sống, mỗi người chơi nhận 100 Coin.
+Trường hợp Thắng (Hạ được Boss):
+ Trụ vững qua 20 phút và hạ gục thành công Đại Yêu Quái, mỗi người chơi nhận 200 Coin.
+Trường hợp Thua:
+ Để bảo toàn công sức, hệ thống sẽ tặng một lượng coin an ủi tương đương với thời gian sống sót (
+n
+hận 2 Coin cho mỗi phút sinh tồn trọn vẹn).
+5
+) Một 
+vài
+ setting bên lề
+- Chế độ multiplayer sẽ không có cơ chế đánh quái rớt điểm EXP.
+- 
+Chế độ multiplayer sẽ không có cơ chế
+ nhận được 1 lượng coin sau khi quét xong mỗi wave (mà chỉ nhận dc 1 lượng coin tổng sau khi chiến thắng màn chơi).
+XI. 
+Cutscene & Dialogue Script
+1) Cutscene Mechanics & UI
+- 
+Visual Layout:
+Background: Hình ảnh tĩnh
+Dialogue Box: Nằm ở cạnh dưới màn hình, chứa Tên nhân vật và Nội dung thoại.
+- 
+Interaction:
+Người chơi 
+bấm spacebar/click chuột trên PC và chạm màn hình trên Mobile
+ để hiển thị câu thoại tiếp 
+theo.
+Có nút 
+Skip
+ ở góc trên màn hình để bỏ qua toàn bộ cutscene cho người chơi lười đọc cốt 
+truyện.
+Text Effect: Chữ hiện ra từ từ theo hiệu ứng gõ phím (Typewriter effect)
+.
+2) Script
+- 
+Cutscene 1: Khởi nguồn cuộc nổi loạn
+Trigger: Kích hoạt ngay sau khi player bấm [Start] ở Title Screen
+ (nếu là lần chơi game đầu tiên)
+.
+Background: Sảnh chính cung điện, lộng lẫy nhưng ngột ngạt.
+BGM:
+Script:
+Narrator: “Ngày xửa ngày xưa, ở một vương quốc nọ...”
+Nhà Vua: “
+Hahaha... chỉ còn ít ngày nữa là tới sinh nhật lần thứ 70 của ta rồi. 
+Các chiến binh, hãy ra trang trại bắt bầy cừu béo tốt nhất về làm thịt đãi tiệc
+ 
+!
+!
+”
+Lính Xanh: “Tuân lệnh bệ hạ!”
+Background đổi cảnh: 
+Khung cảnh trang trại cừu vào sáng sớm tinh mơ, chủ trang trại mở rào và ẵm từng chú cừu lên xe 3 gác.
+Atto: “Cái gì vậy ?? Ông chủ nay lại ẵm gia đình mình lên xe.. ? Chẳng lẽ ổng muốn làm thịt chúng mình ?? Không đời nào, mình sẽ không để chuyện đó xảy ra !!”
+-> 
+xong Cutscene 
+chuyển thẳng đến Tutorial Stage
+- Cutscene 2: Chạy trốn vào Khu Rừng Sâu
+Trigger:
+ 
+Kích hoạt ngay sau khi player
+ bấm vào biểu tượng 
+hình tròn có số 2 
+ở Map 
+Lobby
+Background:
+ Ở đằng xa là một đội quân rất lớn đang rượt đuổi theo Atto và bầy cừu, buộc họ phải chạy đến Khu Rừng Sâu để ẩn náu. Thời gian chiều tà.
+BGM:
+Script:
+Narrator: “Sau khi nghe tin có 1 con cừu “quái vật” đã 1 mình hạ gục hết những chiến binh của Nhà Vua, ông nổi giận lôi đình và đã phái một đạo quân lớn chỉ để truy đuổi và hạ gục “mối hiểm họa đầy lông” này....”
+Narrator: “Khi thấy số lượng quân lính quá áp đảo với Atto, Atto đã nhanh chóng dẫn gia đình cừu của mình tạm thời chạy đến Khu Rừng Sâu không xa phía trước để ẩn náu khỏi tầm ngắm của Nhà Vua...”
+Narrator: “Khu Rừng Sâu là 1 nơi tiềm ẩn nhiều nguy hiểm, không chỉ có những con thú hoang mà còn có những loại ma quỷ về đêm.... Liệu số phận của Atto và đàn cừu sẽ ra sao....”
+-> xong Cutscene chuyển thẳng đến Game Stage 2 Khu Rừng 
+Sâu
+- 
+Cutscene 3: Đại Yêu Quái thức tỉnh
+Trigger:
+ 
+Kích hoạt ngay sau khi player bấm vào biểu tượng hình tròn có số 
+3
+ ở Map Lobby
+Background:
+ Một Hang ổ hình đầu sọ lớn có sừng bò, từ phía bên trong hang ổ xuất hiện ánh mắt chết chóc của Đại Yêu Quái. Thời gian giữa khuya.
+BGM:
+Script: 
+Đại Yêu Quái: “Cái gì cơ.... Có 1 con cừu ranh mà mạnh đến mức đánh bại các đệ tử ma quái của ta sao ? ĐỪNG CHỌC TỨC TA”
+Đại Yêu Quái: “Chính ta sẽ trực tiếp ra tay giết nó và đám cừu yếu ớt mà nó hết sức bảo vệ... BÂY ĐÂU, CÙNG TA XÓA SỔ CHÚNG NÓ !!!!!!”
+xong Cutscene chuyển thẳng đến Game Stage 
+3
+ 
+Hang Ổ Yêu Quái
+- Cutscene 4: Đồng bằng yên bình
+Trigger: 
+Kích hoạt ngay sau khi player
+ win Game Stage 3 
+Hang Ổ Yêu Quái
+Background:  Atto và đàn cừu đi ra khỏi bìa rừng của Khu Rừng Sâu, nhìn thấy 
+ánh bình minh 
+đang vươn lên từ phía 
+xa. Khung cảnh phía trước là 1 đồng bằng rộng lớn, có dòng suối mát vắt ngang qua, không có dấu vết của con người.
+BGM:
+Script:
+Narrator: “Sau bao gian nan và thử thách, cuối cùng Atto cũng đã dẫn được gia đình cừu yêu quý của mình đến một vùng đất an toàn.”
+Narrator: “Và họ quyết định sinh sống tại đây ! Atto vẫn tiếp tục trọng trách bảo vệ đàn cừu yêu dấu của mình khỏi các con thú hoang lâu lâu hay xuất hiện về đêm.”
+Narrator: “Và từ đây, bọn họ đã chung sống hạnh phúc về sau. ”
+Hiện màn hình The End, và 1 nút để player quay trở về Map Lobby.
+XII
+. 
+Discussion/Notes
+- Những 
+thông
+ số 
+(HP, DMG, Mana, giá Items,...) 
+tui để ở trên đều chỉ là tạm thời
+ (tui cũng đã spec-balancing một chút rồi)
+, các ông khi dev cứ tạm thời để như 
+vậy,
+ hoặc 
+có thể 
+chỉnh lại sao cho nó đỡ mất cân bằng (
+team dev 
+nhớ làm 1 spec sheet để ghi chú lại 
+cụ thể 
+các thay đổi thông số mà các ông đã làm)
+. Sau khi các ông đã có 1 bản demo để chơi thử, tui sẽ playtest và viết sheet spec-balacing.
+ Sau đó cả nhóm sẽ cùng test lại game lần nữa để xem có cân bằng không.
+- Scope 3 tuần khá giới hạn nên tui không rõ các ông có dev kịp hết các tính năng của game không. Nếu các ông cảm thấy không thể hoàn thành kịp trong 2 tuần 2 tuần rưỡi gì đó, thì lúc đó mình sẽ họp và lược bỏ 1 số tính năng không cần thiết của 
+game, mà tập trung hoàn thiện game và polish những cái đã dev xong.
+- Ngược lại, nếu như các ông dev sớm dc con game, tụi mình có thể họp và bàn thêm về việc mở rộng content của game (mechanics mới, skill mới, item mới, game stage mới,...). Nếu thấy ko cần thiết có thể bỏ qua phần này.
+- Contact tui sớm nếu như có chỗ nào đó trong file này các ông chưa hiểu hay chưa hình dung ra 
+được, hoặc muốn sửa đổi chỗ nào đó.
+- Mọi người nên đọc kĩ file này vài lần để tất cả có chung 1 vision.
+- Có vẻ với thiết kế game này thì tụi mình phải chấp nhận rằng chơi trên mobile chắc chắn sẽ khó hơn so với chơi trên PC
+- Tui chưa xác định được cơ chế aim mục tiêu khi dùng chiêu (trên PC/Mobile). 
+Trên Mobile tụi mình maybe có thể làm giống cơ chế aim như game Liên Quân Mobile, nhưng trên PC thì sao ? 
+Bên dev tính giải quyết vấn đề này như thế nào ?
