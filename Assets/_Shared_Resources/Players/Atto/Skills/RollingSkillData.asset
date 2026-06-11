@@ -13,15 +13,20 @@ MonoBehaviour:
   m_Name: RollingSkillData
   m_EditorClassIdentifier: Assembly-CSharp::RollingSkillData
   skillId: 2
-  skillName: Roll
+  skillName: 
   description: 
   cooldown: 5
   damage: 10
-  manaCost: 20
+  manaCost: 0
   lambsRequired: 0
   vfxPrefab: {fileID: 0}
-  maxSpeedMultiplier: 5
+  pullRadius: 3
+  pullSpeed: 5
+  hitRadius: 1.5
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  maxSpeedMultiplier: 2
   acceleration: 1.5
-  duration: 5
-  disappearDuration: 0.2
+  duration: 4
   baseRotationSpeed: 360

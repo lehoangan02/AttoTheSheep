@@ -757,13 +757,7 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   normalVisual: {fileID: 2271741925598155448}
   dustVisual: {fileID: 8373598604498323661}
-  spinningPart: {fileID: 3452759695154057927}
-  dustParticle: {fileID: 0}
-  playerCollider: {fileID: 1963130586316328227}
-  enemyLayer:
-    serializedVersion: 2
-    m_Bits: 64
-  maxScaleMultiplier: 1.5
+  spinMesh: {fileID: 3452759695154057927}
 --- !u!1 &6827787686302835520
 GameObject:
   m_ObjectHideFlags: 0

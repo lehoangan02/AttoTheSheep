@@ -3,378 +3,210 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 
-// ĐỔI KẾ THỪA: Kế thừa BaseSkillComponent thay vì MonoBehaviour
 public class PlayerRollingSkill : BaseSkillComponent
 {
-    [Header("Graphics References")]
-    [SerializeField] private GameObject normalVisual;
-    [SerializeField] private GameObject dustVisual;
-    [SerializeField] private Transform spinningPart; // Chỉ xoay child này, không xoay cả dustVisual
+    [Header("Visual References")]
+    [SerializeField] private GameObject normalVisual; // Object chứa hình cừu bình thường
+    [SerializeField] private GameObject dustVisual;   // Object chứa cục bụi/quả bóng
+    [SerializeField] private Transform spinMesh;      // Mesh bên trong Dust Visual để xoay
 
-    [Header("Effects")]
-    [SerializeField] private ParticleSystem dustParticle; 
-    
-    [Header("Collision & Swallow")]
-    [SerializeField] private Collider2D playerCollider; // Collider chính của Player (dùng để phát hiện va chạm khi lăn)
-    [SerializeField] private LayerMask enemyLayer; // Layer của kẻ địch
+    private PlayerController rollController;
 
-    [Header("Scaling")]
-    [SerializeField] private float maxScaleMultiplier = 1.5f; // Kích thước tối đa khi xù lông cuộn tròn
-
-    private bool isSkillActive = false;
-    private bool isVisualActive = false; // Flag riêng cho Client visual, không bị ảnh hưởng bởi Server
-    private float currentSpeedMultiplier = 1f;
-    private RollingSkillData currentData;
-
-    // Danh sách kẻ địch đang bị nuốt (Server-side)
-    private List<NetworkObject> swallowedEnemies = new List<NetworkObject>();
-    private Coroutine damageCoroutine;
-
-    void Update()
+    // Lớp lưu trữ trạng thái quái vật trong dạ dày
+    private class SwallowedEnemy
     {
-        // Hiệu ứng hình ảnh mượt mà phía Client (chỉ chạy khi isVisualActive = true)
-        if (isVisualActive && dustVisual != null && dustVisual.activeSelf && currentData != null)
-        {
-            currentSpeedMultiplier = Mathf.MoveTowards(
-                currentSpeedMultiplier, 
-                currentData.maxSpeedMultiplier, 
-                currentData.acceleration * Time.deltaTime
-            );
-
-            float dynamicRotationSpeed = currentData.baseRotationSpeed * currentSpeedMultiplier;
-            
-            // Chỉ xoay spinningPart (child bên trong dustVisual), không xoay dustVisual gốc
-            Transform target = spinningPart != null ? spinningPart : dustVisual.transform;
-            target.Rotate(0, 0, -dynamicRotationSpeed * Time.deltaTime);
-        }
+        public GameObject Obj;
+        public EnemyMovement Movement;
+        public EnemyAI AI;
+        public NetworkHealth Health;
+        public EnemyEntity Entity; 
+        public SpriteRenderer[] Renderers;
+        public Collider2D[] Colliders;
     }
 
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        // Chỉ Server mới xử lý nuốt enemy
-        if (!IsServer || !isSkillActive || currentData == null) return;
+    private List<SwallowedEnemy> stomach = new List<SwallowedEnemy>();
 
-        // Kiểm tra enemy layer
-        if (!LayerInMask(other.gameObject.layer, enemyLayer)) return;
-
-        NetworkEntity enemyEntity = other.GetComponentInParent<NetworkEntity>();
-        if (enemyEntity == null) return;
-
-        NetworkObject enemyNetObj = enemyEntity.NetworkObject;
-        if (enemyNetObj == null) return;
-
-        // Không nuốt cùng 1 enemy 2 lần
-        if (swallowedEnemies.Contains(enemyNetObj)) return;
-
-        SwallowEnemy(enemyNetObj);
-    }
-
-    private bool LayerInMask(int layer, LayerMask mask)
-    {
-        return ((1 << layer) & mask.value) != 0;
-    }
-
-    private void SwallowEnemy(NetworkObject enemyNetObj)
-    {
-        swallowedEnemies.Add(enemyNetObj);
-
-        // Tắt collider enemy để không va chạm với player
-        Collider2D enemyCollider = enemyNetObj.GetComponent<Collider2D>();
-        if (enemyCollider != null) enemyCollider.enabled = false;
-
-        // Tắt AI/movement của enemy
-        LambAI lambAI = enemyNetObj.GetComponent<LambAI>();
-        if (lambAI != null)
-        {
-            lambAI.enabled = false;
-        }
-        else
-        {
-            // Tắt Rigidbody nếu có
-            Rigidbody2D enemyRb = enemyNetObj.GetComponent<Rigidbody2D>();
-            if (enemyRb != null) enemyRb.linearVelocity = Vector2.zero;
-        }
-
-        // Ẩn enemy (visual) - nhưng vẫn giữ nguyên NetworkObject
-        SetEnemyVisibility(enemyNetObj, false);
-
-        // Nếu coroutine damage chưa chạy, bắt đầu
-        if (damageCoroutine == null)
-        {
-            damageCoroutine = StartCoroutine(SwallowDamageRoutine());
-        }
-
-        Debug.Log($"[SERVER] Đã nuốt enemy {enemyNetObj.name} vào quả bóng!");
-    }
-
-    private void SetEnemyVisibility(NetworkObject enemyNetObj, bool visible)
-    {
-        // Ẩn/hiện tất cả Renderer trên enemy
-        Renderer[] renderers = enemyNetObj.GetComponentsInChildren<Renderer>(true);
-        foreach (Renderer r in renderers)
-        {
-            r.enabled = visible;
-        }
-
-        // Nếu có SpriteRenderer trực tiếp trên object chính
-        SpriteRenderer sprite = enemyNetObj.GetComponent<SpriteRenderer>();
-        if (sprite != null) sprite.enabled = visible;
-
-        // Tắt Animator để enemy không chạy animation ngầm
-        Animator anim = enemyNetObj.GetComponent<Animator>();
-        if (anim != null) anim.enabled = visible;
-    }
-
-    private IEnumerator SwallowDamageRoutine()
-    {
-        // Gây 50 DMG/s cho mỗi kẻ địch bị nuốt
-        WaitForSeconds wait = new WaitForSeconds(1f);
-
-        while (isSkillActive && swallowedEnemies.Count > 0)
-        {
-            yield return wait;
-
-            // Duyệt ngược để có thể xóa an toàn
-            for (int i = swallowedEnemies.Count - 1; i >= 0; i--)
-            {
-                NetworkObject enemyNetObj = swallowedEnemies[i];
-                if (enemyNetObj == null || !enemyNetObj.IsSpawned)
-                {
-                    swallowedEnemies.RemoveAt(i);
-                    continue;
-                }
-
-                NetworkEntity enemyEntity = enemyNetObj.GetComponent<NetworkEntity>();
-                if (enemyEntity != null)
-                {
-                    // Gây sát thương chuẩn (không thể bị chặn bởi invulnerable của enemy)
-                    enemyEntity.TakeDamage(Mathf.RoundToInt(currentData.damagePerSecond));
-                }
-            }
-        }
-
-        damageCoroutine = null;
-    }
-
-    // =========================================================
-    // 1. HÀM CHẠY TRÊN SERVER: TÍNH TOÁN VẬT LÝ VÀ TỐC ĐỘ
-    // =========================================================
     public override void ServerExecute(SkillData data, NetworkEntity caster, PlayerController controller = null)
     {
-        // Ép kiểu Data an toàn
-        if (data is RollingSkillData rollingData && caster != null)
+        if (data is RollingSkillData rollData && controller != null)
         {
-            currentData = rollingData;
-
-            // BẬT TRẠNG THÁI MIỄN NHIỄM
-            caster.isInvulnerable.Value = true;
-
-            // Tìm PlayerMovement để tăng tốc độ
-            PlayerMovement movement = caster.GetComponent<PlayerMovement>();
-            if (movement == null) movement = caster.GetComponentInChildren<PlayerMovement>();
-
-            if (movement != null)
-            {
-                movement.ApplyTemporarySpeedMultiplier(rollingData.maxSpeedMultiplier, rollingData.duration, rollingData.AccelerationDuration);
-                Debug.Log($"[SERVER LOG] Đã kích hoạt tăng tốc Lăn cho {caster.gameObject.name}");
-            }
-
-            // Kích hoạt collider trigger để nuốt enemy
-            if (playerCollider != null)
-            {
-                playerCollider.isTrigger = true;
-            }
-
-            // Bắt đầu coroutine quản lý trạng thái Rolling trên Server
-            StartCoroutine(ServerRollRoutine(rollingData, caster));
+            rollController = controller;
+            StartCoroutine(RollingRoutine(rollData, controller));
         }
     }
 
-    private IEnumerator ServerRollRoutine(RollingSkillData rollingData, NetworkEntity caster)
-    {
-        isSkillActive = true;
-
-        // Đợi thời gian tồn tại của skill
-        yield return new WaitForSeconds(rollingData.duration);
-
-        // Kết thúc: NHẢ TẤT CẢ KẺ ĐỊCH RA NGOÀI
-        ReleaseAllSwallowedEnemies();
-
-        // TẮT MIỄN NHIỄM
-        caster.isInvulnerable.Value = false;
-
-        // Tắt collider trigger
-        if (playerCollider != null)
-        {
-            playerCollider.isTrigger = false;
-        }
-
-        // Ngừng damage coroutine
-        if (damageCoroutine != null)
-        {
-            StopCoroutine(damageCoroutine);
-            damageCoroutine = null;
-        }
-
-        isSkillActive = false;
-        // KHÔNG set currentData = null ở đây vì Client visual coroutine vẫn cần dùng
-        // để chạy hiệu ứng biến mất dần (disappear animation) và bật lại normalVisual.
-        // currentData sẽ được clear bởi Client's RollSkillRoutine() sau khi hoàn tất visual.
-    }
-
-    private void ReleaseAllSwallowedEnemies()
-    {
-        foreach (NetworkObject enemyNetObj in swallowedEnemies)
-        {
-            if (enemyNetObj == null || !enemyNetObj.IsSpawned) continue;
-
-            // Bật lại collider
-            Collider2D enemyCollider = enemyNetObj.GetComponent<Collider2D>();
-            if (enemyCollider != null) enemyCollider.enabled = true;
-
-            // Bật lại AI
-            LambAI lambAI = enemyNetObj.GetComponent<LambAI>();
-            if (lambAI != null)
-            {
-                lambAI.enabled = true;
-            }
-
-            // Hiện lại enemy
-            SetEnemyVisibility(enemyNetObj, true);
-
-            // Bật lại Animator
-            Animator anim = enemyNetObj.GetComponent<Animator>();
-            if (anim != null) anim.enabled = true;
-
-            Debug.Log($"[SERVER] Đã nhả enemy {enemyNetObj.name} ra khỏi quả bóng!");
-        }
-
-        swallowedEnemies.Clear();
-    }
-
-    // =========================================================
-    // 2. HÀM CHẠY TRÊN CLIENT: HIỂN THỊ HÌNH ẢNH (BẬT CỤC BỤI)
-    // =========================================================
     public override void ClientPlayVisual(SkillData data)
     {
-        // KHÔNG kiểm tra isSkillActive ở đây vì Server đã set nó = true trước khi ClientRpc được gọi
-        // Chỉ kiểm tra data != null để tránh NullReference
-        if (data == null) return;
-        
-        if (data is RollingSkillData rollingData)
-        {
-            currentData = rollingData;
-            StartCoroutine(RollSkillRoutine());
-        }
+        // Thực hiện VFX/Sound ở Client nếu cần
     }
 
-    // Coroutine xử lý hình ảnh (visual scaling + rotation)
-    private IEnumerator RollSkillRoutine()
+    private IEnumerator RollingRoutine(RollingSkillData data, PlayerController controller)
     {
-        isVisualActive = true;
-        currentSpeedMultiplier = 1f;
-
+        Debug.Log("🌀 [ROLL] Bắt đầu cuộn tròn! Đang lấy đà...");
+        
+        // --- 1. SETUP VISUAL & TRẠNG THÁI ---
         if (normalVisual != null) normalVisual.SetActive(false);
-        if (dustVisual != null) 
-        {
-            dustVisual.transform.localScale = Vector3.one; 
-            dustVisual.SetActive(true);
+        if (dustVisual != null) dustVisual.SetActive(true);
 
-            // Phóng to quả bóng (xù lông + cuộn tròn)
-            StartCoroutine(ScaleUpRoutine());
-        }
-        
-        if (dustParticle != null) dustParticle.Play(); 
+        // Trích xuất PlayerMovement để xử lý tốc độ
+        PlayerMovement pMovement = controller.GetComponentInChildren<PlayerMovement>();
+        if (pMovement == null) pMovement = controller.GetComponentInParent<PlayerMovement>();
 
-        // Chờ thời gian tồn tại chiêu
-        yield return new WaitForSeconds(currentData.duration);
-        
-        if (dustParticle != null) dustParticle.Stop(); 
-
-        // Hiệu ứng biến mất dần
         float elapsed = 0f;
-        while (elapsed < currentData.disappearDuration)
+        float damageAccumulator = 0f;
+        float currentMultiplier = 1f;
+
+        // --- 2. VÒNG LẶP MECHANIC ---
+        while (elapsed < data.duration)
         {
-            elapsed += Time.deltaTime;
-            float progress = elapsed / currentData.disappearDuration;
-            
-            if (dustVisual != null)
+            float deltaTime = Time.fixedDeltaTime;
+
+            // Lấy đà tăng tốc dần đều
+            if (currentMultiplier < data.maxSpeedMultiplier)
             {
-                dustVisual.transform.localScale = Vector3.Lerp(
-                    dustVisual.transform.localScale, Vector3.zero, progress * 3f * Time.deltaTime
-                );
+                currentMultiplier += data.acceleration * deltaTime;
+                currentMultiplier = Mathf.Min(currentMultiplier, data.maxSpeedMultiplier);
+                
+                // Mở comment nếu PlayerMovement của bạn có biến hệ số tốc độ:
+                // if (pMovement != null) pMovement.speedMultiplier = currentMultiplier;
             }
-            yield return null;
+
+            // Xoay mesh cục bông dựa trên tốc độ hiện tại
+            if (spinMesh != null)
+            {
+                float currentRotationSpeed = data.baseRotationSpeed * currentMultiplier;
+                spinMesh.Rotate(0, 0, -currentRotationSpeed * deltaTime);
+            }
+
+            // MECHANIC: HÚT VÀ NUỐT ĐỊCH
+            Collider2D[] hits = Physics2D.OverlapCircleAll(controller.transform.position, data.pullRadius, data.enemyLayer);
+            foreach (var hit in hits)
+            {
+                float distance = Vector2.Distance(controller.transform.position, hit.transform.position);
+
+                if (distance <= data.hitRadius)
+                {
+                    SwallowEnemy(hit.gameObject); // Đủ gần -> Nuốt vào bụng
+                }
+                else
+                {
+                    // Còn ở xa -> Hút từ từ vào tâm
+                    hit.transform.position = Vector3.MoveTowards(
+                        hit.transform.position, 
+                        controller.transform.position, 
+                        data.pullSpeed * deltaTime
+                    );
+                }
+            }
+
+            // MECHANIC: GÂY SÁT THƯƠNG THEO THỜI GIAN (DOT)
+            // Lấy trực tiếp biến 'damage' từ class cha SkillData làm chỉ số DPS
+            float damageThisFrame = data.damage * deltaTime;
+            damageAccumulator += damageThisFrame;
+
+            if (damageAccumulator >= 1f)
+            {
+                int intDamage = Mathf.FloorToInt(damageAccumulator);
+                damageAccumulator -= intDamage;
+
+                for (int i = stomach.Count - 1; i >= 0; i--)
+                {
+                    SwallowedEnemy swallowed = stomach[i];
+                    
+                    if (swallowed.Obj == null) 
+                    {
+                        stomach.RemoveAt(i);
+                        continue;
+                    }
+
+                    // Ép vị trí quái đi theo Player khi đang ở trong dạ dày
+                    swallowed.Obj.transform.position = controller.transform.position;
+
+                    if (swallowed.Health != null)
+                    {
+                        swallowed.Health.TakeDamage(intDamage);
+                        
+                        // Nếu quái chết trong bụng -> Tiêu hóa thành công
+                        if (swallowed.Entity != null && !swallowed.Entity.IsAlive)
+                        {
+                            Debug.Log($"💀 [ROLL] {swallowed.Obj.name} đã bị tiêu hóa!");
+                            stomach.RemoveAt(i);
+                        }
+                    }
+                }
+            }
+
+            elapsed += deltaTime;
+            yield return new WaitForFixedUpdate();
         }
 
+        // --- 3. KẾT THÚC SKILL ---
+        Debug.Log("🛑 [ROLL] Nhả địch ra và thắng phanh!");
+        SpitOutEnemies();
+
+        // Trả lại Visual cừu bình thường
         if (dustVisual != null) dustVisual.SetActive(false);
         if (normalVisual != null) normalVisual.SetActive(true);
+        if (spinMesh != null) spinMesh.localRotation = Quaternion.identity; 
 
-        isVisualActive = false;
-        currentData = null; 
+        // Sửa lại biến trả tốc độ gốc nếu cần:
+        // if (pMovement != null) pMovement.speedMultiplier = 1f; 
     }
 
-    private IEnumerator ScaleUpRoutine()
+    private void SwallowEnemy(GameObject enemyObj)
     {
-        if (dustVisual == null) yield break;
+        if (stomach.Exists(e => e.Obj == enemyObj || e.Obj == enemyObj.transform.parent?.gameObject)) return;
 
-        float duration = currentData.duration * 0.3f; // Mất 30% thời gian để phóng to
-        float elapsed = 0f;
-        Vector3 startScale = Vector3.one;
-        Vector3 targetScale = Vector3.one * maxScaleMultiplier;
+        NetworkObject netObj = enemyObj.GetComponentInParent<NetworkObject>();
+        if (netObj == null) netObj = enemyObj.GetComponent<NetworkObject>();
+        if (netObj == null) return;
 
-        while (elapsed < duration && dustVisual != null)
+        GameObject rootObj = netObj.gameObject;
+        SwallowedEnemy swallowed = new SwallowedEnemy { Obj = rootObj };
+
+        swallowed.Movement = rootObj.GetComponent<EnemyMovement>();
+        swallowed.AI = rootObj.GetComponent<EnemyAI>();
+        swallowed.Health = rootObj.GetComponent<NetworkHealth>();
+        swallowed.Entity = rootObj.GetComponent<EnemyEntity>(); 
+        swallowed.Renderers = rootObj.GetComponentsInChildren<SpriteRenderer>();
+        swallowed.Colliders = rootObj.GetComponentsInChildren<Collider2D>();
+
+        // Vô hiệu hóa hoạt động của quái
+        if (swallowed.Movement != null) 
         {
-            elapsed += Time.deltaTime;
-            float progress = Mathf.Clamp01(elapsed / duration);
-            dustVisual.transform.localScale = Vector3.Lerp(startScale, targetScale, progress);
-            yield return null;
+            swallowed.Movement.Stop(); 
+            swallowed.Movement.enabled = false;
         }
+        if (swallowed.AI != null) swallowed.AI.enabled = false;
 
-        if (dustVisual != null)
-        {
-            dustVisual.transform.localScale = targetScale;
-        }
+        // Giấu hình ảnh và vật lý
+        foreach (var sr in swallowed.Renderers) if (sr != null) sr.enabled = false;
+        foreach (var col in swallowed.Colliders) if (col != null) col.enabled = false;
+
+        stomach.Add(swallowed);
     }
 
-    public override void OnNetworkDespawn()
+    private void SpitOutEnemies()
     {
-        base.OnNetworkDespawn();
-
-        // Cleanup nếu bị despawn bất ngờ
-        if (damageCoroutine != null)
+        foreach (var enemy in stomach)
         {
-            StopCoroutine(damageCoroutine);
-            damageCoroutine = null;
-        }
+            if (enemy.Obj == null) continue;
 
-        // Nhả enemy nếu còn
-        if (IsServer && swallowedEnemies.Count > 0)
-        {
-            ReleaseAllSwallowedEnemies();
-        }
+            // Văng quái ra một vị trí ngẫu nhiên nhỏ quanh Player
+            Vector2 randomOffset = Random.insideUnitCircle * 1.5f;
+            enemy.Obj.transform.position = rollController.transform.position + (Vector3)randomOffset;
 
-        // Tắt invulnerable
-        if (IsServer && NetworkObject != null)
-        {
-            NetworkEntity entity = GetComponentInParent<NetworkEntity>();
-            if (entity != null)
-            {
-                entity.isInvulnerable.Value = false;
-            }
-        }
+            // Bật lại hoạt động và hiển thị cho quái
+            if (enemy.Movement != null) enemy.Movement.enabled = true;
+            if (enemy.AI != null) enemy.AI.enabled = true;
 
-        isSkillActive = false;
-        currentData = null;
-    }
-
-    private void OnDisable()
-    {
-        // Dọn dẹp khi component bị disable
-        if (damageCoroutine != null)
-        {
-            StopCoroutine(damageCoroutine);
-            damageCoroutine = null;
+            if (enemy.Renderers != null) 
+                foreach (var sr in enemy.Renderers) if (sr != null) sr.enabled = true;
+                
+            if (enemy.Colliders != null) 
+                foreach (var col in enemy.Colliders) if (col != null) col.enabled = true;
         }
+        
+        stomach.Clear();
     }
 }
