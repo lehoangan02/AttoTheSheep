@@ -28,6 +28,11 @@ public class NetworkEntity : NetworkBehaviour
         0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server
     );
 
+    // Invulnerability flag: khi true, TakeDamage bị bỏ qua (dùng cho Rolling Skill)
+    public NetworkVariable<bool> isInvulnerable = new NetworkVariable<bool>(
+        false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server
+    );
+
     public event Action OnDied;
 
     public float BaseMoveSpeed => baseMoveSpeed;
@@ -51,6 +56,9 @@ public class NetworkEntity : NetworkBehaviour
     public virtual void TakeDamage(int damage)
     {
         if (!IsServer || currentHealth.Value <= 0) return;
+
+        // Nếu đang miễn nhiễm, bỏ qua toàn bộ sát thương
+        if (isInvulnerable.Value) return;
 
         currentHealth.Value = Mathf.Max(0, currentHealth.Value - damage);
 
