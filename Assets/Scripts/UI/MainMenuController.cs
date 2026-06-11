@@ -23,6 +23,8 @@ public class MainMenuController : MonoBehaviour
     [Header("Settings")]
     [SerializeField] private Button settingsIconButton;
     [SerializeField] private GameObject settingsPanel;
+    [SerializeField] private Button settingsCloseButton;
+    [SerializeField] private Button settingsBackButton;
 
     [Header("Cursors")]
     [SerializeField] private Texture2D defaultCursor;
@@ -68,6 +70,12 @@ public class MainMenuController : MonoBehaviour
         // Settings toggle
         if (settingsIconButton != null)
             settingsIconButton.onClick.AddListener(OnSettingsToggled);
+            
+        if (settingsCloseButton != null)
+            settingsCloseButton.onClick.AddListener(OnSettingsToggled);
+            
+        if (settingsBackButton != null)
+            settingsBackButton.onClick.AddListener(OnSettingsToggled);
 
         // Make sure settings panel starts closed
         if (settingsPanel != null)
@@ -139,7 +147,7 @@ public class MainMenuController : MonoBehaviour
     // ─────────────────────────────────────────────────────────────────────────
     // Called by Editor setup tool to inject references at design time
     // ─────────────────────────────────────────────────────────────────────────
-    public void Setup(Button newGame, Button cont, Button multi, Button settingsIcon, GameObject settPanel, CanvasGroup fade, Texture2D cDefault = null, Texture2D cHover = null, Texture2D cDisabled = null)
+    public void Setup(Button newGame, Button cont, Button multi, Button settingsIcon, GameObject settPanel, CanvasGroup fade, Texture2D cDefault = null, Texture2D cHover = null, Texture2D cDisabled = null, Button settClose = null, Button settBack = null)
     {
         newGameButton = newGame;
         continueButton = cont;
@@ -151,5 +159,8 @@ public class MainMenuController : MonoBehaviour
         defaultCursor = cDefault;
         hoverCursor = cHover;
         disabledCursor = cDisabled;
+        
+        settingsCloseButton = settClose;
+        settingsBackButton = settBack;
     }
 }

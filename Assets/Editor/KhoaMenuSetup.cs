@@ -119,15 +119,20 @@ public static class KhoaMenuSetup
             "Assets/Tiny Swords/Terrain/Decorations/Rocks/Rock1.png",
             new Vector2(-600f, -480f), new Vector2(60f, 60f), 0f);
 
-        // Blue Pawn character standing guard near the bushes
+        // Blue Pawn character standing guard
         AddDecor(decorLayer.transform, "BluePawn",
             "Assets/Tiny Swords/Pawn and Resources/Pawn/Blue Pawn/Pawn_Idle.png",
-            new Vector2(-820f, -320f), new Vector2(180f, 180f), 0f);
+            new Vector2(-871f, 182f), new Vector2(180f, 180f), 0f);
 
-        // A small ribbon hanging below the title "ATTO THE SHEEP"
-        AddDecor(decorLayer.transform, "Title_Ribbon",
-            "Assets/Tiny Swords/UI Elements/Ribbons/SmallRibbons 1.png",
-            new Vector2(-550f, 160f), new Vector2(250f, 60f), 0f);
+        // Huge Happy Sheep
+        AddDecor(decorLayer.transform, "Sheep",
+            "Assets/Tiny Swords/Pawn and Resources/Meat/Sheep/Sheep_Idle.png",
+            new Vector2(400f, -50f), new Vector2(500f, 500f), 0f);
+
+        // Extra Cloud behind Sheep
+        AddDecor(decorLayer.transform, "Cloud_Extra",
+            "Assets/Tiny Swords/Terrain/Decorations/Clouds/Clouds_01.png",
+            new Vector2(700f, 300f), new Vector2(400f, 200f), 0f);
 
         // ── 5. Cloud Buttons ─────────────────────────────────────────────────
         // Load font and button sprite
@@ -154,7 +159,7 @@ public static class KhoaMenuSetup
         var settingsIconBtn = CreateIconButton("SettingsIconButton", canvas.transform, gearIcon, SettingsIconPos);
 
         // ── 7. Settings Panel (Wood Table, hidden by default) ─────────────────
-        var settingsPanel = BuildSettingsPanel(canvas.transform, font);
+        var (settingsPanel, closeBtn, backBtn) = BuildSettingsPanel(canvas.transform, font);
 
         // ── 8. Fade Overlay ──────────────────────────────────────────────────
         // Always create fresh (destroyed above) to avoid CanvasGroup missing component errors.
@@ -180,7 +185,7 @@ public static class KhoaMenuSetup
         Texture2D curDisabled = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Tiny Swords/UI Elements/Cursors/Cursor_03.png");
 
         controller.Setup(newGameBtn, continueBtn, multiplayerBtn,
-                         settingsIconBtn, settingsPanel, fadeGroup, curDefault, curHover, curDisabled);
+                         settingsIconBtn, settingsPanel, fadeGroup, curDefault, curHover, curDisabled, closeBtn, backBtn);
 
         // Mark scene dirty so Unity knows to save
         EditorSceneManager.MarkSceneDirty(active);
@@ -301,7 +306,7 @@ public static class KhoaMenuSetup
     // ─────────────────────────────────────────────────────────────────────────
     // Settings Panel (Wood Table)
     // ─────────────────────────────────────────────────────────────────────────
-    private static GameObject BuildSettingsPanel(Transform canvasTransform, TMP_FontAsset font)
+    private static (GameObject, Button, Button) BuildSettingsPanel(Transform canvasTransform, TMP_FontAsset font)
     {
         var panel = GetOrCreate("SettingsPanel", canvasTransform);
         ClearChildren(panel.transform);
@@ -310,8 +315,8 @@ public static class KhoaMenuSetup
         rect.anchorMin = new Vector2(0.5f, 0.5f);
         rect.anchorMax = new Vector2(0.5f, 0.5f);
         rect.pivot     = new Vector2(0.5f, 0.5f);
-        rect.sizeDelta        = SettingsPanelSize;
-        rect.anchoredPosition = SettingsPanelPos;
+        rect.sizeDelta        = new Vector2(900f, 600f);
+        rect.anchoredPosition = new Vector2(0f, 0f);
         rect.localScale = Vector3.one;
 
         // Wood Table as panel background
@@ -321,10 +326,10 @@ public static class KhoaMenuSetup
         bgImg.type   = Image.Type.Sliced;
         bgImg.color  = Color.white;
 
-        // Title ribbon inside panel
+        // Title ribbon intersecting the top edge
         var ribbonGo  = GetOrCreate("PanelTitle", panel.transform);
         var ribbonImg = GetOrAddComponent<Image>(ribbonGo);
-        ribbonImg.sprite = LoadSprite("Assets/Tiny Swords/UI Elements/Ribbons/SmallRibbons 2.png");
+        ribbonImg.sprite = LoadSprite("Assets/Tiny Swords/UI Elements/Ribbons/BigRibbons 1.png");
         ribbonImg.color  = Color.white;
         ribbonImg.preserveAspect = true;
         ribbonImg.raycastTarget  = false;
@@ -332,99 +337,237 @@ public static class KhoaMenuSetup
         ribbonRect.anchorMin        = new Vector2(0.5f, 1f);
         ribbonRect.anchorMax        = new Vector2(0.5f, 1f);
         ribbonRect.pivot            = new Vector2(0.5f, 0.5f);
-        ribbonRect.sizeDelta        = new Vector2(300f, 60f);
-        ribbonRect.anchoredPosition = new Vector2(0f, 20f);
+        ribbonRect.sizeDelta        = new Vector2(400f, 120f);
+        ribbonRect.anchoredPosition = new Vector2(0f, 0f);
 
         var titleTextGo   = GetOrCreate("TitleText", ribbonGo.transform);
         var titleTextComp = GetOrAddComponent<TextMeshProUGUI>(titleTextGo);
         titleTextComp.text      = "SETTINGS";
-        titleTextComp.fontSize  = 22;
+        titleTextComp.fontSize  = 46;
         titleTextComp.alignment = TextAlignmentOptions.Center;
         titleTextComp.color     = Color.white;
         titleTextComp.font      = font;
         titleTextComp.raycastTarget = false;
-        StretchFull(titleTextGo.GetComponent<RectTransform>());
+        var titleRect = titleTextGo.GetComponent<RectTransform>();
+        StretchFull(titleRect);
+        titleRect.offsetMin = new Vector2(0, 20f); // tweak text up a bit for BigRibbons
 
-        // Settings rows: [icon] [label] [small button / icon]
-        var settings = new (string label, string iconPath, string valuePath)[]
-        {
-            ("Sound",    "Assets/Tiny Swords/UI Elements/Icons/Icon_11.png", "Assets/Tiny Swords/UI Elements/Buttons/TinyRoundBlueButton.png"),
-            ("Music",    "Assets/Tiny Swords/UI Elements/Icons/Icon_12.png", "Assets/Tiny Swords/UI Elements/Buttons/TinyRoundBlueButton.png"),
-            ("Language", "Assets/Tiny Swords/UI Elements/Icons/Icon_03.png", "Assets/Tiny Swords/UI Elements/Buttons/SmallBlueSquareButton_Regular.png"),
-            ("Credits",  "Assets/Tiny Swords/UI Elements/Icons/Icon_10.png", "Assets/Tiny Swords/UI Elements/Buttons/SmallRedRoundButton_Regular.png"),
-        };
+        // Close Button (Top Right)
+        var closeGo = GetOrCreate("CloseButton", panel.transform);
+        var closeImg = GetOrAddComponent<Image>(closeGo);
+        closeImg.sprite = LoadSprite("Assets/Tiny Swords/UI Elements/Buttons/SmallRedSquareButton_Regular.png");
+        closeImg.type = Image.Type.Simple;
+        var closeRect = closeGo.GetComponent<RectTransform>();
+        closeRect.anchorMin = new Vector2(1f, 1f);
+        closeRect.anchorMax = new Vector2(1f, 1f);
+        closeRect.pivot = new Vector2(0.5f, 0.5f);
+        closeRect.sizeDelta = new Vector2(80f, 80f);
+        closeRect.anchoredPosition = new Vector2(-20f, -20f);
+        
+        var closeBtn = GetOrAddComponent<Button>(closeGo);
+        closeBtn.transition = Selectable.Transition.ColorTint;
+        if (closeGo.GetComponent<MenuButtonAnimator>() == null) closeGo.AddComponent<MenuButtonAnimator>();
+        
+        var closeIconGo = GetOrCreate("CloseIcon", closeGo.transform);
+        var closeTextComp = GetOrAddComponent<TextMeshProUGUI>(closeIconGo);
+        closeTextComp.text = "X";
+        closeTextComp.fontSize = 40;
+        closeTextComp.alignment = TextAlignmentOptions.Center;
+        closeTextComp.color = Color.white;
+        closeTextComp.font = font;
+        closeTextComp.raycastTarget = false;
+        StretchFull(closeIconGo.GetComponent<RectTransform>());
 
-        float startY = 220f;  // rows start near top of 800px-tall panel
-        float rowH   = 120f;  // spacing for 4 rows inside 800px panel
-        for (int i = 0; i < settings.Length; i++)
-        {
-            var (label, iconPath, valuePath) = settings[i];
-            float y = startY - i * rowH;
-            BuildSettingsRow(panel.transform, i, label, iconPath, valuePath, font, y);
-        }
+        // Rows
+        BuildSliderRow(panel.transform, "Row_Sound", "Sound", "Assets/Tiny Swords/UI Elements/Icons/Icon_11.png", font, 100f);
+        BuildSliderRow(panel.transform, "Row_Music", "Music", "Assets/Tiny Swords/UI Elements/Icons/Icon_12.png", font, 0f);
+        BuildToggleRow(panel.transform, "Row_Language", "Language", "Assets/Tiny Swords/UI Elements/Icons/Icon_03.png", font, -100f);
+
+        // Bottom Button (Credits / Back)
+        var backBtnGo = GetOrCreate("BackButton", panel.transform);
+        var backBtnImg = GetOrAddComponent<Image>(backBtnGo);
+        backBtnImg.sprite = LoadSprite("Assets/Tiny Swords/UI Elements/Wood Table/WoodTable_Slots.png");
+        backBtnImg.type = Image.Type.Sliced;
+        var backRect = backBtnGo.GetComponent<RectTransform>();
+        backRect.anchorMin = new Vector2(0.5f, 0f);
+        backRect.anchorMax = new Vector2(0.5f, 0f);
+        backRect.pivot = new Vector2(0.5f, 0.5f);
+        backRect.sizeDelta = new Vector2(300f, 90f);
+        backRect.anchoredPosition = new Vector2(0f, 20f);
+        
+        var backBtn = GetOrAddComponent<Button>(backBtnGo);
+        if (backBtnGo.GetComponent<MenuButtonAnimator>() == null) backBtnGo.AddComponent<MenuButtonAnimator>();
+        
+        var backTextGo = GetOrCreate("Text", backBtnGo.transform);
+        var backTextComp = GetOrAddComponent<TextMeshProUGUI>(backTextGo);
+        backTextComp.text = "BACK TO GAME";
+        backTextComp.fontSize = 28;
+        backTextComp.alignment = TextAlignmentOptions.Center;
+        backTextComp.color = new Color(0.95f, 0.9f, 0.8f);
+        backTextComp.font = font;
+        backTextComp.raycastTarget = false;
+        StretchFull(backTextGo.GetComponent<RectTransform>());
 
         panel.SetActive(false); // hidden by default
-        return panel;
+        return (panel, closeBtn, backBtn);
     }
 
-    private static void BuildSettingsRow(Transform parent, int idx, string label,
-        string iconPath, string btnPath, TMP_FontAsset font, float y)
+    private static void BuildSliderRow(Transform parent, string rowName, string label, string iconPath, TMP_FontAsset font, float y)
     {
-        var row = GetOrCreate($"Row_{label}", parent);
+        var row = GetOrCreate(rowName, parent);
         ClearChildren(row.transform);
 
         var rowRect = row.GetComponent<RectTransform>();
-        rowRect.anchorMin        = new Vector2(0.5f, 0.5f);
-        rowRect.anchorMax        = new Vector2(0.5f, 0.5f);
-        rowRect.pivot            = new Vector2(0.5f, 0.5f);
-        rowRect.sizeDelta        = new Vector2(600f, 80f);   // wider row for the bigger panel
+        rowRect.anchorMin = new Vector2(0.5f, 0.5f);
+        rowRect.anchorMax = new Vector2(0.5f, 0.5f);
+        rowRect.pivot = new Vector2(0.5f, 0.5f);
+        rowRect.sizeDelta = new Vector2(700f, 80f);
         rowRect.anchoredPosition = new Vector2(0f, y);
 
-        // Icon (bigger)
-        var iconGo  = GetOrCreate("Icon", row.transform);
+        // Icon
+        var iconGo = GetOrCreate("Icon", row.transform);
         var iconImg = GetOrAddComponent<Image>(iconGo);
         iconImg.sprite = LoadSprite(iconPath);
         iconImg.preserveAspect = true;
-        iconImg.raycastTarget  = false;
         var iconRect = iconGo.GetComponent<RectTransform>();
-        iconRect.anchorMin        = new Vector2(0f, 0.5f);
-        iconRect.anchorMax        = new Vector2(0f, 0.5f);
-        iconRect.pivot            = new Vector2(0.5f, 0.5f);
-        iconRect.sizeDelta        = new Vector2(64f, 64f);   // bigger icon
-        iconRect.anchoredPosition = new Vector2(40f, 0f);
+        iconRect.anchorMin = new Vector2(0f, 0.5f);
+        iconRect.anchorMax = new Vector2(0f, 0.5f);
+        iconRect.pivot = new Vector2(0f, 0.5f);
+        iconRect.sizeDelta = new Vector2(64f, 64f);
+        iconRect.anchoredPosition = new Vector2(20f, 0f);
 
-        // Label (bigger font)
-        var labelGo  = GetOrCreate("Label", row.transform);
+        // Label
+        var labelGo = GetOrCreate("Label", row.transform);
         var labelTmp = GetOrAddComponent<TextMeshProUGUI>(labelGo);
-        labelTmp.text      = label;
-        labelTmp.fontSize  = 26;                             // bigger font size
+        labelTmp.text = label;
+        labelTmp.fontSize = 32;
         labelTmp.alignment = TextAlignmentOptions.Left;
-        labelTmp.color     = new Color(0.95f, 0.9f, 0.8f);
-        labelTmp.font      = font;
-        labelTmp.raycastTarget = false;
+        labelTmp.color = new Color(0.95f, 0.9f, 0.8f);
+        labelTmp.font = font;
         var labelRect = labelGo.GetComponent<RectTransform>();
-        labelRect.anchorMin        = new Vector2(0f, 0.5f);
-        labelRect.anchorMax        = new Vector2(0f, 0.5f);
-        labelRect.pivot            = new Vector2(0f, 0.5f);
-        labelRect.sizeDelta        = new Vector2(300f, 60f);
-        labelRect.anchoredPosition = new Vector2(85f, 0f);
+        labelRect.anchorMin = new Vector2(0f, 0.5f);
+        labelRect.anchorMax = new Vector2(0f, 0.5f);
+        labelRect.pivot = new Vector2(0f, 0.5f);
+        labelRect.sizeDelta = new Vector2(200f, 60f);
+        labelRect.anchoredPosition = new Vector2(100f, 0f);
 
-        // Action button (bigger)
-        var btnGo  = GetOrCreate("ActionBtn", row.transform);
+        // Slider Component
+        var sliderGo = GetOrCreate("Slider", row.transform);
+        var sliderRect = sliderGo.GetComponent<RectTransform>();
+        sliderRect.anchorMin = new Vector2(1f, 0.5f);
+        sliderRect.anchorMax = new Vector2(1f, 0.5f);
+        sliderRect.pivot = new Vector2(1f, 0.5f);
+        sliderRect.sizeDelta = new Vector2(300f, 30f);
+        sliderRect.anchoredPosition = new Vector2(-40f, 0f);
+        var slider = GetOrAddComponent<Slider>(sliderGo);
+
+        // Background
+        var bgGo = GetOrCreate("Background", sliderGo.transform);
+        var bgImg = GetOrAddComponent<Image>(bgGo);
+        bgImg.sprite = LoadSprite("Assets/Tiny Swords/UI Elements/Bars/SmallBar_Base.png");
+        bgImg.type = Image.Type.Sliced;
+        var bgRect = bgGo.GetComponent<RectTransform>();
+        StretchFull(bgRect);
+
+        // Fill Area
+        var fillAreaGo = GetOrCreate("Fill Area", sliderGo.transform);
+        var fillAreaRect = fillAreaGo.GetComponent<RectTransform>();
+        StretchFull(fillAreaRect);
+        fillAreaRect.offsetMin = new Vector2(5f, 0f);
+        fillAreaRect.offsetMax = new Vector2(-15f, 0f); // account for handle
+
+        // Fill
+        var fillGo = GetOrCreate("Fill", fillAreaGo.transform);
+        var fillImg = GetOrAddComponent<Image>(fillGo);
+        fillImg.sprite = LoadSprite("Assets/Tiny Swords/UI Elements/Bars/SmallBar_Fill.png");
+        fillImg.type = Image.Type.Sliced;
+        fillImg.color = new Color(0.4f, 0.8f, 0.3f); // greenish fill
+        var fillRect = fillGo.GetComponent<RectTransform>();
+        StretchFull(fillRect);
+
+        // Handle Slide Area
+        var handleAreaGo = GetOrCreate("Handle Slide Area", sliderGo.transform);
+        var handleAreaRect = handleAreaGo.GetComponent<RectTransform>();
+        StretchFull(handleAreaRect);
+        handleAreaRect.offsetMin = new Vector2(10f, 0f);
+        handleAreaRect.offsetMax = new Vector2(-10f, 0f);
+
+        // Handle
+        var handleGo = GetOrCreate("Handle", handleAreaGo.transform);
+        var handleImg = GetOrAddComponent<Image>(handleGo);
+        handleImg.sprite = LoadSprite("Assets/Tiny Swords/UI Elements/Buttons/TinyRoundBlueButton.png");
+        handleImg.type = Image.Type.Simple;
+        var handleRect = handleGo.GetComponent<RectTransform>();
+        handleRect.sizeDelta = new Vector2(40f, 40f);
+
+        // Setup slider
+        slider.targetGraphic = handleImg;
+        slider.fillRect = fillRect;
+        slider.handleRect = handleRect;
+        slider.value = 0.5f;
+    }
+
+    private static void BuildToggleRow(Transform parent, string rowName, string label, string iconPath, TMP_FontAsset font, float y)
+    {
+        var row = GetOrCreate(rowName, parent);
+        ClearChildren(row.transform);
+
+        var rowRect = row.GetComponent<RectTransform>();
+        rowRect.anchorMin = new Vector2(0.5f, 0.5f);
+        rowRect.anchorMax = new Vector2(0.5f, 0.5f);
+        rowRect.pivot = new Vector2(0.5f, 0.5f);
+        rowRect.sizeDelta = new Vector2(700f, 80f);
+        rowRect.anchoredPosition = new Vector2(0f, y);
+
+        // Icon
+        var iconGo = GetOrCreate("Icon", row.transform);
+        var iconImg = GetOrAddComponent<Image>(iconGo);
+        iconImg.sprite = LoadSprite(iconPath);
+        iconImg.preserveAspect = true;
+        var iconRect = iconGo.GetComponent<RectTransform>();
+        iconRect.anchorMin = new Vector2(0f, 0.5f);
+        iconRect.anchorMax = new Vector2(0f, 0.5f);
+        iconRect.pivot = new Vector2(0f, 0.5f);
+        iconRect.sizeDelta = new Vector2(64f, 64f);
+        iconRect.anchoredPosition = new Vector2(20f, 0f);
+
+        // Label
+        var labelGo = GetOrCreate("Label", row.transform);
+        var labelTmp = GetOrAddComponent<TextMeshProUGUI>(labelGo);
+        labelTmp.text = label;
+        labelTmp.fontSize = 32;
+        labelTmp.alignment = TextAlignmentOptions.Left;
+        labelTmp.color = new Color(0.95f, 0.9f, 0.8f);
+        labelTmp.font = font;
+        var labelRect = labelGo.GetComponent<RectTransform>();
+        labelRect.anchorMin = new Vector2(0f, 0.5f);
+        labelRect.anchorMax = new Vector2(0f, 0.5f);
+        labelRect.pivot = new Vector2(0f, 0.5f);
+        labelRect.sizeDelta = new Vector2(200f, 60f);
+        labelRect.anchoredPosition = new Vector2(100f, 0f);
+
+        // Toggle Button
+        var btnGo = GetOrCreate("ToggleButton", row.transform);
         var btnImg = GetOrAddComponent<Image>(btnGo);
-        btnImg.sprite = LoadSprite(btnPath);
-        btnImg.type   = Image.Type.Simple;
-        btnImg.preserveAspect = true;
-        var btnComp = GetOrAddComponent<Button>(btnGo);
-        btnComp.transition = Selectable.Transition.ColorTint;
-        if (btnGo.GetComponent<MenuButtonAnimator>() == null)
-            btnGo.AddComponent<MenuButtonAnimator>();
+        btnImg.sprite = LoadSprite("Assets/Tiny Swords/UI Elements/Buttons/SmallBlueSquareButton_Regular.png");
+        btnImg.type = Image.Type.Sliced;
         var btnRect = btnGo.GetComponent<RectTransform>();
-        btnRect.anchorMin        = new Vector2(1f, 0.5f);
-        btnRect.anchorMax        = new Vector2(1f, 0.5f);
-        btnRect.pivot            = new Vector2(1f, 0.5f);
-        btnRect.sizeDelta        = new Vector2(80f, 56f);    // bigger action button
-        btnRect.anchoredPosition = new Vector2(-30f, 0f);
+        btnRect.anchorMin = new Vector2(1f, 0.5f);
+        btnRect.anchorMax = new Vector2(1f, 0.5f);
+        btnRect.pivot = new Vector2(1f, 0.5f);
+        btnRect.sizeDelta = new Vector2(140f, 60f);
+        btnRect.anchoredPosition = new Vector2(-120f, 0f);
+        var btnComp = GetOrAddComponent<Button>(btnGo);
+        if (btnGo.GetComponent<MenuButtonAnimator>() == null) btnGo.AddComponent<MenuButtonAnimator>();
+
+        var btnTextGo = GetOrCreate("Text", btnGo.transform);
+        var btnTextTmp = GetOrAddComponent<TextMeshProUGUI>(btnTextGo);
+        btnTextTmp.text = "ENG";
+        btnTextTmp.fontSize = 28;
+        btnTextTmp.alignment = TextAlignmentOptions.Center;
+        btnTextTmp.color = Color.white;
+        btnTextTmp.font = font;
+        StretchFull(btnTextGo.GetComponent<RectTransform>());
     }
 
     // ─────────────────────────────────────────────────────────────────────────
