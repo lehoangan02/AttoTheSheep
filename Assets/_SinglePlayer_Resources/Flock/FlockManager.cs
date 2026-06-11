@@ -11,6 +11,9 @@ public class FlockManager : NetworkBehaviour
     [SerializeField] private float baseRadius = 1f;
     [SerializeField] private float radiusMultiplier = 0.5f; 
 
+    [Header("Skill Zone (Radius 2 - Lớn hơn)")]
+    [SerializeField] private float skillZoneRadiusMultiplier = 1.5f; // Bán kính kỹ năng = innerRadius * multiplier
+
     [Header("Skill Unlock Milestones")]
     [SerializeField] private int lambsForSkill1 = 3;
     [SerializeField] private int lambsForSkill2 = 6;
@@ -26,7 +29,8 @@ public class FlockManager : NetworkBehaviour
 
     public List<LambAI> activeLambs { get; private set; } = new List<LambAI>();
     public Vector2 currentFlockCenter { get; private set; } 
-    public float currentFlockRadius { get; private set; }
+    public float currentFlockRadius { get; private set; } // Bán kính 1: Giới hạn di chuyển của cừu + hồi máu
+    public float currentSkillZoneRadius { get; private set; } // Bán kính 2: Cho phép dùng skill
 
     [Header("Flock Buff Settings")]
     [SerializeField] private float healScale = 1f;
@@ -110,7 +114,10 @@ public class FlockManager : NetworkBehaviour
 
     private void UpdateFlockRadius()
     {
+        // Bán kính 1: Giới hạn di chuyển của bầy cừu + hồi máu
         currentFlockRadius = baseRadius + (radiusMultiplier * Mathf.Sqrt(activeLambs.Count));
+        // Bán kính 2: Cho phép dùng skill (rộng hơn)
+        currentSkillZoneRadius = currentFlockRadius * skillZoneRadiusMultiplier;
         CommandFlock(currentFlockCenter);
     }
 
@@ -127,6 +134,7 @@ public class FlockManager : NetworkBehaviour
         {
             if (lamb != null && lamb.gameObject.activeInHierarchy)
             {
+                // Cừu di chuyển theo bán kính 1 (inner radius)
                 lamb.SetFlockData(currentFlockCenter, currentFlockRadius);
             }
         }
@@ -144,25 +152,32 @@ public class FlockManager : NetworkBehaviour
     {
         if (showDebugRadius)
         {
-            Gizmos.color = Color.yellow;
+            // Bán kính 1 - Vùng cừu di chuyển + hồi máu (màu xanh lá)
+            Gizmos.color = new Color(0f, 1f, 0f, 0.3f);
             Gizmos.DrawWireSphere(currentFlockCenter, currentFlockRadius);
+
+            // Bán kính 2 - Vùng dùng skill (màu xanh dương)
+            Gizmos.color = new Color(0f, 0.5f, 1f, 0.3f);
+            Gizmos.DrawWireSphere(currentFlockCenter, currentSkillZoneRadius);
         }
     }
 
-    public bool IsPositionInsideFlock(Vector2 targetPosition)
+    /// <summary>
+    /// Bán kính 1: Kiểm tra player có ở trong vùng hồi máu + mana không
+    /// </summary>
+    public bool IsPositionInsideHealZone(Vector2 targetPosition)
     {
         float dist = Vector2.Distance(targetPosition, currentFlockCenter);
         return dist <= currentFlockRadius;
     }
 
-    public bool IsPositionInsideHealZone(Vector2 targetPosition)
-    {
-        return IsPositionInsideFlock(targetPosition);
-    }
-
+    /// <summary>
+    /// Bán kính 2: Kiểm tra player có ở trong vùng cho phép dùng skill không
+    /// </summary>
     public bool IsPositionInsideSkillZone(Vector2 targetPosition)
     {
-        return IsPositionInsideFlock(targetPosition);
+        float dist = Vector2.Distance(targetPosition, currentFlockCenter);
+        return dist <= currentSkillZoneRadius;
     }
 
     public override void OnNetworkDespawn()

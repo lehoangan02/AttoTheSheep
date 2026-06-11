@@ -6,9 +6,12 @@ public class RollingSkillData : SkillData
     [Header("Chỉ số đặc trưng của Lăn/Hóa Bụi")]
     public float maxSpeedMultiplier = 2.0f;
     public float acceleration = 1.5f;
-    public float duration = 5f;
+    public float duration = 4f;
     public float disappearDuration = 0.2f;
     public float baseRotationSpeed = 360f;
+
+    [Header("Cơ chế Nuốt kẻ địch")]
+    public float damagePerSecond = 50f;
 
     // Tự động tính thời gian tăng tốc
     public float AccelerationDuration 
