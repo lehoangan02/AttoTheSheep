@@ -106,28 +106,38 @@ public static class KhoaMenuSetup
         var decorLayer = GetOrCreate("Decorations", canvas.transform);
         ClearChildren(decorLayer.transform);
 
-        // Sword top-right (decorative, behind sheep)
-        AddDecor(decorLayer.transform, "Sword_TL",
-            "Assets/Tiny Swords/UI Elements/Swords/Swords 1.png",
-            new Vector2(-820f, 180f), new Vector2(90f, 90f), 30f);
+        // Decorate the bottom-left grassy area (around the buttons)
+        AddDecor(decorLayer.transform, "Bush_Large",
+            "Assets/Tiny Swords/Terrain/Decorations/Bushes/Bush 3.png",
+            new Vector2(-750f, -440f), new Vector2(180f, 180f), 0f);
+            
+        AddDecor(decorLayer.transform, "Bush_Small",
+            "Assets/Tiny Swords/Terrain/Decorations/Bushes/Bush 1.png",
+            new Vector2(-880f, -480f), new Vector2(110f, 110f), 0f);
+            
+        AddDecor(decorLayer.transform, "Rock",
+            "Assets/Tiny Swords/Terrain/Decorations/Rocks/Rock1.png",
+            new Vector2(-600f, -480f), new Vector2(60f, 60f), 0f);
 
-        AddDecor(decorLayer.transform, "Sword_BL",
-            "Assets/Tiny Swords/UI Elements/Swords/Swords 3.png",
-            new Vector2(-820f, -260f), new Vector2(90f, 90f), -20f);
+        // Blue Pawn character standing guard near the bushes
+        AddDecor(decorLayer.transform, "BluePawn",
+            "Assets/Tiny Swords/Pawn and Resources/Pawn/Blue Pawn/Pawn_Idle.png",
+            new Vector2(-820f, -320f), new Vector2(180f, 180f), 0f);
 
-        // Small ribbons as label strips above each cloud
-        AddDecor(decorLayer.transform, "Ribbon_Top",
+        // A small ribbon hanging below the title "ATTO THE SHEEP"
+        AddDecor(decorLayer.transform, "Title_Ribbon",
             "Assets/Tiny Swords/UI Elements/Ribbons/SmallRibbons 1.png",
-            new Vector2(-560f, 210f), new Vector2(220f, 50f), 0f);
-
-        // Bar decoration at bottom
-        AddDecor(decorLayer.transform, "Bar_Bottom",
-            "Assets/Tiny Swords/UI Elements/Bars/SmallBar_Base.png",
-            new Vector2(0f, -500f), new Vector2(600f, 40f), 0f);
+            new Vector2(-550f, 160f), new Vector2(250f, 60f), 0f);
 
         // ── 5. Cloud Buttons ─────────────────────────────────────────────────
         // Load font and button sprite
-        TMP_FontAsset font = FindFirstAsset<TMP_FontAsset>("t:TMP_FontAsset");
+        TMP_FontAsset font = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>("Assets/TextMesh Pro/Fonts/Skagwae Regular SDF.asset");
+        if (font == null) 
+        {
+            Debug.LogWarning("[KhoaMenuSetup] Skagwae font not found at expected path. Falling back to default.");
+            font = FindFirstAsset<TMP_FontAsset>("t:TMP_FontAsset");
+        }
+
         Sprite btnSprite   = LoadSprite("Assets/Tiny Swords/UI Elements/Buttons/BigBlueButton_Regular.png");
         Sprite btnSpriteRed = LoadSprite("Assets/Tiny Swords/UI Elements/Buttons/BigRedButton_Regular.png");
 
@@ -164,8 +174,13 @@ public static class KhoaMenuSetup
         // ── 9. Wire up MainMenuController ────────────────────────────────────
         if (mainMenuMgr == null) mainMenuMgr = new GameObject("MainMenuManager");
         var controller = GetOrAddComponent<MainMenuController>(mainMenuMgr);
+        
+        Texture2D curDefault = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Tiny Swords/UI Elements/Cursors/Cursor_01.png");
+        Texture2D curHover = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Tiny Swords/UI Elements/Cursors/Cursor_02.png");
+        Texture2D curDisabled = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Tiny Swords/UI Elements/Cursors/Cursor_03.png");
+
         controller.Setup(newGameBtn, continueBtn, multiplayerBtn,
-                         settingsIconBtn, settingsPanel, fadeGroup);
+                         settingsIconBtn, settingsPanel, fadeGroup, curDefault, curHover, curDisabled);
 
         // Mark scene dirty so Unity knows to save
         EditorSceneManager.MarkSceneDirty(active);
@@ -223,7 +238,7 @@ public static class KhoaMenuSetup
         var textGo   = GetOrCreate("Text", go.transform);
         var textComp = GetOrAddComponent<TextMeshProUGUI>(textGo);
         textComp.text      = label;
-        textComp.fontSize  = 24;
+        textComp.fontSize  = 42; // Increased size to fill box
         textComp.alignment = TextAlignmentOptions.Center;
         textComp.color     = interactable ? Color.white : new Color(0.85f, 0.85f, 0.85f);
         textComp.font      = font;
@@ -231,7 +246,7 @@ public static class KhoaMenuSetup
         var textRect = textGo.GetComponent<RectTransform>();
         textRect.anchorMin = Vector2.zero;
         textRect.anchorMax = Vector2.one;
-        textRect.offsetMin = new Vector2(50f, 0f);  // leave space for icon
+        textRect.offsetMin = Vector2.zero; // Perfectly centered
         textRect.offsetMax = Vector2.zero;
 
         return btn;

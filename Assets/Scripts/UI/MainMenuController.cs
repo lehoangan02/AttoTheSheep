@@ -24,6 +24,15 @@ public class MainMenuController : MonoBehaviour
     [SerializeField] private Button settingsIconButton;
     [SerializeField] private GameObject settingsPanel;
 
+    [Header("Cursors")]
+    [SerializeField] private Texture2D defaultCursor;
+    [SerializeField] private Texture2D hoverCursor;
+    [SerializeField] private Texture2D disabledCursor;
+
+    public Texture2D HoverCursor => hoverCursor;
+    public Texture2D DisabledCursor => disabledCursor;
+    public Texture2D DefaultCursor => defaultCursor;
+
     [Header("Fade")]
     [SerializeField] private CanvasGroup fadeOverlay;
     [SerializeField] private float fadeDuration = 0.4f;
@@ -33,6 +42,12 @@ public class MainMenuController : MonoBehaviour
 
     private void Start()
     {
+        // Set default cursor
+        if (defaultCursor != null)
+        {
+            Cursor.SetCursor(defaultCursor, Vector2.zero, CursorMode.Auto);
+        }
+
         // Wire up buttons
         if (newGameButton != null)
             newGameButton.onClick.AddListener(OnNewGameClicked);
@@ -124,7 +139,7 @@ public class MainMenuController : MonoBehaviour
     // ─────────────────────────────────────────────────────────────────────────
     // Called by Editor setup tool to inject references at design time
     // ─────────────────────────────────────────────────────────────────────────
-    public void Setup(Button newGame, Button cont, Button multi, Button settingsIcon, GameObject settPanel, CanvasGroup fade)
+    public void Setup(Button newGame, Button cont, Button multi, Button settingsIcon, GameObject settPanel, CanvasGroup fade, Texture2D cDefault = null, Texture2D cHover = null, Texture2D cDisabled = null)
     {
         newGameButton = newGame;
         continueButton = cont;
@@ -132,5 +147,9 @@ public class MainMenuController : MonoBehaviour
         settingsIconButton = settingsIcon;
         settingsPanel = settPanel;
         fadeOverlay = fade;
+        
+        defaultCursor = cDefault;
+        hoverCursor = cHover;
+        disabledCursor = cDisabled;
     }
 }
