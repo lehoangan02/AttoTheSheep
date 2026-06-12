@@ -710,6 +710,52 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerNameUI
   ShowTopMostFoldoutHeaderGroup: 1
   nameText: {fileID: 4059397634877419734}
+--- !u!1 &4970156938749258079
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8449501306487202680}
+  - component: {fileID: 7338613021342365268}
+  m_Layer: 0
+  m_Name: Skill_3
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8449501306487202680
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4970156938749258079}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1235488546585286335}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7338613021342365268
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4970156938749258079}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c93c63151491364e8fd7c0e1d40621b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerSneezeSkill
+  ShowTopMostFoldoutHeaderGroup: 1
+  spawnPoint: {fileID: 5214352752191870431}
 --- !u!1 &5959344248798845263
 GameObject:
   m_ObjectHideFlags: 0
@@ -1117,6 +1163,7 @@ Transform:
   m_Children:
   - {fileID: 77565061955431801}
   - {fileID: 2288682488833027602}
+  - {fileID: 8449501306487202680}
   m_Father: {fileID: 5214352752191870431}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2590359606250298652
@@ -1149,6 +1196,9 @@ MonoBehaviour:
   - slotName: 
     data: {fileID: 11400000, guid: dd4bb79653e5af84b803cf82889acd35, type: 2}
     logicScript: {fileID: 3653318934025102158}
+  - slotName: 
+    data: {fileID: 11400000, guid: 1a4a111ddeeef3e45aea618f792ae67a, type: 2}
+    logicScript: {fileID: 7338613021342365268}
 --- !u!114 &5817904330219769839
 MonoBehaviour:
   m_ObjectHideFlags: 0
