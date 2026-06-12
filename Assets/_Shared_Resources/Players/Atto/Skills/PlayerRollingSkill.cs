@@ -18,8 +18,7 @@ public class PlayerRollingSkill : BaseSkillComponent
         public GameObject Obj;
         public EnemyMovement Movement;
         public EnemyAI AI;
-        public NetworkHealth Health;
-        public EnemyEntity Entity; 
+        public NetworkEntity Entity; 
         public SpriteRenderer[] Renderers;
         public Collider2D[] Colliders;
     }
@@ -122,12 +121,12 @@ public class PlayerRollingSkill : BaseSkillComponent
                     // Ép vị trí quái đi theo Player khi đang ở trong dạ dày
                     swallowed.Obj.transform.position = controller.transform.position;
 
-                    if (swallowed.Health != null)
+                    if (swallowed.Entity != null)
                     {
-                        swallowed.Health.TakeDamage(intDamage);
+                        swallowed.Entity.TakeDamage(intDamage);
                         
                         // Nếu quái chết trong bụng -> Tiêu hóa thành công
-                        if (swallowed.Entity != null && !swallowed.Entity.IsAlive)
+                        if (!swallowed.Entity.IsAlive)
                         {
                             Debug.Log($"💀 [ROLL] {swallowed.Obj.name} đã bị tiêu hóa!");
                             stomach.RemoveAt(i);
@@ -166,8 +165,7 @@ public class PlayerRollingSkill : BaseSkillComponent
 
         swallowed.Movement = rootObj.GetComponent<EnemyMovement>();
         swallowed.AI = rootObj.GetComponent<EnemyAI>();
-        swallowed.Health = rootObj.GetComponent<NetworkHealth>();
-        swallowed.Entity = rootObj.GetComponent<EnemyEntity>(); 
+        swallowed.Entity = rootObj.GetComponent<NetworkEntity>(); 
         swallowed.Renderers = rootObj.GetComponentsInChildren<SpriteRenderer>();
         swallowed.Colliders = rootObj.GetComponentsInChildren<Collider2D>();
 

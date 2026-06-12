@@ -40,6 +40,7 @@ public class NetworkEntity : NetworkBehaviour
     public float BaseAttackDamage => baseAttackDamage;
     public int BaseMaxHealth => baseMaxHealth;
     public int BaseMaxMana => baseMaxMana;
+    public bool IsAlive => currentHealth.Value > 0;
 
     public override void OnNetworkSpawn()
     {
@@ -60,7 +61,11 @@ public class NetworkEntity : NetworkBehaviour
         // Nếu đang miễn nhiễm, bỏ qua toàn bộ sát thương
         if (isInvulnerable.Value) return;
 
+        int previousHealth = currentHealth.Value;
         currentHealth.Value = Mathf.Max(0, currentHealth.Value - damage);
+        int actualDamage = previousHealth - currentHealth.Value;
+
+        Debug.Log($"[TakeDamage] {name} nhận {actualDamage} sát thương (gốc: {damage}). Máu: {previousHealth} → {currentHealth.Value}");
 
         if (currentHealth.Value <= 0)
         {
