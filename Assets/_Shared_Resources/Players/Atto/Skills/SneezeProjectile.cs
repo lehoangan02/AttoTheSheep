@@ -20,25 +20,43 @@ public class SneezeProjectile : NetworkBehaviour
     private Vector2 startPosition;
     private bool hasHit = false;
 
-    public void Initialize(Vector2 direction, SneezeSkillData data, int overrideDamage = 0)
+    public void Initialize(Vector2 direction, SneezeSkillData data, int overrideDamage = 0, bool flipX = false)
+{
+    speed = data.projectileSpeed;
+    maxDistance = data.projectileMaxDistance;
+    damage = overrideDamage > 0 ? overrideDamage : (int)data.damage;
+    stunDuration = data.stunDuration;
+    enemyLayer = data.enemyLayer;
+
+    startPosition = transform.position;
+
+    if (rb != null)
     {
-        speed = data.projectileSpeed;
-        maxDistance = data.projectileMaxDistance;
-        damage = overrideDamage > 0 ? overrideDamage : (int)data.damage;
-        stunDuration = data.stunDuration;
-        enemyLayer = data.enemyLayer;
-
-        startPosition = transform.position;
-
-        if (rb != null)
-        {
-            rb.linearVelocity = direction * speed;
-        }
-
-        // Xoay đạn theo hướng bay
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        transform.rotation = Quaternion.Euler(0, 0, angle);
+        rb.linearVelocity = direction * speed;
     }
+
+    // --- SỬA LỖI XOAY VÀ CHỤM ĐẠN ---
+    // Tính góc xoay chuẩn 360 độ theo hướng bay thực tế
+    float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+    transform.rotation = Quaternion.Euler(0, 0, angle);
+
+    // Xử lý Flip để giữ bóng (shadow) luôn ở dưới đáy
+    Vector3 localScale = transform.localScale;
+    if (direction.x < 0)
+    {
+        // Khi bay sang trái, đạn bị lộn ngược. Ta lật trục Y (Flip Y) để đưa bóng trở về bên dưới.
+        // Tuyệt đối giữ nguyên trục X dương để đầu đạn hướng đúng theo góc rotation.
+        localScale.y = -Mathf.Abs(localScale.y);
+        localScale.x = Mathf.Abs(localScale.x);
+    }
+    else
+    {
+        // Bay sang phải thì giữ nguyên dương
+        localScale.y = Mathf.Abs(localScale.y);
+        localScale.x = Mathf.Abs(localScale.x);
+    }
+    transform.localScale = localScale;
+}
 
     private void FixedUpdate()
     {

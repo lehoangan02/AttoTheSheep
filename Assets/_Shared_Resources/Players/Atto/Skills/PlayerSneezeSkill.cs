@@ -42,15 +42,22 @@ public class PlayerSneezeSkill : BaseSkillComponent
 
         // Xác định hướng bắn (ưu tiên hướng đang di chuyển / hướng mặt)
         Vector2 baseDirection = GetFacingDirection(controller);
+        // Xác định flipX đồng bộ cho TẤT CẢ đạn dựa trên baseDirection,
+        // tránh mỗi đạn tự flip riêng gây chụm tia
+        bool flipX = baseDirection.x < 0;
 
         // Spawn N tia theo hình spread
         for (int i = 0; i < data.projectileCount; i++)
         {
-            // Tính góc cho tia thứ i
-            // spreadAngle = 60 -> các tia từ -30 đến +30 so với hướng mặt
+            // --- SỬA LỖI ĐÈ LAYER THỨ TỰ TRÊN XUỐNG ---
+            // Đảo ngược index nếu bắn trái để đạn luộn được sinh ra từ dưới lên trên.
+            // Điều này đảm bảo bóng của tia trên luôn đè đúng lên thân tia dưới ở cả 2 hướng.
+            int index = flipX ? (data.projectileCount - 1 - i) : i;
+
+            // Tính góc cho tia thứ index
             float halfSpread = data.spreadAngle * 0.5f;
             float angleStep = data.projectileCount > 1 ? data.spreadAngle / (data.projectileCount - 1) : 0f;
-            float currentAngle = -halfSpread + (angleStep * i);
+            float currentAngle = -halfSpread + (angleStep * index);
 
             // Xoay hướng baseDirection đi 1 góc currentAngle
             Vector2 projectileDir = RotateVector(baseDirection, currentAngle);
@@ -69,11 +76,11 @@ public class PlayerSneezeSkill : BaseSkillComponent
                 netObj.Spawn();
             }
 
-            // Khởi tạo đạn với damage đã chia đều
+            // Khởi tạo đạn
             SneezeProjectile projectile = projectileObj.GetComponent<SneezeProjectile>();
             if (projectile != null)
             {
-                projectile.Initialize(projectileDir, data, damagePerProjectile);
+                projectile.Initialize(projectileDir, data, damagePerProjectile, flipX);
             }
         }
 
