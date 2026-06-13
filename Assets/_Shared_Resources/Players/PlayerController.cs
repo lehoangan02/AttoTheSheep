@@ -8,7 +8,7 @@ public class PlayerController : NetworkBehaviour
 {
     // Events (Interfaces) for child components to plug into and get data
     public event Action<Vector2> OnMoveInputChanged;
-    public event Action<int> OnSkillActivated; // Returns Skill ID (0, 1, 2, 3)
+    public event Action<int> OnSkillActivated; // Returns Skill ID (0, 1, 2, 3, 4)
     public event Action<Vector2> OnMapClicked; 
 
     // ----------------------------------------------------
@@ -22,16 +22,16 @@ public class PlayerController : NetworkBehaviour
     }
 
     // ----------------------------------------------------
-    // RECEIVE BASIC ATTACK INPUT (SKILL 0) - Recently added!
+    // RECEIVE BASIC ATTACK INPUT (SKILL 0) - Matches action "Attack" in InputSystem_Actions
     // ----------------------------------------------------
-    public void OnBasicAttack(InputValue value)
+    public void OnAttack(InputValue value)
     {
         if (!IsOwner || !value.isPressed) return;
         OnSkillActivated?.Invoke(0); // Call SkillSlot 0
     }
 
     // ----------------------------------------------------
-    // RECEIVE OTHER SKILLS INPUT (SKILL 1, 2, 3)
+    // RECEIVE OTHER SKILLS INPUT (SKILL 1, 2, 3) - Matches actions "Skill1", "Skill2", "Skill3" in PlayerInputActions
     // ----------------------------------------------------
     public void OnSkill1(InputValue value)
     {
@@ -52,7 +52,16 @@ public class PlayerController : NetworkBehaviour
     }
 
     // ----------------------------------------------------
-    // RECEIVE MOUSE CLICK INPUT (For Flock)
+    // RECEIVE HEADBUTT INPUT (SKILL 4) - Press 0 to activate! Always available, no flock/tier needed.
+    // ----------------------------------------------------
+    public void OnHeadbutt(InputValue value)
+    {
+        if (!IsOwner || !value.isPressed) return;
+        OnSkillActivated?.Invoke(4); // Call SkillSlot with skillId=4 (Headbutt)
+    }
+
+    // ----------------------------------------------------
+    // RECEIVE MOUSE CLICK INPUT (For Flock) - Matches action "Click" in PlayerInputActions
     // ----------------------------------------------------
     public void OnClick(InputValue value)
     {

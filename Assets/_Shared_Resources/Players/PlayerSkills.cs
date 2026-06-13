@@ -44,17 +44,22 @@ public class PlayerSkills : NetworkBehaviour
         return equippedSkills.Find(slot => slot.data != null && slot.data.skillId == skillId);
     }
 
+    // Base skills (always available: 0 = Basic Attack, 4 = Headbutt)
+    private bool IsBaseSkill(int skillId)
+    {
+        return skillId == 0 || skillId == 4;
+    }
+
     private void TryCastSkill(int skillId)
     {
         SkillSlot slot = GetSkillSlot(skillId);
         if (slot == null || slot.data == null || slot.logicScript == null) return;
 
-        // STEP 0: CHECK FLOCK RANGE — Skills can only be used when inside the radius
-        if (!isInsideFlock.Value) return;
+        // STEP 0: CHECK FLOCK RANGE — Base skills don't need flock
+        if (!IsBaseSkill(skillId) && !isInsideFlock.Value) return;
 
-        // STEP 1: CHECK AUTO-UNLOCK CONDITION
-        // Since Basic Attack has skillId = 0, and unlockedSkillTier >= 0, it will always pass this test!
-        if (skillId > unlockedSkillTier.Value) return;
+        // STEP 1: CHECK AUTO-UNLOCK CONDITION — Base skills always pass
+        if (!IsBaseSkill(skillId) && skillId > unlockedSkillTier.Value) return;
 
         // STEP 2: CHECK COOLDOWN (Attack speed)
         if (lastCastTimes.TryGetValue(skillId, out float lastTime))
@@ -72,11 +77,11 @@ public class PlayerSkills : NetworkBehaviour
         SkillSlot slot = GetSkillSlot(skillId);
         if (slot == null || slot.data == null || slot.logicScript == null) return;
 
-        // Check flock range on Server (Anti-hack)
-        if (!isInsideFlock.Value) return;
+        // Check flock range on Server (Anti-hack) — Base skills bypass
+        if (!IsBaseSkill(skillId) && !isInsideFlock.Value) return;
 
-        // Double check on Server to prevent Hack
-        if (skillId > unlockedSkillTier.Value) return;
+        // Double check on Server to prevent Hack — Base skills bypass
+        if (!IsBaseSkill(skillId) && skillId > unlockedSkillTier.Value) return;
 
         // STEP 3: DEDUCT MANA (If skill has manaCost > 0)
         if (slot.data.manaCost > 0)
@@ -84,7 +89,7 @@ public class PlayerSkills : NetworkBehaviour
             if (entity != null && !entity.ConsumeMana((int)slot.data.manaCost)) return;
         }
 
-        // STEP 4: TRIGGER SERVER LOGIC (Basic Attack, Fart, Dash, etc.)
+        // STEP 4: TRIGGER SERVER LOGIC (Basic Attack, Headbutt, Fart, Dash, etc.)
         slot.logicScript.ServerExecute(slot.data, entity, controller);
 
         // STEP 5: TRIGGER VISUALS ON ALL CLIENTS

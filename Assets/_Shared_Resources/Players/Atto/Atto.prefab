@@ -1,5 +1,54 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &583388835113922329
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7658202682737986263}
+  - component: {fileID: 6261496820048716688}
+  m_Layer: 0
+  m_Name: Skill_0
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7658202682737986263
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 583388835113922329}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1235488546585286335}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6261496820048716688
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 583388835113922329}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8db15914b9c07054cbba8e74de2c3738, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerHeadbuttSkill
+  ShowTopMostFoldoutHeaderGroup: 1
+  animator: {fileID: 7970235993075498558}
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 64
 --- !u!1 &2149695861835639596
 GameObject:
   m_ObjectHideFlags: 0
@@ -334,7 +383,7 @@ CircleCollider2D:
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
-  m_LayerOverridePriority: 0
+  m_LayerOverridePriority: 10
   m_ForceSendLayers:
     serializedVersion: 2
     m_Bits: 4294967295
@@ -1164,6 +1213,7 @@ Transform:
   - {fileID: 77565061955431801}
   - {fileID: 2288682488833027602}
   - {fileID: 8449501306487202680}
+  - {fileID: 7658202682737986263}
   m_Father: {fileID: 5214352752191870431}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2590359606250298652
@@ -1199,6 +1249,9 @@ MonoBehaviour:
   - slotName: 
     data: {fileID: 11400000, guid: 1a4a111ddeeef3e45aea618f792ae67a, type: 2}
     logicScript: {fileID: 7338613021342365268}
+  - slotName: 
+    data: {fileID: 11400000, guid: b8d300a8fbc750b47a61b1af106a3e6d, type: 2}
+    logicScript: {fileID: 6261496820048716688}
 --- !u!114 &5817904330219769839
 MonoBehaviour:
   m_ObjectHideFlags: 0
