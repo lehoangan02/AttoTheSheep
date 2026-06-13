@@ -3,12 +3,26 @@ using System.Collections.Generic;
 using System;
 using Unity.Netcode;
 
+// --- CẤU TRÚC LƯU TRỮ THÔNG SỐ THEO LEVEL ---
+[System.Serializable]
+public struct FlockLevelConfig
+{
+    [Tooltip("Số lượng cừu tối đa ở Level này")]
+    public int maxLambs;
+    [Tooltip("Bán kính cơ bản (Base Radius) ở Level này")]
+    public float baseRadius;
+}
+
 public class FlockManager : NetworkBehaviour
 {
+    [Header("Level Settings")]
+    public NetworkVariable<int> currentLevel = new NetworkVariable<int>(1, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    
+    [Tooltip("Cấu hình số cừu và bán kính cho từng Level. Phần tử 0 = Level 1, Phần tử 1 = Level 2...")]
+    [SerializeField] private FlockLevelConfig[] levelConfigs;
+
     [Header("Flock Settings")]
     [SerializeField] private GameObject lambPrefab;
-    [SerializeField] private int initialLambCount = 5;
-    [SerializeField] private float baseRadius = 1f;
     [SerializeField] private float radiusMultiplier = 0.5f; 
 
     [Header("Skill Zone (Radius 2 - Lớn hơn)")]
@@ -40,12 +54,23 @@ public class FlockManager : NetworkBehaviour
 
     public event Action<int> OnFlockTierChanged;
 
-    private PlayerController currentPlayer; // Store player reference to avoid redundant searches
+    private PlayerController currentPlayer; 
 
     public override void OnNetworkSpawn()
     {
         if (IsServer)
         {
+            // Thiết lập giá trị mặc định cho mảng Level nếu bạn quên kéo trong Inspector
+            if (levelConfigs == null || levelConfigs.Length == 0)
+            {
+                levelConfigs = new FlockLevelConfig[]
+                {
+                    new FlockLevelConfig { maxLambs = 3, baseRadius = 1.0f }, // Level 1
+                    new FlockLevelConfig { maxLambs = 6, baseRadius = 1.5f }, // Level 2
+                    new FlockLevelConfig { maxLambs = 10, baseRadius = 2.0f } // Level 3
+                };
+            }
+
             currentFlockCenter = transform.position;
             SpawnInitialFlock();
         }
@@ -62,7 +87,7 @@ public class FlockManager : NetworkBehaviour
             }
         }
 
-        if (enableAutoSpawn)
+        if (enableAutoSpawn && IsServer)
         {
             spawnTimer += Time.deltaTime; 
             if (spawnTimer >= autoSpawnInterval)
@@ -73,9 +98,18 @@ public class FlockManager : NetworkBehaviour
         }
     }
 
+    // Lấy thông số (max cừu, base radius) của Level hiện tại
+    private FlockLevelConfig GetCurrentLevelConfig()
+    {
+        // Trừ 1 vì Level 1 tương ứng với Index 0 trong mảng
+        int index = Mathf.Clamp(currentLevel.Value - 1, 0, levelConfigs.Length - 1);
+        return levelConfigs[index];
+    }
+
     private void SpawnInitialFlock()
     {
-        for (int i = 0; i < initialLambCount; i++)
+        int startingLambs = GetCurrentLevelConfig().maxLambs;
+        for (int i = 0; i < startingLambs; i++)
         {
             SpawnLamb(currentFlockCenter);
         }
@@ -86,9 +120,14 @@ public class FlockManager : NetworkBehaviour
     {
         if (!IsServer) return;
 
+        // --- ĐIỀU KIỆN CHẶN: Nếu số cừu đã bằng mức tối đa của Level thì không sinh thêm ---
+        if (activeLambs.Count >= GetCurrentLevelConfig().maxLambs)
+        {
+            return;
+        }
+
         GameObject lambObj = Instantiate(lambPrefab, position, Quaternion.identity);
         
-        // Register the lamb with the network so it gets a unique ID and doesn't crash the scene sweep
         NetworkObject netObj = lambObj.GetComponent<NetworkObject>();
         if (netObj != null) netObj.Spawn(true);
 
@@ -114,11 +153,29 @@ public class FlockManager : NetworkBehaviour
 
     private void UpdateFlockRadius()
     {
-        // Bán kính 1: Giới hạn di chuyển của bầy cừu + hồi máu
-        currentFlockRadius = baseRadius + (radiusMultiplier * Mathf.Sqrt(activeLambs.Count));
+        // Lấy Base Radius mở rộng tùy theo Level hiện tại
+        float dynamicBaseRadius = GetCurrentLevelConfig().baseRadius;
+
+        // Bán kính 1 = Base Radius (phụ thuộc Level) + Multiplier * Số lượng cừu
+        currentFlockRadius = dynamicBaseRadius + (radiusMultiplier * Mathf.Sqrt(activeLambs.Count));
+        
         // Bán kính 2: Cho phép dùng skill (rộng hơn)
         currentSkillZoneRadius = currentFlockRadius * skillZoneRadiusMultiplier;
+        
         CommandFlock(currentFlockCenter);
+    }
+
+    // Gọi hàm này khi bạn muốn bầy cừu lên Level (từ Item, EXP, v.v...)
+    public void LevelUpFlock()
+    {
+        if (!IsServer) return;
+
+        if (currentLevel.Value < levelConfigs.Length)
+        {
+            currentLevel.Value++;
+            UpdateFlockRadius();
+            Debug.Log($"[FLOCK] Bầy cừu đã lên Level {currentLevel.Value}! Tối đa: {GetCurrentLevelConfig().maxLambs} cừu.");
+        }
     }
 
     private void HandleMapClicked(Vector2 targetPos)
@@ -134,7 +191,6 @@ public class FlockManager : NetworkBehaviour
         {
             if (lamb != null && lamb.gameObject.activeInHierarchy)
             {
-                // Cừu di chuyển theo bán kính 1 (inner radius)
                 lamb.SetFlockData(currentFlockCenter, currentFlockRadius);
             }
         }
@@ -152,28 +208,20 @@ public class FlockManager : NetworkBehaviour
     {
         if (showDebugRadius)
         {
-            // Bán kính 1 - Vùng cừu di chuyển + hồi máu (màu xanh lá)
             Gizmos.color = new Color(0f, 1f, 0f, 0.3f);
             Gizmos.DrawWireSphere(currentFlockCenter, currentFlockRadius);
 
-            // Bán kính 2 - Vùng dùng skill (màu xanh dương)
             Gizmos.color = new Color(0f, 0.5f, 1f, 0.3f);
             Gizmos.DrawWireSphere(currentFlockCenter, currentSkillZoneRadius);
         }
     }
 
-    /// <summary>
-    /// Bán kính 1: Kiểm tra player có ở trong vùng hồi máu + mana không
-    /// </summary>
     public bool IsPositionInsideHealZone(Vector2 targetPosition)
     {
         float dist = Vector2.Distance(targetPosition, currentFlockCenter);
         return dist <= currentFlockRadius;
     }
 
-    /// <summary>
-    /// Bán kính 2: Kiểm tra player có ở trong vùng cho phép dùng skill không
-    /// </summary>
     public bool IsPositionInsideSkillZone(Vector2 targetPosition)
     {
         float dist = Vector2.Distance(targetPosition, currentFlockCenter);

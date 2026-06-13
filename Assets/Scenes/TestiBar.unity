@@ -570,9 +570,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FlockManager
   ShowTopMostFoldoutHeaderGroup: 1
+  currentLevel:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 1
+  levelConfigs:
+  - maxLambs: 5
+    baseRadius: 1
   lambPrefab: {fileID: 4784860766754900265, guid: 628ff7b0f60023e47884e19d86cef4fc, type: 3}
-  initialLambCount: 5
-  baseRadius: 1
   radiusMultiplier: 0.5
   skillZoneRadiusMultiplier: 1.5
   lambsForSkill1: 1
