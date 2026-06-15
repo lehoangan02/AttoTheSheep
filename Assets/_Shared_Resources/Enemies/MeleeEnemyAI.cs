@@ -6,30 +6,22 @@ public class MeleeEnemyAI : EnemyAI
     [SerializeField] private bool dealDamageOnAttack = true;
     [SerializeField] private EnemyHitbox[] attackHitboxes;
 
+    private bool isAttackMovementLocked;
+
     protected override void ProcessAttack(float distance)
     {
-        EnemyData data = Data;
-        float attackRange = data != null ? data.attackRange : entity.AttackRange;
-        float attackCooldown = data != null ? data.attackCooldown : entity.AttackCooldown;
+        if (KeepAttackMovementLocked()) return;
 
-        if (distance > attackRange)
+        if (distance > AttackRange)
         {
             currentState = State.Chase;
             return;
         }
 
-        movement?.Stop();
+        StopMoving();
 
-        if (Time.time < lastAttackTime + attackCooldown) return;
-
-        lastAttackTime = Time.time;
-        SetAnimatorTrigger("Attack");
-
-        if (dealDamageOnAttack && IsValidTarget(target))
-        {
-            int damage = data != null ? data.attackDamage : entity.AttackDamage;
-            target.TakeDamage(damage);
-        }
+        if (Time.time < lastAttackTime + AttackCooldown) return;
+        AttackTarget();
     }
 
     public void ActivateAttackHitboxes()
@@ -55,6 +47,37 @@ public class MeleeEnemyAI : EnemyAI
             {
                 hitbox.Deactivate();
             }
+        }
+    }
+
+    public void LockMovementForAttack()
+    {
+        isAttackMovementLocked = true;
+        StopMoving();
+    }
+
+    public void UnlockMovementAfterAttack()
+    {
+        isAttackMovementLocked = false;
+    }
+
+    private bool KeepAttackMovementLocked()
+    {
+        if (!isAttackMovementLocked) return false;
+
+        StopMoving();
+        return true;
+    }
+
+    private void AttackTarget()
+    {
+        lastAttackTime = Time.time;
+        LockMovementForAttack();
+        SetAnimatorTrigger("Attack");
+
+        if (dealDamageOnAttack && IsValidTarget(target))
+        {
+            target.TakeDamage(AttackDamage);
         }
     }
 }

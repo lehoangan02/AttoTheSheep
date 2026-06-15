@@ -25,7 +25,6 @@ public abstract class EnemyAI : NetworkBehaviour
     protected EnemyEntity entity;
     protected EnemyMovement movement;
     protected Animator animator;
-    protected Rigidbody2D rb;
     protected NetworkEntity target;
     protected float lastAttackTime;
 
@@ -33,26 +32,28 @@ public abstract class EnemyAI : NetworkBehaviour
     public NetworkEntity Target => target;
     protected EnemyData Data => entity != null ? entity.Data : null;
     protected bool CanRunAI => !requireServerAuthority || !IsSpawned || IsServer;
+    protected float AttackRange => entity != null ? entity.AttackRange : 0f;
+    protected float AttackCooldown => entity != null ? entity.AttackCooldown : 0f;
+    protected int AttackDamage => entity != null ? entity.AttackDamage : 0;
+    protected float MoveSpeed
+    {
+        get
+        {
+            if (entity == null) return 0f;
+            return IsSpawned && IsServer ? entity.currentMoveSpeed.Value : entity.BaseMoveSpeed;
+        }
+    }
 
     protected virtual void Awake()
     {
         entity = GetComponent<EnemyEntity>();
         movement = GetComponent<EnemyMovement>();
         animator = GetComponent<Animator>();
-        rb = GetComponent<Rigidbody2D>();
         currentState = State.Idle;
     }
 
     protected virtual void FixedUpdate()
     {
-        // if (!CanRunAI) return;
-
-        // if (entity == null || !entity.IsAlive)
-        // {
-        //     movement?.Stop();
-        //     return;
-        // }
-
         HandleStateMachine();
         UpdateAnimations();
     }
@@ -127,7 +128,7 @@ public abstract class EnemyAI : NetworkBehaviour
 
     protected virtual void ProcessIdle()
     {
-        movement?.Stop();
+        StopMoving();
         AcquireTarget();
 
         if (target != null)
@@ -138,13 +139,10 @@ public abstract class EnemyAI : NetworkBehaviour
 
     protected virtual void ProcessChase(float distance)
     {
-        EnemyData data = Data;
-        float attackRange = data != null ? data.attackRange : entity.AttackRange;
-
-        if (distance <= attackRange)
+        if (distance <= AttackRange)
         {
             currentState = State.Attack;
-            movement?.Stop();
+            StopMoving();
             return;
         }
 
@@ -155,20 +153,14 @@ public abstract class EnemyAI : NetworkBehaviour
     {
         if (target == null || movement == null) return;
 
-        float moveSpeed = Data != null ? Data.moveSpeed : 0f;
-        if (entity != null)
-        {
-            moveSpeed = IsSpawned && IsServer ? entity.currentMoveSpeed.Value : entity.BaseMoveSpeed;
-        }
-
-        movement.MoveToward(target.transform.position, moveSpeed);
+        movement.MoveToward(target.transform.position, MoveSpeed);
     }
 
     protected virtual void ReturnToIdle()
     {
         target = null;
         currentState = State.Idle;
-        movement?.Stop();
+        StopMoving();
     }
 
     protected bool TryGetTargetDistance(out float distance)
@@ -185,7 +177,7 @@ public abstract class EnemyAI : NetworkBehaviour
 
     protected virtual void ProcessCasting()
     {
-        movement?.Stop();
+        StopMoving();
     }
 
     protected virtual void UpdateAnimations()
@@ -221,11 +213,15 @@ public abstract class EnemyAI : NetworkBehaviour
         return false;
     }
 
+    protected void StopMoving()
+    {
+        movement?.Stop();
+    }
+
     protected virtual bool IsValidTarget(NetworkEntity candidate)
     {
         if (candidate == null) return false;
         if (candidate == entity) return false;
-        // if (candidate.currentHealth.Value <= 0) return false;
         return string.IsNullOrEmpty(targetTag) || candidate.CompareTag(targetTag);
     }
 }
