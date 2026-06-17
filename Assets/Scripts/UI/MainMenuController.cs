@@ -71,11 +71,11 @@ public class MainMenuController : MonoBehaviour
         if (newGameButton != null)
             newGameButton.onClick.AddListener(OnNewGameClicked);
 
-        // Continue is NOT implemented — keep it but grey it out
+        // Continue Button now goes to MapLobby
         if (continueButton != null)
         {
-            continueButton.interactable = false;
-            // Optionally add a "Coming Soon" tooltip in the future
+            continueButton.interactable = true;
+            continueButton.onClick.AddListener(OnContinueClicked);
         }
 
         if (multiplayerButton != null)
@@ -109,6 +109,7 @@ public class MainMenuController : MonoBehaviour
     private void OnDestroy()
     {
         if (newGameButton != null) newGameButton.onClick.RemoveListener(OnNewGameClicked);
+        if (continueButton != null) continueButton.onClick.RemoveListener(OnContinueClicked);
         if (multiplayerButton != null) multiplayerButton.onClick.RemoveListener(OnMultiplayerClicked);
         if (settingsIconButton != null) settingsIconButton.onClick.RemoveListener(OnSettingsToggled);
     }
@@ -121,6 +122,20 @@ public class MainMenuController : MonoBehaviour
     {
         if (_isTransitioning) return;
         StartCoroutine(FadeAndLoad(newGameSceneName));
+    }
+
+    private void OnContinueClicked()
+    {
+        if (_isTransitioning) return;
+        _isTransitioning = true;
+        if (SceneTransitionManager.Instance != null)
+        {
+            SceneTransitionManager.Instance.TransitionTo("MapLobby");
+        }
+        else
+        {
+            SceneManager.LoadScene("MapLobby");
+        }
     }
 
     private void OnMultiplayerClicked()
