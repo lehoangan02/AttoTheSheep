@@ -14,6 +14,7 @@ public class MainMenuController : MonoBehaviour
 {
     [Header("Scene Names")]
     [SerializeField] private string newGameSceneName = "Tutorial";
+    [SerializeField] private string multiplayerSceneName = "MatchMaking";
 
     [Header("Cloud Buttons")]
     [SerializeField] private Button newGameButton;
@@ -50,6 +51,22 @@ public class MainMenuController : MonoBehaviour
             Cursor.SetCursor(defaultCursor, Vector2.zero, CursorMode.Auto);
         }
 
+        // Upgrade Fade Overlay to use background for seamless transition
+        if (fadeOverlay != null)
+        {
+            var fadeImg = fadeOverlay.GetComponent<Image>();
+            var bgObj = GameObject.Find("Background");
+            if (fadeImg != null && bgObj != null)
+            {
+                var bgImg = bgObj.GetComponent<Image>();
+                if (bgImg != null && bgImg.sprite != null)
+                {
+                    fadeImg.sprite = bgImg.sprite;
+                    fadeImg.color = Color.white;
+                }
+            }
+        }
+
         // Wire up buttons
         if (newGameButton != null)
             newGameButton.onClick.AddListener(OnNewGameClicked);
@@ -61,10 +78,10 @@ public class MainMenuController : MonoBehaviour
             // Optionally add a "Coming Soon" tooltip in the future
         }
 
-        // Multiplayer is NOT implemented — keep it but grey it out
         if (multiplayerButton != null)
         {
-            multiplayerButton.interactable = false;
+            multiplayerButton.interactable = true;
+            multiplayerButton.onClick.AddListener(OnMultiplayerClicked);
         }
 
         // Settings toggle
@@ -92,6 +109,7 @@ public class MainMenuController : MonoBehaviour
     private void OnDestroy()
     {
         if (newGameButton != null) newGameButton.onClick.RemoveListener(OnNewGameClicked);
+        if (multiplayerButton != null) multiplayerButton.onClick.RemoveListener(OnMultiplayerClicked);
         if (settingsIconButton != null) settingsIconButton.onClick.RemoveListener(OnSettingsToggled);
     }
 
@@ -103,6 +121,12 @@ public class MainMenuController : MonoBehaviour
     {
         if (_isTransitioning) return;
         StartCoroutine(FadeAndLoad(newGameSceneName));
+    }
+
+    private void OnMultiplayerClicked()
+    {
+        if (_isTransitioning) return;
+        StartCoroutine(FadeAndLoad(multiplayerSceneName));
     }
 
     private void OnSettingsToggled()
@@ -124,21 +148,15 @@ public class MainMenuController : MonoBehaviour
         {
             fadeOverlay.blocksRaycasts = true;
 
-            // Also grab the Image so we can animate its color alpha
-            var fadeImage = fadeOverlay.GetComponent<UnityEngine.UI.Image>();
-
             float elapsed = 0f;
             while (elapsed < fadeDuration)
             {
                 elapsed += Time.unscaledDeltaTime;
                 float t = Mathf.Clamp01(elapsed / fadeDuration);
                 fadeOverlay.alpha = t;
-                if (fadeImage != null)
-                    fadeImage.color = new Color(0f, 0f, 0f, t);
                 yield return null;
             }
             fadeOverlay.alpha = 1f;
-            if (fadeImage != null) fadeImage.color = Color.black;
         }
 
         SceneManager.LoadScene(sceneName);
