@@ -37,23 +37,14 @@ public class LobbyManager : MonoBehaviour
 
     private async void Start()
     {
-        // Initialization is handled by GameBootstrapper, but we ensure Services are ready
-        if (UnityServices.State == ServicesInitializationState.Uninitialized)
+        // Wait for GameBootstrapper to finish initialization and authentication
+        if (GameBootstrapper.Instance != null)
         {
-            InitializationOptions options = new InitializationOptions();
-#if UNITY_EDITOR
-            if (ParrelSync.ClonesManager.IsClone())
-            {
-                string customArgument = ParrelSync.ClonesManager.GetArgument();
-                options.SetProfile($"Clone{customArgument}");
-            }
-#endif
-            await UnityServices.InitializeAsync(options);
+            await GameBootstrapper.Instance.InitializationTask;
         }
-
-        if (!AuthenticationService.Instance.IsSignedIn)
+        else
         {
-            await AuthenticationService.Instance.SignInAnonymouslyAsync();
+            Debug.LogWarning("[LobbyManager] GameBootstrapper Instance not found. Lobby might not work correctly if services aren't initialized.");
         }
     }
 

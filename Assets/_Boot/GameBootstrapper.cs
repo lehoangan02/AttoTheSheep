@@ -3,6 +3,9 @@ using System.Threading.Tasks;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
 using UnityEngine;
+#if UNITY_EDITOR
+using ParrelSync;
+#endif
 
 public class GameBootstrapper : MonoBehaviour
 {
@@ -10,6 +13,9 @@ public class GameBootstrapper : MonoBehaviour
 
     public IPlayerRepository PlayerRepository { get; private set; }
     public PlayerProfile CurrentProfile { get; private set; }
+
+    private TaskCompletionSource<bool> _initializeTaskSource = new TaskCompletionSource<bool>();
+    public Task InitializationTask => _initializeTaskSource.Task;
 
     public event Action OnBootstrapped;
 
@@ -24,15 +30,31 @@ public class GameBootstrapper : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
-        await InitializeGameAsync();
+        try
+        {
+            await InitializeGameAsync();
+            _initializeTaskSource.SetResult(true);
+        }
+        catch (Exception ex)
+        {
+            _initializeTaskSource.SetException(ex);
+        }
     }
 
     private async Task InitializeGameAsync()
     {
         try
         {
-            // 1. Initialize Unity Services (Required for Cloud Save)
-            await UnityServices.InitializeAsync();
+            // 1. Initialize Unity Services with Profile (Required for ParrelSync Clones)
+            InitializationOptions options = new InitializationOptions();
+#if UNITY_EDITOR
+            if (ClonesManager.IsClone())
+            {
+                string customArgument = ClonesManager.GetArgument();
+                options.SetProfile($"Clone{customArgument}");
+            }
+#endif
+            await UnityServices.InitializeAsync(options);
 
             // 2. Authenticate Player (Cloud Save requires a signed-in player)
             if (!AuthenticationService.Instance.IsSignedIn)
@@ -53,6 +75,7 @@ public class GameBootstrapper : MonoBehaviour
         catch (Exception ex)
         {
             Debug.LogError($"[Bootstrapper] Failed to initialize game services: {ex.Message}");
+            throw; // Re-throw to be caught in Awake and set exception on Task
         }
     }
 }
