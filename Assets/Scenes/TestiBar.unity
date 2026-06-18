@@ -822,10 +822,10 @@ MonoBehaviour:
   TargetOffset: {x: 0, y: 0, z: 0}
   Damping: {x: 2, y: 2, z: 1}
   Lookahead:
-    Enabled: 0
-    Time: 0
-    Smoothing: 0
-    IgnoreY: 0
+    Enabled: 1
+    Time: 0.5
+    Smoothing: 10
+    IgnoreY: 1
 --- !u!1001 &2001819491
 PrefabInstance:
   m_ObjectHideFlags: 0
