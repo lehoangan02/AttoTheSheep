@@ -15,8 +15,10 @@ GameObject:
   - component: {fileID: 7633614237194594367}
   - component: {fileID: 3886514007668955850}
   - component: {fileID: 1185576875832236290}
-  - component: {fileID: 5845084456234438651}
-  - component: {fileID: 1754638052678131139}
+  - component: {fileID: 387917968245055618}
+  - component: {fileID: 8414506706315818385}
+  - component: {fileID: 7107817782368067259}
+  - component: {fileID: 8676959025195992803}
   m_Layer: 0
   m_Name: Goblin
   m_TagString: Untagged
@@ -51,7 +53,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 4228956981
+  GlobalObjectIdHash: 722447166
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -226,6 +228,7 @@ MonoBehaviour:
   baseMaxMana: 100
   baseAttackRange: 1
   baseAttackDamage: 10
+  effectController: {fileID: 0}
   currentMoveSpeed:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
@@ -247,7 +250,7 @@ MonoBehaviour:
       MaxSecondsBetweenUpdates: 0
     m_InternalValue: 0
   data: {fileID: 11400000, guid: d5c3248f2291e7f33a40e40d71233927, type: 2}
---- !u!114 &5845084456234438651
+--- !u!114 &387917968245055618
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -256,28 +259,55 @@ MonoBehaviour:
   m_GameObject: {fileID: 5753693385531744272}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ee5ab3adfe54fb24b8df6d126913f170, type: 3}
+  m_Script: {fileID: 11500000, guid: 05253184f40e596c5b8cb84b66a49052, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EnemyMovement
---- !u!114 &1754638052678131139
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5753693385531744272}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 315dbe15957b4646a8a289929bfefc3c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MeleeEnemyAI
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyBrain
   ShowTopMostFoldoutHeaderGroup: 1
-  currentState: 0
-  requireServerAuthority: 0
+  behavior: {fileID: 11400000, guid: 1214d8ed93dc20b15ac88c327275f6dd, type: 2}
   scanRadius: 30
+  targetTag: Player
   targetLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  targetTag: Player
-  dealDamageOnAttack: 0
-  attackHitboxes: []
+  target: {fileID: 0}
+  lastAttackTime: 0
+  IsFrozen: 0
+  IsStunned: 0
+--- !u!114 &8414506706315818385
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5753693385531744272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 367b8a6a7d62f6064b53b2653e6072c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyMotor
+  speedMultiplier: 1
+--- !u!114 &7107817782368067259
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5753693385531744272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d300c7de5eca663f3857ad5edc738dba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyAnimator
+--- !u!114 &8676959025195992803
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5753693385531744272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c192f053ff4f469fdb3e6c5e2376ae11, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StatusEffectController
+  ShowTopMostFoldoutHeaderGroup: 1

@@ -13,8 +13,16 @@ MonoBehaviour:
   m_Name: SnakeData
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
   enemyKind: 2
-  maxHealth: 150
+  displayName: 
+  maxHealth: 250
+  speedTier: 0
   moveSpeed: 5
-  attackDamage: 20
-  attackRange: 1.2
-  attackCooldown: 1.25
+  attacks:
+  - {fileID: 11400000, guid: d2e4f1367ced6b4369e005be35f1691b, type: 2}
+  onHitEffects:
+  - effect: {fileID: 11400000, guid: 42cde80f4edc3a2a1b5190d823340b7f, type: 2}
+    duration: 0
+    damagePerTick: 0
+  skills: []
+  behavior: {fileID: 11400000, guid: 2ffd4e38b9de59eabbf24db5c97345d8, type: 2}
+  projectilePrefab: {fileID: 0}

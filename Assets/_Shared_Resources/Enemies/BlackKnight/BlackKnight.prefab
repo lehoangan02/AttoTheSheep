@@ -15,8 +15,10 @@ GameObject:
   - component: {fileID: 1401072775906352211}
   - component: {fileID: 1992550898811007894}
   - component: {fileID: 6273467545734981384}
-  - component: {fileID: 3585067396203343136}
-  - component: {fileID: 5694063587662024613}
+  - component: {fileID: 1294974825802090833}
+  - component: {fileID: 9177904550777391619}
+  - component: {fileID: 2868464831910828920}
+  - component: {fileID: 1211527052160459364}
   m_Layer: 0
   m_Name: BlackKnight
   m_TagString: Untagged
@@ -51,7 +53,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 3291817632
+  GlobalObjectIdHash: 1724215105
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -226,6 +228,7 @@ MonoBehaviour:
   baseMaxMana: 100
   baseAttackRange: 1
   baseAttackDamage: 10
+  effectController: {fileID: 0}
   currentMoveSpeed:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
@@ -246,8 +249,8 @@ MonoBehaviour:
       MinSecondsBetweenUpdates: 0
       MaxSecondsBetweenUpdates: 0
     m_InternalValue: 0
-  data: {fileID: 0}
---- !u!114 &3585067396203343136
+  data: {fileID: 11400000, guid: 0c6684fe373913a9ba24b6e7797e0047, type: 2}
+--- !u!114 &1294974825802090833
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -256,28 +259,55 @@ MonoBehaviour:
   m_GameObject: {fileID: 2495840725773875051}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ee5ab3adfe54fb24b8df6d126913f170, type: 3}
+  m_Script: {fileID: 11500000, guid: 05253184f40e596c5b8cb84b66a49052, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EnemyMovement
---- !u!114 &5694063587662024613
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2495840725773875051}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 315dbe15957b4646a8a289929bfefc3c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MeleeEnemyAI
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyBrain
   ShowTopMostFoldoutHeaderGroup: 1
-  currentState: 0
-  requireServerAuthority: 0
+  behavior: {fileID: 11400000, guid: 8c58116131b2f5a06b1d60cebd2264d5, type: 2}
   scanRadius: 30
+  targetTag: Player
   targetLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  targetTag: Player
-  dealDamageOnAttack: 0
-  attackHitboxes: []
+  target: {fileID: 0}
+  lastAttackTime: 0
+  IsFrozen: 0
+  IsStunned: 0
+--- !u!114 &9177904550777391619
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2495840725773875051}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 367b8a6a7d62f6064b53b2653e6072c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyMotor
+  speedMultiplier: 1
+--- !u!114 &2868464831910828920
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2495840725773875051}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d300c7de5eca663f3857ad5edc738dba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyAnimator
+--- !u!114 &1211527052160459364
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2495840725773875051}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c192f053ff4f469fdb3e6c5e2376ae11, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StatusEffectController
+  ShowTopMostFoldoutHeaderGroup: 1

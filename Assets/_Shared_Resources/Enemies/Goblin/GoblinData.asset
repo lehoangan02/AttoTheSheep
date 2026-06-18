@@ -13,8 +13,14 @@ MonoBehaviour:
   m_Name: GoblinData
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
   enemyKind: 5
-  maxHealth: 150
-  moveSpeed: 5
-  attackDamage: 20
-  attackRange: 1.2
-  attackCooldown: 1.25
+  displayName: 
+  maxHealth: 350
+  speedTier: 1
+  moveSpeed: 8
+  attacks:
+  - {fileID: 11400000, guid: 9e65e3f1f985f07af9f32245560f5b11, type: 2}
+  - {fileID: 11400000, guid: 497abe24f5320b633b012784b44a7ea4, type: 2}
+  onHitEffects: []
+  skills: []
+  behavior: {fileID: 11400000, guid: 1214d8ed93dc20b15ac88c327275f6dd, type: 2}
+  projectilePrefab: {fileID: 0}

@@ -13,8 +13,13 @@ MonoBehaviour:
   m_Name: SkeletonData
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
   enemyKind: 4
-  maxHealth: 150
-  moveSpeed: 5
-  attackDamage: 20
-  attackRange: 1.2
-  attackCooldown: 1.25
+  displayName: 
+  maxHealth: 250
+  speedTier: 1
+  moveSpeed: 8
+  attacks:
+  - {fileID: 11400000, guid: edf80dc8b76400e6e99daa7f419677f7, type: 2}
+  onHitEffects: []
+  skills: []
+  behavior: {fileID: 11400000, guid: d2d14679fce596193a6afa14f69bf8ad, type: 2}
+  projectilePrefab: {fileID: 0}

@@ -15,7 +15,11 @@ MonoBehaviour:
   enemyKind: 1
   displayName: 
   maxHealth: 200
+  speedTier: 0
   moveSpeed: 5
-  attackDamage: 35
-  attackRange: 1.2
-  attackCooldown: 1.25
+  attacks:
+  - {fileID: 11400000, guid: 15c3825314e435f61a21a74be5413c98, type: 2}
+  onHitEffects: []
+  skills: []
+  behavior: {fileID: 11400000, guid: 8c58116131b2f5a06b1d60cebd2264d5, type: 2}
+  projectilePrefab: {fileID: 0}
