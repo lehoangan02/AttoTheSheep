@@ -11,6 +11,12 @@ public class MenuButtonAnimator : MonoBehaviour, IPointerEnterHandler, IPointerE
     [SerializeField] private float entranceDelay;
     [SerializeField] private float entranceDuration = 0.35f;
 
+    public float HoverScale { get => hoverScale; set => hoverScale = value; }
+    public float PressedScale { get => pressedScale; set => pressedScale = value; }
+
+    public Texture2D defaultCursorOverride;
+    public Texture2D hoverCursorOverride;
+
     public void SetEntranceDelay(float delay) => entranceDelay = delay;
 
     private RectTransform _rectTransform;
@@ -35,7 +41,7 @@ public class MenuButtonAnimator : MonoBehaviour, IPointerEnterHandler, IPointerE
 
     private void Start()
     {
-        _menuController = FindObjectOfType<MainMenuController>();
+        _menuController = Object.FindFirstObjectByType<MainMenuController>();
         _button = GetComponent<UnityEngine.UI.Button>();
         StartCoroutine(PlayEntrance());
     }
@@ -44,7 +50,11 @@ public class MenuButtonAnimator : MonoBehaviour, IPointerEnterHandler, IPointerE
     {
         AnimateTo(_baseScale * hoverScale);
 
-        if (_menuController != null && _button != null)
+        if (hoverCursorOverride != null)
+        {
+            Cursor.SetCursor(hoverCursorOverride, Vector2.zero, CursorMode.Auto);
+        }
+        else if (_menuController != null && _button != null)
         {
             if (_button.interactable && _menuController.HoverCursor != null)
                 Cursor.SetCursor(_menuController.HoverCursor, Vector2.zero, CursorMode.Auto);
@@ -57,8 +67,14 @@ public class MenuButtonAnimator : MonoBehaviour, IPointerEnterHandler, IPointerE
     {
         AnimateTo(_baseScale);
 
-        if (_menuController != null && _menuController.DefaultCursor != null)
+        if (defaultCursorOverride != null)
+        {
+            Cursor.SetCursor(defaultCursorOverride, Vector2.zero, CursorMode.Auto);
+        }
+        else if (_menuController != null && _menuController.DefaultCursor != null)
+        {
             Cursor.SetCursor(_menuController.DefaultCursor, Vector2.zero, CursorMode.Auto);
+        }
     }
 
     public void OnPointerDown(PointerEventData eventData)
