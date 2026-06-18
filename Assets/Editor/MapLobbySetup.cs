@@ -87,29 +87,30 @@ public class MapLobbySetup
         SetRectTopLeft(playerUiObj.GetComponent<RectTransform>(), new Vector2(30, -30));
 
         // 5. Bag Button (Under Player UI)
-        GameObject bagObj = CreateUIButton("BagButton", canvas.transform, bagSprite, cursorDefault, cursorHover, 0.4f);
+        GameObject bagObj = CreateUIButton("BagButton", canvas.transform, bagSprite, cursorDefault, cursorHover, 0.32f);
         SetRectTopLeft(bagObj.GetComponent<RectTransform>(), new Vector2(80, -280));
 
-        // 6. Buttons (Bottom Right)
-        GameObject backObj = CreateUIButton("BackButton", canvas.transform, backBtnSprite, cursorDefault, cursorHover, 1.0f);
-        SetRectBottomRight(backObj.GetComponent<RectTransform>(), new Vector2(-70, 70));
-        
-        GameObject shopObj = CreateUIButton("ShopButton", canvas.transform, shopSprite, cursorDefault, cursorHover, 0.5f);
-        SetRectBottomRight(shopObj.GetComponent<RectTransform>(), new Vector2(-220, 70));
+        // 6. Buttons (Bottom Right) - Wizard & Sheep First
+        GameObject shopObj = CreateUIButton("ShopButton", canvas.transform, shopSprite, cursorDefault, cursorHover, 0.4f);
+        SetRectBottomRight(shopObj.GetComponent<RectTransform>(), new Vector2(-200, 70));
 
-        GameObject upgradeObj = CreateUIButton("UpgradeButton", canvas.transform, upgradeSprite, cursorDefault, cursorHover, 0.5f);
-        SetRectBottomRight(upgradeObj.GetComponent<RectTransform>(), new Vector2(-400, 70));
+        GameObject upgradeObj = CreateUIButton("UpgradeButton", canvas.transform, upgradeSprite, cursorDefault, cursorHover, 0.4f);
+        SetRectBottomRight(upgradeObj.GetComponent<RectTransform>(), new Vector2(-330, 70));
 
         // 7. Level Nodes
-        GameObject node1Obj = CreateUIButton("Node_1", canvas.transform, lockedBall, cursorDefault, cursorHover, 0.45f);
+        GameObject node1Obj = CreateUIButton("Node_1", canvas.transform, lockedBall, cursorDefault, cursorHover, 0.32f);
         SetRectCenter(node1Obj.GetComponent<RectTransform>(), new Vector2(-250, -250));
 
-        GameObject node2Obj = CreateUIButton("Node_2", canvas.transform, lockedBall, cursorDefault, cursorHover, 0.45f);
+        GameObject node2Obj = CreateUIButton("Node_2", canvas.transform, lockedBall, cursorDefault, cursorHover, 0.32f);
         SetRectCenter(node2Obj.GetComponent<RectTransform>(), new Vector2(120, -100));
 
-        GameObject node3Obj = CreateUIButton("Node_3", canvas.transform, lockedBall, cursorDefault, cursorHover, 0.45f);
+        GameObject node3Obj = CreateUIButton("Node_3", canvas.transform, lockedBall, cursorDefault, cursorHover, 0.32f);
         SetRectCenter(node3Obj.GetComponent<RectTransform>(), new Vector2(350, 200));
 
+        // 8. Back Button (Created Last so it renders on top of Wizard if they overlap)
+        GameObject backObj = CreateUIButton("BackButton", canvas.transform, backBtnSprite, cursorDefault, cursorHover, 0.5f);
+        SetRectBottomRight(backObj.GetComponent<RectTransform>(), new Vector2(-70, 70));
+        
         // Add Text to Back Button
         GameObject textObj = new GameObject("Text", typeof(RectTransform), typeof(UnityEngine.UI.Text));
         textObj.transform.SetParent(backObj.transform, false);
@@ -167,7 +168,7 @@ public class MapLobbySetup
         Debug.Log("[MapLobby] Successfully built and saved UI for MapLobby!");
     }
 
-    private static GameObject CreateUIElement(string name, Transform parent, Sprite sprite, float scale = 1f)
+    private static GameObject CreateUIElement(string name, Transform parent, Sprite sprite, float scale = 1f, bool preserveAspect = false)
     {
         GameObject obj = new GameObject(name, typeof(RectTransform), typeof(Image));
         obj.transform.SetParent(parent, false);
@@ -175,6 +176,7 @@ public class MapLobbySetup
         if (sprite != null)
         {
             img.sprite = sprite;
+            img.preserveAspect = preserveAspect;
             img.SetNativeSize();
             RectTransform rt = obj.GetComponent<RectTransform>();
             rt.sizeDelta = new Vector2(rt.sizeDelta.x * scale, rt.sizeDelta.y * scale);
@@ -185,7 +187,7 @@ public class MapLobbySetup
 
     private static GameObject CreateUIButton(string name, Transform parent, Sprite sprite, Texture2D defCursor, Texture2D hovCursor, float scale = 1f)
     {
-        GameObject obj = CreateUIElement(name, parent, sprite, scale);
+        GameObject obj = CreateUIElement(name, parent, sprite, scale, true);
         obj.AddComponent<Button>();
         MenuButtonAnimator anim = obj.AddComponent<MenuButtonAnimator>();
         anim.HoverScale = 1.1f;
