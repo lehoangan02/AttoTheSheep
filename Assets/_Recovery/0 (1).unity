@@ -15978,34 +15978,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7335084586799056515, guid: 37b33631d8760c8409510c86ab13be0f, type: 3}
-      propertyPath: house
-      value: 
-      objectReference: {fileID: 944330972}
-    - target: {fileID: 7335084586799056515, guid: 37b33631d8760c8409510c86ab13be0f, type: 3}
-      propertyPath: animator
-      value: 
-      objectReference: {fileID: 1316641282}
-    - target: {fileID: 7335084586799056515, guid: 37b33631d8760c8409510c86ab13be0f, type: 3}
-      propertyPath: moveSpeed
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7335084586799056515, guid: 37b33631d8760c8409510c86ab13be0f, type: 3}
-      propertyPath: targetTree
-      value: 
-      objectReference: {fileID: 1147267178}
-    - target: {fileID: 7335084586799056515, guid: 37b33631d8760c8409510c86ab13be0f, type: 3}
-      propertyPath: npcRenderer
-      value: 
-      objectReference: {fileID: 1316641283}
-    - target: {fileID: 7335084586799056515, guid: 37b33631d8760c8409510c86ab13be0f, type: 3}
-      propertyPath: chopDuration
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 7335084586799056515, guid: 37b33631d8760c8409510c86ab13be0f, type: 3}
-      propertyPath: houseStayDuration
-      value: 6
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -16345,11 +16317,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5770000807968274643, guid: 37b33631d8760c8409510c86ab13be0f, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 5.18
+      value: 22.18949
       objectReference: {fileID: 0}
     - target: {fileID: 5770000807968274643, guid: 37b33631d8760c8409510c86ab13be0f, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 13.52
+      value: 13.758558
       objectReference: {fileID: 0}
     - target: {fileID: 5770000807968274643, guid: 37b33631d8760c8409510c86ab13be0f, type: 3}
       propertyPath: m_LocalPosition.z
@@ -16383,44 +16355,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7335084586799056515, guid: 37b33631d8760c8409510c86ab13be0f, type: 3}
-      propertyPath: house
-      value: 
-      objectReference: {fileID: 944330972}
-    - target: {fileID: 7335084586799056515, guid: 37b33631d8760c8409510c86ab13be0f, type: 3}
-      propertyPath: animator
-      value: 
-      objectReference: {fileID: 857603436}
-    - target: {fileID: 7335084586799056515, guid: 37b33631d8760c8409510c86ab13be0f, type: 3}
-      propertyPath: moveSpeed
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 7335084586799056515, guid: 37b33631d8760c8409510c86ab13be0f, type: 3}
-      propertyPath: targetTree
-      value: 
-      objectReference: {fileID: 566197986}
-    - target: {fileID: 7335084586799056515, guid: 37b33631d8760c8409510c86ab13be0f, type: 3}
-      propertyPath: npcRenderer
-      value: 
-      objectReference: {fileID: 1316641283}
-    - target: {fileID: 7335084586799056515, guid: 37b33631d8760c8409510c86ab13be0f, type: 3}
-      propertyPath: chopDuration
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 7335084586799056515, guid: 37b33631d8760c8409510c86ab13be0f, type: 3}
-      propertyPath: houseStayDuration
-      value: 2
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 37b33631d8760c8409510c86ab13be0f, type: 3}
---- !u!95 &857603436 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 5475527383723507305, guid: 37b33631d8760c8409510c86ab13be0f, type: 3}
-  m_PrefabInstance: {fileID: 857603435}
-  m_PrefabAsset: {fileID: 0}
 --- !u!95 &911379976 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 5475527383723507305, guid: 37b33631d8760c8409510c86ab13be0f, type: 3}
@@ -17145,15 +17084,11 @@ PrefabInstance:
     - target: {fileID: 7335084586799056515, guid: 37b33631d8760c8409510c86ab13be0f, type: 3}
       propertyPath: house
       value: 
-      objectReference: {fileID: 944330972}
+      objectReference: {fileID: 1264593951}
     - target: {fileID: 7335084586799056515, guid: 37b33631d8760c8409510c86ab13be0f, type: 3}
       propertyPath: animator
       value: 
       objectReference: {fileID: 911379976}
-    - target: {fileID: 7335084586799056515, guid: 37b33631d8760c8409510c86ab13be0f, type: 3}
-      propertyPath: moveSpeed
-      value: 7
-      objectReference: {fileID: 0}
     - target: {fileID: 7335084586799056515, guid: 37b33631d8760c8409510c86ab13be0f, type: 3}
       propertyPath: targetTree
       value: 
@@ -17162,14 +17097,6 @@ PrefabInstance:
       propertyPath: npcRenderer
       value: 
       objectReference: {fileID: 911379977}
-    - target: {fileID: 7335084586799056515, guid: 37b33631d8760c8409510c86ab13be0f, type: 3}
-      propertyPath: chopDuration
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 7335084586799056515, guid: 37b33631d8760c8409510c86ab13be0f, type: 3}
-      propertyPath: houseStayDuration
-      value: 10
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -17632,16 +17559,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0b9ed429b8916d74bbf8e91235184b83, type: 3}
---- !u!95 &1316641282 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 5475527383723507305, guid: 37b33631d8760c8409510c86ab13be0f, type: 3}
-  m_PrefabInstance: {fileID: 624204019}
-  m_PrefabAsset: {fileID: 0}
---- !u!212 &1316641283 stripped
-SpriteRenderer:
-  m_CorrespondingSourceObject: {fileID: 6130837374368733227, guid: 37b33631d8760c8409510c86ab13be0f, type: 3}
-  m_PrefabInstance: {fileID: 624204019}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1375772015
 PrefabInstance:
   m_ObjectHideFlags: 0
