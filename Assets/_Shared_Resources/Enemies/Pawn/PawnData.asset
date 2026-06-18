@@ -13,9 +13,8 @@ MonoBehaviour:
   m_Name: PawnData
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
   enemyKind: 0
-  displayName: 
-  maxHealth: 150
-  speedTier: 1
-  attackDamage: 20
+  maxHealth: 20
+  moveSpeed: 5
+  attackDamage: 5
   attackRange: 1.2
   attackCooldown: 1.25
