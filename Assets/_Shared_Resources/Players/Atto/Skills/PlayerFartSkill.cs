@@ -75,17 +75,13 @@ public class PlayerFartSkill : BaseSkillComponent
                     
                     // Trừ máu quái
                     NetworkEntity enemyEntity = hit.GetComponent<NetworkEntity>();
-                    if (enemyEntity != null) enemyEntity.TakeDamage((int)data.damage);
-
-                    // Xử lý Knockback Độc Lập
-                    Rigidbody2D enemyRb = hit.GetComponent<Rigidbody2D>();
-                    if (enemyRb == null) enemyRb = hit.GetComponentInParent<Rigidbody2D>();
-
-                    if (enemyRb != null)
+                    if (enemyEntity != null)
                     {
+                        enemyEntity.TakeDamage((int)data.damage);
+
+                        // Knockback: freeze brain + apply force for 0.3s via ApplyKnockback
                         Vector2 knockbackDir = ((Vector2)hit.transform.position - (Vector2)controller.transform.position).normalized;
-                        // Mặc định thời gian choáng/văng là 0.3s (Bạn có thể đưa nó vào FartSkillData sau này nếu muốn)
-                        StartCoroutine(ApplyIndependentKnockback(hit.gameObject, enemyRb, knockbackDir, data.knockupForce, 0.3f));
+                        enemyEntity.ApplyKnockback(knockbackDir * data.knockupForce, 0.3f);
                     }
                 }
             }
@@ -104,41 +100,6 @@ public class PlayerFartSkill : BaseSkillComponent
 
         currentFartData = null;
         fartController = null;
-    }
-
-    /// <summary>
-    /// Coroutine xử lý Knockback độc lập: Tắt AI -> Đẩy -> Chờ -> Bật AI
-    /// Không cần sửa đổi code bên trong file của Enemy.
-    /// </summary>
-    private IEnumerator ApplyIndependentKnockback(GameObject enemyObj, Rigidbody2D enemyRb, Vector2 dir, float force, float duration)
-    {
-        // 1. TÌM CÁC SCRIPT ĐIỀU KHIỂN CỦA ĐỊCH
-        EnemyMovement enemyMovement = enemyObj.GetComponent<EnemyMovement>();
-        if (enemyMovement == null) enemyMovement = enemyObj.GetComponentInParent<EnemyMovement>();
-
-        EnemyAI ai = enemyObj.GetComponent<EnemyAI>();
-        if (ai == null) ai = enemyObj.GetComponentInParent<EnemyAI>();
-
-        // 2. TẮT TẠM THỜI (Tránh AI override linearVelocity)
-        if (enemyMovement != null) enemyMovement.enabled = false;
-        if (ai != null) ai.enabled = false;
-
-        // 3. ÉP LỰC VẬT LÝ
-        enemyRb.linearVelocity = Vector2.zero; // Xóa quán tính cũ
-        enemyRb.linearVelocity = dir * force;  // Gán vận tốc đẩy cực mạnh
-
-        // 4. CHỜ HẾT THỜI GIAN VĂNG
-        yield return new WaitForSeconds(duration);
-
-        // 5. HÃM PHANH (Rất quan trọng vì BlackKnight có Linear Damping = 0, nếu không hãm nó sẽ trượt mãi)
-        if (enemyRb != null) 
-        {
-            enemyRb.linearVelocity = Vector2.zero; 
-        }
-
-        // 6. BẬT LẠI AI
-        if (enemyMovement != null) enemyMovement.enabled = true;
-        if (ai != null) ai.enabled = true;
     }
 
     // Vẽ vòng tròn vàng trong Editor để bạn dễ căn chỉnh vùng sát thương trúng

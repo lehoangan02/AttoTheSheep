@@ -12,9 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53b306e7e4e5b6ac7bb45a92f9d7ea87, type: 3}
   m_Name: PawnData
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
-  enemyKind: 0
-  maxHealth: 20
+  enemyKind: 8
+  displayName: 
+  maxHealth: 100
+  speedTier: 0
   moveSpeed: 5
-  attackDamage: 5
-  attackRange: 1.2
-  attackCooldown: 1.25
+  attackDamage: 10
+  attackRange: 1
+  attackCooldown: 1.5

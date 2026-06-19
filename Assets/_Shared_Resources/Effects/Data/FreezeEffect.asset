@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d3fbc350a2cc3344bf9ecc1730af036, type: 3}
+  m_Name: FreezeEffect
+  m_EditorClassIdentifier: Assembly-CSharp::FreezeEffect
+  kind: 2
+  duration: 2
+  tickRate: 0
+  damagePerTick: 0
+  stopsMovement: 1
+  stopsAttack: 1
+  knockbackForce: 0
+  speedMultiplier: 1

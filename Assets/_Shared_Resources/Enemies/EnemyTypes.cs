@@ -17,7 +17,8 @@ public enum EnemyKind
     Skeleton,
     Goblin,
     Wizard,
-    GreatDemon
+    GreatDemon,
+    Pawn
 }
 
 [Serializable]
@@ -51,11 +52,13 @@ public static class EnemySpawnRuleCatalog
             Create(EnemyKind.PoisonSpider, StageId.DeepForest, 4, 0, 10),
             Create(EnemyKind.Skeleton, StageId.DeepForest, 6, 0, 8),
             Create(EnemyKind.Goblin, StageId.DeepForest, 7, 0, 8),
+            Create(EnemyKind.Pawn, StageId.DeepForest, 5, 0, 6),
 
             Create(EnemyKind.PoisonSnake, StageId.DemonLair, 1, 0, 10),
             Create(EnemyKind.PoisonSpider, StageId.DemonLair, 1, 0, 10),
             Create(EnemyKind.Skeleton, StageId.DemonLair, 3, 0, 8),
             Create(EnemyKind.Goblin, StageId.DemonLair, 3, 0, 8),
+            Create(EnemyKind.Pawn, StageId.DemonLair, 2, 0, 6),
             Create(EnemyKind.Wizard, StageId.DemonLair, 9, 0, 2),
             Create(EnemyKind.GreatDemon, StageId.DemonLair, 15, 15, 1, true)
         };

@@ -13,8 +13,10 @@ MonoBehaviour:
   m_Name: SnakeData
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
   enemyKind: 2
-  maxHealth: 150
+  displayName: 
+  maxHealth: 250
+  speedTier: 0
   moveSpeed: 5
-  attackDamage: 20
-  attackRange: 1.2
-  attackCooldown: 1.25
+  attackDamage: 12
+  attackRange: 1
+  attackCooldown: 1

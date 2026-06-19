@@ -13,8 +13,10 @@ MonoBehaviour:
   m_Name: SpiderData
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
   enemyKind: 3
-  maxHealth: 150
+  displayName: 
+  maxHealth: 300
+  speedTier: 0
   moveSpeed: 5
-  attackDamage: 20
-  attackRange: 1.2
-  attackCooldown: 1.25
+  attackDamage: 14
+  attackRange: 1
+  attackCooldown: 1.2

@@ -4,12 +4,27 @@ public class EnemyEntity : NetworkEntity
 {
     [SerializeField] private EnemyData data;
 
+    private EnemyBrain brain;
+    private EnemyMotor motor;
+    private EnemyHitbox hitbox;
+
     public EnemyData Data => data;
     public EnemyKind EnemyKind => Data != null ? Data.enemyKind : EnemyKind.BlueKnight;
+    public EnemyBrain Brain => brain;
+    public EnemyMotor Motor => motor;
+    public EnemyHitbox Hitbox => hitbox;
+
+    public float MoveSpeed => Data != null ? Data.MoveSpeed : 5f;
     public int AttackDamage => Data != null ? Data.attackDamage : 20;
     public float AttackRange => Data != null ? Data.attackRange : 1.2f;
     public float AttackCooldown => Data != null ? Data.attackCooldown : 1.25f;
-    public bool IsAlive => currentHealth.Value > 0;
+
+    void Awake()
+    {
+        brain = GetComponent<EnemyBrain>();
+        motor = GetComponent<EnemyMotor>();
+        hitbox = GetComponentInChildren<EnemyHitbox>(true);
+    }
 
     public override void OnNetworkSpawn()
     {
@@ -29,13 +44,26 @@ public class EnemyEntity : NetworkEntity
         }
     }
 
-    private void ApplyDataToBaseStats()
+    void ApplyDataToBaseStats()
     {
         if (data == null) return;
-
         baseMaxHealth = data.maxHealth;
-        baseMoveSpeed = data.moveSpeed;
+        baseMoveSpeed = data.MoveSpeed;
         baseAttackDamage = data.attackDamage;
         baseAttackRange = data.attackRange;
+    }
+
+    public override void TakeDamage(int damage)
+    {
+        if (brain != null && brain.ShouldBlockDamage())
+            return;
+        base.TakeDamage(damage);
+    }
+
+    public override void TakeDamage(int damage, NetworkEntity source)
+    {
+        if (brain != null && brain.ShouldBlockDamage())
+            return;
+        base.TakeDamage(damage, source);
     }
 }

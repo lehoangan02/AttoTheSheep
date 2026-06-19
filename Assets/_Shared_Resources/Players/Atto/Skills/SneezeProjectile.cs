@@ -88,45 +88,11 @@ public class SneezeProjectile : NetworkBehaviour
         enemyEntity.TakeDamage(damage);
         Debug.Log($"💧 [SNEEZE_PROJECTILE] Trúng {other.gameObject.name}! Gây {damage} DMG.");
 
-        // Choáng
-        StunEnemy(other.gameObject);
+        // Stun: freeze brain + zero velocity for stunDuration
+        enemyEntity.ApplyKnockback(Vector2.zero, stunDuration);
 
         // Hủy đạn
         DespawnProjectile();
-    }
-
-    private void StunEnemy(GameObject enemyObj)
-    {
-        EnemyMovement enemyMovement = enemyObj.GetComponent<EnemyMovement>();
-        if (enemyMovement == null) enemyMovement = enemyObj.GetComponentInParent<EnemyMovement>();
-
-        EnemyAI ai = enemyObj.GetComponent<EnemyAI>();
-        if (ai == null) ai = enemyObj.GetComponentInParent<EnemyAI>();
-
-        Rigidbody2D enemyRb = enemyObj.GetComponent<Rigidbody2D>();
-        if (enemyRb == null) enemyRb = enemyObj.GetComponentInParent<Rigidbody2D>();
-
-        // Kiểm tra nếu đã stun rồi
-        if (enemyMovement != null && !enemyMovement.enabled) return;
-        if (ai != null && !ai.enabled) return;
-
-        if (enemyMovement != null) enemyMovement.enabled = false;
-        if (ai != null) ai.enabled = false;
-        if (enemyRb != null) enemyRb.linearVelocity = Vector2.zero;
-
-        StartCoroutine(RemoveStunAfterDelay(enemyObj, enemyMovement, ai, enemyRb, stunDuration));
-    }
-
-    private System.Collections.IEnumerator RemoveStunAfterDelay(
-        GameObject enemyObj, EnemyMovement movement, EnemyAI ai, Rigidbody2D rb, float delay)
-    {
-        yield return new WaitForSeconds(delay);
-
-        if (enemyObj == null) yield break;
-
-        if (movement != null) movement.enabled = true;
-        if (ai != null) ai.enabled = true;
-        if (rb != null) rb.linearVelocity = Vector2.zero;
     }
 
     private void DespawnProjectile()

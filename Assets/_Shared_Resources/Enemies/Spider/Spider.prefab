@@ -1,5 +1,87 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &8076364328737488706
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3792679394267725795}
+  - component: {fileID: 5952885352025862670}
+  - component: {fileID: 4236392564696115786}
+  m_Layer: 0
+  m_Name: SpiderHitbox
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3792679394267725795
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8076364328737488706}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.64, y: -0.184, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3301719980737460497}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5952885352025862670
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8076364328737488706}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 211899e69eb96be20be51bf576dc8197, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyHitbox
+  hitboxCollider: {fileID: 0}
+--- !u!58 &4236392564696115786
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8076364328737488706}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_Radius: 0.5
 --- !u!1 &8481652928192273667
 GameObject:
   m_ObjectHideFlags: 0
@@ -15,8 +97,9 @@ GameObject:
   - component: {fileID: 5483278756839920923}
   - component: {fileID: 2520769989421796281}
   - component: {fileID: 3117867985937299287}
-  - component: {fileID: 20422763828835222}
-  - component: {fileID: 3725250641375463126}
+  - component: {fileID: 3221528501908904135}
+  - component: {fileID: 7711539553068198587}
+  - component: {fileID: 7849640760919338362}
   m_Layer: 0
   m_Name: Spider
   m_TagString: Untagged
@@ -36,7 +119,8 @@ Transform:
   m_LocalPosition: {x: 0.35, y: -3.07, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 3792679394267725795}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1575983138307684013
@@ -226,6 +310,7 @@ MonoBehaviour:
   baseMaxMana: 100
   baseAttackRange: 1
   baseAttackDamage: 10
+  effectController: {fileID: 0}
   currentMoveSpeed:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
@@ -247,7 +332,7 @@ MonoBehaviour:
       MaxSecondsBetweenUpdates: 0
     m_InternalValue: 0
   data: {fileID: 11400000, guid: 33407df0068cffec7b35a4dcb3f6b89f, type: 2}
---- !u!114 &20422763828835222
+--- !u!114 &3221528501908904135
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -256,28 +341,42 @@ MonoBehaviour:
   m_GameObject: {fileID: 8481652928192273667}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ee5ab3adfe54fb24b8df6d126913f170, type: 3}
+  m_Script: {fileID: 11500000, guid: 9df45dda5e29eb3a8bd6b5d72afd9aeb, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EnemyMovement
---- !u!114 &3725250641375463126
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8481652928192273667}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 315dbe15957b4646a8a289929bfefc3c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MeleeEnemyAI
+  m_EditorClassIdentifier: Assembly-CSharp::SpiderBrain
   ShowTopMostFoldoutHeaderGroup: 1
-  currentState: 0
-  requireServerAuthority: 0
   scanRadius: 30
+  targetTag: Player
   targetLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  targetTag: Player
-  dealDamageOnAttack: 0
-  attackHitboxes: []
+  target: {fileID: 0}
+  lastAttackTime: 0
+  IsFrozen: 0
+  IsStunned: 0
+--- !u!114 &7711539553068198587
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8481652928192273667}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 367b8a6a7d62f6064b53b2653e6072c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyMotor
+  speedMultiplier: 1
+--- !u!114 &7849640760919338362
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8481652928192273667}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c192f053ff4f469fdb3e6c5e2376ae11, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StatusEffectController
+  ShowTopMostFoldoutHeaderGroup: 1
