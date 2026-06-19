@@ -1,5 +1,87 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1006597540975089474
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1339966403061034150}
+  - component: {fileID: 6153255769359383660}
+  - component: {fileID: 1019231238830495767}
+  m_Layer: 0
+  m_Name: GoblinHitbox
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1339966403061034150
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1006597540975089474}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 1.25, y: -0.15, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3055164010490647127}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6153255769359383660
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1006597540975089474}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 211899e69eb96be20be51bf576dc8197, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyHitbox
+  hitboxCollider: {fileID: 0}
+--- !u!58 &1019231238830495767
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1006597540975089474}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: -0.65357065, y: 0}
+  m_Radius: 1.0251908
 --- !u!1 &5753693385531744272
 GameObject:
   m_ObjectHideFlags: 0
@@ -15,8 +97,9 @@ GameObject:
   - component: {fileID: 7633614237194594367}
   - component: {fileID: 3886514007668955850}
   - component: {fileID: 1185576875832236290}
-  - component: {fileID: 5845084456234438651}
-  - component: {fileID: 1754638052678131139}
+  - component: {fileID: 6342863579529224448}
+  - component: {fileID: 8414506706315818385}
+  - component: {fileID: 8676959025195992803}
   m_Layer: 0
   m_Name: Goblin
   m_TagString: Untagged
@@ -36,7 +119,8 @@ Transform:
   m_LocalPosition: {x: 5.44, y: 2.33, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1339966403061034150}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &128439464852622794
@@ -226,6 +310,7 @@ MonoBehaviour:
   baseMaxMana: 100
   baseAttackRange: 1
   baseAttackDamage: 10
+  effectController: {fileID: 0}
   currentMoveSpeed:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
@@ -247,7 +332,7 @@ MonoBehaviour:
       MaxSecondsBetweenUpdates: 0
     m_InternalValue: 0
   data: {fileID: 11400000, guid: d5c3248f2291e7f33a40e40d71233927, type: 2}
---- !u!114 &5845084456234438651
+--- !u!114 &6342863579529224448
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -256,28 +341,43 @@ MonoBehaviour:
   m_GameObject: {fileID: 5753693385531744272}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ee5ab3adfe54fb24b8df6d126913f170, type: 3}
+  m_Script: {fileID: 11500000, guid: b869984bb1b1beca0860f29d471e1250, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EnemyMovement
---- !u!114 &1754638052678131139
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5753693385531744272}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 315dbe15957b4646a8a289929bfefc3c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MeleeEnemyAI
+  m_EditorClassIdentifier: Assembly-CSharp::GoblinBrain
   ShowTopMostFoldoutHeaderGroup: 1
-  currentState: 0
-  requireServerAuthority: 0
   scanRadius: 30
+  targetTag: Player
   targetLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  targetTag: Player
-  dealDamageOnAttack: 0
-  attackHitboxes: []
+  target: {fileID: 0}
+  lastAttackTime: 0
+  IsFrozen: 0
+  IsStunned: 0
+  isFastAttack: 1
+--- !u!114 &8414506706315818385
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5753693385531744272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 367b8a6a7d62f6064b53b2653e6072c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyMotor
+  speedMultiplier: 1
+--- !u!114 &8676959025195992803
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5753693385531744272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c192f053ff4f469fdb3e6c5e2376ae11, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StatusEffectController
+  ShowTopMostFoldoutHeaderGroup: 1

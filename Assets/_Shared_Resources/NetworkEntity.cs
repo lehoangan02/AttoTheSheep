@@ -13,6 +13,8 @@ public class NetworkEntity : NetworkBehaviour
     [SerializeField] protected float baseAttackRange = 1f;
     [SerializeField] protected float baseAttackDamage = 10f;
 
+    [HideInInspector] public StatusEffectController effectController;
+
 
 
     // Biến mạng đồng bộ cho mọi người chơi thấy
@@ -44,6 +46,9 @@ public class NetworkEntity : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
+        if (effectController == null)
+            effectController = GetComponent<StatusEffectController>();
+
         if (IsServer)
         {
             // Initialize base stats on the Server
@@ -71,6 +76,21 @@ public class NetworkEntity : NetworkBehaviour
         {
             Die();
         }
+    }
+
+    public virtual void TakeDamage(int damage, NetworkEntity source)
+    {
+        if (!IsServer || currentHealth.Value <= 0) return;
+        if (isInvulnerable.Value) return;
+
+        int previousHealth = currentHealth.Value;
+        currentHealth.Value = Mathf.Max(0, currentHealth.Value - damage);
+        int actualDamage = previousHealth - currentHealth.Value;
+
+        Debug.Log($"[TakeDamage] {name} nhận {actualDamage} sát thương (gốc: {damage}) from {source?.name}. Máu: {previousHealth} → {currentHealth.Value}");
+
+        if (currentHealth.Value <= 0)
+            Die();
     }
     // Mana deduction function for casting skills (Only Server can deduct)
     public virtual bool ConsumeMana(int amount)
@@ -100,8 +120,31 @@ public class NetworkEntity : NetworkBehaviour
     public virtual void Heal(int amount)
     {
         if (!IsServer || currentHealth.Value <= 0) return;
-        
+
         currentHealth.Value = Mathf.Min(baseMaxHealth, currentHealth.Value + amount);
+    }
+
+    public virtual void ApplyKnockback(Vector2 force, float duration)
+    {
+        if (!IsServer) return;
+        Rigidbody2D rb = GetComponent<Rigidbody2D>();
+        if (rb == null) return;
+
+        StartCoroutine(KnockbackRoutine(rb, force, duration));
+    }
+
+    System.Collections.IEnumerator KnockbackRoutine(Rigidbody2D rb, Vector2 force, float duration)
+    {
+        EnemyBrain brain = GetComponent<EnemyBrain>();
+
+        // Disable AI during knockback
+        if (brain != null) brain.IsFrozen = true;
+
+        rb.linearVelocity = force;
+
+        yield return new WaitForSeconds(duration);
+
+        if (brain != null) brain.IsFrozen = false;
     }
 
     protected virtual void Die()

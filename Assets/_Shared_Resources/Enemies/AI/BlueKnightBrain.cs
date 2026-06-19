@@ -1,0 +1,85 @@
+using UnityEngine;
+
+public class BlueKnightBrain : EnemyBrain
+{
+    [SerializeField] float guardChance = 0.2f;
+
+    protected void FixedUpdate()
+    {
+        if (!IsServer) return;
+        if (entity == null || !entity.IsAlive) { if (CurrentState != EnemyState.Dead) SetState(EnemyState.Dead); return; }
+        if (CurrentState == EnemyState.Dead) return;
+        if (IsCCLocked()) { if (CurrentState != EnemyState.Hurt) SetState(EnemyState.Hurt); return; }
+        if (CurrentState == EnemyState.Hurt) { if (!IsCCLocked()) SetState(EnemyState.Idle); return; }
+        AcquireTarget();
+        if (CurrentState != EnemyState.Attack && CurrentState != EnemyState.Guard) DecideNextState();
+        if (CurrentState == EnemyState.Chase && target != null)
+            motor.MoveToward(target.transform.position, entity.MoveSpeed * (effectController?.GetSpeedMultiplier() ?? 1f));
+        stateTimer += Time.fixedDeltaTime;
+        if (CurrentState == EnemyState.Attack && stateTimer > 3f)
+            SetState(EnemyState.Idle);
+        if (CurrentState == EnemyState.Guard)
+        {
+            motor.Stop();
+            if (stateTimer > 0.5f) SetState(EnemyState.Idle);
+        }
+    }
+
+    protected override void DecideNextState()
+    {
+        if (target == null) { SetState(EnemyState.Idle); return; }
+        float dist = DistanceTo(target);
+        if (dist > entity.Data.attackRange) { SetState(EnemyState.Chase); return; }
+        if (IsAttackReady()) { SetState(ShouldGuard() ? EnemyState.Guard : EnemyState.Attack); return; }
+        SetState(EnemyState.Idle);
+    }
+
+    protected override void OnStateEnter(EnemyState state)
+    {
+        float speedMult = effectController?.GetSpeedMultiplier() ?? 1f;
+        switch (state)
+        {
+            case EnemyState.Chase:
+                anim.SetBool("IsChasing", true);
+                motor.MoveToward(target.transform.position, entity.MoveSpeed * speedMult);
+                break;
+            case EnemyState.Attack:
+                anim.SetTrigger("Attack");
+                motor.Stop();
+                lastAttackTime = Time.time;
+                break;
+            case EnemyState.Guard:
+                anim.SetTrigger("Guard");
+                motor.Stop();
+                lastAttackTime = Time.time;
+                break;
+            case EnemyState.Idle:
+                motor.Stop();
+                break;
+        }
+    }
+
+    protected override void OnStateExit(EnemyState state)
+    {
+        switch (state)
+        {
+            case EnemyState.Chase:
+                motor.Stop();
+                anim.SetBool("IsChasing", false);
+                break;
+            case EnemyState.Attack:
+                Hitbox.Disable();
+                break;
+        }
+    }
+
+    public override bool ShouldBlockDamage() => CurrentState == EnemyState.Guard;
+
+    bool ShouldGuard() => Random.value < guardChance;
+
+    // Animation events
+    public void OnAttackHitStart() => Hitbox.Enable(entity.Data.attackDamage);
+    public void OnAttackHitEnd() => Hitbox.Disable();
+    public void OnAttackEnd() => SetState(EnemyState.Idle);
+    public void OnGuardEnd() => SetState(EnemyState.Idle);
+}

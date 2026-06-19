@@ -13,8 +13,10 @@ MonoBehaviour:
   m_Name: SkeletonData
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
   enemyKind: 4
-  maxHealth: 150
-  moveSpeed: 5
-  attackDamage: 20
+  displayName: 
+  maxHealth: 250
+  speedTier: 1
+  moveSpeed: 8
+  attackDamage: 18
   attackRange: 1.2
-  attackCooldown: 1.25
+  attackCooldown: 1.5

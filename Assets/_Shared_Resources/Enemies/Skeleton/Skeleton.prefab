@@ -1,5 +1,88 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &7650411544393126048
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 72558342879609602}
+  - component: {fileID: 1949746120964439189}
+  - component: {fileID: 4751966796221130544}
+  m_Layer: 0
+  m_Name: SkeletonHitbox
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &72558342879609602
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7650411544393126048}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.466, y: 0.195, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1114043075884067437}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1949746120964439189
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7650411544393126048}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 211899e69eb96be20be51bf576dc8197, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyHitbox
+  hitboxCollider: {fileID: 0}
+--- !u!70 &4751966796221130544
+CapsuleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7650411544393126048}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0.20430885, y: -0.29614916}
+  m_Size: {x: 0.91996384, y: 0.40154177}
+  m_Direction: 1
 --- !u!1 &8842079955634194191
 GameObject:
   m_ObjectHideFlags: 0
@@ -15,8 +98,9 @@ GameObject:
   - component: {fileID: 7309944941878378428}
   - component: {fileID: 8997899824232206497}
   - component: {fileID: 8056654142133915931}
-  - component: {fileID: 1726677324160112039}
-  - component: {fileID: 6700746683676478870}
+  - component: {fileID: 1391891449951702887}
+  - component: {fileID: 4508125577496492425}
+  - component: {fileID: 1835900202279474326}
   m_Layer: 0
   m_Name: Skeleton
   m_TagString: Untagged
@@ -36,7 +120,8 @@ Transform:
   m_LocalPosition: {x: -4.6, y: -3.44, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 72558342879609602}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &4318825030144848374
@@ -51,7 +136,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 1316331734
+  GlobalObjectIdHash: 3052210012
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -226,6 +311,7 @@ MonoBehaviour:
   baseMaxMana: 100
   baseAttackRange: 1
   baseAttackDamage: 10
+  effectController: {fileID: 0}
   currentMoveSpeed:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
@@ -247,7 +333,7 @@ MonoBehaviour:
       MaxSecondsBetweenUpdates: 0
     m_InternalValue: 0
   data: {fileID: 11400000, guid: 9da4d22eaa5f7ee6dbf881f9c4c7de10, type: 2}
---- !u!114 &1726677324160112039
+--- !u!114 &1391891449951702887
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -256,28 +342,42 @@ MonoBehaviour:
   m_GameObject: {fileID: 8842079955634194191}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ee5ab3adfe54fb24b8df6d126913f170, type: 3}
+  m_Script: {fileID: 11500000, guid: 59214edf1fdf3290393eb98a53d9bb2a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EnemyMovement
---- !u!114 &6700746683676478870
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8842079955634194191}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 315dbe15957b4646a8a289929bfefc3c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MeleeEnemyAI
+  m_EditorClassIdentifier: Assembly-CSharp::SkeletonBrain
   ShowTopMostFoldoutHeaderGroup: 1
-  currentState: 0
-  requireServerAuthority: 0
   scanRadius: 30
+  targetTag: Player
   targetLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  targetTag: Player
-  dealDamageOnAttack: 0
-  attackHitboxes: []
+  target: {fileID: 0}
+  lastAttackTime: 0
+  IsFrozen: 0
+  IsStunned: 0
+--- !u!114 &4508125577496492425
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8842079955634194191}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 367b8a6a7d62f6064b53b2653e6072c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyMotor
+  speedMultiplier: 1
+--- !u!114 &1835900202279474326
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8842079955634194191}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c192f053ff4f469fdb3e6c5e2376ae11, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StatusEffectController
+  ShowTopMostFoldoutHeaderGroup: 1

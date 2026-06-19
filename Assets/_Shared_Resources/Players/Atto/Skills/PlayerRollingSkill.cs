@@ -16,8 +16,8 @@ public class PlayerRollingSkill : BaseSkillComponent
     private class SwallowedEnemy
     {
         public GameObject Obj;
-        public EnemyMovement Movement;
-        public EnemyAI AI;
+        public EnemyBrain Brain;
+        public EnemyMotor Motor;
         public NetworkEntity Entity; 
         public SpriteRenderer[] Renderers;
         public Collider2D[] Colliders;
@@ -163,19 +163,15 @@ public class PlayerRollingSkill : BaseSkillComponent
         GameObject rootObj = netObj.gameObject;
         SwallowedEnemy swallowed = new SwallowedEnemy { Obj = rootObj };
 
-        swallowed.Movement = rootObj.GetComponent<EnemyMovement>();
-        swallowed.AI = rootObj.GetComponent<EnemyAI>();
+        swallowed.Brain = rootObj.GetComponent<EnemyBrain>();
+        swallowed.Motor = rootObj.GetComponent<EnemyMotor>();
         swallowed.Entity = rootObj.GetComponent<NetworkEntity>(); 
         swallowed.Renderers = rootObj.GetComponentsInChildren<SpriteRenderer>();
         swallowed.Colliders = rootObj.GetComponentsInChildren<Collider2D>();
 
-        // Vô hiệu hóa hoạt động của quái
-        if (swallowed.Movement != null) 
-        {
-            swallowed.Movement.Stop(); 
-            swallowed.Movement.enabled = false;
-        }
-        if (swallowed.AI != null) swallowed.AI.enabled = false;
+        // Freeze enemy while swallowed (stop AI + movement)
+        if (swallowed.Brain != null) swallowed.Brain.IsFrozen = true;
+        if (swallowed.Motor != null) swallowed.Motor.IsFrozen = true;
 
         // Giấu hình ảnh và vật lý
         foreach (var sr in swallowed.Renderers) if (sr != null) sr.enabled = false;
@@ -194,9 +190,9 @@ public class PlayerRollingSkill : BaseSkillComponent
             Vector2 randomOffset = Random.insideUnitCircle * 1.5f;
             enemy.Obj.transform.position = rollController.transform.position + (Vector3)randomOffset;
 
-            // Bật lại hoạt động và hiển thị cho quái
-            if (enemy.Movement != null) enemy.Movement.enabled = true;
-            if (enemy.AI != null) enemy.AI.enabled = true;
+            // Unfreeze enemy after spit out
+            if (enemy.Brain != null) enemy.Brain.IsFrozen = false;
+            if (enemy.Motor != null) enemy.Motor.IsFrozen = false;
 
             if (enemy.Renderers != null) 
                 foreach (var sr in enemy.Renderers) if (sr != null) sr.enabled = true;
