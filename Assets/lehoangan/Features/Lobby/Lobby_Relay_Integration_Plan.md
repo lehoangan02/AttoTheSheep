@@ -209,9 +209,9 @@ public class LobbyPresenter
         {
             var options = new UpdateLobbyOptions
             {
-                Data = new Dictionary<string, LobbyDataObject>
+                Data = new Dictionary<string, DataObject>
                 {
-                    { "RelayJoinCode", new LobbyDataObject(LobbyDataObject.VisibilityOptions.Member, joinCode) }
+                    { "RelayJoinCode", new DataObject(DataObject.VisibilityOptions.Member, joinCode) }
                 }
             };
 
