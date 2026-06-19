@@ -173,7 +173,7 @@ public class LobbyPresenter
         }
     }
 
-    private void OnLobbyChanged(LobbyChanges changes)
+    private void OnLobbyChanged(ILobbyChanges changes)
     {
         if (JoinedLobby == null) return;
 
