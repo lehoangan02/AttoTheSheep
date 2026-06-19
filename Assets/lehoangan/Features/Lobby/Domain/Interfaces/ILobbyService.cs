@@ -14,4 +14,5 @@ public interface ILobbyService
     Task DeleteLobbyAsync(string lobbyId);
     Task SendHeartbeatPingAsync(string lobbyId);
     Task<Lobby> UpdateLobbyAsync(string lobbyId, UpdateLobbyOptions options);
+    Task<ILobbyEvents> SubscribeToLobbyEventsAsync(string lobbyId, LobbyEventCallbacks callbacks);
 }

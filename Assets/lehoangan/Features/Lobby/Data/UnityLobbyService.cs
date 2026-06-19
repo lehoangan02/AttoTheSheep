@@ -54,4 +54,9 @@ public class UnityLobbyService : ILobbyService
     {
         return await LobbyService.Instance.UpdateLobbyAsync(lobbyId, options);
     }
+
+    public async Task<ILobbyEvents> SubscribeToLobbyEventsAsync(string lobbyId, LobbyEventCallbacks callbacks)
+    {
+        return await LobbyService.Instance.SubscribeToLobbyEventsAsync(lobbyId, callbacks);
+    }
 }

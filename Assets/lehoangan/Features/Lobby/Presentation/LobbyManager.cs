@@ -6,6 +6,7 @@ using Unity.Services.Lobbies.Models;
 using QFSW.QC;
 using System.Collections.Generic;
 using System;
+using Unity.Netcode;
 
 public class LobbyManager : MonoBehaviour
 {
@@ -31,8 +32,12 @@ public class LobbyManager : MonoBehaviour
             new JoinLobbyUseCase(lobbyService),
             new LeaveLobbyUseCase(lobbyService),
             new GetLobbiesUseCase(lobbyService),
-            new HeartbeatLobbyUseCase(lobbyService)
+            new HeartbeatLobbyUseCase(lobbyService),
+            new UpdateLobbyUseCase(lobbyService),
+            new SubscribeLobbyEventsUseCase(lobbyService)
         );
+
+        Presenter.OnRelayJoinCodeReceived += OnRelayJoinCodeReceived;
     }
 
     private async void Start()
@@ -71,6 +76,7 @@ public class LobbyManager : MonoBehaviour
     {
         await Presenter.CreateLobby("MyLobby", 5, isPrivate, playerName);
         Debug.Log($"Created lobby: {Presenter.JoinedLobby.Name} ID: {Presenter.JoinedLobby.Id}");
+        await Presenter.SubscribeToCurrentLobby();
     }
 
     [Command]
@@ -89,6 +95,7 @@ public class LobbyManager : MonoBehaviour
     {
         await Presenter.JoinLobbyByCode(lobbyCode, playerName);
         Debug.Log($"Successfully joined lobby with code: {lobbyCode}");
+        await Presenter.SubscribeToCurrentLobby();
     }
 
     [Command]
@@ -96,6 +103,7 @@ public class LobbyManager : MonoBehaviour
     {
         await Presenter.JoinLobby(lobbyId, playerName);
         Debug.Log($"Successfully joined lobby with id: {lobbyId}");
+        await Presenter.SubscribeToCurrentLobby();
     }
 
     [Command]
@@ -103,5 +111,90 @@ public class LobbyManager : MonoBehaviour
     {
         await Presenter.LeaveLobby();
         Debug.Log("Successfully left lobby");
+    }
+
+    private async void OnRelayJoinCodeReceived(string joinCode)
+    {
+        if (NetworkManager.Singleton.IsServer || NetworkManager.Singleton.IsHost) return;
+
+        Debug.Log($"[Client] Received Relay Join Code: {joinCode}. Connecting to game session...");
+
+        // Connect Client via Relay
+        await RelayManager.Instance.Presenter.JoinRelay(joinCode);
+
+        // Register Scene Load Complete
+        if (NetworkManager.Singleton.SceneManager != null)
+        {
+            NetworkManager.Singleton.SceneManager.OnLoadEventCompleted += OnSceneLoadCompleted;
+        }
+    }
+
+    [Command]
+    public async void HostStartGame()
+    {
+        if (!Presenter.IsHost) return;
+
+        try
+        {
+            // 1. Create Relay Allocation using standard Relay Use Case
+            Debug.Log("[Host] Allocating Relay session...");
+            await RelayManager.Instance.Presenter.CreateRelay(Presenter.JoinedLobby.MaxPlayers);
+            string joinCode = RelayManager.Instance.Presenter.HostData.JoinCode;
+
+            // 2. Share Relay Join Code with Lobby
+            Debug.Log($"[Host] Relay created. Sharing Join Code {joinCode} with Lobby members...");
+            await Presenter.ShareRelayJoinCode(joinCode);
+
+            // Register Scene Load Complete
+            if (NetworkManager.Singleton.SceneManager != null)
+            {
+                NetworkManager.Singleton.SceneManager.OnLoadEventCompleted += OnSceneLoadCompleted;
+            }
+
+            // 3. Initiate Unity Netcode Scene loading
+            Debug.Log("[Host] Starting game scene load...");
+            NetworkManager.Singleton.SceneManager.LoadScene("GamePlayScene", UnityEngine.SceneManagement.LoadSceneMode.Single);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[Host] Failed to transition to game: {e.Message}");
+        }
+    }
+
+    private async void OnSceneLoadCompleted(string sceneName, UnityEngine.SceneManagement.LoadSceneMode loadMode, List<ulong> clientsCompleted, List<ulong> clientsTimedOut)
+    {
+        if (sceneName != "GamePlayScene") return;
+
+        // Unsubscribe from Netcode Scene Manager load completion
+        if (NetworkManager.Singleton != null && NetworkManager.Singleton.SceneManager != null)
+        {
+            NetworkManager.Singleton.SceneManager.OnLoadEventCompleted -= OnSceneLoadCompleted;
+        }
+
+        // Clean up event subscription
+        await Presenter.UnsubscribeLobbyEvents();
+
+        if (NetworkManager.Singleton.IsServer)
+        {
+            Debug.Log("[Host] Scene load completed for all clients. Terminating Lobby cloud session...");
+            await Presenter.LeaveLobby(); 
+        }
+        else
+        {
+            Debug.Log("[Client] Scene load completed. Disconnecting from Lobby state...");
+            await Presenter.LeaveLobby();
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (NetworkManager.Singleton != null && NetworkManager.Singleton.SceneManager != null)
+        {
+            NetworkManager.Singleton.SceneManager.OnLoadEventCompleted -= OnSceneLoadCompleted;
+        }
+        if (Presenter != null)
+        {
+            Presenter.OnRelayJoinCodeReceived -= OnRelayJoinCodeReceived;
+        }
     }
 }
