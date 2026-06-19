@@ -75,7 +75,7 @@ public class LobbyManager : MonoBehaviour
     public async void CreateLobby(string playerName, bool isPrivate)
     {
         await Presenter.CreateLobby("MyLobby", 5, isPrivate, playerName);
-        Debug.Log($"Created lobby: {Presenter.JoinedLobby.Name} ID: {Presenter.JoinedLobby.Id}");
+        Debug.Log($"Created lobby: {Presenter.JoinedLobby.Name} | ID: {Presenter.JoinedLobby.Id} | Code: {Presenter.JoinedLobby.LobbyCode}");
         await Presenter.SubscribeToCurrentLobby();
     }
 
@@ -86,7 +86,7 @@ public class LobbyManager : MonoBehaviour
         Debug.Log($"Number of lobbies found: {Presenter.AvailableLobbies.Count}");
         foreach (var lobby in Presenter.AvailableLobbies)
         {
-            Debug.Log($"Lobby name: {lobby.Name} | Lobby ID: {lobby.Id}");
+            Debug.Log($"Lobby name: {lobby.Name} | Lobby ID: {lobby.Id} | Lobby Code: {lobby.LobbyCode}");
         }
     }
 
@@ -138,6 +138,12 @@ public class LobbyManager : MonoBehaviour
     {
         if (NetworkManager.Singleton.IsServer || NetworkManager.Singleton.IsHost) return;
 
+        if (RelayManager.Instance == null)
+        {
+            Debug.LogError("[LobbyManager] RelayManager.Instance is null! Clients cannot connect without an active RelayManager in the scene.");
+            return;
+        }
+
         Debug.Log($"[Client] Received Relay Join Code: {joinCode}. Connecting to game session...");
 
         // Connect Client via Relay
@@ -154,6 +160,12 @@ public class LobbyManager : MonoBehaviour
     public async void HostStartGame()
     {
         if (!Presenter.IsHost) return;
+
+        if (RelayManager.Instance == null)
+        {
+            Debug.LogError("[LobbyManager] RelayManager.Instance is null! Ensure RelayManager is attached to a GameObject in your active scene.");
+            return;
+        }
 
         try
         {
