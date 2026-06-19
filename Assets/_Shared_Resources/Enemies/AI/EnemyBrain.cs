@@ -1,11 +1,10 @@
 using UnityEngine;
 using Unity.Netcode;
-using System.Collections.Generic;
+using System.Collections;
 
 [RequireComponent(typeof(EnemyEntity))]
-public class EnemyBrain : NetworkBehaviour
+public abstract class EnemyBrain : NetworkBehaviour
 {
-    [SerializeField] EnemyBehavior behavior;
     [SerializeField] float scanRadius = 30f;
     [SerializeField] string targetTag = "Player";
     [SerializeField] LayerMask targetLayers = ~0;
@@ -15,53 +14,49 @@ public class EnemyBrain : NetworkBehaviour
     [HideInInspector] public bool IsFrozen;
     [HideInInspector] public bool IsStunned;
 
-    EnemyEntity entity;
-    EnemyMotor motor;
-    EnemyAnimator animator;
-    StatusEffectController effectController;
-    Dictionary<string, float> cooldownTimers = new Dictionary<string, float>();
+    public EnemyState CurrentState { get; private set; } = EnemyState.Idle;
 
-    // Public accessors for actions/conditions:
+    protected float stateTimer;
+
+    protected EnemyEntity entity;
+    protected EnemyMotor motor;
+    protected StatusEffectController effectController;
+    protected EnemyHitbox hitbox;
+    protected Animator anim;
+
     public EnemyEntity Entity => entity;
     public EnemyMotor Motor => motor;
-    public EnemyAnimator Animator => animator;
     public StatusEffectController EffectController => effectController;
-    public EnemyBehavior Behavior { get => behavior; set => behavior = value; }
-    public float ScanRadius => scanRadius;
-    public string TargetTag => targetTag;
-    public float DeltaTime => Time.fixedDeltaTime;
+    protected EnemyHitbox Hitbox => hitbox;
 
     void Awake()
     {
         entity = GetComponent<EnemyEntity>();
         motor = GetComponent<EnemyMotor>();
-        animator = GetComponent<EnemyAnimator>();
         effectController = GetComponent<StatusEffectController>();
+        hitbox = GetComponentInChildren<EnemyHitbox>(true);
+        anim = GetComponent<Animator>();
     }
 
-    void FixedUpdate()
+    protected void SetState(EnemyState state)
     {
-        if (!IsServer) return;
-        if (behavior == null) return;
-        if (entity == null || !entity.IsAlive) return;
-
-        // Check CC
-        bool locked = effectController != null && effectController.IsMovementLocked();
-        if (locked) { motor?.Stop(); return; }
-
-        AcquireTarget();
-
-        // Evaluate behavior nodes top-to-bottom
-        foreach (BehaviorNode node in behavior.nodes)
-        {
-            bool conditionMet = node.condition == null || node.condition.Evaluate(this);
-            if (conditionMet)
-            {
-                node.action?.Execute(this);
-                break; // only run first matching node per frame
-            }
-        }
+        if (CurrentState == state) return;
+        OnStateExit(CurrentState);
+        CurrentState = state;
+        stateTimer = 0f;
+        OnStateEnter(state);
     }
+
+    protected virtual void OnStateEnter(EnemyState state) { }
+    protected virtual void OnStateExit(EnemyState state) { }
+
+    public virtual bool ShouldBlockDamage() => false;
+
+    protected float DistanceTo(NetworkEntity t) => Vector2.Distance(transform.position, t.transform.position);
+
+    protected bool IsCCLocked() => IsFrozen || (effectController != null && effectController.IsMovementLocked());
+
+    protected bool IsAttackReady() => Time.time >= lastAttackTime + (entity?.Data?.attackCooldown ?? 1.25f);
 
     public void AcquireTarget()
     {
@@ -93,14 +88,5 @@ public class EnemyBrain : NetworkBehaviour
     public void SetTarget(NetworkEntity t) => target = t;
     public void ClearTarget() => target = null;
 
-    // Cooldown helpers (for skills like Wizard fireball)
-    public float GetCooldownTimer(string key) => cooldownTimers.TryGetValue(key, out float v) ? v : 0f;
-    public void SetCooldownTimer(string key, float value) => cooldownTimers[key] = value;
-    public void IncrementCooldowns(float dt)
-    {
-        var keys = new List<string>(cooldownTimers.Keys);
-        foreach (var k in keys) cooldownTimers[k] += dt;
-        // Cleanup very large timers
-        foreach (var k in keys) if (cooldownTimers[k] > 1000f) cooldownTimers.Remove(k);
-    }
+    protected abstract void DecideNextState();
 }

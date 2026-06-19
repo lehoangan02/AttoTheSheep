@@ -17,9 +17,6 @@ MonoBehaviour:
   maxHealth: 250
   speedTier: 1
   moveSpeed: 8
-  attacks:
-  - {fileID: 11400000, guid: edf80dc8b76400e6e99daa7f419677f7, type: 2}
-  onHitEffects: []
-  skills: []
-  behavior: {fileID: 11400000, guid: d2d14679fce596193a6afa14f69bf8ad, type: 2}
-  projectilePrefab: {fileID: 0}
+  attackDamage: 18
+  attackRange: 1.2
+  attackCooldown: 1.5

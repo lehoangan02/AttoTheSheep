@@ -6,7 +6,7 @@ public class EnemyProjectile : NetworkBehaviour
     [SerializeField] protected float speed = 8f;
     [SerializeField] protected float maxDistance = 15f;
     [SerializeField] protected int damage = 100;
-    [SerializeField] protected Effect[] onHitEffects;
+    [SerializeField] protected EffectData[] onHitEffectData;
     [SerializeField] protected LayerMask targetLayers = ~0;
 
     protected Rigidbody2D rb;
@@ -20,12 +20,12 @@ public class EnemyProjectile : NetworkBehaviour
         rb = GetComponent<Rigidbody2D>();
     }
 
-    public virtual void Initialize(Vector2 dir, float spd, int dmg, Effect[] effects, NetworkEntity src)
+    public virtual void Initialize(Vector2 dir, float spd, int dmg, EffectData[] effectDatas, NetworkEntity src)
     {
         direction = dir.normalized;
         speed = spd;
         damage = dmg;
-        onHitEffects = effects;
+        onHitEffectData = effectDatas;
         source = src;
         startPosition = transform.position;
         hasHit = false;
@@ -35,8 +35,6 @@ public class EnemyProjectile : NetworkBehaviour
     {
         if (!IsServer || hasHit) return;
         if (rb != null) rb.linearVelocity = direction * speed;
-
-        // Despawn if traveled too far
         if (Vector2.Distance(startPosition, transform.position) >= maxDistance)
             Despawn();
     }
@@ -51,19 +49,18 @@ public class EnemyProjectile : NetworkBehaviour
         if (!target.IsAlive) return;
 
         hasHit = true;
-
-        // Deal damage
         target.TakeDamage(damage);
 
-        // Apply effects
-        if (onHitEffects != null && onHitEffects.Length > 0)
+        if (onHitEffectData != null && onHitEffectData.Length > 0)
         {
             StatusEffectController effectController = target.GetComponent<StatusEffectController>();
             if (effectController != null)
             {
-                foreach (Effect effect in onHitEffects)
+                foreach (EffectData effectData in onHitEffectData)
                 {
-                    effectController.ApplyEffect(effect, effect.duration, source);
+                    if (effectData?.effect == null) continue;
+                    float duration = effectData.duration > 0 ? effectData.duration : effectData.effect.duration;
+                    effectController.ApplyEffect(effectData.effect, duration, source);
                 }
             }
         }

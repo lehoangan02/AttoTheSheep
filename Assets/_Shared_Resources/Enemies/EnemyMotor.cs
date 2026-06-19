@@ -4,7 +4,6 @@ using UnityEngine;
 public class EnemyMotor : MonoBehaviour
 {
     Rigidbody2D rb;
-    SpriteRenderer spriteRenderer;
     public float speedMultiplier = 1f;
     public bool IsFrozen { get; set; }
     public bool IsMoving { get; private set; }
@@ -12,7 +11,6 @@ public class EnemyMotor : MonoBehaviour
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        spriteRenderer = GetComponent<SpriteRenderer>();
         if (rb != null)
         {
             rb.bodyType = RigidbodyType2D.Dynamic;
@@ -30,16 +28,16 @@ public class EnemyMotor : MonoBehaviour
         rb.linearVelocity = direction * baseSpeed * speedMultiplier;
         IsMoving = true;
 
-        if (spriteRenderer != null)
-        {
-            if (direction.x > 0.01f) spriteRenderer.flipX = false;
-            else if (direction.x < -0.01f) spriteRenderer.flipX = true;
-        }
+        Vector3 scale = transform.localScale;
+        if (direction.x > 0.01f)
+            transform.localScale = new Vector3(Mathf.Abs(scale.x), scale.y, scale.z);
+        else if (direction.x < -0.01f)
+            transform.localScale = new Vector3(-Mathf.Abs(scale.x), scale.y, scale.z);
     }
 
     public void Stop()
     {
-        if (rb != null) rb.linearVelocity = Vector2.zero;
+        if (rb != null) { rb.linearVelocity = Vector2.zero; rb.Sleep(); }
         IsMoving = false;
     }
 

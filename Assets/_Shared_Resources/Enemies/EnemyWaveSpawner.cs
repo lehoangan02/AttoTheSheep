@@ -112,12 +112,6 @@ public class EnemyWaveSpawner : NetworkBehaviour
             entity.Configure(entry.data);
         }
 
-        EnemyBrain brain = enemy.GetComponent<EnemyBrain>();
-        if (brain != null && entry.data != null && entry.data.behavior != null)
-        {
-            brain.Behavior = entry.data.behavior;
-        }
-
         NetworkObject networkObject = enemy.GetComponent<NetworkObject>();
         if (networkObject == null)
         {

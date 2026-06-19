@@ -369,7 +369,7 @@ Transform:
   m_GameObject: {fileID: 1320970998}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5.17, y: -1.53, z: 0}
+  m_LocalPosition: {x: -2.02, y: -0.16, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -621,10 +621,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: BlackKnight
       objectReference: {fileID: 0}
-    - target: {fileID: 2495840725773875051, guid: 858dd570ac8436d628b317a7988f8c17, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 4170642968498222792, guid: 858dd570ac8436d628b317a7988f8c17, type: 3}
       propertyPath: m_LocalPosition.x
       value: 4.31
@@ -790,10 +786,6 @@ PrefabInstance:
     - target: {fileID: 8276238298806300973, guid: a206fc0f79892548b8cb16a8bf65c82f, type: 3}
       propertyPath: m_Name
       value: BlueKnight
-      objectReference: {fileID: 0}
-    - target: {fileID: 8276238298806300973, guid: a206fc0f79892548b8cb16a8bf65c82f, type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8804897818845142488, guid: a206fc0f79892548b8cb16a8bf65c82f, type: 3}
       propertyPath: GlobalObjectIdHash
