@@ -113,6 +113,27 @@ public class LobbyManager : MonoBehaviour
         Debug.Log("Successfully left lobby");
     }
 
+    [Command]
+    public void PrintLobbyPlayers()
+    {
+        if (Presenter.JoinedLobby == null)
+        {
+            Debug.Log("You are not in any lobby.");
+            return;
+        }
+
+        Debug.Log($"--- Players in {Presenter.JoinedLobby.Name} ({Presenter.JoinedLobby.Players.Count}/{Presenter.JoinedLobby.MaxPlayers}) ---");
+        foreach (var player in Presenter.JoinedLobby.Players)
+        {
+            string name = player.Data != null && player.Data.TryGetValue("PlayerName", out var dataObj) 
+                ? dataObj.Value 
+                : "Unknown Player";
+            
+            Debug.Log($"- {name} (ID: {player.Id})");
+        }
+    }
+
+
     private async void OnRelayJoinCodeReceived(string joinCode)
     {
         if (NetworkManager.Singleton.IsServer || NetworkManager.Singleton.IsHost) return;
