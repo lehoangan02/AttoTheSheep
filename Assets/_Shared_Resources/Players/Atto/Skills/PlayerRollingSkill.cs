@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
+using Unity.Cinemachine;// Cần thiết để gọi hệ thống rung của Cinemachine (Lưu ý: Nếu dùng Unity 6/Cinemachine 3, đổi thành 'using Unity.Cinemachine;')
 
 public class PlayerRollingSkill : BaseSkillComponent
 {
@@ -9,6 +10,10 @@ public class PlayerRollingSkill : BaseSkillComponent
     [SerializeField] private GameObject normalVisual; // Object chứa hình cừu bình thường
     [SerializeField] private GameObject dustVisual;   // Object chứa cục bụi/quả bóng
     [SerializeField] private Transform spinMesh;      // Mesh bên trong Dust Visual để xoay
+    [SerializeField] private ParticleSystem rollingDust; // Hiệu ứng bụi cuốn theo khi lăn
+
+    [Header("Camera Shake Settings")]
+    [SerializeField] private CinemachineImpulseSource impulseSource; // Component tạo rung chấn Cinemachine
 
     private PlayerController rollController;
 
@@ -36,7 +41,7 @@ public class PlayerRollingSkill : BaseSkillComponent
 
     public override void ClientPlayVisual(SkillData data)
     {
-        // Thực hiện VFX/Sound ở Client nếu cần
+        // Thực hiện VFX/Sound riêng ở Client nếu cần
     }
 
     private IEnumerator RollingRoutine(RollingSkillData data, PlayerController controller)
@@ -46,8 +51,10 @@ public class PlayerRollingSkill : BaseSkillComponent
         // --- 1. SETUP VISUAL & TRẠNG THÁI ---
         if (normalVisual != null) normalVisual.SetActive(false);
         if (dustVisual != null) dustVisual.SetActive(true);
+        
+        // Bật Particle bụi
+        if (rollingDust != null) rollingDust.Play();
 
-        // Trích xuất PlayerMovement để xử lý tốc độ
         PlayerMovement pMovement = controller.GetComponentInChildren<PlayerMovement>();
         if (pMovement == null) pMovement = controller.GetComponentInParent<PlayerMovement>();
 
@@ -66,7 +73,7 @@ public class PlayerRollingSkill : BaseSkillComponent
                 currentMultiplier += data.acceleration * deltaTime;
                 currentMultiplier = Mathf.Min(currentMultiplier, data.maxSpeedMultiplier);
                 
-                // Mở comment nếu PlayerMovement của bạn có biến hệ số tốc độ:
+                // Mở comment dưới nếu PlayerMovement có biến nhận hệ số tốc độ
                 // if (pMovement != null) pMovement.speedMultiplier = currentMultiplier;
             }
 
@@ -99,7 +106,6 @@ public class PlayerRollingSkill : BaseSkillComponent
             }
 
             // MECHANIC: GÂY SÁT THƯƠNG THEO THỜI GIAN (DOT)
-            // Lấy trực tiếp biến 'damage' từ class cha SkillData làm chỉ số DPS
             float damageThisFrame = data.damage * deltaTime;
             damageAccumulator += damageThisFrame;
 
@@ -141,14 +147,25 @@ public class PlayerRollingSkill : BaseSkillComponent
 
         // --- 3. KẾT THÚC SKILL ---
         Debug.Log("🛑 [ROLL] Nhả địch ra và thắng phanh!");
+        
+        // Tắt Particle bụi
+        if (rollingDust != null) rollingDust.Stop();
+
+        // Nhả địch ra xung quanh
         SpitOutEnemies();
+
+        // GỌI RUNG CAMERA BẰNG CINEMACHINE TẠI ĐÂY
+        if (impulseSource != null)
+        {
+            impulseSource.GenerateImpulse(); 
+        }
 
         // Trả lại Visual cừu bình thường
         if (dustVisual != null) dustVisual.SetActive(false);
         if (normalVisual != null) normalVisual.SetActive(true);
         if (spinMesh != null) spinMesh.localRotation = Quaternion.identity; 
-
-        // Sửa lại biến trả tốc độ gốc nếu cần:
+        
+        // Trả lại hệ số tốc độ gốc nếu có dùng
         // if (pMovement != null) pMovement.speedMultiplier = 1f; 
     }
 
@@ -169,7 +186,7 @@ public class PlayerRollingSkill : BaseSkillComponent
         swallowed.Renderers = rootObj.GetComponentsInChildren<SpriteRenderer>();
         swallowed.Colliders = rootObj.GetComponentsInChildren<Collider2D>();
 
-        // Freeze enemy while swallowed (stop AI + movement)
+        // Đóng băng AI và di chuyển của quái khi bị nuốt
         if (swallowed.Brain != null) swallowed.Brain.IsFrozen = true;
         if (swallowed.Motor != null) swallowed.Motor.IsFrozen = true;
 
@@ -190,10 +207,11 @@ public class PlayerRollingSkill : BaseSkillComponent
             Vector2 randomOffset = Random.insideUnitCircle * 1.5f;
             enemy.Obj.transform.position = rollController.transform.position + (Vector3)randomOffset;
 
-            // Unfreeze enemy after spit out
+            // Rã đông quái (cho phép AI chạy lại)
             if (enemy.Brain != null) enemy.Brain.IsFrozen = false;
             if (enemy.Motor != null) enemy.Motor.IsFrozen = false;
 
+            // Hiển thị lại hình ảnh và vật lý
             if (enemy.Renderers != null) 
                 foreach (var sr in enemy.Renderers) if (sr != null) sr.enabled = true;
                 

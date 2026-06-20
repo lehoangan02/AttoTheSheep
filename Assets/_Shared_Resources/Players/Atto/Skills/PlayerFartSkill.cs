@@ -7,14 +7,17 @@ public class PlayerFartSkill : BaseSkillComponent
 {
     [Header("References")]
     [SerializeField] private ParticleSystem fartGasParticle; 
-    [SerializeField] private Collider2D playerCollider; // Collider chính của Player (để chuyển trigger khi dash)
+    [SerializeField] private Collider2D playerCollider; 
+    
+    // THÊM BIẾN NÀY ĐỂ KÉO THẢ TRONG INSPECTOR
+    [SerializeField] private SpriteRenderer playerSprite; 
 
     private FartSkillData currentFartData;
     private PlayerController fartController;
 
     public override void ServerExecute(SkillData data, NetworkEntity caster, PlayerController controller = null)
     {
-        // Ép kiểu Data an toàn
+        // Code cũ của bạn giữ nguyên...
         if (data is FartSkillData fartData && controller != null)
         {
             currentFartData = fartData;
@@ -25,14 +28,45 @@ public class PlayerFartSkill : BaseSkillComponent
 
     public override void ClientPlayVisual(SkillData data)
     {
-        if (fartGasParticle != null) fartGasParticle.Play();
+        if (fartGasParticle != null) 
+        {
+            // 1. Giữ nguyên Transform gốc của Particle, không bẻ nó nữa để tránh lỗi mất Stretch
+            fartGasParticle.transform.localRotation = Quaternion.identity;
+
+            if (playerSprite != null)
+            {
+                // Truy cập trực tiếp vào module Shape bằng Code
+                var shapeModule = fartGasParticle.shape;
+
+                Debug.Log($"🌬️ [VFX LOG] Trạng thái nhân vật lật (flipX) = {playerSprite.flipX}");
+
+                if (playerSprite.flipX) 
+                {
+                    // Nhân vật nhìn TRÁI -> Dash TRÁI -> Gió thổi sang PHẢI
+                    // Xoay góc trục Y của module Shape thành -90
+                    shapeModule.rotation = new Vector3(0, 90, 0); 
+                }
+                else 
+                {
+                    // Nhân vật nhìn PHẢI -> Dash PHẢI -> Gió thổi sang TRÁI
+                    // Xoay góc trục Y của module Shape thành 90
+                    shapeModule.rotation = new Vector3(0, -90, 0); 
+                }
+            }
+            else
+            {
+                Debug.LogWarning("⚠️ [VFX LỖI] Bạn chưa kéo thả SpriteRenderer vào ô Player Sprite!");
+            }
+
+            fartGasParticle.Play();
+        }
     }
 
     private IEnumerator DashAndDamageRoutine(FartSkillData data, PlayerController controller)
     {
+        // Code Coroutine cũ của bạn giữ nguyên...
         Rigidbody2D rb = controller.GetComponent<Rigidbody2D>();
         
-        // 1. Tìm Script di chuyển để chuẩn bị khóa
         PlayerMovement movement = controller.GetComponentInChildren<PlayerMovement>();
         if (movement == null) movement = controller.GetComponentInParent<PlayerMovement>();
 
@@ -42,7 +76,6 @@ public class PlayerFartSkill : BaseSkillComponent
             yield break;
         }
 
-        // 2. Xác định hướng lướt (ưu tiên hướng đang chạy)
         Vector2 dashDir = rb.linearVelocity.normalized;
         if (dashDir == Vector2.zero) 
         {
@@ -52,20 +85,16 @@ public class PlayerFartSkill : BaseSkillComponent
 
         Debug.Log($"🚀 [LOGIC LOG] Đang lướt về hướng {dashDir} với lực {data.dashForce} trong {data.dashDuration} giây.");
 
-        // 3. KHÓA DI CHUYỂN TỪ NGƯỜI CHƠI + CHUYỂN COLLIDER THÀNH TRIGGER
         if (movement != null) movement.isMovementLocked = true;
         if (playerCollider != null) playerCollider.isTrigger = true;
 
         float elapsed = 0f;
-        // HashSet đảm bảo mỗi quái vật chỉ nhận sát thương/knockback MỘT LẦN duy nhất trong 1 lần lướt
         HashSet<Collider2D> damagedEnemies = new HashSet<Collider2D>(); 
 
         while (elapsed < data.dashDuration)
         {
-            // Ép vận tốc lướt
             rb.linearVelocity = dashDir * data.dashForce;
             
-            // Quét vùng sát thương xung quanh nhân vật
             Collider2D[] hits = Physics2D.OverlapCircleAll(controller.transform.position, data.hitRadius, data.enemyLayer);
             foreach (var hit in hits)
             {
@@ -73,13 +102,11 @@ public class PlayerFartSkill : BaseSkillComponent
                 {
                     Debug.Log($"💥 [OVERLAP] Tông trúng mục tiêu: {hit.gameObject.name}! Gây {data.damage} sát thương.");
                     
-                    // Trừ máu quái
                     NetworkEntity enemyEntity = hit.GetComponent<NetworkEntity>();
                     if (enemyEntity != null)
                     {
                         enemyEntity.TakeDamage((int)data.damage);
 
-                        // Knockback: freeze brain + apply force for 0.3s via ApplyKnockback
                         Vector2 knockbackDir = ((Vector2)hit.transform.position - (Vector2)controller.transform.position).normalized;
                         enemyEntity.ApplyKnockback(knockbackDir * data.knockupForce, 0.3f);
                     }
@@ -87,14 +114,12 @@ public class PlayerFartSkill : BaseSkillComponent
             }
 
             elapsed += Time.fixedDeltaTime;
-            yield return new WaitForFixedUpdate(); // Chờ đến khung hình vật lý tiếp theo
+            yield return new WaitForFixedUpdate();
         }
 
-        // 4. Lướt xong, hãm phanh dừng lại
         rb.linearVelocity = Vector2.zero;
         Debug.Log("🛑 [LOGIC LOG] Lướt xong, đã dừng lại.");
 
-        // 5. MỞ KHÓA DI CHUYỂN + TRẢ COLLIDER VỀ TRẠNG THÁI BÌNH THƯỜNG
         if (movement != null) movement.isMovementLocked = false;
         if (playerCollider != null) playerCollider.isTrigger = false;
 
@@ -102,10 +127,9 @@ public class PlayerFartSkill : BaseSkillComponent
         fartController = null;
     }
 
-    // Vẽ vòng tròn vàng trong Editor để bạn dễ căn chỉnh vùng sát thương trúng
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, 2f); // Bán kính hiển thị nháp
+        Gizmos.DrawWireSphere(transform.position, 2f); 
     }
 }
