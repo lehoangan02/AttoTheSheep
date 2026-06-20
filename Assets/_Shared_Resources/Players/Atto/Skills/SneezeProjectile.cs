@@ -1,97 +1,106 @@
 using UnityEngine;
 using Unity.Netcode;
 
-/// <summary>
-/// Đạn nước mũi: bay thẳng về phía trước, chạm quái thì gây sát thương + choáng rồi biến mất.
-/// </summary>
 public class SneezeProjectile : NetworkBehaviour
 {
     [Header("Components")]
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private Collider2D col;
 
-    [Header("Settings")]
-    public float speed = 15f;
-    public float maxDistance = 8f;
-    public int damage = 150;
-    public float stunDuration = 1.5f;
-    public LayerMask enemyLayer;
+    private SneezeSkillData skillData;
+    private float speed;
+    private float maxDistance;
+    private int damage;
 
     private Vector2 startPosition;
-    private bool hasHit = false;
+    private bool hasTriggeredPuddle = false; // Ngăn chặn việc sinh ra nhiều vũng nước cùng lúc
 
     public void Initialize(Vector2 direction, SneezeSkillData data, int overrideDamage = 0, bool flipX = false)
-{
-    speed = data.projectileSpeed;
-    maxDistance = data.projectileMaxDistance;
-    damage = overrideDamage > 0 ? overrideDamage : (int)data.damage;
-    stunDuration = data.stunDuration;
-    enemyLayer = data.enemyLayer;
-
-    startPosition = transform.position;
-
-    if (rb != null)
     {
-        rb.linearVelocity = direction * speed;
-    }
+        skillData = data;
+        speed = data.projectileSpeed;
+        maxDistance = data.projectileMaxDistance;
+        damage = overrideDamage > 0 ? overrideDamage : (int)data.damage;
 
-    // --- SỬA LỖI XOAY VÀ CHỤM ĐẠN ---
-    // Tính góc xoay chuẩn 360 độ theo hướng bay thực tế
-    float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-    transform.rotation = Quaternion.Euler(0, 0, angle);
+        startPosition = transform.position;
 
-    // Xử lý Flip để giữ bóng (shadow) luôn ở dưới đáy
-    Vector3 localScale = transform.localScale;
-    if (direction.x < 0)
-    {
-        // Khi bay sang trái, đạn bị lộn ngược. Ta lật trục Y (Flip Y) để đưa bóng trở về bên dưới.
-        // Tuyệt đối giữ nguyên trục X dương để đầu đạn hướng đúng theo góc rotation.
-        localScale.y = -Mathf.Abs(localScale.y);
-        localScale.x = Mathf.Abs(localScale.x);
+        if (rb != null)
+        {
+            rb.linearVelocity = direction * speed;
+        }
+
+        // Xoay hướng đạn
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        transform.rotation = Quaternion.Euler(0, 0, angle);
+
+        // Lật trục để bóng đổ luôn đúng
+        Vector3 localScale = transform.localScale;
+        if (direction.x < 0)
+        {
+            localScale.y = -Mathf.Abs(localScale.y);
+            localScale.x = Mathf.Abs(localScale.x);
+        }
+        else
+        {
+            localScale.y = Mathf.Abs(localScale.y);
+            localScale.x = Mathf.Abs(localScale.x);
+        }
+        transform.localScale = localScale;
     }
-    else
-    {
-        // Bay sang phải thì giữ nguyên dương
-        localScale.y = Mathf.Abs(localScale.y);
-        localScale.x = Mathf.Abs(localScale.x);
-    }
-    transform.localScale = localScale;
-}
 
     private void FixedUpdate()
     {
-        if (!IsServer || hasHit) return;
+        if (!IsServer || hasTriggeredPuddle) return;
 
-        // Tự hủy nếu bay quá xa
+        // Nếu bay hết tầm tối đa -> Tạo vũng nước tại đây
         float distanceTraveled = Vector2.Distance(startPosition, transform.position);
         if (distanceTraveled >= maxDistance)
         {
-            DespawnProjectile();
+            CreatePuddleAndDespawn();
         }
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (!IsServer || hasHit) return;
+        if (!IsServer || hasTriggeredPuddle) return;
 
-        // Kiểm tra layer bằng bitmask
-        if ((enemyLayer.value & (1 << other.gameObject.layer)) == 0) return;
+        // Kiểm tra xem đạn có đụng trúng quái / tường không
+        if ((skillData.hitLayer.value & (1 << other.gameObject.layer)) == 0) return;
 
-        // Lấy NetworkEntity từ enemy
-        NetworkEntity enemyEntity = other.GetComponent<NetworkEntity>();
-        if (enemyEntity == null) enemyEntity = other.GetComponentInParent<NetworkEntity>();
-        if (enemyEntity == null) return;
+        // Nếu muốn đạn vẫn gây sát thương khi đập thẳng vào mặt quái, mở khóa đoạn này:
+        /*
+        NetworkEntity enemyEntity = other.GetComponent<NetworkEntity>() ?? other.GetComponentInParent<NetworkEntity>();
+        if (enemyEntity != null) {
+            enemyEntity.TakeDamage(damage);
+        }
+        */
 
-        hasHit = true;
+        // Đụng trúng mục tiêu -> Tạo vũng nước tại chân mục tiêu
+        CreatePuddleAndDespawn();
+    }
 
-        // Gây sát thương
-        enemyEntity.TakeDamage(damage);
-        Debug.Log($"💧 [SNEEZE_PROJECTILE] Trúng {other.gameObject.name}! Gây {damage} DMG.");
+    private void CreatePuddleAndDespawn()
+    {
+        hasTriggeredPuddle = true;
 
-        // Stun: freeze brain + zero velocity for stunDuration
-        enemyEntity.ApplyKnockback(Vector2.zero, stunDuration);
+        if (skillData.puddlePrefab != null)
+        {
+            // Sinh vũng nước ra
+            GameObject puddleObj = Instantiate(skillData.puddlePrefab, transform.position, Quaternion.identity);
+            
+            // Đồng bộ qua mạng
+            NetworkObject netObj = puddleObj.GetComponent<NetworkObject>();
+            if (netObj != null) netObj.Spawn();
 
-        // Hủy đạn
+            // Khởi tạo thông số làm chậm
+            SlowPuddle puddleScript = puddleObj.GetComponent<SlowPuddle>();
+            if (puddleScript != null)
+            {
+                puddleScript.Initialize(skillData.slowMultiplier, skillData.puddleDuration);
+            }
+        }
+
+        // Tiêu hủy viên đạn
         DespawnProjectile();
     }
 
@@ -105,13 +114,5 @@ public class SneezeProjectile : NetworkBehaviour
         {
             Destroy(gameObject);
         }
-    }
-
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.cyan;
-        Gizmos.DrawWireSphere(transform.position, 0.3f);
-        Vector2 dir = rb != null ? rb.linearVelocity.normalized : Vector2.right;
-        Gizmos.DrawRay(transform.position, dir * maxDistance);
     }
 }

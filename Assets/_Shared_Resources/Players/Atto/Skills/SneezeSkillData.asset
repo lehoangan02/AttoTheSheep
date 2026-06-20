@@ -17,17 +17,19 @@ MonoBehaviour:
   description: "Atto h\u1EAFt x\xEC th\u1EADt m\u1EA1nh, b\u1EAFn ra 5 tia n\u01B0\u1EDBc
     m\u0169i theo h\xECnh qu\u1EA1t v\u1EC1 ph\xEDa tr\u01B0\u1EDBc. M\u1ED7i tia
     g\xE2y 150 DMG v\xE0 cho\xE1ng 1.5s."
-  cooldown: 7
+  cooldown: 0
   damage: 150
-  manaCost: 70
+  manaCost: 0
   lambsRequired: 0
   vfxPrefab: {fileID: 0}
   projectilePrefab: {fileID: 5472383393138764189, guid: c7e11037152dd5d47b3bf4ac6de9c4e2, type: 3}
   projectileCount: 5
-  spreadAngle: 60
+  spreadAngle: 150
   projectileSpeed: 15
   projectileMaxDistance: 8
-  stunDuration: 1.5
-  enemyLayer:
+  puddlePrefab: {fileID: 8849798543113921564, guid: 8866c3ed94c78a64fa0fdf9a633ae376, type: 3}
+  puddleDuration: 5
+  slowMultiplier: 0.5
+  hitLayer:
     serializedVersion: 2
     m_Bits: 64

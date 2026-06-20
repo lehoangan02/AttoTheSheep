@@ -30,11 +30,11 @@ MonoBehaviour:
   vfxPrefab: {fileID: 0}
   pullRadius: 3
   pullSpeed: 5
-  hitRadius: 1.5
+  hitRadius: 3
   enemyLayer:
     serializedVersion: 2
     m_Bits: 64
-  maxSpeedMultiplier: 2
+  maxSpeedMultiplier: 5
   acceleration: 1.5
-  duration: 4
+  duration: 7
   baseRotationSpeed: 360
