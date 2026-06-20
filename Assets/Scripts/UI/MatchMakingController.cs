@@ -7,7 +7,7 @@ using TMPro;
 public class MatchMakingController : MonoBehaviour
 {
     [Header("Scene References")]
-    [SerializeField] private string mainMenuSceneName = "KhoaMenu";
+    [SerializeField] private string mainMenuSceneName = "MainMenu";
     
     [Header("UI Buttons")]
     [SerializeField] private Button backButton;
@@ -124,6 +124,7 @@ public class MatchMakingController : MonoBehaviour
             {
                 createNameInput.text = "";
                 createNameInput.Select();
+                createNameInput.ActivateInputField();
             }
         }
     }
@@ -139,6 +140,7 @@ public class MatchMakingController : MonoBehaviour
             {
                 joinCodeInput.text = "";
                 joinCodeInput.Select();
+                joinCodeInput.ActivateInputField();
             }
         }
     }
