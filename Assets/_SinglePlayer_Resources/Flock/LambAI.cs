@@ -1,8 +1,9 @@
 using UnityEngine;
 using Unity.Netcode;
+using System.Collections;
 
-[RequireComponent(typeof(NetworkEntity))] // Lambs still use the common OOP core for Health/Speed
-public class LambAI : NetworkBehaviour
+// Kế thừa trực tiếp từ NetworkEntity
+public class LambAI : NetworkEntity 
 {
     [Header("Movement Settings")]
     [SerializeField] private float stoppingDistance = 0.1f; 
@@ -13,13 +14,20 @@ public class LambAI : NetworkBehaviour
     [Range(0f, 0.9f)]
     [SerializeField] private float speedNoiseRange = 0.25f;
 
+    [Header("Damage Feedback (Hiệu ứng)")]
+    [SerializeField] private Color damageColor = Color.red;
+    [SerializeField] private float flashDuration = 0.15f;
+    [SerializeField] private float knockbackForce = 10f; 
+    [SerializeField] private float knockbackDuration = 0.15f;
+
     private float personalSpeedMultiplier = 1f; 
+    private Color originalColor;
+    private bool isMovementLocked = false; 
 
     private Rigidbody2D rb;
     private Animator animator;
     private SpriteRenderer spriteRenderer;
     private FlockManager myManager;
-    private NetworkEntity entity; 
 
     private Vector2 flockCenter;
     private float flockRadius;
@@ -31,7 +39,11 @@ public class LambAI : NetworkBehaviour
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponentInChildren<Animator>();
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
-        entity = GetComponent<NetworkEntity>(); 
+
+        if (spriteRenderer != null)
+        {
+            originalColor = spriteRenderer.color;
+        }
     }
 
     void Start()
@@ -46,8 +58,29 @@ public class LambAI : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        // Register event: When Entity reports health = 0 -> Remove from flock
-        entity.OnDied += HandleLambDeath;
+        // QUAN TRỌNG: Gọi base để khởi tạo Máu, Năng lượng và Tốc độ từ class cha
+        base.OnNetworkSpawn(); 
+        
+        currentHealth.OnValueChanged += OnHealthChanged;
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        base.OnNetworkDespawn();
+        currentHealth.OnValueChanged -= OnHealthChanged;
+    }
+
+    // GHI ĐÈ HÀM CHẾT TỪ NETWORK ENTITY
+    protected override void Die()
+    {
+        // Xóa cừu khỏi bầy trước khi nó biến mất
+        if (myManager != null) 
+        {
+            myManager.RemoveLamb(this);
+        }
+        
+        // Gọi base để thực hiện logic hủy object mặc định (NetworkObject.Despawn)
+        base.Die(); 
     }
 
     public void SetFlockData(Vector2 center, float radius)
@@ -65,8 +98,7 @@ public class LambAI : NetworkBehaviour
 
     void FixedUpdate()
     {
-        // Safety check: If not spawned or not the server, do not calculate
-        if (!IsSpawned || !IsServer) return; 
+        if (!IsSpawned || !IsServer || isMovementLocked) return; 
 
         if (!hasTarget) 
         {
@@ -82,8 +114,8 @@ public class LambAI : NetworkBehaviour
         {
             Vector2 direction = (actualTarget - (Vector2)transform.position).normalized;
             
-            // READ STATS: Get speed from the OOP core NetworkEntity
-            float maxSpeedWithNoise = entity.currentMoveSpeed.Value * personalSpeedMultiplier;
+            // Dùng trực tiếp biến currentMoveSpeed của class cha NetworkEntity
+            float maxSpeedWithNoise = currentMoveSpeed.Value * personalSpeedMultiplier;
             float targetSpeed = maxSpeedWithNoise;
             
             if (distToTarget < slowingRadius)
@@ -103,9 +135,6 @@ public class LambAI : NetworkBehaviour
         }
     }
 
-    // ==========================================
-    // LOCAL FUNCTION: NO NEED TO USE RPC
-    // ==========================================
     private void UpdateAnimationLocal(bool isMoving)
     {
         if (animator != null) animator.SetBool("IsMoving", isMoving);
@@ -117,29 +146,67 @@ public class LambAI : NetworkBehaviour
         }
     }
 
-    private void HandleLambDeath()
+    // ==========================================
+    // GHI ĐÈ HÀM NHẬN SÁT THƯƠNG (TỪ NETWORK ENTITY)
+    // ==========================================
+    public override void TakeDamage(int damage, NetworkEntity source)
     {
-        if (myManager != null) 
+        int healthBefore = currentHealth.Value; 
+
+        // 1. Gọi logic trừ máu mặc định của class cha
+        base.TakeDamage(damage, source);
+
+        // 2. Thêm hiệu ứng Knockback (Đẩy lùi) nếu bị mất máu và có người tấn công
+        if (IsServer && currentHealth.Value < healthBefore && source != null)
         {
-            myManager.RemoveLamb(this);
+            // Lấy vị trí của kẻ tấn công (source) để tính hướng đẩy lùi
+            Vector2 knockbackDirection = ((Vector2)transform.position - (Vector2)source.transform.position).normalized;
+            Vector2 appliedForce = knockbackDirection * knockbackForce;
+
+            ApplyKnockbackClientRpc(appliedForce);
         }
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    // ==========================================
+    // TỰ ĐỘNG ÁM ĐỎ KHI MÁU THAY ĐỔI
+    // ==========================================
+    private void OnHealthChanged(int previousValue, int newValue)
     {
-        if (!IsServer) return;
-
-        // OOP Mechanism: Touching an enemy causes health loss (instead of instant death)
-        if (collision.gameObject.CompareTag("Enemy"))
+        if (newValue < previousValue)
         {
-            // Deduct health through the parent class NetworkEntity's function
-            // You can pass the Enemy's damage in, here for example it is 20 damage
-            entity.TakeDamage(20); 
+            if (spriteRenderer != null)
+            {
+                StopCoroutine(nameof(FlashRedRoutine)); 
+                StartCoroutine(nameof(FlashRedRoutine));
+            }
         }
     }
 
-    public override void OnNetworkDespawn()
+    private IEnumerator FlashRedRoutine()
     {
-        if (entity != null) entity.OnDied -= HandleLambDeath;
+        spriteRenderer.color = damageColor;
+        yield return new WaitForSeconds(flashDuration);
+        spriteRenderer.color = originalColor;
+    }
+
+    // ==========================================
+    // CƠ CHẾ ĐẨY LÙI (KNOCKBACK)
+    // ==========================================
+    [ClientRpc]
+    private void ApplyKnockbackClientRpc(Vector2 force)
+    {
+        if (rb != null)
+        {
+            StartCoroutine(KnockbackRoutine(force));
+        }
+    }
+
+    private IEnumerator KnockbackRoutine(Vector2 force)
+    {
+        isMovementLocked = true;
+        rb.linearVelocity = force;
+        yield return new WaitForSeconds(knockbackDuration);
+        rb.linearVelocity = Vector2.zero;
+        isMovementLocked = false;
     }
 }

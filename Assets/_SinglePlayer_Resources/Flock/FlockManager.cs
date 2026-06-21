@@ -53,6 +53,17 @@ public class FlockManager : NetworkBehaviour
     [SerializeField] private float autoSpawnInterval = 10f;
     private float spawnTimer = 0f; 
 
+    // ==========================================
+    // TÍNH NĂNG MỚI: BỘ LỌC SPAWN
+    // ==========================================
+    [Header("Spawn Validation (Chống kẹt tường/quái)")]
+    [Tooltip("Các Layer không được phép spawn đè lên (VD: Wall, Obstacle, Enemy)")]
+    [SerializeField] private LayerMask obstacleLayer;
+    [Tooltip("Kích thước vùng kiểm tra (Thường bằng bán kính của collider cừu)")]
+    [SerializeField] private float spawnCheckRadius = 0.4f;
+    [Tooltip("Số lần thử tìm vị trí trống tối đa trước khi hủy lệnh spawn lần đó")]
+    [SerializeField] private int maxSpawnAttempts = 10;
+
     [Header("Debug Settings")]
     [SerializeField] private bool showDebugRadius = true;
 
@@ -172,7 +183,7 @@ public class FlockManager : NetworkBehaviour
         UpdateFlockRadius();
     }
 
-    public void SpawnLamb(Vector2 position)
+    public void SpawnLamb(Vector2 centerPosition)
     {
         if (!IsServer) return;
 
@@ -181,7 +192,14 @@ public class FlockManager : NetworkBehaviour
             return;
         }
 
-        GameObject lambObj = Instantiate(lambPrefab, position, Quaternion.identity);
+        // TÌM VỊ TRÍ HỢP LỆ TRƯỚC KHI SPAWN
+        if (!TryGetValidSpawnPosition(centerPosition, currentFlockRadius, out Vector2 spawnPos))
+        {
+            Debug.LogWarning("⚠️ [FlockManager] Không tìm được vị trí trống để spawn cừu! Hủy spawn lần này để tránh kẹt tường.");
+            return; // Hủy spawn nếu không có chỗ trống
+        }
+
+        GameObject lambObj = Instantiate(lambPrefab, spawnPos, Quaternion.identity);
         
         NetworkObject netObj = lambObj.GetComponent<NetworkObject>();
         if (netObj != null) netObj.Spawn(true);
@@ -194,6 +212,33 @@ public class FlockManager : NetworkBehaviour
             UpdateFlockRadius();
             OnFlockTierChanged?.Invoke(GetFlockTier());
         }
+    }
+
+    /// <summary>
+    /// Thử tìm vị trí ngẫu nhiên không đè lên chướng ngại vật.
+    /// </summary>
+    private bool TryGetValidSpawnPosition(Vector2 center, float maxRadius, out Vector2 validPosition)
+    {
+        for (int i = 0; i < maxSpawnAttempts; i++)
+        {
+            // Lấy 1 điểm random xung quanh tâm bầy
+            Vector2 randomOffset = UnityEngine.Random.insideUnitCircle * maxRadius;
+            Vector2 testPosition = center + randomOffset;
+
+            // Kiểm tra xem vị trí này có bị đụng tường/quái (obstacleLayer) không
+            Collider2D hit = Physics2D.OverlapCircle(testPosition, spawnCheckRadius, obstacleLayer);
+            
+            if (hit == null)
+            {
+                // Vị trí an toàn, trả về true
+                validPosition = testPosition;
+                return true;
+            }
+        }
+        
+        // Đã thử quá giới hạn số lần mà vẫn toàn vướng tường -> Trả về false
+        validPosition = center;
+        return false;
     }
 
     public void RemoveLamb(LambAI lamb)
