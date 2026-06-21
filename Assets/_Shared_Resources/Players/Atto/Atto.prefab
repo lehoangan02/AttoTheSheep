@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8173818436291477422}
   - component: {fileID: 4552377656879383303}
   - component: {fileID: 701238810622516781}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: RollingDust
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4846,7 +4846,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7658202682737986263}
   - component: {fileID: 6261496820048716688}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Skill_0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4908,7 +4908,7 @@ GameObject:
   - component: {fileID: 6551048971583672964}
   - component: {fileID: 2762547472229503846}
   - component: {fileID: 1963130586316328227}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Atto
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -5136,6 +5136,11 @@ MonoBehaviour:
       MinSecondsBetweenUpdates: 0
       MaxSecondsBetweenUpdates: 0
     m_InternalValue: 0
+  spriteRenderer: {fileID: 0}
+  damageColor: {r: 1, g: 0, b: 0, a: 1}
+  flashDuration: 0.2
+  knockbackForce: 5
+  knockbackDuration: 0.15
 --- !u!114 &1343113486860999786
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5192,6 +5197,11 @@ MonoBehaviour:
       MinSecondsBetweenUpdates: 0
       MaxSecondsBetweenUpdates: 0
     m_InternalValue: 0
+  spriteRenderer: {fileID: 0}
+  damageColor: {r: 1, g: 0, b: 0, a: 1}
+  flashDuration: 0.2
+  knockbackForce: 5
+  knockbackDuration: 0.15
 --- !u!114 &2762547472229503846
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5254,7 +5264,7 @@ GameObject:
   - component: {fileID: 5959691933641822895}
   - component: {fileID: 5340469637365962046}
   - component: {fileID: 7970235993075498558}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: NormalVisual
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5368,7 +5378,7 @@ GameObject:
   - component: {fileID: 3478572267434883359}
   - component: {fileID: 1525549603215431118}
   - component: {fileID: 601324703800862324}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: HeadbuttSparks
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10261,7 +10271,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3452759695154057927}
   - component: {fileID: 8062081234954515216}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: SpinMesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10353,7 +10363,7 @@ GameObject:
   - component: {fileID: 8189110104746625352}
   - component: {fileID: 7736925452235863875}
   - component: {fileID: 3407218128487003197}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: RunDust
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15190,7 +15200,7 @@ GameObject:
   - component: {fileID: 1200250212177285409}
   - component: {fileID: 4059397634877419734}
   - component: {fileID: 9024644052003064940}
-  m_Layer: 5
+  m_Layer: 7
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15341,7 +15351,7 @@ GameObject:
   - component: {fileID: 5617405842823007154}
   - component: {fileID: 8992876592193253081}
   - component: {fileID: 2867893050777859096}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: DashWind
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -20234,7 +20244,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8449501306487202680}
   - component: {fileID: 7338613021342365268}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Skill_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -20282,7 +20292,7 @@ GameObject:
   - component: {fileID: 2288682488833027602}
   - component: {fileID: 3653318934025102158}
   - component: {fileID: 6022902517185921301}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Skill_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -20386,7 +20396,7 @@ GameObject:
   m_Component:
   - component: {fileID: 77565061955431801}
   - component: {fileID: 1956502594171290489}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Skill_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -20435,7 +20445,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2371937422554456442}
   - component: {fileID: 8307629245878965988}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Movement
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -20484,7 +20494,7 @@ GameObject:
   - component: {fileID: 5996072210342867122}
   - component: {fileID: 3828345090377897385}
   - component: {fileID: 7268105977368774057}
-  m_Layer: 5
+  m_Layer: 7
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -20585,7 +20595,7 @@ GameObject:
   - component: {fileID: 4849186260417632315}
   - component: {fileID: 8906198909094651351}
   - component: {fileID: 2229812765945419008}
-  m_Layer: 5
+  m_Layer: 7
   m_Name: Panel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -20660,7 +20670,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8738608390983301840}
   - component: {fileID: 2077572055681574321}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: DustVisual
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -20716,7 +20726,7 @@ GameObject:
   - component: {fileID: 1235488546585286335}
   - component: {fileID: 2590359606250298652}
   - component: {fileID: 5817904330219769839}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Combat
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -611,9 +611,12 @@ MonoBehaviour:
   levelConfigs:
   - maxLambs: 5
     baseRadius: 1
+  currentControlMode: 1
+  playerDeadzoneRadius: 3
+  randomOffsetRadius: 2
   lambPrefab: {fileID: 4784860766754900265, guid: 628ff7b0f60023e47884e19d86cef4fc, type: 3}
   radiusMultiplier: 0.5
-  skillZoneRadiusMultiplier: 1.5
+  skillZoneRadiusMultiplier: 2
   lambsForSkill1: 1
   lambsForSkill2: 1
   lambsForSkill3: 1

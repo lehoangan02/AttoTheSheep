@@ -13,6 +13,12 @@ public struct FlockLevelConfig
     public float baseRadius;
 }
 
+public enum FlockControlMode
+{
+    Manual, // Click đâu đi đó
+    Auto    // Tự động bám theo player với Deadzone
+}
+
 public class FlockManager : NetworkBehaviour
 {
     [Header("Level Settings")]
@@ -20,6 +26,15 @@ public class FlockManager : NetworkBehaviour
     
     [Tooltip("Cấu hình số cừu và bán kính cho từng Level. Phần tử 0 = Level 1, Phần tử 1 = Level 2...")]
     [SerializeField] private FlockLevelConfig[] levelConfigs;
+
+    [Header("Control Settings")]
+    public FlockControlMode currentControlMode = FlockControlMode.Auto;
+
+    [Header("Auto Follow Settings (AI)")]
+    [Tooltip("Khoảng cách tối đa Player có thể di chuyển trước khi bầy cừu đi theo")]
+    [SerializeField] private float playerDeadzoneRadius = 3f;
+    [Tooltip("Bán kính random tâm mới xung quanh Player (Tạo sự tự nhiên)")]
+    [SerializeField] private float randomOffsetRadius = 2f;
 
     [Header("Flock Settings")]
     [SerializeField] private GameObject lambPrefab;
@@ -60,7 +75,6 @@ public class FlockManager : NetworkBehaviour
     {
         if (IsServer)
         {
-            // Thiết lập giá trị mặc định cho mảng Level nếu bạn quên kéo trong Inspector
             if (levelConfigs == null || levelConfigs.Length == 0)
             {
                 levelConfigs = new FlockLevelConfig[]
@@ -78,6 +92,7 @@ public class FlockManager : NetworkBehaviour
 
     void Update()
     {
+        // Liên tục kiểm tra và lấy tham chiếu đến Player (cần chỉnh sửa nếu có nhiều Player)
         if (currentPlayer == null)
         {
             currentPlayer = FindFirstObjectByType<PlayerController>();
@@ -87,21 +102,62 @@ public class FlockManager : NetworkBehaviour
             }
         }
 
-        if (enableAutoSpawn && IsServer)
+        if (IsServer)
         {
-            spawnTimer += Time.deltaTime; 
-            if (spawnTimer >= autoSpawnInterval)
+            // Xử lý logic AI đi theo
+            if (currentControlMode == FlockControlMode.Auto && currentPlayer != null)
             {
-                spawnTimer = 0f; 
-                SpawnLamb(currentFlockCenter);
+                HandleAutoFollow();
+            }
+
+            // Xử lý sinh cừu tự động
+            if (enableAutoSpawn)
+            {
+                spawnTimer += Time.deltaTime; 
+                if (spawnTimer >= autoSpawnInterval)
+                {
+                    spawnTimer = 0f; 
+                    SpawnLamb(currentFlockCenter);
+                }
             }
         }
     }
 
-    // Lấy thông số (max cừu, base radius) của Level hiện tại
+    // ==========================================
+    // AUTO FOLLOW (AI) LOGIC
+    // ==========================================
+    private void HandleAutoFollow()
+    {
+        Vector2 playerPos = currentPlayer.transform.position;
+        float distanceToPlayer = Vector2.Distance(currentFlockCenter, playerPos);
+
+        // Nếu người chơi vượt ra khỏi Deadzone
+        if (distanceToPlayer > playerDeadzoneRadius)
+        {
+            // Tạo một vị trí random xung quanh player
+            Vector2 randomOffset = UnityEngine.Random.insideUnitCircle * randomOffsetRadius;
+            Vector2 newFlockCenter = playerPos + randomOffset;
+            
+            CommandFlock(newFlockCenter);
+        }
+    }
+
+    // Bạn có thể gọi hàm này từ UI/Input để đổi trạng thái
+    public void SetControlMode(FlockControlMode newMode)
+    {
+        currentControlMode = newMode;
+        if (newMode == FlockControlMode.Auto && currentPlayer != null)
+        {
+            // Buộc cập nhật ngay lập tức nếu chuyển sang Auto
+            HandleAutoFollow(); 
+        }
+    }
+
+    // ==========================================
+    // CORE FLOCK LOGIC
+    // ==========================================
     private FlockLevelConfig GetCurrentLevelConfig()
     {
-        // Trừ 1 vì Level 1 tương ứng với Index 0 trong mảng
         int index = Mathf.Clamp(currentLevel.Value - 1, 0, levelConfigs.Length - 1);
         return levelConfigs[index];
     }
@@ -120,7 +176,6 @@ public class FlockManager : NetworkBehaviour
     {
         if (!IsServer) return;
 
-        // --- ĐIỀU KIỆN CHẶN: Nếu số cừu đã bằng mức tối đa của Level thì không sinh thêm ---
         if (activeLambs.Count >= GetCurrentLevelConfig().maxLambs)
         {
             return;
@@ -153,19 +208,13 @@ public class FlockManager : NetworkBehaviour
 
     private void UpdateFlockRadius()
     {
-        // Lấy Base Radius mở rộng tùy theo Level hiện tại
         float dynamicBaseRadius = GetCurrentLevelConfig().baseRadius;
-
-        // Bán kính 1 = Base Radius (phụ thuộc Level) + Multiplier * Số lượng cừu
         currentFlockRadius = dynamicBaseRadius + (radiusMultiplier * Mathf.Sqrt(activeLambs.Count));
-        
-        // Bán kính 2: Cho phép dùng skill (rộng hơn)
         currentSkillZoneRadius = currentFlockRadius * skillZoneRadiusMultiplier;
         
         CommandFlock(currentFlockCenter);
     }
 
-    // Gọi hàm này khi bạn muốn bầy cừu lên Level (từ Item, EXP, v.v...)
     public void LevelUpFlock()
     {
         if (!IsServer) return;
@@ -180,6 +229,8 @@ public class FlockManager : NetworkBehaviour
 
     private void HandleMapClicked(Vector2 targetPos)
     {
+        // Tự động chuyển qua chế độ Manual khi người chơi ra lệnh
+        currentControlMode = FlockControlMode.Manual;
         CommandFlock(targetPos);
     }
 
@@ -208,11 +259,19 @@ public class FlockManager : NetworkBehaviour
     {
         if (showDebugRadius)
         {
+            // Vẽ tâm của bầy
             Gizmos.color = new Color(0f, 1f, 0f, 0.3f);
             Gizmos.DrawWireSphere(currentFlockCenter, currentFlockRadius);
 
             Gizmos.color = new Color(0f, 0.5f, 1f, 0.3f);
             Gizmos.DrawWireSphere(currentFlockCenter, currentSkillZoneRadius);
+
+            // Vẽ Deadzone của Player (nếu ở chế độ Auto)
+            if (Application.isPlaying && currentPlayer != null && currentControlMode == FlockControlMode.Auto)
+            {
+                Gizmos.color = new Color(1f, 0f, 0f, 0.2f); // Màu đỏ nhạt cho Deadzone
+                Gizmos.DrawWireSphere(currentPlayer.transform.position, playerDeadzoneRadius);
+            }
         }
     }
 

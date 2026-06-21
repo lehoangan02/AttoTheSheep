@@ -4,6 +4,13 @@ using System.Collections.Generic;
 
 public class SlowPuddle : NetworkBehaviour
 {
+    [Header("Target Settings (Bộ Lọc Mục Tiêu)")]
+    [Tooltip("Các Layer sẽ bị vũng nước làm chậm (VD: Enemy, Monster)")]
+    [SerializeField] private LayerMask affectedLayers;
+    
+    [Tooltip("Các Tag sẽ bị làm chậm (VD: Boss, Minion). Bỏ trống nếu không muốn dùng Tag.")]
+    [SerializeField] private List<string> affectedTags = new List<string>();
+
     private float slowMultiplier;
     private float duration;
     
@@ -23,9 +30,38 @@ public class SlowPuddle : NetworkBehaviour
         }
     }
 
+    /// <summary>
+    /// Kiểm tra xem đối tượng có nằm trong danh sách Layer hoặc Tag cho phép hay không.
+    /// </summary>
+    private bool IsValidTarget(GameObject target)
+    {
+        // 1. Kiểm tra theo Layer
+        // Toán tử bitwise để xem layer của target có nằm trong LayerMask hay không
+        if ((affectedLayers.value & (1 << target.layer)) != 0)
+        {
+            return true;
+        }
+
+        // 2. Kiểm tra theo Tag
+        if (affectedTags != null && affectedTags.Count > 0)
+        {
+            if (affectedTags.Contains(target.tag))
+            {
+                return true;
+            }
+        }
+
+        // Nếu không khớp cả Layer lẫn Tag thì bỏ qua
+        return false;
+    }
+
     private void OnTriggerEnter2D(Collider2D other)
     {
         GameObject target = other.gameObject;
+
+        // BỘ LỌC TÙY CHỌN: Dừng lại ngay nếu mục tiêu không hợp lệ
+        if (!IsValidTarget(target)) return;
+
         if (!objectsInside.Contains(target))
         {
             Debug.Log($"🚶‍♂️ [SlowPuddle] VỪA BƯỚC VÀO: {target.name}");
@@ -37,6 +73,10 @@ public class SlowPuddle : NetworkBehaviour
     private void OnTriggerExit2D(Collider2D other)
     {
         GameObject target = other.gameObject;
+
+        // BỘ LỌC TÙY CHỌN: Chỉ xử lý xóa debuff cho những mục tiêu hợp lệ
+        if (!IsValidTarget(target)) return;
+
         if (objectsInside.Contains(target))
         {
             Debug.Log($"🏃‍♂️ [SlowPuddle] VỪA BƯỚC RA: {target.name}");

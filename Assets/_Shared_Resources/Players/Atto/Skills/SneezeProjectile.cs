@@ -17,6 +17,9 @@ public class SneezeProjectile : NetworkBehaviour
 
     public void Initialize(Vector2 direction, SneezeSkillData data, int overrideDamage = 0, bool flipX = false)
     {
+        // QUAN TRỌNG: Reset lại trạng thái để tránh lỗi khi Object được tái sử dụng (Pooling)
+        hasTriggeredPuddle = false; 
+
         skillData = data;
         speed = data.projectileSpeed;
         maxDistance = data.projectileMaxDistance;
@@ -48,6 +51,35 @@ public class SneezeProjectile : NetworkBehaviour
         transform.localScale = localScale;
     }
 
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (!IsServer || hasTriggeredPuddle) return;
+
+        // --- BỘ LỌC AN TOÀN ---
+        // Bỏ qua nếu đụng trúng chính Player (người cast), các tia đạn khác, hoặc Bầy cừu
+        if (other.gameObject.CompareTag("Player") || 
+            other.GetComponent<SneezeProjectile>() != null || 
+            other.GetComponent<LambAI>() != null) 
+        {
+            return;
+        }
+
+        // Kiểm tra xem có đụng trúng quái / tường theo Layer Mask không
+        if ((skillData.hitLayer.value & (1 << other.gameObject.layer)) == 0) return;
+
+        // --- 1. CƠ CHẾ GÂY SÁT THƯƠNG ---
+        NetworkEntity enemyEntity = other.GetComponent<NetworkEntity>() ?? other.GetComponentInParent<NetworkEntity>();
+
+        if (enemyEntity != null) 
+        {
+            enemyEntity.TakeDamage(damage); 
+            Debug.Log($"💥 [SneezeProjectile] Đã gây {damage} sát thương cho {other.name}!");
+        }
+
+        // --- 2. TẠO VŨNG NƯỚC VÀ BIẾN MẤT ---
+        CreatePuddleAndDespawn();
+    }
+
     private void FixedUpdate()
     {
         if (!IsServer || hasTriggeredPuddle) return;
@@ -58,25 +90,6 @@ public class SneezeProjectile : NetworkBehaviour
         {
             CreatePuddleAndDespawn();
         }
-    }
-
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        if (!IsServer || hasTriggeredPuddle) return;
-
-        // Kiểm tra xem đạn có đụng trúng quái / tường không
-        if ((skillData.hitLayer.value & (1 << other.gameObject.layer)) == 0) return;
-
-        // Nếu muốn đạn vẫn gây sát thương khi đập thẳng vào mặt quái, mở khóa đoạn này:
-        /*
-        NetworkEntity enemyEntity = other.GetComponent<NetworkEntity>() ?? other.GetComponentInParent<NetworkEntity>();
-        if (enemyEntity != null) {
-            enemyEntity.TakeDamage(damage);
-        }
-        */
-
-        // Đụng trúng mục tiêu -> Tạo vũng nước tại chân mục tiêu
-        CreatePuddleAndDespawn();
     }
 
     private void CreatePuddleAndDespawn()
