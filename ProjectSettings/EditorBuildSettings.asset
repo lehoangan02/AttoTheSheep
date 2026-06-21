@@ -6,7 +6,7 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/KhoaMenu.unity
+    path: Assets/Scenes/MainMenu.unity
     guid: 6c55c1405ee915144b1355a597f5fefe
   - enabled: 1
     path: Assets/Scenes/SampleScene.unity
@@ -29,6 +29,48 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Tutorial/FTUE.unity
     guid: 4c94b270b3cfa12459c322176041978b
+  - enabled: 1
+    path: Assets/_Recovery/0 (1).unity
+    guid: 1ba14ecfd410b154998faf2bc34f6158
+  - enabled: 1
+    path: Assets/_Recovery/0 (2).unity
+    guid: 622be94d352fab541bd982d39ef7d417
+  - enabled: 1
+    path: Assets/_Recovery/0.unity
+    guid: 325ec4a288c13a24ba9a723c57c68c14
+  - enabled: 1
+    path: Assets/Plugins/QFSW/Quantum Console/Source/Demo Scene/DemoScene.unity
+    guid: cbc636f930f78c841a91c76a805bdfec
+  - enabled: 1
+    path: Assets/Scenes/Enemies.unity
+    guid: b1f359f18fe8048619c9557edcf28206
+  - enabled: 1
+    path: Assets/Scenes/lehoangan/Lobby.unity
+    guid: 4d42347fc5b08461b80f9160d1eac386
+  - enabled: 1
+    path: Assets/Settings/Scenes/URP2DSceneTemplate.unity
+    guid: 2cda990e2423bbf4892e6590ba056729
+  - enabled: 1
+    path: Assets/Tiny Swords/Scenes/Demo Buildings.unity
+    guid: a88e65710092a44f2bca7d7007b71566
+  - enabled: 1
+    path: Assets/Tiny Swords/Scenes/Demo Particle FX.unity
+    guid: 4a954d1ae4fd24c3ba9a395a17d04733
+  - enabled: 1
+    path: Assets/Tiny Swords/Scenes/Demo Pawn and Resources.unity
+    guid: 356c3d8d74a40494195f85258dd25cfe
+  - enabled: 1
+    path: Assets/Tiny Swords/Scenes/Demo Terrain-Decorations.unity
+    guid: f7ce3576a758b4b58a7780aeee2f7ebe
+  - enabled: 1
+    path: Assets/Tiny Swords/Scenes/Demo Terrain-Tiles.unity
+    guid: 5edac036fdf10492ba8f09946014383d
+  - enabled: 1
+    path: Assets/Tiny Swords/Scenes/Demo UI.unity
+    guid: b250a587d1395499b9972a0a0ef78931
+  - enabled: 1
+    path: Assets/Tiny Swords/Scenes/Demo Units.unity
+    guid: 6ecab33378e794701b3469d14ac4dbd9
   m_configObjects:
     com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}

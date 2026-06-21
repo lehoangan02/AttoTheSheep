@@ -49,32 +49,11 @@ public class MenuButtonAnimator : MonoBehaviour, IPointerEnterHandler, IPointerE
     public void OnPointerEnter(PointerEventData eventData)
     {
         AnimateTo(_baseScale * hoverScale);
-
-        if (hoverCursorOverride != null)
-        {
-            Cursor.SetCursor(hoverCursorOverride, Vector2.zero, CursorMode.Auto);
-        }
-        else if (_menuController != null && _button != null)
-        {
-            if (_button.interactable && _menuController.HoverCursor != null)
-                Cursor.SetCursor(_menuController.HoverCursor, Vector2.zero, CursorMode.Auto);
-            else if (!_button.interactable && _menuController.DisabledCursor != null)
-                Cursor.SetCursor(_menuController.DisabledCursor, Vector2.zero, CursorMode.Auto);
-        }
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
         AnimateTo(_baseScale);
-
-        if (defaultCursorOverride != null)
-        {
-            Cursor.SetCursor(defaultCursorOverride, Vector2.zero, CursorMode.Auto);
-        }
-        else if (_menuController != null && _menuController.DefaultCursor != null)
-        {
-            Cursor.SetCursor(_menuController.DefaultCursor, Vector2.zero, CursorMode.Auto);
-        }
     }
 
     public void OnPointerDown(PointerEventData eventData)
