@@ -15308,6 +15308,7 @@ GameObject:
   - component: {fileID: 621483409}
   - component: {fileID: 621483408}
   - component: {fileID: 621483410}
+  - component: {fileID: 621483411}
   m_Layer: 20
   m_Name: Lake
   m_TagString: Untagged
@@ -15349,7 +15350,7 @@ Transform:
   - {fileID: 1770849013}
   - {fileID: 2068248504}
   - {fileID: 1498101983858071667}
-  m_Father: {fileID: 1425312042}
+  m_Father: {fileID: 1641993310}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!483693784 &621483408
 TilemapRenderer:
@@ -16776,7 +16777,7 @@ PolygonCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 621483406}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Density: 1
   m_Material: {fileID: 0}
@@ -16831,6 +16832,44 @@ PolygonCollider2D:
       - {x: 23.658075, y: 11.460282}
       - {x: 23.192474, y: 12.172053}
   m_UseDelaunayMesh: 1
+--- !u!19719996 &621483411
+TilemapCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 621483406}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_MaximumTileChangeCount: 1000
+  m_ExtrusionFactor: 0
+  m_UseDelaunayMesh: 0
 --- !u!1001 &624204019
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -19369,6 +19408,9 @@ MonoBehaviour:
   levelConfigs:
   - maxLambs: 5
     baseRadius: 1
+  currentControlMode: 1
+  playerDeadzoneRadius: 3
+  randomOffsetRadius: 2
   lambPrefab: {fileID: 4784860766754900265, guid: 628ff7b0f60023e47884e19d86cef4fc, type: 3}
   radiusMultiplier: 0.5
   skillZoneRadiusMultiplier: 1.5
@@ -19377,6 +19419,11 @@ MonoBehaviour:
   lambsForSkill3: 1
   enableAutoSpawn: 1
   autoSpawnInterval: 10
+  obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  spawnCheckRadius: 0.4
+  maxSpawnAttempts: 10
   showDebugRadius: 1
   healScale: 1
   manaScale: 1
@@ -19968,7 +20015,6 @@ Transform:
   m_Children:
   - {fileID: 305847354}
   - {fileID: 1613662417}
-  - {fileID: 621483407}
   - {fileID: 1139393}
   - {fileID: 1060143306}
   - {fileID: 1463602173}
@@ -22645,6 +22691,51 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d9f044427dc75d249a4de0a46d5b720c, type: 3}
+--- !u!1 &1641993308
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1641993310}
+  - component: {fileID: 1641993309}
+  m_Layer: 0
+  m_Name: Grid
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!156049354 &1641993309
+Grid:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1641993308}
+  m_Enabled: 1
+  m_CellSize: {x: 1, y: 1, z: 0}
+  m_CellGap: {x: 0, y: 0, z: 0}
+  m_CellLayout: 0
+  m_CellSwizzle: 0
+--- !u!4 &1641993310
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1641993308}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 621483407}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1652937452
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -25289,3 +25380,4 @@ SceneRoots:
   - {fileID: 1819302888}
   - {fileID: 561229988}
   - {fileID: 1763191376}
+  - {fileID: 1641993310}
