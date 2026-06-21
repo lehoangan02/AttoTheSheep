@@ -37,6 +37,7 @@ public class MatchMakingController : MonoBehaviour
 
     [Header("Lobby List Content")]
     [SerializeField] private Transform lobbyContent;
+    [SerializeField] private GameObject lobbyRowPrefab;
 
     [Header("Fade")]
     [SerializeField] private CanvasGroup fadeOverlay;
@@ -61,6 +62,7 @@ public class MatchMakingController : MonoBehaviour
         if (confirmOkButton != null) confirmOkButton.onClick.AddListener(OnConfirmOkClicked);
 
         CloseAllModals();
+        GenerateMockLobbyList();
 
         if (fadeOverlay != null)
         {
@@ -84,24 +86,49 @@ public class MatchMakingController : MonoBehaviour
             StartCoroutine(FadeIn());
         }
 
-        // Hook up mock lobby rows
-        if (lobbyContent != null)
+        GenerateMockLobbyList();
+    }
+
+    private void GenerateMockLobbyList()
+    {
+        var mockLobbies = new System.Collections.Generic.List<AttoTheSheep.Core.LobbyData>();
+        for (int i = 1; i <= 5; i++)
         {
+            mockLobbies.Add(new AttoTheSheep.Core.LobbyData
+            {
+                LobbyId = $"Lobby_ID_{i}",
+                LobbyName = $"Public Lobby {i}",
+                CurrentPlayers = Random.Range(1, 10),
+                MaxPlayers = 10,
+                GameMode = Random.value > 0.5f ? "Custom" : "Classic",
+                IsPrivate = false
+            });
+        }
+
+        PopulateLobbies(mockLobbies);
+    }
+
+    /// <summary>
+    /// Gọi hàm này từ Server/NetworkManager để cập nhật danh sách các phòng chờ
+    /// </summary>
+    public void PopulateLobbies(System.Collections.Generic.List<AttoTheSheep.Core.LobbyData> lobbies)
+    {
+        if (lobbyRowPrefab != null && lobbyContent != null)
+        {
+            // Xóa các row tĩnh hoặc row cũ đi
             foreach (Transform child in lobbyContent)
             {
-                var btn = child.GetComponent<Button>();
-                if (btn != null)
-                {
-                    // Find the Name text (assume it's the first text child or named Row_Name)
-                    string lobbyName = "Unknown Lobby";
-                    var nameTransform = child.Find("Row_Name");
-                    if (nameTransform != null)
-                    {
-                        var tmp = nameTransform.GetComponent<TextMeshProUGUI>();
-                        if (tmp != null) lobbyName = tmp.text;
-                    }
+                Destroy(child.gameObject);
+            }
 
-                    btn.onClick.AddListener(() => OnLobbyRowClicked(lobbyName));
+            // Render các row mới từ data truyền vào
+            foreach (var lobby in lobbies)
+            {
+                var rowObj = Instantiate(lobbyRowPrefab, lobbyContent);
+                var rowUI = rowObj.GetComponent<LobbyRowUI>();
+                if (rowUI != null)
+                {
+                    rowUI.Setup(lobby, OnLobbyRowClicked);
                 }
             }
         }
@@ -173,7 +200,11 @@ public class MatchMakingController : MonoBehaviour
         if (createNameInput != null && !string.IsNullOrEmpty(createNameInput.text))
         {
             Debug.Log($"[MatchMaking] Creating lobby: {createNameInput.text}");
+            AttoTheSheep.Core.LobbySession.CurrentLobbyName = createNameInput.text;
+            AttoTheSheep.Core.LobbySession.MaxPlayers = 4; // Mock
+            AttoTheSheep.Core.LobbySession.IsHost = true;
             CloseAllModals();
+            StartCoroutine(FadeAndLoad("WaitLobby"));
         }
     }
 
@@ -182,14 +213,22 @@ public class MatchMakingController : MonoBehaviour
         if (joinCodeInput != null && !string.IsNullOrEmpty(joinCodeInput.text))
         {
             Debug.Log($"[MatchMaking] Joining private lobby code: {joinCodeInput.text}");
+            AttoTheSheep.Core.LobbySession.CurrentLobbyName = "Private " + joinCodeInput.text;
+            AttoTheSheep.Core.LobbySession.MaxPlayers = 4;
+            AttoTheSheep.Core.LobbySession.IsHost = false;
             CloseAllModals();
+            StartCoroutine(FadeAndLoad("WaitLobby"));
         }
     }
 
     private void OnConfirmOkClicked()
     {
         Debug.Log($"[MatchMaking] Joining public lobby: {_selectedLobbyName}");
+        AttoTheSheep.Core.LobbySession.CurrentLobbyName = _selectedLobbyName;
+        AttoTheSheep.Core.LobbySession.MaxPlayers = 4;
+        AttoTheSheep.Core.LobbySession.IsHost = false;
         CloseAllModals();
+        StartCoroutine(FadeAndLoad("WaitLobby"));
     }
 
     private IEnumerator FadeIn()
@@ -241,7 +280,7 @@ public class MatchMakingController : MonoBehaviour
                       GameObject createModal, Button createCancel, Button createOk, TMP_InputField createName,
                       GameObject joinModal, Button joinCancel, Button joinOk, TMP_InputField joinCode,
                       GameObject confirmModal, Button confirmCancel, Button confirmOk, TextMeshProUGUI confirmText,
-                      Transform content, CanvasGroup fade)
+                      Transform content, GameObject rowPrefab, CanvasGroup fade)
     {
         backButton = back;
         createLobbyButton = create;
@@ -265,6 +304,7 @@ public class MatchMakingController : MonoBehaviour
         confirmJoinText = confirmText;
         
         lobbyContent = content;
+        lobbyRowPrefab = rowPrefab;
         fadeOverlay = fade;
     }
 }
