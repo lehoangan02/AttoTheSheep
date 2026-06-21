@@ -6,6 +6,13 @@ using TMPro;
 
 public class WaitLobbyController : MonoBehaviour
 {
+    // ==========================================
+    // SERVER / NETWORK EVENTS
+    // ==========================================
+    public event System.Action OnRequestLeaveLobby;
+    public event System.Action OnRequestReady;
+    public event System.Action<string> OnRequestKickPlayer;
+
     [Header("UI References")]
     [SerializeField] private TextMeshProUGUI lobbyNameText;
     [SerializeField] private TextMeshProUGUI playerCountText;
@@ -114,8 +121,16 @@ public class WaitLobbyController : MonoBehaviour
     private void OnKickPlayer(AttoTheSheep.Core.PlayerData p)
     {
         Debug.Log($"[WaitLobby] Kicking player: {p.PlayerName}");
-        _players.Remove(p);
-        RefreshUI();
+        if (OnRequestKickPlayer != null)
+        {
+            OnRequestKickPlayer.Invoke(p.PlayerId);
+        }
+        else
+        {
+            // Fallback Mock Logic
+            _players.Remove(p);
+            RefreshUI();
+        }
     }
 
     private void OnLeaveClicked()
@@ -133,7 +148,15 @@ public class WaitLobbyController : MonoBehaviour
     private void OnConfirmYesClicked()
     {
         Debug.Log("[WaitLobby] Leaving lobby...");
-        SceneManager.LoadScene("MatchMaking");
+        if (OnRequestLeaveLobby != null)
+        {
+            OnRequestLeaveLobby.Invoke();
+        }
+        else
+        {
+            // Fallback Mock Logic
+            SceneManager.LoadScene("MatchMaking");
+        }
     }
 
     private void OnConfirmNoClicked()
@@ -144,7 +167,14 @@ public class WaitLobbyController : MonoBehaviour
     private void OnReadyClicked()
     {
         Debug.Log("[WaitLobby] Ready clicked! Proceeding to Game...");
-        // For now, no actual game scene exists, just log it.
-        // SceneManager.LoadScene("MainGame");
+        if (OnRequestReady != null)
+        {
+            OnRequestReady.Invoke();
+        }
+        else
+        {
+            // Fallback Mock Logic: For now, no actual game scene exists, just log it.
+            // SceneManager.LoadScene("MainGame");
+        }
     }
 }

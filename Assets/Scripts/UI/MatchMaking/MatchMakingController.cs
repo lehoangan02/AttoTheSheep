@@ -6,6 +6,13 @@ using TMPro;
 
 public class MatchMakingController : MonoBehaviour
 {
+    // ==========================================
+    // SERVER / NETWORK EVENTS
+    // ==========================================
+    public event System.Action<string> OnRequestCreateLobby;
+    public event System.Action<string> OnRequestJoinPrivateLobby;
+    public event System.Action<string> OnRequestJoinPublicLobby;
+
     [Header("Scene References")]
     [SerializeField] private string mainMenuSceneName = "MainMenu";
     
@@ -200,11 +207,20 @@ public class MatchMakingController : MonoBehaviour
         if (createNameInput != null && !string.IsNullOrEmpty(createNameInput.text))
         {
             Debug.Log($"[MatchMaking] Creating lobby: {createNameInput.text}");
-            AttoTheSheep.Core.LobbySession.CurrentLobbyName = createNameInput.text;
-            AttoTheSheep.Core.LobbySession.MaxPlayers = 4; // Mock
-            AttoTheSheep.Core.LobbySession.IsHost = true;
             CloseAllModals();
-            StartCoroutine(FadeAndLoad("WaitLobby"));
+
+            if (OnRequestCreateLobby != null)
+            {
+                OnRequestCreateLobby.Invoke(createNameInput.text);
+            }
+            else
+            {
+                // Fallback Mock Logic
+                AttoTheSheep.Core.LobbySession.CurrentLobbyName = createNameInput.text;
+                AttoTheSheep.Core.LobbySession.MaxPlayers = 4; // Mock
+                AttoTheSheep.Core.LobbySession.IsHost = true;
+                StartCoroutine(FadeAndLoad("WaitLobby"));
+            }
         }
     }
 
@@ -213,22 +229,40 @@ public class MatchMakingController : MonoBehaviour
         if (joinCodeInput != null && !string.IsNullOrEmpty(joinCodeInput.text))
         {
             Debug.Log($"[MatchMaking] Joining private lobby code: {joinCodeInput.text}");
-            AttoTheSheep.Core.LobbySession.CurrentLobbyName = "Private " + joinCodeInput.text;
-            AttoTheSheep.Core.LobbySession.MaxPlayers = 4;
-            AttoTheSheep.Core.LobbySession.IsHost = false;
             CloseAllModals();
-            StartCoroutine(FadeAndLoad("WaitLobby"));
+
+            if (OnRequestJoinPrivateLobby != null)
+            {
+                OnRequestJoinPrivateLobby.Invoke(joinCodeInput.text);
+            }
+            else
+            {
+                // Fallback Mock Logic
+                AttoTheSheep.Core.LobbySession.CurrentLobbyName = "Private " + joinCodeInput.text;
+                AttoTheSheep.Core.LobbySession.MaxPlayers = 4;
+                AttoTheSheep.Core.LobbySession.IsHost = false;
+                StartCoroutine(FadeAndLoad("WaitLobby"));
+            }
         }
     }
 
     private void OnConfirmOkClicked()
     {
         Debug.Log($"[MatchMaking] Joining public lobby: {_selectedLobbyName}");
-        AttoTheSheep.Core.LobbySession.CurrentLobbyName = _selectedLobbyName;
-        AttoTheSheep.Core.LobbySession.MaxPlayers = 4;
-        AttoTheSheep.Core.LobbySession.IsHost = false;
         CloseAllModals();
-        StartCoroutine(FadeAndLoad("WaitLobby"));
+
+        if (OnRequestJoinPublicLobby != null)
+        {
+            OnRequestJoinPublicLobby.Invoke(_selectedLobbyName); // _selectedLobbyName here acts as LobbyId
+        }
+        else
+        {
+            // Fallback Mock Logic
+            AttoTheSheep.Core.LobbySession.CurrentLobbyName = _selectedLobbyName;
+            AttoTheSheep.Core.LobbySession.MaxPlayers = 4;
+            AttoTheSheep.Core.LobbySession.IsHost = false;
+            StartCoroutine(FadeAndLoad("WaitLobby"));
+        }
     }
 
     private IEnumerator FadeIn()
