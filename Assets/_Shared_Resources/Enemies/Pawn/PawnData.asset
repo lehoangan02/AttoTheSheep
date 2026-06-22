@@ -20,3 +20,20 @@ MonoBehaviour:
   attackDamage: 10
   attackRange: 1
   attackCooldown: 1.5
+  audio:
+    attackStart:
+      clip: {fileID: 8300000, guid: 947c1cb226716f94180bb7a74abcde13, type: 3}
+      duration: 0
+    attackHit:
+      clip: {fileID: 8300000, guid: 0ab391d713cedc647bd09bdb03e5f488, type: 3}
+      duration: 0
+    attackVariants: []
+    guard:
+      clip: {fileID: 0}
+      duration: 0
+    hurt:
+      clip: {fileID: 8300000, guid: 79ba64e3d717d7542861a83746cc6112, type: 3}
+      duration: 0
+    death:
+      clip: {fileID: 8300000, guid: 6f07a912466a8b348b589263938d9880, type: 3}
+      duration: 0

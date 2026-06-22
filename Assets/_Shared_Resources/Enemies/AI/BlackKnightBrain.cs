@@ -45,7 +45,9 @@ public class BlackKnightBrain : EnemyBrain
                 motor.MoveToward(target.transform.position, entity.MoveSpeed * speedMult);
                 break;
             case EnemyState.Attack:
-                anim.SetTrigger(isLeftAttack ? "AttackLeft" : "AttackRight");
+                bool useLeftAttack = isLeftAttack;
+                SetAttackAudioId(useLeftAttack ? "Left" : "Right");
+                anim.SetTrigger(useLeftAttack ? "AttackLeft" : "AttackRight");
                 isLeftAttack = !isLeftAttack;
                 motor.Stop();
                 lastAttackTime = Time.time;

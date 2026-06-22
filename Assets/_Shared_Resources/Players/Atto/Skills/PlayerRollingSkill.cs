@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
-using Unity.Cinemachine; // Cần thiết để gọi hệ thống rung của Cinemachine (Lưu ý: Nếu dùng Unity 6/Cinemachine 3, đổi thành 'using Unity.Cinemachine;')
+using Unity.Cinemachine; 
 
 public class PlayerRollingSkill : BaseSkillComponent
 {
@@ -61,7 +61,6 @@ public class PlayerRollingSkill : BaseSkillComponent
         if (pMovement == null) pMovement = controller.GetComponentInParent<PlayerMovement>();
 
         float elapsed = 0f;
-        float damageAccumulator = 0f;
         float currentMultiplier = 1f;
 
         // --- 2. VÒNG LẶP MECHANIC ---
@@ -74,9 +73,6 @@ public class PlayerRollingSkill : BaseSkillComponent
             {
                 currentMultiplier += data.acceleration * deltaTime;
                 currentMultiplier = Mathf.Min(currentMultiplier, data.maxSpeedMultiplier);
-                
-                // Mở comment dưới nếu PlayerMovement có biến nhận hệ số tốc độ
-                // if (pMovement != null) pMovement.speedMultiplier = currentMultiplier;
             }
 
             // Xoay mesh cục bông dựa trên tốc độ hiện tại
@@ -107,53 +103,57 @@ public class PlayerRollingSkill : BaseSkillComponent
                 }
             }
 
-            // MECHANIC: GÂY SÁT THƯƠNG THEO THỜI GIAN (DOT)
-            float damageThisFrame = data.damage * deltaTime;
-            damageAccumulator += damageThisFrame;
-
-            if (damageAccumulator >= 1f)
+            // Đảm bảo quái vật đã nằm trong bụng sẽ luôn đi theo Player
+            for (int i = stomach.Count - 1; i >= 0; i--)
             {
-                int intDamage = Mathf.FloorToInt(damageAccumulator);
-                damageAccumulator -= intDamage;
-
-                for (int i = stomach.Count - 1; i >= 0; i--)
+                SwallowedEnemy swallowed = stomach[i];
+                if (swallowed.Obj == null) 
                 {
-                    SwallowedEnemy swallowed = stomach[i];
-                    
-                    if (swallowed.Obj == null) 
-                    {
-                        stomach.RemoveAt(i);
-                        continue;
-                    }
-
-                    // Ép vị trí quái đi theo Player khi đang ở trong dạ dày
-                    swallowed.Obj.transform.position = controller.transform.position;
-
-                    if (swallowed.Entity != null)
-                    {
-                        swallowed.Entity.TakeDamage(intDamage);
-                        
-                        // Nếu quái chết trong bụng -> Tiêu hóa thành công
-                        if (!swallowed.Entity.IsAlive)
-                        {
-                            Debug.Log($"💀 [ROLL] {swallowed.Obj.name} đã bị tiêu hóa!");
-                            stomach.RemoveAt(i);
-                        }
-                    }
+                    stomach.RemoveAt(i);
+                    continue;
                 }
+                swallowed.Obj.transform.position = controller.transform.position;
             }
 
             elapsed += deltaTime;
             yield return new WaitForFixedUpdate();
         }
 
-        // --- 3. KẾT THÚC SKILL ---
-        Debug.Log("🛑 [ROLL] Nhả địch ra và thắng phanh!");
-        
+        // --- 3. KẾT THÚC SKILL VÀ TÍNH TOÁN SÁT THƯƠNG 1 LẦN ---
+        Debug.Log("🛑 [ROLL] Kết thúc cuộn tròn, chuẩn bị nhả địch!");
+
+        // LƯU Ý: Nếu muốn sát thương tổng bằng với tổng sát thương DoT cũ, bạn có thể nhân data.damage với data.duration.
+        // Ở đây mặc định lấy thẳng lượng sát thương data.damage
+        int burstDamage = Mathf.FloorToInt(data.damage); 
+
+        for (int i = stomach.Count - 1; i >= 0; i--)
+        {
+            SwallowedEnemy swallowed = stomach[i];
+                    
+            if (swallowed.Obj == null) 
+            {
+                stomach.RemoveAt(i);
+                continue;
+            }
+
+            if (swallowed.Entity != null)
+            {
+                // Gây sát thương một lần duy nhất
+                swallowed.Entity.TakeDamage(burstDamage);
+                        
+                // Nếu quái chết trong bụng -> Tiêu hóa thành công (không nhả ra nữa)
+                if (!swallowed.Entity.IsAlive)
+                {
+                    Debug.Log($"💀 [ROLL] {swallowed.Obj.name} đã bị tiêu hóa!");
+                    stomach.RemoveAt(i);
+                }
+            }
+        }
+
         // Tắt Particle bụi
         if (rollingDust != null) rollingDust.Stop();
 
-        // Nhả địch ra xung quanh bằng Animation
+        // Nhả những con địch còn sống ra xung quanh bằng Animation
         SpitOutEnemies(data);
 
         // GỌI RUNG CAMERA BẰNG CINEMACHINE TẠI ĐÂY
@@ -166,9 +166,6 @@ public class PlayerRollingSkill : BaseSkillComponent
         if (dustVisual != null) dustVisual.SetActive(false);
         if (normalVisual != null) normalVisual.SetActive(true);
         if (spinMesh != null) spinMesh.localRotation = Quaternion.identity; 
-        
-        // Trả lại hệ số tốc độ gốc nếu có dùng
-        // if (pMovement != null) pMovement.speedMultiplier = 1f; 
     }
 
     private void SwallowEnemy(GameObject enemyObj)

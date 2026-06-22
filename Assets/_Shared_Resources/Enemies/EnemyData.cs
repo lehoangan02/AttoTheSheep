@@ -21,6 +21,9 @@ public class EnemyData : ScriptableObject
     public float attackRange = 1.2f;
     public float attackCooldown = 1.25f;
 
+    [Header("Audio")]
+    public EnemyAudioSet audio = new EnemyAudioSet();
+
     public float MoveSpeed => moveSpeed > 0 ? moveSpeed : GetDefaultSpeed();
 
     float GetDefaultSpeed()

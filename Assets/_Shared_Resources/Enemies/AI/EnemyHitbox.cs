@@ -11,11 +11,15 @@ public class EnemyHitbox : MonoBehaviour
     float currentKnockbackForce;
     float currentKnockbackDuration;
     EnemyBrain brain;
+    EnemyAudio enemyAudio;
     HashSet<NetworkEntity> hitTargets = new HashSet<NetworkEntity>();
 
     void Awake()
     {
         brain = GetComponentInParent<EnemyBrain>();
+        enemyAudio = GetComponentInParent<EnemyAudio>();
+        if (enemyAudio == null && brain != null)
+            enemyAudio = brain.gameObject.AddComponent<EnemyAudio>();
         if (hitboxCollider == null)
             hitboxCollider = GetComponent<Collider2D>();
         Disable();
@@ -59,6 +63,7 @@ public class EnemyHitbox : MonoBehaviour
 
         hitTargets.Add(target);
         target.TakeDamage(currentDamage, brain.Entity);
+        enemyAudio?.PlayAttackHit(brain.CurrentAttackAudioId, target.transform.position);
 
         if (currentEffects != null)
             foreach (var e in currentEffects) ApplyEffect(target, e);

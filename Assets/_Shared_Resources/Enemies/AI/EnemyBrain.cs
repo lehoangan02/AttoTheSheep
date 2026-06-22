@@ -22,11 +22,14 @@ public abstract class EnemyBrain : NetworkBehaviour
     protected EnemyMotor motor;
     protected StatusEffectController effectController;
     protected EnemyHitbox hitbox;
+    protected EnemyAudio enemyAudio;
     protected Animator anim;
+    protected string currentAttackAudioId;
 
     public EnemyEntity Entity => entity;
     public EnemyMotor Motor => motor;
     public StatusEffectController EffectController => effectController;
+    public string CurrentAttackAudioId => currentAttackAudioId;
     protected EnemyHitbox Hitbox => hitbox;
 
     void Awake()
@@ -35,6 +38,9 @@ public abstract class EnemyBrain : NetworkBehaviour
         motor = GetComponent<EnemyMotor>();
         effectController = GetComponent<StatusEffectController>();
         hitbox = GetComponentInChildren<EnemyHitbox>(true);
+        enemyAudio = GetComponent<EnemyAudio>();
+        if (enemyAudio == null)
+            enemyAudio = gameObject.AddComponent<EnemyAudio>();
         anim = GetComponent<Animator>();
     }
 
@@ -45,6 +51,7 @@ public abstract class EnemyBrain : NetworkBehaviour
         CurrentState = state;
         stateTimer = 0f;
         OnStateEnter(state);
+        PlayStateAudio(state);
     }
 
     protected virtual void OnStateEnter(EnemyState state) { }
@@ -89,4 +96,27 @@ public abstract class EnemyBrain : NetworkBehaviour
     public void ClearTarget() => target = null;
 
     protected abstract void DecideNextState();
+
+    protected void SetAttackAudioId(string attackId)
+    {
+        currentAttackAudioId = attackId;
+    }
+
+    private void PlayStateAudio(EnemyState state)
+    {
+        if (enemyAudio == null) return;
+
+        switch (state)
+        {
+            case EnemyState.Attack:
+                enemyAudio.PlayAttackStart(currentAttackAudioId);
+                break;
+            case EnemyState.Hurt:
+                enemyAudio.Play(EnemyAudioCueType.Hurt);
+                break;
+            case EnemyState.Dead:
+                enemyAudio.Play(EnemyAudioCueType.Death);
+                break;
+        }
+    }
 }

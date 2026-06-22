@@ -40,9 +40,11 @@ public class GoblinBrain : EnemyBrain
                 motor.MoveToward(target.transform.position, entity.MoveSpeed * speedMult);
                 break;
             case EnemyState.Attack:
-                string trigger = isFastAttack ? "AttackFast" : "AttackStrong";
+                bool useFastAttack = isFastAttack;
+                string trigger = useFastAttack ? "AttackFast" : "AttackStrong";
+                SetAttackAudioId(useFastAttack ? "Fast" : "Strong");
                 anim.SetTrigger(trigger);
-                currentAttackDamage = isFastAttack ? entity.Data.attackDamage : entity.Data.attackDamage * 2;
+                currentAttackDamage = useFastAttack ? entity.Data.attackDamage : entity.Data.attackDamage * 2;
                 isFastAttack = !isFastAttack;
                 lastAttackTime = Time.time;
                 motor.Stop();

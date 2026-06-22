@@ -7,6 +7,7 @@ public class EnemyEntity : NetworkEntity
     private EnemyBrain brain;
     private EnemyMotor motor;
     private EnemyHitbox hitbox;
+    private EnemyAudio enemyAudio;
 
     public EnemyData Data => data;
     public EnemyKind EnemyKind => Data != null ? Data.enemyKind : EnemyKind.BlueKnight;
@@ -24,6 +25,9 @@ public class EnemyEntity : NetworkEntity
         brain = GetComponent<EnemyBrain>();
         motor = GetComponent<EnemyMotor>();
         hitbox = GetComponentInChildren<EnemyHitbox>(true);
+        enemyAudio = GetComponent<EnemyAudio>();
+        if (enemyAudio == null)
+            enemyAudio = gameObject.AddComponent<EnemyAudio>();
     }
 
     public override void OnNetworkSpawn()
@@ -56,14 +60,34 @@ public class EnemyEntity : NetworkEntity
     public override void TakeDamage(int damage)
     {
         if (brain != null && brain.ShouldBlockDamage())
+        {
+            enemyAudio?.Play(EnemyAudioCueType.Guard);
             return;
+        }
+
+        int previousHealth = currentHealth.Value;
         base.TakeDamage(damage);
+        PlayDamageAudio(previousHealth);
     }
 
     public override void TakeDamage(int damage, NetworkEntity source)
     {
         if (brain != null && brain.ShouldBlockDamage())
+        {
+            enemyAudio?.Play(EnemyAudioCueType.Guard);
             return;
+        }
+
+        int previousHealth = currentHealth.Value;
         base.TakeDamage(damage, source);
+        PlayDamageAudio(previousHealth);
+    }
+
+    private void PlayDamageAudio(int previousHealth)
+    {
+        if (!IsServer || enemyAudio == null) return;
+        if (previousHealth <= 0 || currentHealth.Value >= previousHealth) return;
+
+        enemyAudio.Play(currentHealth.Value <= 0 ? EnemyAudioCueType.Death : EnemyAudioCueType.Hurt);
     }
 }
