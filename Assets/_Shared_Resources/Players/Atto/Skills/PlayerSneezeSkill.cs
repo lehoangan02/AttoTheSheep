@@ -22,12 +22,12 @@ public class PlayerSneezeSkill : BaseSkillComponent
 
     public override void ClientPlayVisual(SkillData data)
     {
-        // Chạy âm thanh / particle nhẹ ở client nếu muốn
-        // VD: "ACHOO!" sound, hoặc 1 burst particle nhỏ
+        base.ClientPlayVisual(data); 
     }
 
     private IEnumerator SneezeRoutine(SneezeSkillData data, PlayerController controller)
     {
+
         Debug.Log($"🤧 [SNEEZE] Atto hắt xì! Bắn {data.projectileCount} tia nước mũi!");
 
         if (data.projectilePrefab == null)

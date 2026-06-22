@@ -27,7 +27,8 @@ public class PlayerFartSkill : BaseSkillComponent
     }
 
     public override void ClientPlayVisual(SkillData data)
-    {
+    {        
+        base.ClientPlayVisual(data); // Gọi code của class cha để tự động phát SFX nếu có
         if (fartGasParticle != null) 
         {
             // 1. Giữ nguyên Transform gốc của Particle, không bẻ nó nữa để tránh lỗi mất Stretch
@@ -110,6 +111,8 @@ public class PlayerFartSkill : BaseSkillComponent
                         Vector2 knockbackDir = ((Vector2)hit.transform.position - (Vector2)controller.transform.position).normalized;
                         enemyEntity.ApplyKnockback(knockbackDir * data.knockupForce, 0.3f);
                     }
+                    ClientPlayHitEffect(data, hit.transform.position);
+
                 }
             }
 

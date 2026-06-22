@@ -22,6 +22,15 @@ MonoBehaviour:
   manaCost: 0
   lambsRequired: 0
   vfxPrefab: {fileID: 0}
+  castSFX:
+    clip: {fileID: 0}
+    duration: 0
+  activeSFX:
+    clip: {fileID: 8300000, guid: 521e29927e2170f4fbe2170fb782db60, type: 3}
+    duration: 0
+  hitSFX:
+    clip: {fileID: 0}
+    duration: 0
   projectilePrefab: {fileID: 5472383393138764189, guid: c7e11037152dd5d47b3bf4ac6de9c4e2, type: 3}
   projectileCount: 5
   spreadAngle: 150

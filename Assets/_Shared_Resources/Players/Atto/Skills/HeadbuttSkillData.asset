@@ -20,6 +20,15 @@ MonoBehaviour:
   manaCost: 0
   lambsRequired: 0
   vfxPrefab: {fileID: 0}
+  castSFX:
+    clip: {fileID: 0}
+    duration: 0
+  activeSFX:
+    clip: {fileID: 0}
+    duration: 0
+  hitSFX:
+    clip: {fileID: 8300000, guid: 63db76b05e97c0e44a6c480c8051e5c9, type: 3}
+    duration: 0
   hitRadius: 1
   hitboxOffset: {x: 1, y: 0}
   knockbackForce: 5

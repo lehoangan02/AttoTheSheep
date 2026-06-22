@@ -42,7 +42,8 @@ public class PlayerRollingSkill : BaseSkillComponent
 
     public override void ClientPlayVisual(SkillData data)
     {
-        // Thực hiện VFX/Sound riêng ở Client nếu cần
+        // 1. GỌI CODE CỦA CLASS CHA ĐỂ TỰ ĐỘNG PHÁT SFX VÀ LOG
+        base.ClientPlayVisual(data);
     }
 
     private IEnumerator RollingRoutine(RollingSkillData data, PlayerController controller)

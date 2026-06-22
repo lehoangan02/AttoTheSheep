@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System;
 using Unity.Netcode;
 
-// --- CẤU TRÚC LƯU TRỮ THÔNG SỐ THEO LEVEL ---
 [System.Serializable]
 public struct FlockLevelConfig
 {
@@ -15,8 +14,8 @@ public struct FlockLevelConfig
 
 public enum FlockControlMode
 {
-    Manual, // Click đâu đi đó
-    Auto    // Tự động bám theo player với Deadzone
+    Manual,
+    Auto   
 }
 
 public class FlockManager : NetworkBehaviour
@@ -24,16 +23,13 @@ public class FlockManager : NetworkBehaviour
     [Header("Level Settings")]
     public NetworkVariable<int> currentLevel = new NetworkVariable<int>(1, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
     
-    [Tooltip("Cấu hình số cừu và bán kính cho từng Level. Phần tử 0 = Level 1, Phần tử 1 = Level 2...")]
     [SerializeField] private FlockLevelConfig[] levelConfigs;
 
     [Header("Control Settings")]
     public FlockControlMode currentControlMode = FlockControlMode.Auto;
 
     [Header("Auto Follow Settings (AI)")]
-    [Tooltip("Khoảng cách tối đa Player có thể di chuyển trước khi bầy cừu đi theo")]
     [SerializeField] private float playerDeadzoneRadius = 3f;
-    [Tooltip("Bán kính random tâm mới xung quanh Player (Tạo sự tự nhiên)")]
     [SerializeField] private float randomOffsetRadius = 2f;
 
     [Header("Flock Settings")]
@@ -41,7 +37,7 @@ public class FlockManager : NetworkBehaviour
     [SerializeField] private float radiusMultiplier = 0.5f; 
 
     [Header("Skill Zone (Radius 2 - Lớn hơn)")]
-    [SerializeField] private float skillZoneRadiusMultiplier = 1.5f; // Bán kính kỹ năng = innerRadius * multiplier
+    [SerializeField] private float skillZoneRadiusMultiplier = 1.5f; 
 
     [Header("Skill Unlock Milestones")]
     [SerializeField] private int lambsForSkill1 = 3;
@@ -53,24 +49,32 @@ public class FlockManager : NetworkBehaviour
     [SerializeField] private float autoSpawnInterval = 10f;
     private float spawnTimer = 0f; 
 
-    // ==========================================
-    // TÍNH NĂNG MỚI: BỘ LỌC SPAWN
-    // ==========================================
     [Header("Spawn Validation (Chống kẹt tường/quái)")]
-    [Tooltip("Các Layer không được phép spawn đè lên (VD: Wall, Obstacle, Enemy)")]
     [SerializeField] private LayerMask obstacleLayer;
-    [Tooltip("Kích thước vùng kiểm tra (Thường bằng bán kính của collider cừu)")]
     [SerializeField] private float spawnCheckRadius = 0.4f;
-    [Tooltip("Số lần thử tìm vị trí trống tối đa trước khi hủy lệnh spawn lần đó")]
     [SerializeField] private int maxSpawnAttempts = 10;
+
+    // ==========================================
+    // TÍNH NĂNG MỚI: CẤU HÌNH CHIẾN ĐẤU & BỊ ĐẨY
+    // ==========================================
+    [Header("Combat & Push Settings")]
+    [Tooltip("Thời gian cừu chạy loạn xạ khi bị tấn công")]
+    [SerializeField] private float panicDuration = 3f;
+    [Tooltip("Bán kính lan truyền hoảng loạn sang các con cừu bên cạnh")]
+    [SerializeField] private float panicAlertRadius = 2.5f;
+    [Tooltip("Tần suất (giây) kiểm tra cừu bị đẩy ra ngoài bán kính bầy")]
+    [SerializeField] private float oobCheckInterval = 0.2f;
+    private float oobCheckTimer = 0f;
 
     [Header("Debug Settings")]
     [SerializeField] private bool showDebugRadius = true;
 
     public List<LambAI> activeLambs { get; private set; } = new List<LambAI>();
-    public Vector2 currentFlockCenter { get; private set; } 
-    public float currentFlockRadius { get; private set; } // Bán kính 1: Giới hạn di chuyển của cừu + hồi máu
-    public float currentSkillZoneRadius { get; private set; } // Bán kính 2: Cho phép dùng skill
+    
+    public NetworkVariable<Vector2> currentFlockCenter = new NetworkVariable<Vector2>(Vector2.zero, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server); 
+    
+    public float currentFlockRadius { get; private set; } 
+    public float currentSkillZoneRadius { get; private set; } 
 
     [Header("Flock Buff Settings")]
     [SerializeField] private float healScale = 1f;
@@ -81,6 +85,8 @@ public class FlockManager : NetworkBehaviour
     public event Action<int> OnFlockTierChanged;
 
     private PlayerController currentPlayer; 
+    private Vector2 lastPlayerAnchorPos; 
+    private Vector2 flockDestination;
 
     public override void OnNetworkSpawn()
     {
@@ -90,83 +96,165 @@ public class FlockManager : NetworkBehaviour
             {
                 levelConfigs = new FlockLevelConfig[]
                 {
-                    new FlockLevelConfig { maxLambs = 3, baseRadius = 1.0f }, // Level 1
-                    new FlockLevelConfig { maxLambs = 6, baseRadius = 1.5f }, // Level 2
-                    new FlockLevelConfig { maxLambs = 10, baseRadius = 2.0f } // Level 3
+                    new FlockLevelConfig { maxLambs = 3, baseRadius = 1.0f },
+                    new FlockLevelConfig { maxLambs = 6, baseRadius = 1.5f },
+                    new FlockLevelConfig { maxLambs = 10, baseRadius = 2.0f }
                 };
             }
 
-            currentFlockCenter = transform.position;
+            flockDestination = transform.position;
+            currentFlockCenter.Value = transform.position;
             SpawnInitialFlock();
         }
     }
 
     void Update()
     {
-        // Liên tục kiểm tra và lấy tham chiếu đến Player (cần chỉnh sửa nếu có nhiều Player)
         if (currentPlayer == null)
         {
             currentPlayer = FindFirstObjectByType<PlayerController>();
             if (currentPlayer != null)
             {
                 currentPlayer.OnMapClicked += HandleMapClicked;
+                lastPlayerAnchorPos = currentPlayer.transform.position;
             }
         }
 
         if (IsServer)
         {
-            // Xử lý logic AI đi theo
             if (currentControlMode == FlockControlMode.Auto && currentPlayer != null)
             {
                 HandleAutoFollow();
             }
 
-            // Xử lý sinh cừu tự động
+            UpdateActualFlockCenter();
+
+            // TÍNH NĂNG MỚI: Quét định kỳ kiểm tra xem có con cừu nào bị đẩy ra rìa không
+            oobCheckTimer += Time.deltaTime;
+            if (oobCheckTimer >= oobCheckInterval)
+            {
+                oobCheckTimer = 0f;
+                CheckLambsOutOfBounds();
+            }
+
             if (enableAutoSpawn)
             {
                 spawnTimer += Time.deltaTime; 
                 if (spawnTimer >= autoSpawnInterval)
                 {
                     spawnTimer = 0f; 
-                    SpawnLamb(currentFlockCenter);
+                    SpawnLamb(currentFlockCenter.Value);
+                }
+            }
+        }
+    }
+
+    private void UpdateActualFlockCenter()
+    {
+        if (activeLambs == null || activeLambs.Count == 0)
+        {
+            currentFlockCenter.Value = flockDestination;
+            return;
+        }
+
+        Vector2 sumPosition = Vector2.zero;
+        int validCount = 0;
+
+        for (int i = 0; i < activeLambs.Count; i++)
+        {
+            if (activeLambs[i] != null && activeLambs[i].gameObject.activeInHierarchy)
+            {
+                sumPosition += (Vector2)activeLambs[i].transform.position;
+                validCount++;
+            }
+        }
+
+        if (validCount > 0)
+        {
+            currentFlockCenter.Value = sumPosition / validCount;
+        }
+        else
+        {
+            currentFlockCenter.Value = flockDestination;
+        }
+    }
+
+    // ==========================================
+    // LOGIC 1: PHÁT HIỆN CỪU BỊ ĐẨY KHỎI BÁN KÍNH
+    // ==========================================
+    private void CheckLambsOutOfBounds()
+    {
+        Vector2 center = currentFlockCenter.Value;
+
+        foreach (var lamb in activeLambs)
+        {
+            if (lamb != null && lamb.gameObject.activeInHierarchy)
+            {
+                float dist = Vector2.Distance(lamb.transform.position, center);
+                
+                // Nếu khoảng cách lớn hơn bán kính bầy hiện tại
+                if (dist > currentFlockRadius)
+                {
+                    // Phát lệnh ép buộc cừu quay trở về bầy lập tức
+                    lamb.NotifyOutOfBounds(center);
                 }
             }
         }
     }
 
     // ==========================================
-    // AUTO FOLLOW (AI) LOGIC
+    // LOGIC 2: KÍCH HOẠT KHI BẦY CỪU BỊ TẤN CÔNG
     // ==========================================
-    private void HandleAutoFollow()
+    /// <summary>
+    /// Hàm này được gọi từ script nhận sát thương của con cừu (ví dụ: LambHealth hoặc chính LambAI)
+    /// </summary>
+    public void ReportLambAttacked(LambAI attackedLamb)
     {
-        Vector2 playerPos = currentPlayer.transform.position;
-        float distanceToPlayer = Vector2.Distance(currentFlockCenter, playerPos);
+        if (!IsServer) return;
 
-        // Nếu người chơi vượt ra khỏi Deadzone
-        if (distanceToPlayer > playerDeadzoneRadius)
+        // 1. Cho con cừu bị dính đòn hoảng loạn trước
+        attackedLamb.TriggerPanic(panicDuration);
+
+        // 2. Hiệu ứng đám đông: Lan truyền sự sợ hãi sang các con cừu lân cận
+        foreach (var lamb in activeLambs)
         {
-            // Tạo một vị trí random xung quanh player
-            Vector2 randomOffset = UnityEngine.Random.insideUnitCircle * randomOffsetRadius;
-            Vector2 newFlockCenter = playerPos + randomOffset;
-            
-            CommandFlock(newFlockCenter);
+            if (lamb != null && lamb != attackedLamb && lamb.gameObject.activeInHierarchy)
+            {
+                float dist = Vector2.Distance(attackedLamb.transform.position, lamb.transform.position);
+                if (dist <= panicAlertRadius)
+                {
+                    // Cừu xung quanh hoảng loạn ngắn hơn một chút (70% thời gian gốc)
+                    lamb.TriggerPanic(panicDuration * 0.7f); 
+                }
+            }
         }
     }
 
-    // Bạn có thể gọi hàm này từ UI/Input để đổi trạng thái
+    private void HandleAutoFollow()
+    {
+        Vector2 playerPos = currentPlayer.transform.position;
+        float distancePlayerMoved = Vector2.Distance(lastPlayerAnchorPos, playerPos);
+
+        if (distancePlayerMoved > playerDeadzoneRadius)
+        {
+            Vector2 randomOffset = UnityEngine.Random.insideUnitCircle * randomOffsetRadius;
+            Vector2 newFlockDestination = playerPos + randomOffset;
+            
+            CommandFlock(newFlockDestination);
+            lastPlayerAnchorPos = playerPos;
+        }
+    }
+
     public void SetControlMode(FlockControlMode newMode)
     {
         currentControlMode = newMode;
         if (newMode == FlockControlMode.Auto && currentPlayer != null)
         {
-            // Buộc cập nhật ngay lập tức nếu chuyển sang Auto
+            lastPlayerAnchorPos = currentPlayer.transform.position;
             HandleAutoFollow(); 
         }
     }
 
-    // ==========================================
-    // CORE FLOCK LOGIC
-    // ==========================================
     private FlockLevelConfig GetCurrentLevelConfig()
     {
         int index = Mathf.Clamp(currentLevel.Value - 1, 0, levelConfigs.Length - 1);
@@ -178,7 +266,7 @@ public class FlockManager : NetworkBehaviour
         int startingLambs = GetCurrentLevelConfig().maxLambs;
         for (int i = 0; i < startingLambs; i++)
         {
-            SpawnLamb(currentFlockCenter);
+            SpawnLamb(flockDestination);
         }
         UpdateFlockRadius();
     }
@@ -187,16 +275,12 @@ public class FlockManager : NetworkBehaviour
     {
         if (!IsServer) return;
 
-        if (activeLambs.Count >= GetCurrentLevelConfig().maxLambs)
-        {
-            return;
-        }
+        if (activeLambs.Count >= GetCurrentLevelConfig().maxLambs) return;
 
-        // TÌM VỊ TRÍ HỢP LỆ TRƯỚC KHI SPAWN
         if (!TryGetValidSpawnPosition(centerPosition, currentFlockRadius, out Vector2 spawnPos))
         {
-            Debug.LogWarning("⚠️ [FlockManager] Không tìm được vị trí trống để spawn cừu! Hủy spawn lần này để tránh kẹt tường.");
-            return; // Hủy spawn nếu không có chỗ trống
+            Debug.LogWarning("⚠️ [FlockManager] Không tìm được vị trí trống để spawn cừu!");
+            return; 
         }
 
         GameObject lambObj = Instantiate(lambPrefab, spawnPos, Quaternion.identity);
@@ -214,29 +298,20 @@ public class FlockManager : NetworkBehaviour
         }
     }
 
-    /// <summary>
-    /// Thử tìm vị trí ngẫu nhiên không đè lên chướng ngại vật.
-    /// </summary>
     private bool TryGetValidSpawnPosition(Vector2 center, float maxRadius, out Vector2 validPosition)
     {
         for (int i = 0; i < maxSpawnAttempts; i++)
         {
-            // Lấy 1 điểm random xung quanh tâm bầy
             Vector2 randomOffset = UnityEngine.Random.insideUnitCircle * maxRadius;
             Vector2 testPosition = center + randomOffset;
 
-            // Kiểm tra xem vị trí này có bị đụng tường/quái (obstacleLayer) không
             Collider2D hit = Physics2D.OverlapCircle(testPosition, spawnCheckRadius, obstacleLayer);
-            
             if (hit == null)
             {
-                // Vị trí an toàn, trả về true
                 validPosition = testPosition;
                 return true;
             }
         }
-        
-        // Đã thử quá giới hạn số lần mà vẫn toàn vướng tường -> Trả về false
         validPosition = center;
         return false;
     }
@@ -257,7 +332,7 @@ public class FlockManager : NetworkBehaviour
         currentFlockRadius = dynamicBaseRadius + (radiusMultiplier * Mathf.Sqrt(activeLambs.Count));
         currentSkillZoneRadius = currentFlockRadius * skillZoneRadiusMultiplier;
         
-        CommandFlock(currentFlockCenter);
+        CommandFlock(flockDestination);
     }
 
     public void LevelUpFlock()
@@ -268,26 +343,28 @@ public class FlockManager : NetworkBehaviour
         {
             currentLevel.Value++;
             UpdateFlockRadius();
-            Debug.Log($"[FLOCK] Bầy cừu đã lên Level {currentLevel.Value}! Tối đa: {GetCurrentLevelConfig().maxLambs} cừu.");
         }
     }
 
     private void HandleMapClicked(Vector2 targetPos)
     {
-        // Tự động chuyển qua chế độ Manual khi người chơi ra lệnh
-        currentControlMode = FlockControlMode.Manual;
         CommandFlock(targetPos);
+
+        if (currentControlMode == FlockControlMode.Auto && currentPlayer != null)
+        {
+            lastPlayerAnchorPos = currentPlayer.transform.position;
+        }
     }
 
     private void CommandFlock(Vector2 targetPos)
     {
-        currentFlockCenter = targetPos;
+        flockDestination = targetPos;
 
         foreach (var lamb in activeLambs)
         {
             if (lamb != null && lamb.gameObject.activeInHierarchy)
             {
-                lamb.SetFlockData(currentFlockCenter, currentFlockRadius);
+                lamb.SetFlockData(flockDestination, currentFlockRadius);
             }
         }
     }
@@ -304,31 +381,32 @@ public class FlockManager : NetworkBehaviour
     {
         if (showDebugRadius)
         {
-            // Vẽ tâm của bầy
             Gizmos.color = new Color(0f, 1f, 0f, 0.3f);
-            Gizmos.DrawWireSphere(currentFlockCenter, currentFlockRadius);
+            Gizmos.DrawWireSphere(currentFlockCenter.Value, currentFlockRadius);
 
             Gizmos.color = new Color(0f, 0.5f, 1f, 0.3f);
-            Gizmos.DrawWireSphere(currentFlockCenter, currentSkillZoneRadius);
+            Gizmos.DrawWireSphere(currentFlockCenter.Value, currentSkillZoneRadius);
 
-            // Vẽ Deadzone của Player (nếu ở chế độ Auto)
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawSphere(flockDestination, 0.2f);
+
             if (Application.isPlaying && currentPlayer != null && currentControlMode == FlockControlMode.Auto)
             {
-                Gizmos.color = new Color(1f, 0f, 0f, 0.2f); // Màu đỏ nhạt cho Deadzone
-                Gizmos.DrawWireSphere(currentPlayer.transform.position, playerDeadzoneRadius);
+                Gizmos.color = new Color(1f, 0f, 0f, 0.2f); 
+                Gizmos.DrawWireSphere(lastPlayerAnchorPos, playerDeadzoneRadius);
             }
         }
     }
 
     public bool IsPositionInsideHealZone(Vector2 targetPosition)
     {
-        float dist = Vector2.Distance(targetPosition, currentFlockCenter);
+        float dist = Vector2.Distance(targetPosition, currentFlockCenter.Value);
         return dist <= currentFlockRadius;
     }
 
     public bool IsPositionInsideSkillZone(Vector2 targetPosition)
     {
-        float dist = Vector2.Distance(targetPosition, currentFlockCenter);
+        float dist = Vector2.Distance(targetPosition, currentFlockCenter.Value);
         return dist <= currentSkillZoneRadius;
     }
 

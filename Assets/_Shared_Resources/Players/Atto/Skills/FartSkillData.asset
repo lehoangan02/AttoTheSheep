@@ -23,6 +23,15 @@ MonoBehaviour:
   manaCost: 10
   lambsRequired: 0
   vfxPrefab: {fileID: 0}
+  castSFX:
+    clip: {fileID: 0}
+    duration: 0
+  activeSFX:
+    clip: {fileID: 8300000, guid: 4524da26b5d98754c901c53d70f8b62d, type: 3}
+    duration: 0
+  hitSFX:
+    clip: {fileID: 8300000, guid: adcf8612a72eb054f97046365f9147e4, type: 3}
+    duration: 0
   dashForce: 20
   dashDuration: 0.2
   knockupForce: 50

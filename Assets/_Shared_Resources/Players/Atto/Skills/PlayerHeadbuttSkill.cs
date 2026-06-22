@@ -29,6 +29,7 @@ public class PlayerHeadbuttSkill : BaseSkillComponent
 
     public override void ClientPlayVisual(SkillData data)
     {
+        base.ClientPlayVisual(data); // Gọi code của class cha để tự động phát SFX nếu có
         Animator anim = animator;
         if (anim == null) anim = GetComponentInParent<Animator>();
         if (anim == null) anim = GetComponentInChildren<Animator>();
@@ -79,22 +80,24 @@ public class PlayerHeadbuttSkill : BaseSkillComponent
                 if (impactParticle != null && !hasPlayedParticle)
                 {
                     // Lấy điểm tiếp xúc gần nhất
-                    Vector3 impactPos = hit.ClosestPoint(hitCenter); 
-                    
+                    Vector3 impactPos = hit.ClosestPoint(hitCenter);
+
                     // Dời object particle đến đúng vị trí chạm
                     impactParticle.transform.position = impactPos;
-                    
+
                     // XOAY PARTICLE THEO HƯỚNG NHÂN VẬT
                     // Nếu nhân vật quay trái (facingDir.x < 0), xoay Particle 180 độ trục Y. Nếu quay phải thì giữ nguyên 0 độ.
                     float yRotation = facingDir.x < 0 ? 180f : 0f;
                     impactParticle.transform.rotation = Quaternion.Euler(0f, yRotation, 0f);
-                    
+
                     // Bật nổ tia lửa
-                    impactParticle.Play(); 
-                    
+                    impactParticle.Play();
+
                     // Đánh dấu là đã nổ để không gọi lại Play() nếu trúng thêm quái khác cùng lúc
                     hasPlayedParticle = true;
                 }
+                
+                ClientPlayHitEffect(data, hit.transform.position);
             }
         }
 

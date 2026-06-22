@@ -28,6 +28,15 @@ MonoBehaviour:
   manaCost: 0
   lambsRequired: 0
   vfxPrefab: {fileID: 0}
+  castSFX:
+    clip: {fileID: 8300000, guid: 0484f89df132d804d9a484ac5ae945d1, type: 3}
+    duration: 7
+  activeSFX:
+    clip: {fileID: 8300000, guid: e86eb6a4f74871c45b30d13e91c71e76, type: 3}
+    duration: 2
+  hitSFX:
+    clip: {fileID: 0}
+    duration: 0
   pullRadius: 3
   pullSpeed: 5
   hitRadius: 3
