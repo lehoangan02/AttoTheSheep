@@ -8,6 +8,7 @@ public class PlayerMovement : NetworkBehaviour
     private NetworkEntity entity; // Get core stats from Parent
     private SpriteRenderer spriteRenderer;
     private Animator animator;
+    private PlayerAudio playerAudio;
     private Coroutine speedBoostRoutine;
 
     public bool isMovementLocked = false; 
@@ -24,6 +25,9 @@ public class PlayerMovement : NetworkBehaviour
         rb = GetComponentInParent<Rigidbody2D>();
         controller = GetComponentInParent<PlayerController>();
         entity = GetComponentInParent<NetworkEntity>();
+        playerAudio = GetComponentInParent<PlayerAudio>();
+        if (playerAudio == null && transform.parent != null)
+            playerAudio = transform.parent.gameObject.AddComponent<PlayerAudio>();
 
         // Search for sprite and animator in all child Objects of Atto
         if (transform.parent != null)
@@ -49,12 +53,18 @@ public class PlayerMovement : NetworkBehaviour
     {
         // Use local input for smoothness if Owner, others use network input
         Vector2 currentInput = IsOwner ? localMoveInput : netMoveInput.Value;
-        if (animator != null) animator.SetBool("IsMoving", currentInput != Vector2.zero);
+        bool isMoving = currentInput.sqrMagnitude > 0.01f;
+        if (animator != null) animator.SetBool("IsMoving", isMoving);
         
         if (spriteRenderer != null)
         {
             if (currentInput.x > 0) spriteRenderer.flipX = false;
             else if (currentInput.x < 0) spriteRenderer.flipX = true;
+        }
+
+        if (isMoving && !isMovementLocked && entity != null && entity.IsAlive)
+        {
+            playerAudio?.TryPlayFootstep(transform.position);
         }
     }
 

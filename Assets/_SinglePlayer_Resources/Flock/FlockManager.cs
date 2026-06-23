@@ -184,7 +184,7 @@ public class FlockManager : NetworkBehaviour
     // ==========================================
     private void CheckLambsOutOfBounds()
     {
-        Vector2 center = currentFlockCenter.Value;
+        Vector2 center = flockDestination;
 
         foreach (var lamb in activeLambs)
         {
@@ -291,7 +291,7 @@ public class FlockManager : NetworkBehaviour
         LambAI lambAI = lambObj.GetComponent<LambAI>();
         if (lambAI != null)
         {
-            lambAI.Initialize(this); 
+            lambAI.Initialize(this, obstacleLayer);
             activeLambs.Add(lambAI);
             UpdateFlockRadius();
             OnFlockTierChanged?.Invoke(GetFlockTier());
