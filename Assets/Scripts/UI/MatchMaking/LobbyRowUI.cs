@@ -10,12 +10,8 @@ public class LobbyRowUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI gameModeText;
     [SerializeField] private Button rowButton;
 
-    private string _lobbyName;
-
-    public void Setup(AttoTheSheep.Core.LobbyData data, Action<string> onClicked)
+    public void Setup(AttoTheSheep.Core.LobbyData data, Action<AttoTheSheep.Core.LobbyData> onClicked)
     {
-        _lobbyName = data.LobbyName;
-
         if (lobbyNameText != null) lobbyNameText.text = data.LobbyName;
         if (playersText != null) playersText.text = $"{data.CurrentPlayers}/{data.MaxPlayers}";
         if (gameModeText != null) gameModeText.text = data.GameMode;
@@ -23,7 +19,7 @@ public class LobbyRowUI : MonoBehaviour
         if (rowButton != null)
         {
             rowButton.onClick.RemoveAllListeners();
-            rowButton.onClick.AddListener(() => onClicked?.Invoke(data.LobbyId));
+            rowButton.onClick.AddListener(() => onClicked?.Invoke(data));
         }
     }
 }
