@@ -12,11 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53b306e7e4e5b6ac7bb45a92f9d7ea87, type: 3}
   m_Name: GoblinData
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
-  enemyKind: 5
-  displayName: 
   maxHealth: 350
-  speedTier: 1
-  moveSpeed: 8
+  moveSpeed: 4
   attackDamage: 15
   attackRange: 1
   attackCooldown: 0.8

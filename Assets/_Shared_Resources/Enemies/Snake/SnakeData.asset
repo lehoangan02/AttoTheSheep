@@ -12,11 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53b306e7e4e5b6ac7bb45a92f9d7ea87, type: 3}
   m_Name: SnakeData
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
-  enemyKind: 2
-  displayName: 
   maxHealth: 250
-  speedTier: 0
-  moveSpeed: 5
+  moveSpeed: 3
   attackDamage: 12
   attackRange: 1
   attackCooldown: 1

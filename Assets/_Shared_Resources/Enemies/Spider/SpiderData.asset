@@ -12,11 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53b306e7e4e5b6ac7bb45a92f9d7ea87, type: 3}
   m_Name: SpiderData
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
-  enemyKind: 3
-  displayName: 
   maxHealth: 300
-  speedTier: 0
-  moveSpeed: 5
+  moveSpeed: 3
   attackDamage: 14
   attackRange: 1
   attackCooldown: 1.2
