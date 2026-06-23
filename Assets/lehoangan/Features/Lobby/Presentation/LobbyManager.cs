@@ -62,8 +62,10 @@ public class LobbyManager : MonoBehaviour
 
     private async void HandleLobbyRefresh()
     {
-        // Only refresh the list if we haven't joined a lobby yet
-        if (Presenter.JoinedLobby == null)
+        // Only refresh if we haven't joined a lobby yet AND we are authenticated
+        if (Presenter.JoinedLobby == null && 
+            UnityServices.State == ServicesInitializationState.Initialized && 
+            AuthenticationService.Instance.IsSignedIn)
         {
             listRefreshTimer -= Time.deltaTime;
             if (listRefreshTimer <= 0)
@@ -98,6 +100,12 @@ public class LobbyManager : MonoBehaviour
     [Command]
     public async void ListLobbies()
     {
+        if (UnityServices.State != ServicesInitializationState.Initialized || !AuthenticationService.Instance.IsSignedIn)
+        {
+            Debug.LogWarning("[LobbyManager] Cannot list lobbies yet; still waiting for Unity Services Authentication.");
+            return;
+        }
+
         await Presenter.RefreshLobbyList();
         Debug.Log($"Number of lobbies found: {Presenter.AvailableLobbies.Count}");
         foreach (var lobby in Presenter.AvailableLobbies)
