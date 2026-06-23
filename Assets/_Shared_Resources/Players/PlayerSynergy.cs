@@ -85,6 +85,10 @@ public class PlayerFlockBuffs : NetworkBehaviour
     [ServerRpc]
     private void UpdateSkillTierServerRpc(int tier)
     {
-        if (skills != null) skills.unlockedSkillTier.Value = tier;
+        if (skills != null)
+        {
+            skills.unlockedSkillTier.Value = tier;
+            skills.isInsideFlock.Value = true;
+        }
     }
 }

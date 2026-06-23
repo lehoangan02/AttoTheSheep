@@ -18,9 +18,9 @@ GameObject:
   - component: {fileID: 8295163450808458972}
   - component: {fileID: 1155625615522297754}
   - component: {fileID: 7145579840219437702}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Pawn
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -309,7 +309,7 @@ GameObject:
   - component: {fileID: 1569060010444865296}
   - component: {fileID: 3788564204004673872}
   - component: {fileID: 165329513767362487}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: PawnHitbox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
