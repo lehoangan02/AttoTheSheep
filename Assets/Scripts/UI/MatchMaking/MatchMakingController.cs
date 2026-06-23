@@ -70,7 +70,6 @@ public class MatchMakingController : MonoBehaviour
         if (confirmOkButton != null) confirmOkButton.onClick.AddListener(OnConfirmOkClicked);
 
         CloseAllModals();
-        GenerateMockLobbyList();
 
         if (fadeOverlay != null)
         {
