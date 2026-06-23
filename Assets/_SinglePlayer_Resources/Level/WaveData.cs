@@ -24,13 +24,13 @@ public class WaveData : ScriptableObject
 
     public GameObject GetRandomEnemyPrefab()
     {
-        if (enemyPrefabs == null || enemyPrefabs.Length == 0) return null;
-        return enemyPrefabs[UnityEngine.Random.Range(0, enemyPrefabs.Length)];
+        if (enemyPrefabs?.Length == 0) return null;
+        return enemyPrefabs[Random.Range(0, enemyPrefabs.Length)];
     }
 
     void OnValidate()
     {
-        if (enemyPrefabs == null || enemyPrefabs.Length == 0)
+        if (enemyPrefabs?.Length == 0)
             Debug.LogWarning($"WaveData '{name}': no enemy prefabs assigned.", this);
     }
 }
