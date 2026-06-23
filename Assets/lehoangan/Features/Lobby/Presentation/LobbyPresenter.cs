@@ -135,7 +135,15 @@ public class LobbyPresenter
     {
         if (IsHost && JoinedLobby != null)
         {
-            await _heartbeatLobbyUseCase.ExecuteAsync(JoinedLobby.Id);
+            try
+            {
+                await _heartbeatLobbyUseCase.ExecuteAsync(JoinedLobby.Id);
+                Debug.Log($"[LobbyPresenter] Heartbeat successfully sent for Lobby {JoinedLobby.Id}");
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[LobbyPresenter] Failed to send heartbeat: {e}");
+            }
         }
     }
 
