@@ -12,7 +12,8 @@ GameObject:
   - component: {fileID: 4624916543590909842}
   - component: {fileID: 3472668627105093665}
   - component: {fileID: -5867216667026200191}
-  m_Layer: 20
+  - component: {fileID: 4625017717691310676}
+  m_Layer: 19
   m_Name: Miner
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -130,5 +131,43 @@ MonoBehaviour:
   goldMine: {fileID: 0}
   house: {fileID: 0}
   animator: {fileID: 0}
+  npcRenderer: {fileID: 0}
   moveSpeed: 3
   miningDuration: 5
+  houseStayDuration: 3
+--- !u!58 &4625017717691310676
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2431930567194253585}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: -0.116488695, y: 0}
+  m_Radius: 0.49640632
