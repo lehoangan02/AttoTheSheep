@@ -14,6 +14,7 @@ public class PlayerEntity : NetworkEntity
 
     private Color originalColor;
     private Rigidbody2D rb;
+    private PlayerAudio playerAudio;
     private PlayerMovement playerMovement; // Khai báo tham chiếu đến PlayerMovement
 
     private void Awake()
@@ -23,6 +24,8 @@ public class PlayerEntity : NetworkEntity
         
         // Tìm PlayerMovement nằm ở Object con (giống cách bạn setup GetComponentInParent bên PlayerMovement)
         playerMovement = GetComponentInChildren<PlayerMovement>();
+        playerAudio = GetComponent<PlayerAudio>();
+        if (playerAudio == null) playerAudio = gameObject.AddComponent<PlayerAudio>();
         
         if (spriteRenderer != null) 
         {
@@ -66,6 +69,7 @@ public class PlayerEntity : NetworkEntity
 
     protected override void Die()
     {
+        PlayDeathClientRpc();
         base.Die();
         Debug.Log("Player has been defeated! Showing Game Over screen...");
     }
@@ -82,7 +86,18 @@ public class PlayerEntity : NetworkEntity
                 StopAllCoroutines(); 
                 StartCoroutine(FlashRedRoutine());
             }
+
+            if (newValue > 0)
+            {
+                playerAudio?.PlayHurt();
+            }
         }
+    }
+
+    [ClientRpc]
+    private void PlayDeathClientRpc()
+    {
+        playerAudio?.PlayDeath();
     }
 
     private IEnumerator FlashRedRoutine()

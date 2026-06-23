@@ -29,10 +29,25 @@ public class LambAI : NetworkEntity
     [Tooltip("Tốc độ nhân thêm khi cố chạy ngược về bầy")]
     [SerializeField] private float returnSpeedMultiplier = 1.3f;
 
+    [Header("Stuck Recovery Settings")]
+    [SerializeField] private float stuckCheckInterval = 0.25f;
+    [SerializeField] private float stuckMinMoveDistance = 0.03f;
+    [SerializeField] private float stuckTimeToRecover = 0.75f;
+    [SerializeField] private float unstuckDuration = 0.8f;
+    [SerializeField] private float unstuckSideStepDistance = 1.2f;
+    [SerializeField] private float unstuckClearanceRadius = 0.25f;
+
     private bool isPanicking = false;
     private float panicTimer = 0f;
     private Vector2 panicTargetPos;
     private bool isForceReturning = false;
+    private bool isRecoveringFromStuck = false;
+    private float unstuckTimer = 0f;
+    private Vector2 unstuckTargetPos;
+    private int unstuckSideSign = 1;
+    private float stuckCheckTimer = 0f;
+    private float stuckTimer = 0f;
+    private Vector2 lastStuckCheckPosition;
 
     private float personalSpeedMultiplier = 1f; 
     private Color originalColor;
@@ -42,6 +57,7 @@ public class LambAI : NetworkEntity
     private Animator animator;
     private SpriteRenderer spriteRenderer;
     private FlockManager myManager;
+    private LayerMask obstacleLayer;
 
     private Vector2 flockCenter;
     private float flockRadius;
@@ -63,11 +79,18 @@ public class LambAI : NetworkEntity
     void Start()
     {
         personalSpeedMultiplier = Random.Range(1f - speedNoiseRange, 1f + speedNoiseRange);
+        lastStuckCheckPosition = rb.position;
     }
 
     public void Initialize(FlockManager manager)
     {
         myManager = manager;
+    }
+
+    public void Initialize(FlockManager manager, LayerMask recoveryObstacleLayer)
+    {
+        myManager = manager;
+        obstacleLayer = recoveryObstacleLayer;
     }
 
     public override void OnNetworkSpawn()
@@ -201,6 +224,15 @@ public class LambAI : NetworkEntity
         if (shouldMove)
         {
             float distToTarget = Vector2.Distance(transform.position, actualTarget);
+
+            UpdateStuckRecovery(actualTarget, distToTarget);
+            if (isRecoveringFromStuck)
+            {
+                actualTarget = unstuckTargetPos;
+                targetSpeed = maxSpeedWithNoise * returnSpeedMultiplier;
+                applySlowingRadius = false;
+                distToTarget = Vector2.Distance(transform.position, actualTarget);
+            }
             
             if (distToTarget > stoppingDistance)
             {
@@ -229,9 +261,109 @@ public class LambAI : NetworkEntity
         else
         {
             // Không có mục tiêu nào -> Giảm tốc về 0
+            isRecoveringFromStuck = false;
+            ResetStuckTracking();
             rb.linearVelocity = Vector2.Lerp(rb.linearVelocity, Vector2.zero, accelerationRate * Time.fixedDeltaTime);
             UpdateAnimationLocal(rb.linearVelocity.magnitude > 0.1f);
         }
+    }
+
+    private void UpdateStuckRecovery(Vector2 desiredTarget, float distToTarget)
+    {
+        if (distToTarget <= stoppingDistance)
+        {
+            ResetStuckTracking();
+            return;
+        }
+
+        if (isRecoveringFromStuck)
+        {
+            unstuckTimer -= Time.fixedDeltaTime;
+            if (unstuckTimer <= 0f || Vector2.Distance(transform.position, unstuckTargetPos) <= stoppingDistance)
+            {
+                isRecoveringFromStuck = false;
+                ResetStuckTracking();
+            }
+            return;
+        }
+
+        stuckCheckTimer += Time.fixedDeltaTime;
+        if (stuckCheckTimer < stuckCheckInterval) return;
+
+        float movedDistance = Vector2.Distance(rb.position, lastStuckCheckPosition);
+        if (movedDistance < stuckMinMoveDistance)
+        {
+            stuckTimer += stuckCheckTimer;
+        }
+        else
+        {
+            stuckTimer = 0f;
+        }
+
+        stuckCheckTimer = 0f;
+        lastStuckCheckPosition = rb.position;
+
+        if (stuckTimer >= stuckTimeToRecover)
+        {
+            StartStuckRecovery(desiredTarget);
+        }
+    }
+
+    private void StartStuckRecovery(Vector2 desiredTarget)
+    {
+        Vector2 currentPosition = rb.position;
+        Vector2 toTarget = desiredTarget - currentPosition;
+        if (toTarget.sqrMagnitude < 0.001f)
+        {
+            toTarget = Random.insideUnitCircle;
+            if (toTarget.sqrMagnitude < 0.001f)
+            {
+                toTarget = Vector2.right;
+            }
+        }
+
+        toTarget.Normalize();
+
+        Vector2 side = new Vector2(-toTarget.y, toTarget.x) * unstuckSideSign;
+        unstuckSideSign *= -1;
+
+        Vector2[] candidates =
+        {
+            currentPosition + side * unstuckSideStepDistance + toTarget * (unstuckSideStepDistance * 0.35f),
+            currentPosition - side * unstuckSideStepDistance + toTarget * (unstuckSideStepDistance * 0.35f),
+            currentPosition + side * unstuckSideStepDistance - toTarget * (unstuckSideStepDistance * 0.35f),
+            currentPosition - side * unstuckSideStepDistance - toTarget * (unstuckSideStepDistance * 0.35f),
+            currentPosition - toTarget * unstuckSideStepDistance
+        };
+
+        unstuckTargetPos = candidates[0];
+        for (int i = 0; i < candidates.Length; i++)
+        {
+            if (IsRecoveryPointClear(candidates[i]))
+            {
+                unstuckTargetPos = candidates[i];
+                break;
+            }
+        }
+
+        isRecoveringFromStuck = true;
+        unstuckTimer = unstuckDuration;
+        stuckTimer = 0f;
+        stuckCheckTimer = 0f;
+        lastStuckCheckPosition = currentPosition;
+    }
+
+    private bool IsRecoveryPointClear(Vector2 point)
+    {
+        if (obstacleLayer.value == 0) return true;
+        return Physics2D.OverlapCircle(point, unstuckClearanceRadius, obstacleLayer) == null;
+    }
+
+    private void ResetStuckTracking()
+    {
+        stuckTimer = 0f;
+        stuckCheckTimer = 0f;
+        lastStuckCheckPosition = rb.position;
     }
 
     private void UpdateAnimationLocal(bool isMoving)
@@ -307,5 +439,6 @@ public class LambAI : NetworkEntity
         yield return new WaitForSeconds(knockbackDuration);
         rb.linearVelocity = Vector2.zero;
         isMovementLocked = false;
+        ResetStuckTracking();
     }
 }

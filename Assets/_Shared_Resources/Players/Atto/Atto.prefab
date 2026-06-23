@@ -4908,6 +4908,7 @@ GameObject:
   - component: {fileID: 6551048971583672964}
   - component: {fileID: 2762547472229503846}
   - component: {fileID: 1963130586316328227}
+  - component: {fileID: 5768902246884596341}
   m_Layer: 7
   m_Name: Atto
   m_TagString: Player
@@ -5253,6 +5254,30 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
   m_Radius: 0.27
+--- !u!114 &5768902246884596341
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2149695861835639596}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1f44985d3a604de5a07c0f43e42bf2ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerAudio
+  footstepSFX:
+  - clip: {fileID: 8300000, guid: 0e9f91481018dcc4d9fced02f498b76e, type: 3}
+    duration: 0
+  - clip: {fileID: 8300000, guid: b87d0dc15ad2aca44a19c7822ea7cf27, type: 3}
+    duration: 0
+  footstepInterval: 0.35
+  hurtSFX:
+    clip: {fileID: 8300000, guid: 86e9881ba723fa94a960d3fd559d7f36, type: 3}
+    duration: 0
+  deathSFX:
+    clip: {fileID: 8300000, guid: 3625e24cfbd6089428b7857f29ceacb2, type: 3}
+    duration: 0
 --- !u!1 &2271741925598155448
 GameObject:
   m_ObjectHideFlags: 0
