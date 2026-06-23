@@ -60,8 +60,13 @@ public class LobbyPresenter
         }
     }
 
+    private bool _isRefreshing;
+
     public async Task RefreshLobbyList()
     {
+        if (_isRefreshing) return;
+        _isRefreshing = true;
+
         try
         {
             var response = await _getLobbiesUseCase.ExecuteAsync();
@@ -70,8 +75,11 @@ public class LobbyPresenter
         }
         catch (Exception e)
         {
-            OnErrorOccurred?.Invoke(e.Message);
-            throw;
+            Debug.LogError($"[LobbyPresenter] Failed to fetch lobby list: {e.Message}");
+        }
+        finally
+        {
+            _isRefreshing = false;
         }
     }
 
