@@ -12,6 +12,8 @@ public class WaveController : MonoBehaviour
 {
     [Header("Config")]
     [SerializeField] private WaveData waveData;
+    [Tooltip("Scene Transforms where enemies spawn. ScriptableObjects can't hold scene refs.")]
+    [SerializeField] private Transform[] spawnPoints;
 
     [Header("Debug")]
     [SerializeField] private bool logEvents;
@@ -100,7 +102,7 @@ public class WaveController : MonoBehaviour
     private void SpawnOneEnemy()
     {
         GameObject prefab = waveData.GetRandomEnemyPrefab();
-        Transform spawnPoint = waveData.GetRandomSpawnPoint();
+        Transform spawnPoint = GetRandomSpawnPoint();
 
         if (prefab == null)
         {
@@ -133,6 +135,12 @@ public class WaveController : MonoBehaviour
         netObj.Spawn(true);
 
         if (logEvents) Debug.Log($"[WaveController] Spawned {prefab.name} at {position}. alive={_aliveCount}");
+    }
+
+    private Transform GetRandomSpawnPoint()
+    {
+        if (spawnPoints == null || spawnPoints.Length == 0) return null;
+        return spawnPoints[UnityEngine.Random.Range(0, spawnPoints.Length)];
     }
 
     // --- Death Callback ---

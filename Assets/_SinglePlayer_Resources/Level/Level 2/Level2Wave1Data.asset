@@ -15,9 +15,7 @@ MonoBehaviour:
   enemyPrefabs:
   - {fileID: 736431478501333566, guid: 3bb04c46540f936b8a90a4ea82e005ff, type: 3}
   - {fileID: 8481652928192273667, guid: 433b1f558e92c9ddeb83ddc67800a11d, type: 3}
-  spawnPoints:
-  - {fileID: 0}
-  - {fileID: 0}
+  spawnPoints: []
   totalEnemyCount: 5
   spawnInterval: 1.5
   maxAliveAtOnce: 0
