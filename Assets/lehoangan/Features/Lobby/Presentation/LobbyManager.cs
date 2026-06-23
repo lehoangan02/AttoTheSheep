@@ -13,6 +13,7 @@ public class LobbyManager : MonoBehaviour
     public static LobbyManager Instance { get; private set; }
 
     private float heartbeatTimer;
+    private float listRefreshTimer = 5f;
     public LobbyPresenter Presenter { get; private set; }
 
     private void Awake()
@@ -56,6 +57,21 @@ public class LobbyManager : MonoBehaviour
     private void Update()
     {
         HandleLobbyHeartbeat();
+        HandleLobbyRefresh();
+    }
+
+    private async void HandleLobbyRefresh()
+    {
+        // Only refresh the list if we haven't joined a lobby yet
+        if (Presenter.JoinedLobby == null)
+        {
+            listRefreshTimer -= Time.deltaTime;
+            if (listRefreshTimer <= 0)
+            {
+                listRefreshTimer = 5f;
+                await Presenter.RefreshLobbyList();
+            }
+        }
     }
 
     private async void HandleLobbyHeartbeat()
