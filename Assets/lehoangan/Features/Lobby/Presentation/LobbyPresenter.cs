@@ -131,6 +131,21 @@ public class LobbyPresenter
         }
     }
 
+    public async Task KickPlayer(string playerId)
+    {
+        if (!IsHost || JoinedLobby == null) return;
+
+        try
+        {
+            await _leaveLobbyUseCase.ExecuteAsync(JoinedLobby.Id, playerId);
+        }
+        catch (Exception e)
+        {
+            OnErrorOccurred?.Invoke($"Failed to kick player: {e.Message}");
+            throw;
+        }
+    }
+
     public async Task HandleHeartbeat()
     {
         if (IsHost && JoinedLobby != null)

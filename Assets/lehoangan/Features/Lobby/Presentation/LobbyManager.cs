@@ -138,6 +138,13 @@ public class LobbyManager : MonoBehaviour
     }
 
     [Command]
+    public async void KickPlayer(string playerId)
+    {
+        await Presenter.KickPlayer(playerId);
+        Debug.Log($"Successfully kicked player {playerId} from lobby");
+    }
+
+    [Command]
     public void PrintLobbyPlayers()
     {
         if (Presenter.JoinedLobby == null)

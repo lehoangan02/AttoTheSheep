@@ -169,11 +169,9 @@ public class WaitLobbyController : MonoBehaviour
         {
             OnRequestKickPlayer.Invoke(p.PlayerId);
         }
-        else
+        else if (LobbyManager.Instance != null)
         {
-            // Fallback Mock Logic
-            _players.Remove(p);
-            RefreshUI();
+            LobbyManager.Instance.KickPlayer(p.PlayerId);
         }
     }
 
