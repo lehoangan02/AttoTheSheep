@@ -217,7 +217,7 @@ public class LobbyManager : MonoBehaviour
 
             // 3. Initiate Unity Netcode Scene loading
             Debug.Log("[Host] Starting game scene load...");
-            NetworkManager.Singleton.SceneManager.LoadScene("GamePlayScene", UnityEngine.SceneManagement.LoadSceneMode.Single);
+            NetworkManager.Singleton.SceneManager.LoadScene("SampleScene", UnityEngine.SceneManagement.LoadSceneMode.Single);
         }
         catch (Exception e)
         {
@@ -227,7 +227,7 @@ public class LobbyManager : MonoBehaviour
 
     private async void OnSceneLoadCompleted(string sceneName, UnityEngine.SceneManagement.LoadSceneMode loadMode, List<ulong> clientsCompleted, List<ulong> clientsTimedOut)
     {
-        if (sceneName != "GamePlayScene") return;
+        if (sceneName != "SampleScene") return;
 
         // Unsubscribe from Netcode Scene Manager load completion
         if (NetworkManager.Singleton != null && NetworkManager.Singleton.SceneManager != null)
