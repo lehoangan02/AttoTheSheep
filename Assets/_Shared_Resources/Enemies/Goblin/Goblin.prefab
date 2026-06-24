@@ -80,7 +80,7 @@ CircleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -0.65357065, y: 0}
+  m_Offset: {x: -0.65357065, y: 0.4}
   m_Radius: 1.0251908
 --- !u!1 &5753693385531744272
 GameObject:
@@ -209,7 +209,7 @@ CircleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0, y: 0.4}
   m_Radius: 0.5
 --- !u!95 &7633614237194594367
 Animator:
@@ -280,7 +280,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 10
+  m_SortingOrder: 11
   m_MaskInteraction: 0
   m_Sprite: {fileID: -5274279815260803775, guid: e3431bd4bcaf103d7a0b52630115273c, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -291,7 +291,7 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_SpriteSortPoint: 0
+  m_SpriteSortPoint: 1
 --- !u!114 &1185576875832236290
 MonoBehaviour:
   m_ObjectHideFlags: 0
