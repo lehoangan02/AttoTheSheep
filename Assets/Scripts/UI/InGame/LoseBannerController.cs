@@ -1,0 +1,50 @@
+using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+
+namespace AttoTheSheep.UI.InGame
+{
+    public class LoseBannerController : MonoBehaviour
+    {
+        [Header("UI Buttons")]
+        [SerializeField] private Button retryButton;
+        [SerializeField] private Button mainMenuButton;
+
+        [Header("Scene Settings")]
+        [SerializeField] private string mainMenuSceneName = "MainMenu";
+
+        private void Start()
+        {
+            if (retryButton != null)
+                retryButton.onClick.AddListener(OnRetryClicked);
+            
+            if (mainMenuButton != null)
+                mainMenuButton.onClick.AddListener(OnMainMenuClicked);
+        }
+
+        private void OnRetryClicked()
+        {
+            Debug.Log("[LoseBanner] Đang chơi lại Level hiện tại...");
+            Time.timeScale = 1f; // Bỏ trạng thái pause trước khi load lại
+            // Load lại chính scene hiện tại
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        }
+
+        private void OnMainMenuClicked()
+        {
+            Debug.Log("[LoseBanner] Về Main Menu...");
+            Time.timeScale = 1f;
+            SceneManager.LoadScene(mainMenuSceneName);
+        }
+
+        public void ShowBanner()
+        {
+            gameObject.SetActive(true);
+        }
+
+        public void HideBanner()
+        {
+            gameObject.SetActive(false);
+        }
+    }
+}
