@@ -259,7 +259,7 @@ public class MatchMakingController : MonoBehaviour
 
             if (LobbyManager.Instance != null)
             {
-                string defaultPlayerName = "Player_" + Random.Range(1000, 9999);
+                string defaultPlayerName = await GetCloudPlayerName();
                 try 
                 {
                     await LobbyManager.Instance.Presenter.CreateLobby(createNameInput.text, 10, false, defaultPlayerName);
@@ -300,7 +300,7 @@ public class MatchMakingController : MonoBehaviour
 
             if (LobbyManager.Instance != null)
             {
-                string defaultPlayerName = "Player_" + Random.Range(1000, 9999);
+                string defaultPlayerName = await GetCloudPlayerName();
                 try 
                 {
                     await LobbyManager.Instance.Presenter.JoinLobbyByCode(joinCodeInput.text, defaultPlayerName);
@@ -339,7 +339,7 @@ public class MatchMakingController : MonoBehaviour
 
         if (LobbyManager.Instance != null)
         {
-            string defaultPlayerName = "Player_" + Random.Range(1000, 9999);
+            string defaultPlayerName = await GetCloudPlayerName();
             try 
             {
                 await LobbyManager.Instance.Presenter.JoinLobby(_selectedLobbyId, defaultPlayerName);
@@ -445,5 +445,21 @@ public class MatchMakingController : MonoBehaviour
         lobbyContent = content;
         lobbyRowPrefab = rowPrefab;
         fadeOverlay = fade;
+    }
+
+    private async System.Threading.Tasks.Task<string> GetCloudPlayerName()
+    {
+        string defaultName = "Player_" + Random.Range(1000, 9999);
+        try
+        {
+            if (Unity.Services.Core.UnityServices.State == Unity.Services.Core.ServicesInitializationState.Initialized 
+                && Unity.Services.Authentication.AuthenticationService.Instance.IsSignedIn)
+            {
+                string cloudName = await Unity.Services.Authentication.AuthenticationService.Instance.GetPlayerNameAsync();
+                if (!string.IsNullOrEmpty(cloudName)) return cloudName;
+            }
+        }
+        catch {}
+        return defaultName;
     }
 }
