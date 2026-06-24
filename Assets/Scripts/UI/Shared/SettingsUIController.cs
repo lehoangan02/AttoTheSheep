@@ -83,7 +83,21 @@ namespace AttoTheSheep.UI.Shared
             SetLanguage(lang);
 
             // --- FPS ---
-            int fps = PlayerPrefs.GetInt(PREF_FPS, 60);
+            int fps;
+            if (PlayerPrefs.HasKey(PREF_FPS))
+            {
+                // Người chơi đã từng chỉnh setting, lấy từ bộ nhớ
+                fps = PlayerPrefs.GetInt(PREF_FPS);
+            }
+            else
+            {
+                // Lần đầu vào game: Đồng bộ lấy giá trị mặc định từ Inspector của FPSLimiter
+                if (FPSLimiter.Instance != null)
+                    fps = FPSLimiter.Instance.GetCurrentTargetFPS();
+                else
+                    fps = 60;
+            }
+
             if (FPSLimiter.Instance != null) FPSLimiter.Instance.SetTargetFPS(fps);
             if (fpsDropdown != null)
             {
