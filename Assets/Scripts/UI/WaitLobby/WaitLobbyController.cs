@@ -43,30 +43,74 @@ public class WaitLobbyController : MonoBehaviour
         if (confirmYesButton != null) confirmYesButton.onClick.AddListener(OnConfirmYesClicked);
         if (confirmNoButton != null) confirmNoButton.onClick.AddListener(OnConfirmNoClicked);
 
-        GenerateMockData();
-        RefreshUI();
+        if (LobbyManager.Instance != null && LobbyManager.Instance.Presenter != null)
+        {
+            LobbyManager.Instance.Presenter.OnJoinedLobbyUpdated += OnJoinedLobbyUpdated;
+            UpdateRealLobbyData(LobbyManager.Instance.Presenter.JoinedLobby);
+        }
+        else
+        {
+            Debug.LogWarning("[WaitLobbyController] No LobbyManager found! UI will be empty.");
+            RefreshUI();
+        }
     }
 
-    private void GenerateMockData()
+    private void OnDestroy()
     {
+        if (LobbyManager.Instance != null && LobbyManager.Instance.Presenter != null)
+        {
+            LobbyManager.Instance.Presenter.OnJoinedLobbyUpdated -= OnJoinedLobbyUpdated;
+        }
+    }
+
+    private void OnJoinedLobbyUpdated(Unity.Services.Lobbies.Models.Lobby lobby)
+    {
+        if (lobby == null)
+        {
+            Debug.Log("[WaitLobby] Lobby was deleted or left. Returning to MatchMaking.");
+            SceneManager.LoadScene("MatchMaking");
+            return;
+        }
+        UpdateRealLobbyData(lobby);
+    }
+
+    private void UpdateRealLobbyData(Unity.Services.Lobbies.Models.Lobby lobby)
+    {
+        if (lobby == null) return;
+
         _players.Clear();
-        
-        bool hostMode = AttoTheSheep.Core.LobbySession.IsHost;
+        foreach (var p in lobby.Players)
+        {
+            string pName = "Unknown";
+            if (p.Data != null && p.Data.TryGetValue("PlayerName", out var dataObj))
+            {
+                pName = dataObj.Value;
+            }
 
-        // Mock the current player
-        _players.Add(new AttoTheSheep.Core.PlayerData 
-        { 
-            PlayerId = "p_1",
-            PlayerName = "Atto (You)", 
-            IsHost = hostMode, 
-            IsLocalPlayer = true, 
-            AvatarIndex = Random.Range(0, mockAvatars != null ? mockAvatars.Length : 1) 
-        });
+            bool isHost = (lobby.HostId == p.Id);
+            bool isMe = (p.Id == Unity.Services.Authentication.AuthenticationService.Instance.PlayerId);
 
-        // Mock other players
-        _players.Add(new AttoTheSheep.Core.PlayerData { PlayerId = "p_2", PlayerName = "Spider-Man", IsHost = !hostMode, IsLocalPlayer = false, AvatarIndex = Random.Range(0, mockAvatars != null ? mockAvatars.Length : 1) });
-        _players.Add(new AttoTheSheep.Core.PlayerData { PlayerId = "p_3", PlayerName = "Iron Man", IsHost = false, IsLocalPlayer = false, AvatarIndex = Random.Range(0, mockAvatars != null ? mockAvatars.Length : 1) });
-        _players.Add(new AttoTheSheep.Core.PlayerData { PlayerId = "p_4", PlayerName = "Black Widow", IsHost = false, IsLocalPlayer = false, AvatarIndex = Random.Range(0, mockAvatars != null ? mockAvatars.Length : 1) });
+            _players.Add(new AttoTheSheep.Core.PlayerData 
+            {
+                PlayerId = p.Id,
+                PlayerName = pName,
+                IsHost = isHost,
+                IsLocalPlayer = isMe,
+                AvatarIndex = 0 // Mock avatar for now
+            });
+        }
+
+        AttoTheSheep.Core.LobbySession.CurrentLobbyName = lobby.Name;
+        AttoTheSheep.Core.LobbySession.MaxPlayers = lobby.MaxPlayers;
+        AttoTheSheep.Core.LobbySession.IsHost = (lobby.HostId == Unity.Services.Authentication.AuthenticationService.Instance.PlayerId);
+
+        // Hide ready button if not host
+        if (readyButton != null)
+        {
+            readyButton.gameObject.SetActive(AttoTheSheep.Core.LobbySession.IsHost);
+        }
+
+        RefreshUI();
     }
 
     private Sprite GetAvatarSprite(int index)
@@ -125,11 +169,9 @@ public class WaitLobbyController : MonoBehaviour
         {
             OnRequestKickPlayer.Invoke(p.PlayerId);
         }
-        else
+        else if (LobbyManager.Instance != null)
         {
-            // Fallback Mock Logic
-            _players.Remove(p);
-            RefreshUI();
+            LobbyManager.Instance.KickPlayer(p.PlayerId);
         }
     }
 
@@ -152,9 +194,9 @@ public class WaitLobbyController : MonoBehaviour
         {
             OnRequestLeaveLobby.Invoke();
         }
-        else
+        else if (LobbyManager.Instance != null)
         {
-            // Fallback Mock Logic
+            LobbyManager.Instance.LeaveLobby();
             SceneManager.LoadScene("MatchMaking");
         }
     }
@@ -171,10 +213,9 @@ public class WaitLobbyController : MonoBehaviour
         {
             OnRequestReady.Invoke();
         }
-        else
+        else if (LobbyManager.Instance != null)
         {
-            // Fallback Mock Logic: For now, no actual game scene exists, just log it.
-            // SceneManager.LoadScene("MainGame");
+            LobbyManager.Instance.HostStartGame();
         }
     }
 }

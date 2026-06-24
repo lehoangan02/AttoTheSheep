@@ -60,8 +60,13 @@ public class LobbyPresenter
         }
     }
 
+    private bool _isRefreshing;
+
     public async Task RefreshLobbyList()
     {
+        if (_isRefreshing) return;
+        _isRefreshing = true;
+
         try
         {
             var response = await _getLobbiesUseCase.ExecuteAsync();
@@ -70,8 +75,11 @@ public class LobbyPresenter
         }
         catch (Exception e)
         {
-            OnErrorOccurred?.Invoke(e.Message);
-            throw;
+            Debug.LogError($"[LobbyPresenter] Failed to fetch lobby list: {e.Message}");
+        }
+        finally
+        {
+            _isRefreshing = false;
         }
     }
 
@@ -123,11 +131,34 @@ public class LobbyPresenter
         }
     }
 
+    public async Task KickPlayer(string playerId)
+    {
+        if (!IsHost || JoinedLobby == null) return;
+
+        try
+        {
+            await _leaveLobbyUseCase.ExecuteAsync(JoinedLobby.Id, playerId);
+        }
+        catch (Exception e)
+        {
+            OnErrorOccurred?.Invoke($"Failed to kick player: {e.Message}");
+            throw;
+        }
+    }
+
     public async Task HandleHeartbeat()
     {
         if (IsHost && JoinedLobby != null)
         {
-            await _heartbeatLobbyUseCase.ExecuteAsync(JoinedLobby.Id);
+            try
+            {
+                await _heartbeatLobbyUseCase.ExecuteAsync(JoinedLobby.Id);
+                Debug.Log($"[LobbyPresenter] Heartbeat successfully sent for Lobby {JoinedLobby.Id}");
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[LobbyPresenter] Failed to send heartbeat: {e}");
+            }
         }
     }
 

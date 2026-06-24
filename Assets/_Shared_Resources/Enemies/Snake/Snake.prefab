@@ -18,9 +18,9 @@ GameObject:
   - component: {fileID: 7864477700928072051}
   - component: {fileID: 7212075443899413569}
   - component: {fileID: 5702808161632651095}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Snake
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -309,7 +309,7 @@ GameObject:
   - component: {fileID: 2052418052958439154}
   - component: {fileID: 3261310353838127310}
   - component: {fileID: 1716720468790368373}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: SnakeHitbox
   m_TagString: Untagged
   m_Icon: {fileID: 0}

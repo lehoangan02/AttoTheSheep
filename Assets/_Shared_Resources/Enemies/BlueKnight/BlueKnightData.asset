@@ -12,11 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53b306e7e4e5b6ac7bb45a92f9d7ea87, type: 3}
   m_Name: BlueKnightData
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
-  enemyKind: 0
-  displayName: 
   maxHealth: 150
-  speedTier: 0
-  moveSpeed: 5
+  moveSpeed: 3
   attackDamage: 20
   attackRange: 1.2
   attackCooldown: 1.25
@@ -27,6 +24,7 @@ MonoBehaviour:
     attackHit:
       clip: {fileID: 8300000, guid: 2f5a74ce4dfd66e4188a2d92208b1ff7, type: 3}
       duration: 0
+    attackVariants: []
     guard:
       clip: {fileID: 8300000, guid: 51cdfac4573b24e47ba6b31e3e1f487a, type: 3}
       duration: 0

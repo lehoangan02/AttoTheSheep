@@ -61,6 +61,8 @@ public class EnemyHitbox : MonoBehaviour
         if (!target.IsAlive) return;
         if (hitTargets.Contains(target)) return;
 
+        if (target is not PlayerEntity && target is not LambAI) return;
+
         hitTargets.Add(target);
         target.TakeDamage(currentDamage, brain.Entity);
         enemyAudio?.PlayAttackHit(brain.CurrentAttackAudioId, target.transform.position);

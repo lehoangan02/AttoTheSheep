@@ -9,5 +9,6 @@ namespace AttoTheSheep.Core
         public int MaxPlayers;
         public string GameMode;
         public bool IsPrivate;
+        public string LobbyCode;
     }
 }

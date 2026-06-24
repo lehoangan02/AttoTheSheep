@@ -13,6 +13,7 @@ public class LobbyManager : MonoBehaviour
     public static LobbyManager Instance { get; private set; }
 
     private float heartbeatTimer;
+    private float listRefreshTimer = 5f;
     public LobbyPresenter Presenter { get; private set; }
 
     private void Awake()
@@ -56,6 +57,23 @@ public class LobbyManager : MonoBehaviour
     private void Update()
     {
         HandleLobbyHeartbeat();
+        HandleLobbyRefresh();
+    }
+
+    private async void HandleLobbyRefresh()
+    {
+        // Only refresh if we haven't joined a lobby yet AND we are authenticated
+        if (Presenter.JoinedLobby == null && 
+            UnityServices.State == ServicesInitializationState.Initialized && 
+            AuthenticationService.Instance.IsSignedIn)
+        {
+            listRefreshTimer -= Time.deltaTime;
+            if (listRefreshTimer <= 0)
+            {
+                listRefreshTimer = 5f;
+                await Presenter.RefreshLobbyList();
+            }
+        }
     }
 
     private async void HandleLobbyHeartbeat()
@@ -82,6 +100,12 @@ public class LobbyManager : MonoBehaviour
     [Command]
     public async void ListLobbies()
     {
+        if (UnityServices.State != ServicesInitializationState.Initialized || !AuthenticationService.Instance.IsSignedIn)
+        {
+            Debug.LogWarning("[LobbyManager] Cannot list lobbies yet; still waiting for Unity Services Authentication.");
+            return;
+        }
+
         await Presenter.RefreshLobbyList();
         Debug.Log($"Number of lobbies found: {Presenter.AvailableLobbies.Count}");
         foreach (var lobby in Presenter.AvailableLobbies)
@@ -111,6 +135,13 @@ public class LobbyManager : MonoBehaviour
     {
         await Presenter.LeaveLobby();
         Debug.Log("Successfully left lobby");
+    }
+
+    [Command]
+    public async void KickPlayer(string playerId)
+    {
+        await Presenter.KickPlayer(playerId);
+        Debug.Log($"Successfully kicked player {playerId} from lobby");
     }
 
     [Command]

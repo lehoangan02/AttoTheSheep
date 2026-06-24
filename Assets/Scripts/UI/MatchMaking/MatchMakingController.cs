@@ -51,7 +51,8 @@ public class MatchMakingController : MonoBehaviour
     [SerializeField] private float fadeDuration = 0.4f;
 
     private bool _isTransitioning;
-    private string _selectedLobbyName = "";
+    private string _selectedLobbyId = "";
+    private string _selectedLobbyDisplayName = "";
 
     private void Start()
     {
@@ -69,7 +70,6 @@ public class MatchMakingController : MonoBehaviour
         if (confirmOkButton != null) confirmOkButton.onClick.AddListener(OnConfirmOkClicked);
 
         CloseAllModals();
-        GenerateMockLobbyList();
 
         if (fadeOverlay != null)
         {
@@ -93,7 +93,53 @@ public class MatchMakingController : MonoBehaviour
             StartCoroutine(FadeIn());
         }
 
-        GenerateMockLobbyList();
+        if (LobbyManager.Instance != null && LobbyManager.Instance.Presenter != null)
+        {
+            LobbyManager.Instance.Presenter.OnLobbyListUpdated += OnRealLobbyListUpdated;
+            LobbyManager.Instance.ListLobbies(); // Fetch real lobbies immediately
+        }
+        else
+        {
+            GenerateMockLobbyList();
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (LobbyManager.Instance != null && LobbyManager.Instance.Presenter != null)
+        {
+            LobbyManager.Instance.Presenter.OnLobbyListUpdated -= OnRealLobbyListUpdated;
+        }
+    }
+
+    private void OnRealLobbyListUpdated()
+    {
+        var realLobbies = new System.Collections.Generic.List<AttoTheSheep.Core.LobbyData>();
+        
+        if (LobbyManager.Instance.Presenter.AvailableLobbies != null)
+        {
+            Debug.Log($"[MatchMaking] Auto-Refresh: Found {LobbyManager.Instance.Presenter.AvailableLobbies.Count} lobbies from server.");
+            foreach (var unityLobby in LobbyManager.Instance.Presenter.AvailableLobbies)
+            {
+                string customCode = "Hidden";
+                if (unityLobby.Data != null && unityLobby.Data.TryGetValue("PublicLobbyCode", out var codeData))
+                {
+                    customCode = codeData.Value;
+                }
+
+                realLobbies.Add(new AttoTheSheep.Core.LobbyData
+                {
+                    LobbyId = unityLobby.Id,
+                    LobbyName = unityLobby.Name,
+                    CurrentPlayers = unityLobby.Players.Count,
+                    MaxPlayers = unityLobby.MaxPlayers,
+                    GameMode = "Multiplayer", // Always Multiplayer
+                    IsPrivate = unityLobby.IsPrivate,
+                    LobbyCode = customCode 
+                });
+            }
+        }
+        PopulateLobbies(realLobbies);
     }
 
     private void GenerateMockLobbyList()
@@ -107,8 +153,9 @@ public class MatchMakingController : MonoBehaviour
                 LobbyName = $"Public Lobby {i}",
                 CurrentPlayers = Random.Range(1, 10),
                 MaxPlayers = 10,
-                GameMode = Random.value > 0.5f ? "Custom" : "Classic",
-                IsPrivate = false
+                GameMode = "Multiplayer",
+                IsPrivate = false,
+                LobbyCode = $"XYZ{i}9{i}"
             });
         }
 
@@ -179,9 +226,10 @@ public class MatchMakingController : MonoBehaviour
         }
     }
 
-    private void OnLobbyRowClicked(string lobbyName)
+    private void OnLobbyRowClicked(AttoTheSheep.Core.LobbyData data)
     {
-        _selectedLobbyName = lobbyName;
+        _selectedLobbyId = data.LobbyId;
+        _selectedLobbyDisplayName = data.LobbyName;
         CloseAllModals();
         if (modalOverlay != null) modalOverlay.SetActive(true);
         if (confirmJoinModal != null)
@@ -189,7 +237,7 @@ public class MatchMakingController : MonoBehaviour
             confirmJoinModal.SetActive(true);
             if (confirmJoinText != null)
             {
-                confirmJoinText.text = $"Do you want to join '{lobbyName}'?";
+                confirmJoinText.text = $"Do you want to join '{data.LobbyName}'?";
             }
         }
     }
@@ -202,14 +250,33 @@ public class MatchMakingController : MonoBehaviour
         if (confirmJoinModal != null) confirmJoinModal.SetActive(false);
     }
 
-    private void OnCreateOkClicked()
+    private async void OnCreateOkClicked()
     {
         if (createNameInput != null && !string.IsNullOrEmpty(createNameInput.text))
         {
             Debug.Log($"[MatchMaking] Creating lobby: {createNameInput.text}");
             CloseAllModals();
 
-            if (OnRequestCreateLobby != null)
+            if (LobbyManager.Instance != null)
+            {
+                string defaultPlayerName = "Player_" + Random.Range(1000, 9999);
+                try 
+                {
+                    await LobbyManager.Instance.Presenter.CreateLobby(createNameInput.text, 10, false, defaultPlayerName);
+                    await LobbyManager.Instance.Presenter.SubscribeToCurrentLobby();
+                    
+                    AttoTheSheep.Core.LobbySession.CurrentLobbyName = createNameInput.text;
+                    AttoTheSheep.Core.LobbySession.MaxPlayers = 10;
+                    AttoTheSheep.Core.LobbySession.IsHost = true;
+
+                    StartCoroutine(FadeAndLoad("WaitLobby"));
+                }
+                catch (System.Exception e)
+                {
+                    Debug.LogError($"[MatchMaking] Failed to create lobby: {e}");
+                }
+            }
+            else if (OnRequestCreateLobby != null)
             {
                 OnRequestCreateLobby.Invoke(createNameInput.text);
             }
@@ -224,14 +291,33 @@ public class MatchMakingController : MonoBehaviour
         }
     }
 
-    private void OnJoinOkClicked()
+    private async void OnJoinOkClicked()
     {
         if (joinCodeInput != null && !string.IsNullOrEmpty(joinCodeInput.text))
         {
             Debug.Log($"[MatchMaking] Joining private lobby code: {joinCodeInput.text}");
             CloseAllModals();
 
-            if (OnRequestJoinPrivateLobby != null)
+            if (LobbyManager.Instance != null)
+            {
+                string defaultPlayerName = "Player_" + Random.Range(1000, 9999);
+                try 
+                {
+                    await LobbyManager.Instance.Presenter.JoinLobbyByCode(joinCodeInput.text, defaultPlayerName);
+                    await LobbyManager.Instance.Presenter.SubscribeToCurrentLobby();
+
+                    AttoTheSheep.Core.LobbySession.CurrentLobbyName = "Private Lobby";
+                    AttoTheSheep.Core.LobbySession.MaxPlayers = 10;
+                    AttoTheSheep.Core.LobbySession.IsHost = false;
+
+                    StartCoroutine(FadeAndLoad("WaitLobby"));
+                }
+                catch (System.Exception e)
+                {
+                    Debug.LogError($"[MatchMaking] Failed to join private lobby: {e}");
+                }
+            }
+            else if (OnRequestJoinPrivateLobby != null)
             {
                 OnRequestJoinPrivateLobby.Invoke(joinCodeInput.text);
             }
@@ -246,19 +332,38 @@ public class MatchMakingController : MonoBehaviour
         }
     }
 
-    private void OnConfirmOkClicked()
+    private async void OnConfirmOkClicked()
     {
-        Debug.Log($"[MatchMaking] Joining public lobby: {_selectedLobbyName}");
+        Debug.Log($"[MatchMaking] Joining public lobby ID: {_selectedLobbyId}");
         CloseAllModals();
 
-        if (OnRequestJoinPublicLobby != null)
+        if (LobbyManager.Instance != null)
         {
-            OnRequestJoinPublicLobby.Invoke(_selectedLobbyName); // _selectedLobbyName here acts as LobbyId
+            string defaultPlayerName = "Player_" + Random.Range(1000, 9999);
+            try 
+            {
+                await LobbyManager.Instance.Presenter.JoinLobby(_selectedLobbyId, defaultPlayerName);
+                await LobbyManager.Instance.Presenter.SubscribeToCurrentLobby();
+
+                AttoTheSheep.Core.LobbySession.CurrentLobbyName = _selectedLobbyDisplayName;
+                AttoTheSheep.Core.LobbySession.MaxPlayers = 10;
+                AttoTheSheep.Core.LobbySession.IsHost = false;
+
+                StartCoroutine(FadeAndLoad("WaitLobby"));
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"[MatchMaking] Failed to join public lobby: {e}");
+            }
+        }
+        else if (OnRequestJoinPublicLobby != null)
+        {
+            OnRequestJoinPublicLobby.Invoke(_selectedLobbyId); // Pass LobbyId
         }
         else
         {
             // Fallback Mock Logic
-            AttoTheSheep.Core.LobbySession.CurrentLobbyName = _selectedLobbyName;
+            AttoTheSheep.Core.LobbySession.CurrentLobbyName = _selectedLobbyDisplayName;
             AttoTheSheep.Core.LobbySession.MaxPlayers = 4;
             AttoTheSheep.Core.LobbySession.IsHost = false;
             StartCoroutine(FadeAndLoad("WaitLobby"));

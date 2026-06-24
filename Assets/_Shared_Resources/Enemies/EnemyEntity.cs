@@ -10,7 +10,6 @@ public class EnemyEntity : NetworkEntity
     private EnemyAudio enemyAudio;
 
     public EnemyData Data => data;
-    public EnemyKind EnemyKind => Data != null ? Data.enemyKind : EnemyKind.BlueKnight;
     public EnemyBrain Brain => brain;
     public EnemyMotor Motor => motor;
     public EnemyHitbox Hitbox => hitbox;
