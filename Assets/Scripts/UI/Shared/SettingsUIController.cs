@@ -41,6 +41,36 @@ namespace AttoTheSheep.UI.Shared
         private const string PREF_LANG = "Settings_Language";
         private const string PREF_FPS = "Settings_TargetFPS";
 
+        private void OnEnable()
+        {
+            AttoTheSheep.Core.LocalizationManager.OnLanguageChanged += UpdateDropdownTexts;
+            UpdateDropdownTexts();
+        }
+
+        private void OnDisable()
+        {
+            AttoTheSheep.Core.LocalizationManager.OnLanguageChanged -= UpdateDropdownTexts;
+        }
+
+        private void UpdateDropdownTexts()
+        {
+            if (AttoTheSheep.Core.LocalizationManager.Instance == null) return;
+            var loc = AttoTheSheep.Core.LocalizationManager.Instance;
+
+            if (languageDropdown != null && languageDropdown.options.Count >= 2)
+            {
+                languageDropdown.options[0].text = loc.GetText("lang_english");
+                languageDropdown.options[1].text = loc.GetText("lang_vietnamese");
+                languageDropdown.captionText.text = languageDropdown.options[languageDropdown.value].text;
+            }
+
+            if (fpsDropdown != null && fpsDropdown.options.Count >= 4)
+            {
+                fpsDropdown.options[3].text = loc.GetText("fps_uncapped");
+                fpsDropdown.captionText.text = fpsDropdown.options[fpsDropdown.value].text;
+            }
+        }
+
         private async void Start()
         {
             // 1. Gắn sự kiện (Listener)
@@ -145,10 +175,16 @@ namespace AttoTheSheep.UI.Shared
         // ================= LANGUAGE LOGIC =================
         public void SetLanguage(int languageIndex)
         {
-            PlayerPrefs.SetInt(PREF_LANG, languageIndex);
-            
-            // Phát sóng (Broadcast) sự kiện đổi ngôn ngữ ra toàn bộ Game
-            OnLanguageChanged?.Invoke(languageIndex);
+            if (AttoTheSheep.Core.LocalizationManager.Instance != null)
+            {
+                AttoTheSheep.Core.LocalizationManager.Instance.ChangeLanguage(languageIndex);
+            }
+            else
+            {
+                // Fallback nếu chưa gắn LocalizationManager
+                PlayerPrefs.SetInt(PREF_LANG, languageIndex);
+                OnLanguageChanged?.Invoke(languageIndex);
+            }
             
             Debug.Log($"[Settings] Language changed to: {(languageIndex == 0 ? "English" : "Vietnamese")}");
         }
@@ -177,7 +213,10 @@ namespace AttoTheSheep.UI.Shared
         private async Task LoadCloudUsername()
         {
             TextMeshProUGUI btnText = saveUsernameButton != null ? saveUsernameButton.GetComponentInChildren<TextMeshProUGUI>() : null;
-            if (btnText != null) btnText.text = "Loading...";
+            LocalizedText locText = btnText != null ? btnText.GetComponent<LocalizedText>() : null;
+
+            if (locText != null) locText.SetTextID("btn_save_loading");
+            else if (btnText != null) btnText.text = "Loading...";
 
             try
             {
@@ -199,12 +238,15 @@ namespace AttoTheSheep.UI.Shared
                 {
                     usernameInput.text = string.IsNullOrEmpty(currentName) ? "Guest" : currentName;
                 }
-                if (btnText != null) btnText.text = "Save";
+                
+                if (locText != null) locText.SetTextID("btn_save");
+                else if (btnText != null) btnText.text = "Save";
             }
             catch (Exception ex)
             {
                 Debug.LogError("[Settings] Failed to fetch Cloud Username: " + ex.Message);
-                if (btnText != null) btnText.text = "Offline";
+                if (locText != null) locText.SetTextID("btn_save_offline");
+                else if (btnText != null) btnText.text = "Offline";
             }
         }
 
@@ -213,6 +255,8 @@ namespace AttoTheSheep.UI.Shared
             if (usernameInput == null || string.IsNullOrWhiteSpace(usernameInput.text)) return;
             
             TextMeshProUGUI btnText = saveUsernameButton.GetComponentInChildren<TextMeshProUGUI>();
+            LocalizedText locText = btnText != null ? btnText.GetComponent<LocalizedText>() : null;
+            
             saveUsernameButton.interactable = false;
 
             // Start spinner
@@ -227,21 +271,30 @@ namespace AttoTheSheep.UI.Shared
                 await AuthenticationService.Instance.UpdatePlayerNameAsync(newName);
                 
                 if (spinner != null) StopCoroutine(spinner);
-                if (btnText != null) btnText.text = "Saved!";
+                
+                if (locText != null) locText.SetTextID("btn_save_success");
+                else if (btnText != null) btnText.text = "Saved!";
+                
                 Debug.Log($"[Settings] Successfully saved cloud username: {newName}");
             }
             catch (Exception ex)
             {
                 Debug.LogError("[Settings] Failed to save Cloud Username: " + ex.Message);
                 if (spinner != null) StopCoroutine(spinner);
-                if (btnText != null) btnText.text = "Error!";
+                
+                if (locText != null) locText.SetTextID("btn_save_error");
+                else if (btnText != null) btnText.text = "Error!";
             }
             finally
             {
                 saveUsernameButton.interactable = true;
                 // Trả về chữ Save sau 2 giây
                 await Task.Delay(2000);
-                if (btnText != null && btnText.text != "Loading...") btnText.text = "Save";
+                if (btnText != null && btnText.text != "Loading...")
+                {
+                    if (locText != null) locText.SetTextID("btn_save");
+                    else btnText.text = "Save";
+                }
             }
         }
 

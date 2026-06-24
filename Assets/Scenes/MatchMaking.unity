@@ -458,6 +458,7 @@ GameObject:
   - component: {fileID: 98604944}
   - component: {fileID: 98604946}
   - component: {fileID: 98604945}
+  - component: {fileID: 98604947}
   m_Layer: 0
   m_Name: Text
   m_TagString: Untagged
@@ -482,7 +483,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 200, y: 80}
+  m_SizeDelta: {x: 240, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &98604945
 MonoBehaviour:
@@ -584,6 +585,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 98604943}
   m_CullTransparentMesh: 1
+--- !u!114 &98604947
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 98604943}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6aedfa3279ed09e4a8bc8590a12f02f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AttoTheSheep.UI.Shared.LocalizedText
+  textID: btn_cancel
 --- !u!1 &102757342
 GameObject:
   m_ObjectHideFlags: 0
@@ -810,6 +824,7 @@ GameObject:
   - component: {fileID: 231018191}
   - component: {fileID: 231018193}
   - component: {fileID: 231018192}
+  - component: {fileID: 231018194}
   m_Layer: 0
   m_Name: Text
   m_TagString: Untagged
@@ -936,6 +951,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 231018190}
   m_CullTransparentMesh: 1
+--- !u!114 &231018194
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 231018190}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6aedfa3279ed09e4a8bc8590a12f02f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AttoTheSheep.UI.Shared.LocalizedText
+  textID: btn_ok
 --- !u!1 &252094595
 GameObject:
   m_ObjectHideFlags: 0
@@ -947,6 +975,7 @@ GameObject:
   - component: {fileID: 252094596}
   - component: {fileID: 252094598}
   - component: {fileID: 252094597}
+  - component: {fileID: 252094599}
   m_Layer: 0
   m_Name: Text
   m_TagString: Untagged
@@ -1073,6 +1102,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 252094595}
   m_CullTransparentMesh: 1
+--- !u!114 &252094599
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 252094595}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6aedfa3279ed09e4a8bc8590a12f02f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AttoTheSheep.UI.Shared.LocalizedText
+  textID: btn_ok
 --- !u!1 &284242467
 GameObject:
   m_ObjectHideFlags: 0
@@ -1447,7 +1489,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -150, y: -110}
-  m_SizeDelta: {x: 200, y: 80}
+  m_SizeDelta: {x: 240, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &370468116
 MonoBehaviour:
@@ -1742,6 +1784,7 @@ GameObject:
   - component: {fileID: 414497647}
   - component: {fileID: 414497649}
   - component: {fileID: 414497648}
+  - component: {fileID: 414497650}
   m_Layer: 0
   m_Name: ModalTitle
   m_TagString: Untagged
@@ -1868,6 +1911,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 414497646}
   m_CullTransparentMesh: 1
+--- !u!114 &414497650
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 414497646}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6aedfa3279ed09e4a8bc8590a12f02f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AttoTheSheep.UI.Shared.LocalizedText
+  textID: lobby_join_title
 --- !u!1 &419731242
 GameObject:
   m_ObjectHideFlags: 0
@@ -2168,7 +2224,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 448143734}
   m_HandleRect: {fileID: 102757343}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -2327,6 +2383,7 @@ GameObject:
   - component: {fileID: 469214811}
   - component: {fileID: 469214813}
   - component: {fileID: 469214812}
+  - component: {fileID: 469214814}
   m_Layer: 0
   m_Name: Header_Players
   m_TagString: Untagged
@@ -2453,6 +2510,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 469214810}
   m_CullTransparentMesh: 1
+--- !u!114 &469214814
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 469214810}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6aedfa3279ed09e4a8bc8590a12f02f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AttoTheSheep.UI.Shared.LocalizedText
+  textID: lobby_col_players
 --- !u!1 &476457979
 GameObject:
   m_ObjectHideFlags: 0
@@ -3213,7 +3283,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 150, y: -110}
-  m_SizeDelta: {x: 200, y: 80}
+  m_SizeDelta: {x: 240, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &596836297
 MonoBehaviour:
@@ -3461,6 +3531,7 @@ GameObject:
   - component: {fileID: 745280996}
   - component: {fileID: 745280997}
   - component: {fileID: 745280998}
+  - component: {fileID: 745280999}
   m_Layer: 0
   m_Name: ConfirmText
   m_TagString: Untagged
@@ -3587,6 +3658,19 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &745280999
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 745280995}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6aedfa3279ed09e4a8bc8590a12f02f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AttoTheSheep.UI.Shared.LocalizedText
+  textID: lobby_join_prompt
 --- !u!1 &756369736
 GameObject:
   m_ObjectHideFlags: 0
@@ -3673,6 +3757,7 @@ GameObject:
   - component: {fileID: 766307343}
   - component: {fileID: 766307345}
   - component: {fileID: 766307344}
+  - component: {fileID: 766307346}
   m_Layer: 0
   m_Name: Text
   m_TagString: Untagged
@@ -3799,6 +3884,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 766307342}
   m_CullTransparentMesh: 1
+--- !u!114 &766307346
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 766307342}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6aedfa3279ed09e4a8bc8590a12f02f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AttoTheSheep.UI.Shared.LocalizedText
+  textID: btn_join_private
 --- !u!1 &773904126
 GameObject:
   m_ObjectHideFlags: 0
@@ -3990,6 +4088,7 @@ GameObject:
   - component: {fileID: 779575925}
   - component: {fileID: 779575927}
   - component: {fileID: 779575926}
+  - component: {fileID: 779575928}
   m_Layer: 0
   m_Name: Text
   m_TagString: Untagged
@@ -4116,6 +4215,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 779575924}
   m_CullTransparentMesh: 1
+--- !u!114 &779575928
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 779575924}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6aedfa3279ed09e4a8bc8590a12f02f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AttoTheSheep.UI.Shared.LocalizedText
+  textID: btn_cancel
 --- !u!1 &797144021
 GameObject:
   m_ObjectHideFlags: 0
@@ -4323,6 +4435,7 @@ GameObject:
   - component: {fileID: 811705501}
   - component: {fileID: 811705503}
   - component: {fileID: 811705502}
+  - component: {fileID: 811705504}
   m_Layer: 0
   m_Name: Header_Mode
   m_TagString: Untagged
@@ -4449,6 +4562,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 811705500}
   m_CullTransparentMesh: 1
+--- !u!114 &811705504
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 811705500}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6aedfa3279ed09e4a8bc8590a12f02f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AttoTheSheep.UI.Shared.LocalizedText
+  textID: lobby_col_mode
 --- !u!1 &840562043
 GameObject:
   m_ObjectHideFlags: 0
@@ -4747,6 +4873,7 @@ GameObject:
   - component: {fileID: 965163743}
   - component: {fileID: 965163745}
   - component: {fileID: 965163744}
+  - component: {fileID: 965163746}
   m_Layer: 0
   m_Name: Placeholder
   m_TagString: Untagged
@@ -4873,6 +5000,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 965163742}
   m_CullTransparentMesh: 1
+--- !u!114 &965163746
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 965163742}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6aedfa3279ed09e4a8bc8590a12f02f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AttoTheSheep.UI.Shared.LocalizedText
+  textID: lobby_join_private_placeholder
 --- !u!1 &999676062
 GameObject:
   m_ObjectHideFlags: 0
@@ -4990,7 +5130,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 150, y: -110}
-  m_SizeDelta: {x: 200, y: 80}
+  m_SizeDelta: {x: 240, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1011373587
 MonoBehaviour:
@@ -5153,6 +5293,7 @@ GameObject:
   - component: {fileID: 1051362920}
   - component: {fileID: 1051362922}
   - component: {fileID: 1051362921}
+  - component: {fileID: 1051362923}
   m_Layer: 0
   m_Name: ModalTitle
   m_TagString: Untagged
@@ -5279,6 +5420,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1051362919}
   m_CullTransparentMesh: 1
+--- !u!114 &1051362923
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1051362919}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6aedfa3279ed09e4a8bc8590a12f02f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AttoTheSheep.UI.Shared.LocalizedText
+  textID: lobby_join_private_title
 --- !u!1 &1094230712
 GameObject:
   m_ObjectHideFlags: 0
@@ -5290,6 +5444,7 @@ GameObject:
   - component: {fileID: 1094230713}
   - component: {fileID: 1094230715}
   - component: {fileID: 1094230714}
+  - component: {fileID: 1094230716}
   m_Layer: 0
   m_Name: Text
   m_TagString: Untagged
@@ -5416,6 +5571,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1094230712}
   m_CullTransparentMesh: 1
+--- !u!114 &1094230716
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1094230712}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6aedfa3279ed09e4a8bc8590a12f02f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AttoTheSheep.UI.Shared.LocalizedText
+  textID: btn_create_lobby
 --- !u!1001 &1102378594
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5967,6 +6135,7 @@ GameObject:
   - component: {fileID: 1229993411}
   - component: {fileID: 1229993413}
   - component: {fileID: 1229993412}
+  - component: {fileID: 1229993414}
   m_Layer: 0
   m_Name: Text
   m_TagString: Untagged
@@ -6093,6 +6262,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1229993410}
   m_CullTransparentMesh: 1
+--- !u!114 &1229993414
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1229993410}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6aedfa3279ed09e4a8bc8590a12f02f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AttoTheSheep.UI.Shared.LocalizedText
+  textID: btn_ok
 --- !u!1 &1276754639
 GameObject:
   m_ObjectHideFlags: 0
@@ -6243,6 +6425,7 @@ GameObject:
   - component: {fileID: 1298340633}
   - component: {fileID: 1298340635}
   - component: {fileID: 1298340634}
+  - component: {fileID: 1298340636}
   m_Layer: 0
   m_Name: Label
   m_TagString: Untagged
@@ -6369,6 +6552,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1298340632}
   m_CullTransparentMesh: 1
+--- !u!114 &1298340636
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1298340632}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6aedfa3279ed09e4a8bc8590a12f02f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AttoTheSheep.UI.Shared.LocalizedText
+  textID: lobby_create_max
 --- !u!1 &1301624267
 GameObject:
   m_ObjectHideFlags: 0
@@ -6408,7 +6604,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -150, y: -110}
-  m_SizeDelta: {x: 200, y: 80}
+  m_SizeDelta: {x: 240, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1301624269
 MonoBehaviour:
@@ -6519,6 +6715,7 @@ GameObject:
   - component: {fileID: 1302734846}
   - component: {fileID: 1302734848}
   - component: {fileID: 1302734847}
+  - component: {fileID: 1302734849}
   m_Layer: 0
   m_Name: ModalTitle
   m_TagString: Untagged
@@ -6645,6 +6842,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1302734845}
   m_CullTransparentMesh: 1
+--- !u!114 &1302734849
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1302734845}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6aedfa3279ed09e4a8bc8590a12f02f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AttoTheSheep.UI.Shared.LocalizedText
+  textID: lobby_create_title
 --- !u!1 &1318102867
 GameObject:
   m_ObjectHideFlags: 0
@@ -7024,6 +7234,7 @@ GameObject:
   - component: {fileID: 1440807547}
   - component: {fileID: 1440807549}
   - component: {fileID: 1440807548}
+  - component: {fileID: 1440807550}
   m_Layer: 0
   m_Name: Text
   m_TagString: Untagged
@@ -7150,6 +7361,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1440807546}
   m_CullTransparentMesh: 1
+--- !u!114 &1440807550
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1440807546}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6aedfa3279ed09e4a8bc8590a12f02f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AttoTheSheep.UI.Shared.LocalizedText
+  textID: btn_back
 --- !u!1 &1448642238
 GameObject:
   m_ObjectHideFlags: 0
@@ -7218,6 +7442,7 @@ GameObject:
   - component: {fileID: 1469081180}
   - component: {fileID: 1469081182}
   - component: {fileID: 1469081181}
+  - component: {fileID: 1469081183}
   m_Layer: 0
   m_Name: Title
   m_TagString: Untagged
@@ -7344,6 +7569,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1469081179}
   m_CullTransparentMesh: 1
+--- !u!114 &1469081183
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1469081179}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6aedfa3279ed09e4a8bc8590a12f02f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AttoTheSheep.UI.Shared.LocalizedText
+  textID: lobby_list_title
 --- !u!1001 &1495298623
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7716,6 +7954,7 @@ GameObject:
   - component: {fileID: 1746010724}
   - component: {fileID: 1746010726}
   - component: {fileID: 1746010725}
+  - component: {fileID: 1746010727}
   m_Layer: 0
   m_Name: Placeholder
   m_TagString: Untagged
@@ -7842,6 +8081,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1746010723}
   m_CullTransparentMesh: 1
+--- !u!114 &1746010727
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1746010723}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6aedfa3279ed09e4a8bc8590a12f02f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AttoTheSheep.UI.Shared.LocalizedText
+  textID: lobby_create_placeholder
 --- !u!1 &1779083986
 GameObject:
   m_ObjectHideFlags: 0
@@ -7853,6 +8105,7 @@ GameObject:
   - component: {fileID: 1779083987}
   - component: {fileID: 1779083989}
   - component: {fileID: 1779083988}
+  - component: {fileID: 1779083990}
   m_Layer: 0
   m_Name: Header_Name
   m_TagString: Untagged
@@ -7979,6 +8232,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1779083986}
   m_CullTransparentMesh: 1
+--- !u!114 &1779083990
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1779083986}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6aedfa3279ed09e4a8bc8590a12f02f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AttoTheSheep.UI.Shared.LocalizedText
+  textID: lobby_col_name
 --- !u!1 &1793616606
 GameObject:
   m_ObjectHideFlags: 0
@@ -8056,7 +8322,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -150, y: -110}
-  m_SizeDelta: {x: 200, y: 80}
+  m_SizeDelta: {x: 240, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1863561452
 MonoBehaviour:
@@ -8242,6 +8508,7 @@ GameObject:
   - component: {fileID: 1892130679}
   - component: {fileID: 1892130681}
   - component: {fileID: 1892130680}
+  - component: {fileID: 1892130682}
   m_Layer: 0
   m_Name: Text
   m_TagString: Untagged
@@ -8368,6 +8635,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1892130678}
   m_CullTransparentMesh: 1
+--- !u!114 &1892130682
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1892130678}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6aedfa3279ed09e4a8bc8590a12f02f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AttoTheSheep.UI.Shared.LocalizedText
+  textID: btn_cancel
 --- !u!1 &1908212612
 GameObject:
   m_ObjectHideFlags: 0
@@ -8407,7 +8687,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 150, y: -110}
-  m_SizeDelta: {x: 200, y: 80}
+  m_SizeDelta: {x: 240, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1908212614
 MonoBehaviour:
