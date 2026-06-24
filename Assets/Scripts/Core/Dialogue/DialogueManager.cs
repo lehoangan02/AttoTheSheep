@@ -76,7 +76,7 @@ public class DialogueManager : MonoBehaviour
     // ── Public API ────────────────────────────────────────────────────────────
     public void StartDialogue(DialogueData data)
     {
-        Debug.Log($"[DialogueManager] StartDialogue called. data={(data != null ? data.speakerName : "NULL")}");
+            Debug.Log($"[DialogueManager] StartDialogue called. data={(data != null ? data.speakerName : "NULL")}");
 
         if (data == null || data.lines == null || data.lines.Length == 0)
         {
