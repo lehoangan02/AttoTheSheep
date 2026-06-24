@@ -179,7 +179,7 @@ MonoBehaviour:
   m_text: Leave
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8e90ddc3446c8a8469758e4146d538ac, type: 2}
-  m_sharedMaterial: {fileID: -1333254729127453999, guid: 8e90ddc3446c8a8469758e4146d538ac, type: 2}
+  m_sharedMaterial: {fileID: 2100000, guid: 201fb46d2d6e847feb785b35866787c3, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -344,6 +344,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4269183789788525224, guid: 4d49ff8063fe646788e84d7392d796c3, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: 2100000, guid: 201fb46d2d6e847feb785b35866787c3, type: 2}
     - target: {fileID: 8960991543169844226, guid: 4d49ff8063fe646788e84d7392d796c3, type: 3}
       propertyPath: m_Name
       value: PlayerRow (3)
@@ -522,6 +526,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4269183789788525224, guid: 4d49ff8063fe646788e84d7392d796c3, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: 2100000, guid: 201fb46d2d6e847feb785b35866787c3, type: 2}
     - target: {fileID: 8960991543169844226, guid: 4d49ff8063fe646788e84d7392d796c3, type: 3}
       propertyPath: m_Name
       value: PlayerRow (1)
@@ -733,7 +741,7 @@ MonoBehaviour:
   m_text: Start
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8e90ddc3446c8a8469758e4146d538ac, type: 2}
-  m_sharedMaterial: {fileID: -1333254729127453999, guid: 8e90ddc3446c8a8469758e4146d538ac, type: 2}
+  m_sharedMaterial: {fileID: 2100000, guid: 201fb46d2d6e847feb785b35866787c3, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -949,7 +957,7 @@ MonoBehaviour:
   m_text: No
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8e90ddc3446c8a8469758e4146d538ac, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2100000, guid: 201fb46d2d6e847feb785b35866787c3, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1817,7 +1825,7 @@ MonoBehaviour:
   m_text: Yes
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8e90ddc3446c8a8469758e4146d538ac, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2100000, guid: 201fb46d2d6e847feb785b35866787c3, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -2949,6 +2957,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4269183789788525224, guid: 4d49ff8063fe646788e84d7392d796c3, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: 2100000, guid: 201fb46d2d6e847feb785b35866787c3, type: 2}
     - target: {fileID: 8960991543169844226, guid: 4d49ff8063fe646788e84d7392d796c3, type: 3}
       propertyPath: m_Name
       value: PlayerRow (2)
@@ -3355,6 +3367,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4269183789788525224, guid: 4d49ff8063fe646788e84d7392d796c3, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: 2100000, guid: 201fb46d2d6e847feb785b35866787c3, type: 2}
     - target: {fileID: 8960991543169844226, guid: 4d49ff8063fe646788e84d7392d796c3, type: 3}
       propertyPath: m_Name
       value: PlayerRow
