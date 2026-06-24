@@ -7,11 +7,11 @@ public class HoverCursor : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     public Texture2D defaultCursor;
     public Texture2D hoverCursor;
     
-    [Tooltip("If true, automatically sets the click point to the center of the cursor image.")]
-    public bool autoCenterHotSpot = true;
-    
-    [Tooltip("Manual hotspot if autoCenter is false. (0,0) is top-left.")]
-    public Vector2 customHotSpot = Vector2.zero;
+    [Tooltip("Hotspot for Default Cursor. (0,0) is top-left.")]
+    public Vector2 defaultHotSpot = new Vector2(22, 17);
+
+    [Tooltip("Hotspot for Hover Cursor. (0,0) is top-left.")]
+    public Vector2 hoverHotSpot = new Vector2(22, 17);
 
     private Selectable selectable;
 
@@ -20,14 +20,10 @@ public class HoverCursor : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         selectable = GetComponent<Selectable>();
     }
 
-    private Vector2 GetHotSpot(Texture2D cursorTexture)
+    private Vector2 GetHotSpot(Texture2D cursorTexture, bool isHoverCursor)
     {
         if (cursorTexture == null) return Vector2.zero;
-        if (autoCenterHotSpot)
-        {
-            return new Vector2(cursorTexture.width / 2f, cursorTexture.height / 2f);
-        }
-        return customHotSpot;
+        return isHoverCursor ? hoverHotSpot : defaultHotSpot;
     }
 
     private static Texture2D currentCursor = null;
@@ -40,7 +36,7 @@ public class HoverCursor : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         
         if (hoverCursor != null && currentCursor != hoverCursor)
         {
-            Cursor.SetCursor(hoverCursor, GetHotSpot(hoverCursor), CursorMode.Auto);
+            Cursor.SetCursor(hoverCursor, GetHotSpot(hoverCursor, true), CursorMode.Auto);
             currentCursor = hoverCursor;
         }
     }
@@ -59,7 +55,7 @@ public class HoverCursor : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         {
             if (currentCursor != defaultCursor)
             {
-                Cursor.SetCursor(defaultCursor, GetHotSpot(defaultCursor), CursorMode.Auto);
+                Cursor.SetCursor(defaultCursor, GetHotSpot(defaultCursor, false), CursorMode.Auto);
                 currentCursor = defaultCursor;
             }
         }

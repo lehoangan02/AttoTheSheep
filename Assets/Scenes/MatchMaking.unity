@@ -256,8 +256,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HoverCursor
   defaultCursor: {fileID: 2800000, guid: e50602bb4737a4a8795f25305980c3b7, type: 3}
   hoverCursor: {fileID: 2800000, guid: d5341ee0556844303a17dd8cb83e9727, type: 3}
-  autoCenterHotSpot: 1
-  customHotSpot: {x: 0, y: 0}
+  defaultHotSpot: {x: 22, y: 17}
+  hoverHotSpot: {x: 22, y: 17}
 --- !u!1 &15850108
 GameObject:
   m_ObjectHideFlags: 0
@@ -758,8 +758,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -80, y: -20}
+  m_AnchoredPosition: {x: 0, y: 2.5}
+  m_SizeDelta: {x: -60, y: -25}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &149738536
 MonoBehaviour:
@@ -859,7 +859,7 @@ MonoBehaviour:
   m_text: OK
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8e90ddc3446c8a8469758e4146d538ac, type: 2}
-  m_sharedMaterial: {fileID: 0}
+  m_sharedMaterial: {fileID: -1333254729127453999, guid: 8e90ddc3446c8a8469758e4146d538ac, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -996,7 +996,7 @@ MonoBehaviour:
   m_text: JOIN
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8e90ddc3446c8a8469758e4146d538ac, type: 2}
-  m_sharedMaterial: {fileID: 0}
+  m_sharedMaterial: {fileID: -1333254729127453999, guid: 8e90ddc3446c8a8469758e4146d538ac, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1210,8 +1210,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HoverCursor
   defaultCursor: {fileID: 2800000, guid: e50602bb4737a4a8795f25305980c3b7, type: 3}
   hoverCursor: {fileID: 2800000, guid: d5341ee0556844303a17dd8cb83e9727, type: 3}
-  autoCenterHotSpot: 1
-  customHotSpot: {x: 0, y: 0}
+  defaultHotSpot: {x: 22, y: 17}
+  hoverHotSpot: {x: 22, y: 17}
 --- !u!1 &360825918
 GameObject:
   m_ObjectHideFlags: 0
@@ -1245,6 +1245,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 388537421}
+  - {fileID: 1552881584}
   m_Father: {fileID: 1448642239}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
@@ -1367,7 +1368,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -1405,8 +1406,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HoverCursor
   defaultCursor: {fileID: 2800000, guid: e50602bb4737a4a8795f25305980c3b7, type: 3}
   hoverCursor: {fileID: 2800000, guid: d5341ee0556844303a17dd8cb83e9727, type: 3}
-  autoCenterHotSpot: 1
-  customHotSpot: {x: 0, y: 0}
+  defaultHotSpot: {x: 22, y: 17}
+  hoverHotSpot: {x: 22, y: 17}
 --- !u!1 &370468114
 GameObject:
   m_ObjectHideFlags: 0
@@ -1544,8 +1545,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HoverCursor
   defaultCursor: {fileID: 2800000, guid: e50602bb4737a4a8795f25305980c3b7, type: 3}
   hoverCursor: {fileID: 2800000, guid: d5341ee0556844303a17dd8cb83e9727, type: 3}
-  autoCenterHotSpot: 1
-  customHotSpot: {x: 0, y: 0}
+  defaultHotSpot: {x: 22, y: 17}
+  hoverHotSpot: {x: 22, y: 17}
 --- !u!1 &388537420
 GameObject:
   m_ObjectHideFlags: 0
@@ -1598,6 +1599,81 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.RectMask2D
   m_Padding: {x: 0, y: 0, z: 0, w: 0}
   m_Softness: {x: 0, y: 0}
+--- !u!1 &399466693
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 399466694}
+  - component: {fileID: 399466696}
+  - component: {fileID: 399466695}
+  m_Layer: 0
+  m_Name: Hitbox
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &399466694
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 399466693}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 797144022}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 2.5}
+  m_SizeDelta: {x: -60, y: -25}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &399466695
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 399466693}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &399466696
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 399466693}
+  m_CullTransparentMesh: 1
 --- !u!1001 &401203792
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2092,7 +2168,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 448143734}
   m_HandleRect: {fileID: 102757343}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -2150,8 +2226,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HoverCursor
   defaultCursor: {fileID: 2800000, guid: e50602bb4737a4a8795f25305980c3b7, type: 3}
   hoverCursor: {fileID: 2800000, guid: d5341ee0556844303a17dd8cb83e9727, type: 3}
-  autoCenterHotSpot: 1
-  customHotSpot: {x: 0, y: 0}
+  defaultHotSpot: {x: 22, y: 17}
+  hoverHotSpot: {x: 22, y: 17}
 --- !u!1 &450118113
 GameObject:
   m_ObjectHideFlags: 0
@@ -2389,7 +2465,6 @@ GameObject:
   - component: {fileID: 476457982}
   - component: {fileID: 476457981}
   - component: {fileID: 476457983}
-  - component: {fileID: 476457984}
   m_Layer: 0
   m_Name: CodeInput
   m_TagString: Untagged
@@ -2410,6 +2485,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 66514509}
+  - {fileID: 544490889}
   m_Father: {fileID: 1385628923}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -2556,22 +2632,6 @@ MonoBehaviour:
   isAlert: 0
   m_InputValidator: {fileID: 0}
   m_ShouldActivateOnSelect: 1
---- !u!114 &476457984
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 476457979}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f1d853b097e2a3c46b214722a8712c69, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::HoverCursor
-  defaultCursor: {fileID: 2800000, guid: e50602bb4737a4a8795f25305980c3b7, type: 3}
-  hoverCursor: {fileID: 2800000, guid: d5341ee0556844303a17dd8cb83e9727, type: 3}
-  autoCenterHotSpot: 1
-  customHotSpot: {x: 0, y: 0}
 --- !u!1 &511327847
 GameObject:
   m_ObjectHideFlags: 0
@@ -2709,8 +2769,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HoverCursor
   defaultCursor: {fileID: 2800000, guid: e50602bb4737a4a8795f25305980c3b7, type: 3}
   hoverCursor: {fileID: 2800000, guid: d5341ee0556844303a17dd8cb83e9727, type: 3}
-  autoCenterHotSpot: 1
-  customHotSpot: {x: 0, y: 0}
+  defaultHotSpot: {x: 22, y: 17}
+  hoverHotSpot: {x: 22, y: 17}
 --- !u!1 &524319074
 GameObject:
   m_ObjectHideFlags: 0
@@ -2771,7 +2831,7 @@ MonoBehaviour:
   m_text: "\u200B"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8e90ddc3446c8a8469758e4146d538ac, type: 2}
-  m_sharedMaterial: {fileID: 0}
+  m_sharedMaterial: {fileID: -1333254729127453999, guid: 8e90ddc3446c8a8469758e4146d538ac, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -2848,6 +2908,58 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 524319074}
   m_CullTransparentMesh: 1
+--- !u!1 &544490888
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 544490889}
+  - component: {fileID: 544490890}
+  m_Layer: 0
+  m_Name: Hitbox
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &544490889
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 544490888}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 476457980}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 2.5}
+  m_SizeDelta: {x: -60, y: -25}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &544490890
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 544490888}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1d853b097e2a3c46b214722a8712c69, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HoverCursor
+  defaultCursor: {fileID: 2800000, guid: e50602bb4737a4a8795f25305980c3b7, type: 3}
+  hoverCursor: {fileID: 2800000, guid: d5341ee0556844303a17dd8cb83e9727, type: 3}
+  defaultHotSpot: {x: 22, y: 17}
+  hoverHotSpot: {x: 22, y: 17}
 --- !u!1 &583009296
 GameObject:
   m_ObjectHideFlags: 0
@@ -3199,8 +3311,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HoverCursor
   defaultCursor: {fileID: 2800000, guid: e50602bb4737a4a8795f25305980c3b7, type: 3}
   hoverCursor: {fileID: 2800000, guid: d5341ee0556844303a17dd8cb83e9727, type: 3}
-  autoCenterHotSpot: 1
-  customHotSpot: {x: 0, y: 0}
+  defaultHotSpot: {x: 22, y: 17}
+  hoverHotSpot: {x: 22, y: 17}
 --- !u!1 &668240376
 GameObject:
   m_ObjectHideFlags: 0
@@ -3509,8 +3621,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -80, y: -20}
+  m_AnchoredPosition: {x: 0, y: 2.5}
+  m_SizeDelta: {x: -60, y: -25}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &756369738
 MonoBehaviour:
@@ -3826,8 +3938,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -80, y: -20}
+  m_AnchoredPosition: {x: 0, y: 2.5}
+  m_SizeDelta: {x: -60, y: -25}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &779261873
 MonoBehaviour:
@@ -3927,7 +4039,7 @@ MonoBehaviour:
   m_text: CANCEL
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8e90ddc3446c8a8469758e4146d538ac, type: 2}
-  m_sharedMaterial: {fileID: 0}
+  m_sharedMaterial: {fileID: -1333254729127453999, guid: 8e90ddc3446c8a8469758e4146d538ac, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -4037,6 +4149,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1039953827}
+  - {fileID: 399466694}
   m_Father: {fileID: 425176865}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -4058,7 +4171,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -4197,8 +4310,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HoverCursor
   defaultCursor: {fileID: 2800000, guid: e50602bb4737a4a8795f25305980c3b7, type: 3}
   hoverCursor: {fileID: 2800000, guid: d5341ee0556844303a17dd8cb83e9727, type: 3}
-  autoCenterHotSpot: 1
-  customHotSpot: {x: 0, y: 0}
+  defaultHotSpot: {x: 22, y: 17}
+  hoverHotSpot: {x: 22, y: 17}
 --- !u!1 &811705500
 GameObject:
   m_ObjectHideFlags: 0
@@ -4370,8 +4483,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -80, y: -20}
+  m_AnchoredPosition: {x: 0, y: 2.5}
+  m_SizeDelta: {x: -60, y: -25}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &840562045
 MonoBehaviour:
@@ -4445,8 +4558,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -80, y: -20}
+  m_AnchoredPosition: {x: 0, y: 2.5}
+  m_SizeDelta: {x: -60, y: -25}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &877390495
 MonoBehaviour:
@@ -4683,7 +4796,7 @@ MonoBehaviour:
   m_text: Enter Code...
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8e90ddc3446c8a8469758e4146d538ac, type: 2}
-  m_sharedMaterial: {fileID: 0}
+  m_sharedMaterial: {fileID: -1333254729127453999, guid: 8e90ddc3446c8a8469758e4146d538ac, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -4975,8 +5088,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HoverCursor
   defaultCursor: {fileID: 2800000, guid: e50602bb4737a4a8795f25305980c3b7, type: 3}
   hoverCursor: {fileID: 2800000, guid: d5341ee0556844303a17dd8cb83e9727, type: 3}
-  autoCenterHotSpot: 1
-  customHotSpot: {x: 0, y: 0}
+  defaultHotSpot: {x: 22, y: 17}
+  hoverHotSpot: {x: 22, y: 17}
 --- !u!1 &1039953826
 GameObject:
   m_ObjectHideFlags: 0
@@ -5416,8 +5529,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -80, y: -20}
+  m_AnchoredPosition: {x: 0, y: 2.5}
+  m_SizeDelta: {x: -60, y: -25}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1176962640
 MonoBehaviour:
@@ -5492,7 +5605,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -80, y: 0}
+  m_SizeDelta: {x: -10, y: -10}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1196147080
 MonoBehaviour:
@@ -6003,8 +6116,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HoverCursor
   defaultCursor: {fileID: 2800000, guid: e50602bb4737a4a8795f25305980c3b7, type: 3}
   hoverCursor: {fileID: 2800000, guid: d5341ee0556844303a17dd8cb83e9727, type: 3}
-  autoCenterHotSpot: 1
-  customHotSpot: {x: 0, y: 0}
+  defaultHotSpot: {x: 22, y: 17}
+  hoverHotSpot: {x: 22, y: 17}
 --- !u!1 &1298340632
 GameObject:
   m_ObjectHideFlags: 0
@@ -6279,8 +6392,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HoverCursor
   defaultCursor: {fileID: 2800000, guid: e50602bb4737a4a8795f25305980c3b7, type: 3}
   hoverCursor: {fileID: 2800000, guid: d5341ee0556844303a17dd8cb83e9727, type: 3}
-  autoCenterHotSpot: 1
-  customHotSpot: {x: 0, y: 0}
+  defaultHotSpot: {x: 22, y: 17}
+  hoverHotSpot: {x: 22, y: 17}
 --- !u!1 &1302734845
 GameObject:
   m_ObjectHideFlags: 0
@@ -6528,7 +6641,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -80, y: 0}
+  m_SizeDelta: {x: -10, y: -10}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1352261979
 MonoBehaviour:
@@ -6705,8 +6818,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HoverCursor
   defaultCursor: {fileID: 2800000, guid: e50602bb4737a4a8795f25305980c3b7, type: 3}
   hoverCursor: {fileID: 2800000, guid: d5341ee0556844303a17dd8cb83e9727, type: 3}
-  autoCenterHotSpot: 1
-  customHotSpot: {x: 0, y: 0}
+  defaultHotSpot: {x: 22, y: 17}
+  hoverHotSpot: {x: 22, y: 17}
 --- !u!1 &1385628922
 GameObject:
   m_ObjectHideFlags: 0
@@ -7208,8 +7321,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -80, y: -20}
+  m_AnchoredPosition: {x: 0, y: 2.5}
+  m_SizeDelta: {x: -60, y: -25}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1516787160
 MonoBehaviour:
@@ -7248,6 +7361,81 @@ CanvasRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1516787158}
+  m_CullTransparentMesh: 1
+--- !u!1 &1552881583
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1552881584}
+  - component: {fileID: 1552881586}
+  - component: {fileID: 1552881585}
+  m_Layer: 0
+  m_Name: Hitbox
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1552881584
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1552881583}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 360825919}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: -30, y: -30}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1552881585
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1552881583}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1552881586
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1552881583}
   m_CullTransparentMesh: 1
 --- !u!1 &1579770155
 GameObject:
@@ -7362,8 +7550,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -80, y: -20}
+  m_AnchoredPosition: {x: -5, y: 2.5}
+  m_SizeDelta: {x: -70, y: -25}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1732580798
 MonoBehaviour:
@@ -7852,8 +8040,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HoverCursor
   defaultCursor: {fileID: 2800000, guid: e50602bb4737a4a8795f25305980c3b7, type: 3}
   hoverCursor: {fileID: 2800000, guid: d5341ee0556844303a17dd8cb83e9727, type: 3}
-  autoCenterHotSpot: 1
-  customHotSpot: {x: 0, y: 0}
+  defaultHotSpot: {x: 22, y: 17}
+  hoverHotSpot: {x: 22, y: 17}
 --- !u!1 &1887237923
 GameObject:
   m_ObjectHideFlags: 0
@@ -7888,8 +8076,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -80, y: -20}
+  m_AnchoredPosition: {x: 15, y: 2.5}
+  m_SizeDelta: {x: -30, y: -25}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1887237925
 MonoBehaviour:
@@ -7989,7 +8177,7 @@ MonoBehaviour:
   m_text: CANCEL
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8e90ddc3446c8a8469758e4146d538ac, type: 2}
-  m_sharedMaterial: {fileID: 0}
+  m_sharedMaterial: {fileID: -1333254729127453999, guid: 8e90ddc3446c8a8469758e4146d538ac, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -8203,8 +8391,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HoverCursor
   defaultCursor: {fileID: 2800000, guid: e50602bb4737a4a8795f25305980c3b7, type: 3}
   hoverCursor: {fileID: 2800000, guid: d5341ee0556844303a17dd8cb83e9727, type: 3}
-  autoCenterHotSpot: 1
-  customHotSpot: {x: 0, y: 0}
+  defaultHotSpot: {x: 22, y: 17}
+  hoverHotSpot: {x: 22, y: 17}
 --- !u!1 &1911807877
 GameObject:
   m_ObjectHideFlags: 0
