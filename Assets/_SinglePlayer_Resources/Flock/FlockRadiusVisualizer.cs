@@ -22,8 +22,9 @@ public class FlockRadiusVisualizer : MonoBehaviour
     void Awake()
     {
         runeLineRenderer = GetComponent<LineRenderer>();
-        runeLineRenderer.positionCount = segments + 1;
+        runeLineRenderer.positionCount = segments; // Đã sửa: bỏ "+ 1"
         runeLineRenderer.useWorldSpace = true;
+        runeLineRenderer.loop = true; // Đã thêm: Bật vòng lặp khép kín xóa vết gợn
         
         if (runeLineRenderer.material != null)
         {
@@ -33,8 +34,9 @@ public class FlockRadiusVisualizer : MonoBehaviour
         // Tự động cấu hình cho Line nền nếu có
         if (backgroundLineRenderer != null)
         {
-            backgroundLineRenderer.positionCount = segments + 1;
+            backgroundLineRenderer.positionCount = segments; // Đã sửa: bỏ "+ 1"
             backgroundLineRenderer.useWorldSpace = true;
+            backgroundLineRenderer.loop = true; // Đã thêm: Bật vòng lặp khép kín
         }
     }
 
@@ -68,19 +70,30 @@ public class FlockRadiusVisualizer : MonoBehaviour
         float deltaTheta = (2f * Mathf.PI) / segments;
         float theta = 0f;
 
-        for (int i = 0; i < segments + 1; i++)
+        // HIỆU CHỈNH ĐỘ DÀY: Trừ đi một nửa chiều rộng (startWidth) của LineRenderer
+        // Giúp mép ngoài cùng co lại, nằm ĐÚNG vào bán kính Logic
+        float adjustedRuneRadius = radius - (runeLineRenderer.startWidth / 2f);
+        
+        float adjustedBgRadius = radius;
+        if (backgroundLineRenderer != null)
         {
-            float x = radius * Mathf.Cos(theta);
-            float y = radius * Mathf.Sin(theta);
-            
-            // 1. Vòng chữ nằm ở Z = 0.1f
-            Vector3 runePos = new Vector3(x, y, 0.1f) + (Vector3)center; 
+            adjustedBgRadius = radius - (backgroundLineRenderer.startWidth / 2f);
+        }
+
+        for (int i = 0; i < segments; i++) // Đã sửa: chạy đến < segments
+        {
+            // 1. Tính toán cho Vòng chữ cổ tự
+            float xRune = adjustedRuneRadius * Mathf.Cos(theta);
+            float yRune = adjustedRuneRadius * Mathf.Sin(theta);
+            Vector3 runePos = new Vector3(xRune, yRune, 0.1f) + (Vector3)center; 
             runeLineRenderer.SetPosition(i, runePos);
 
-            // 2. Vòng nền nằm ở Z = 0.12f (Hơi lùi về sau một chút để nằm DƯỚI chữ)
+            // 2. Tính toán cho Vòng nền (nếu có)
             if (backgroundLineRenderer != null)
             {
-                Vector3 bgPos = new Vector3(x, y, 0.12f) + (Vector3)center;
+                float xBg = adjustedBgRadius * Mathf.Cos(theta);
+                float yBg = adjustedBgRadius * Mathf.Sin(theta);
+                Vector3 bgPos = new Vector3(xBg, yBg, 0.12f) + (Vector3)center;
                 backgroundLineRenderer.SetPosition(i, bgPos);
             }
 
