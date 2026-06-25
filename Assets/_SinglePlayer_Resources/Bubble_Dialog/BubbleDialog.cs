@@ -74,8 +74,12 @@ public class BubbleDialog : MonoBehaviour
         Vector2 finalSize = ResizeBubble(text);
         
         // Align the center-left of the bubble to the given position
-        // By shifting the object's center RIGHT by half the width, its LEFT edge sits exactly at the target position!
-        transform.position = new Vector3(position.x + (finalSize.x / 2f), position.y, transform.position.z);                                                                                                                                                                                         
+        // By placing the parent exactly at the target position and shifting the children RIGHT by half the width,
+        // the bubble's left edge stays anchored exactly at the target position even during the scaling animation!
+        transform.position = new Vector3(position.x, position.y, transform.position.z);
+        
+        bubbleSprite.transform.localPosition = new Vector3(finalSize.x / 2f, 0f, 0f);
+        textMeshPro.transform.localPosition = new Vector3(finalSize.x / 2f, 0f, 0f);                                                                                                                                                                                         
                                                                                                                                                                                                                     
         // If the bubble is already on-screen, restart the typewriter effect immediately                                                                                                                            
         if (gameObject.activeInHierarchy)                                                                                                                                                                           
