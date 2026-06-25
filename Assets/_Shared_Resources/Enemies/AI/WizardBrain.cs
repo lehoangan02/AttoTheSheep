@@ -3,9 +3,6 @@ using Unity.Netcode;
 
 public class WizardBrain : EnemyBrain
 {
-    [SerializeField] private float acquisitionRadius = 25f;
-    [SerializeField] private LayerMask enemyLayers = 1 << 7;
-
     [Header("Throw Ball")]
     [SerializeField] private float throwRange = 8f;
     [SerializeField] private float throwCooldown = 1.5f;
@@ -31,7 +28,7 @@ public class WizardBrain : EnemyBrain
         if (IsCCLocked()) { if (CurrentState != EnemyState.Hurt) SetState(EnemyState.Hurt); return; }
         if (CurrentState == EnemyState.Hurt) { if (!IsCCLocked()) SetState(EnemyState.Idle); return; }
 
-        AcquireWizardTarget();
+        AcquireTarget();
         if (CurrentState != EnemyState.Attack && CurrentState != EnemyState.Guard)
             DecideNextState();
 
@@ -46,23 +43,18 @@ public class WizardBrain : EnemyBrain
             SetState(EnemyState.Idle);
     }
 
-    private void AcquireWizardTarget()
+    protected override bool IsValidTarget(NetworkEntity c)
     {
-        if (target != null && target.IsAlive)
-        {
-            LambAI lamb = target as LambAI;
-            if (lamb != null && !lamb.IsPig.Value) return;
-
-            PlayerController pc = target.gameObject.GetComponentInParent<PlayerController>();
-            if (pc != null) return;
-        }
-
-        target = FindWizardTarget();
+        if (!base.IsValidTarget(c)) return false;
+        // Reject pigged lambs — they are no longer valid targets
+        LambAI lamb = c as LambAI;
+        if (lamb != null && lamb.IsPig.Value) return false;
+        return true;
     }
 
-    private NetworkEntity FindWizardTarget()
+    protected override NetworkEntity FindTarget()
     {
-        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, acquisitionRadius, enemyLayers);
+        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, scanRadius, targetLayers);
         NetworkEntity nearestLamb = null;
         float nearestLambDist = float.MaxValue;
         NetworkEntity nearestAtto = null;
@@ -71,10 +63,10 @@ public class WizardBrain : EnemyBrain
         foreach (Collider2D hit in hits)
         {
             NetworkEntity candidate = hit.GetComponentInParent<NetworkEntity>();
-            if (candidate == null || candidate == entity || !candidate.IsAlive) continue;
+            if (!IsValidTarget(candidate)) continue;
 
             LambAI lamb = candidate as LambAI;
-            if (lamb != null && !lamb.IsPig.Value)
+            if (lamb != null)
             {
                 float d = ((Vector2)candidate.transform.position - (Vector2)transform.position).sqrMagnitude;
                 if (d < nearestLambDist) { nearestLamb = candidate; nearestLambDist = d; }

@@ -126,9 +126,10 @@ public class LambAI : NetworkEntity
 
         IsPig.Value = true;
         myManager?.RemoveLamb(this); // drops from flock count + tier immediately
-
+        Debug.Log($"[LambAI] {gameObject.name} has transformed into a pig!");
         if (spriteRenderer != null)
         {
+            Debug.Log($"[LambAI] {gameObject.name} is changing sprite to pigSprite: {pigSprite}");
             if (pigSprite != null)
                 spriteRenderer.sprite = pigSprite;
             else
