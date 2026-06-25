@@ -3,8 +3,8 @@ using Unity.Netcode;
 
 public class WizardBrain : EnemyBrain
 {
-    [SerializeField] private float scanRadius = 25f;
-    [SerializeField] private LayerMask targetLayers = 1 << 7;
+    [SerializeField] private float acquisitionRadius = 25f;
+    [SerializeField] private LayerMask enemyLayers = 1 << 7;
 
     [Header("Throw Ball")]
     [SerializeField] private float throwRange = 8f;
@@ -62,7 +62,7 @@ public class WizardBrain : EnemyBrain
 
     private NetworkEntity FindWizardTarget()
     {
-        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, scanRadius, targetLayers);
+        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, acquisitionRadius, enemyLayers);
         NetworkEntity nearestLamb = null;
         float nearestLambDist = float.MaxValue;
         NetworkEntity nearestAtto = null;
@@ -132,7 +132,7 @@ public class WizardBrain : EnemyBrain
                 SetAttackAudioId("Throw");
                 break;
             case EnemyState.Guard:
-                anim.SetTrigger("CastTransform");
+                anim.SetTrigger("Transform");
                 motor.Stop();
                 lastTransformTime = Time.time;
                 currentTransformTarget = target as LambAI;
