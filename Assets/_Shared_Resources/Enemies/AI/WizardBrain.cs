@@ -44,15 +44,6 @@ public class WizardBrain : EnemyBrain
             SetState(EnemyState.Idle);
     }
 
-    protected override bool IsValidTarget(NetworkEntity c)
-    {
-        if (!base.IsValidTarget(c)) return false;
-        // Reject pigged lambs — they are no longer valid targets
-        LambAI lamb = c as LambAI;
-        if (lamb != null) return false;
-        return true;
-    }
-
     protected override NetworkEntity FindTarget()
     {
         Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, scanRadius, targetLayers);
@@ -125,6 +116,7 @@ public class WizardBrain : EnemyBrain
                 SetAttackAudioId("Throw");
                 break;
             case EnemyState.Guard:
+                Debug.Log("[WizardBrain] Transforming lamb: " + target.name);
                 anim.SetTrigger("Transform");
                 motor.Stop();
                 lastTransformTime = Time.time;
