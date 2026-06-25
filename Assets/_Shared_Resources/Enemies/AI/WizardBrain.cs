@@ -30,7 +30,7 @@ public class WizardBrain : EnemyBrain
         if (CurrentState == EnemyState.Hurt) { if (!IsCCLocked()) SetState(EnemyState.Idle); return; }
 
         AcquireTarget();
-        if (CurrentState != EnemyState.Attack && CurrentState != EnemyState.Guard)
+        if (CurrentState != EnemyState.Attack && CurrentState != EnemyState.Cast)
             DecideNextState();
 
         if (CurrentState == EnemyState.Chase && target != null)
@@ -40,7 +40,7 @@ public class WizardBrain : EnemyBrain
 
         if (CurrentState == EnemyState.Attack && stateTimer > 5f)
             SetState(EnemyState.Idle);
-        if (CurrentState == EnemyState.Guard && stateTimer > 5f)
+        if (CurrentState == EnemyState.Cast && stateTimer > 5f)
             SetState(EnemyState.Idle);
     }
 
@@ -86,7 +86,7 @@ public class WizardBrain : EnemyBrain
         if (lambTarget != null && lambTarget.IsAlive
             && dist <= transformRange && IsTransformReady())
         {
-            SetState(EnemyState.Guard);
+            SetState(EnemyState.Cast);
             return;
         }
 
@@ -115,7 +115,7 @@ public class WizardBrain : EnemyBrain
                 lastThrowTime = Time.time;
                 SetAttackAudioId("Throw");
                 break;
-            case EnemyState.Guard:
+            case EnemyState.Cast:
                 Debug.Log("[WizardBrain] Transforming lamb: " + target.name);
                 anim.SetTrigger("Transform");
                 motor.Stop();
@@ -139,7 +139,7 @@ public class WizardBrain : EnemyBrain
                 break;
             case EnemyState.Attack:
                 break;
-            case EnemyState.Guard:
+            case EnemyState.Cast:
                 break;
         }
     }

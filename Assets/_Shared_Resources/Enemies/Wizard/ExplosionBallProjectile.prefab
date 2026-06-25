@@ -49,7 +49,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 2801993781
+  GlobalObjectIdHash: 3120937205
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -229,5 +229,5 @@ MonoBehaviour:
   targetLayers:
     serializedVersion: 2
     m_Bits: 128
-  explosionRadius: 1.5
+  explosionRadius: 1
   explosionVFXPrefab: {fileID: 156349755774099303, guid: 02cad0c0f71953bff97437c0a87d4af5, type: 3}
