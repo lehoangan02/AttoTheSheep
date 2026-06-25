@@ -5,27 +5,36 @@ public class FlockRadiusVisualizer : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private FlockManager flockManager;
+    
+    [Tooltip("Kéo LineRenderer làm NỀN vào đây (Nếu muốn có vành đai nền nổi bật chữ)")]
+    [SerializeField] private LineRenderer backgroundLineRenderer;
 
     [Header("Line Settings")]
-    [SerializeField] private int segments = 60; // Độ mượt của vòng tròn
+    [SerializeField] private int segments = 60; 
 
     [Header("Skill Zone Settings (Cổ tự)")]
     [SerializeField] private float runeRotationSpeed = 0.2f;
 
-    private LineRenderer lineRenderer;
+    private LineRenderer runeLineRenderer;
     private Material runtimeMaterial;
     private float currentOffsetX = 0f;
 
     void Awake()
     {
-        lineRenderer = GetComponent<LineRenderer>();
-        lineRenderer.positionCount = segments + 1;
-        lineRenderer.useWorldSpace = true;
+        runeLineRenderer = GetComponent<LineRenderer>();
+        runeLineRenderer.positionCount = segments + 1;
+        runeLineRenderer.useWorldSpace = true;
         
-        // Tránh ghi đè asset material gốc
-        if (lineRenderer.material != null)
+        if (runeLineRenderer.material != null)
         {
-            runtimeMaterial = lineRenderer.material;
+            runtimeMaterial = runeLineRenderer.material;
+        }
+
+        // Tự động cấu hình cho Line nền nếu có
+        if (backgroundLineRenderer != null)
+        {
+            backgroundLineRenderer.positionCount = segments + 1;
+            backgroundLineRenderer.useWorldSpace = true;
         }
     }
 
@@ -33,25 +42,22 @@ public class FlockRadiusVisualizer : MonoBehaviour
     {
         if (flockManager == null) return;
 
-        // Vòng Skill chỉ hiện khi bầy cừu có ít nhất 1 chiêu thức (Tier > 0)
         bool hasSkill = flockManager.GetFlockTier() > 0;
-        lineRenderer.enabled = hasSkill;
+        runeLineRenderer.enabled = hasSkill;
+        if (backgroundLineRenderer != null) backgroundLineRenderer.enabled = hasSkill;
         
         if (!hasSkill) return;
 
-        // Lấy tọa độ và bán kính vòng Skill từ FlockManager
         Vector2 center = flockManager.currentFlockCenter.Value;
         float targetRadius = flockManager.currentSkillZoneRadius;
 
-        // Vẽ vòng tròn ma thuật
+        // Vẽ cả 2 vòng cùng lúc để đồng bộ tuyệt đối
         DrawCircle(center, targetRadius);
 
         // Cuộn Texture để xoay cổ tự
         if (runtimeMaterial != null)
         {
             currentOffsetX -= Time.deltaTime * runeRotationSpeed;
-            
-            // Giữ nguyên Offset Y trên Inspector, chỉ cập nhật Offset X để chữ chạy vòng quanh
             float currentOffsetY = runtimeMaterial.mainTextureOffset.y;
             runtimeMaterial.mainTextureOffset = new Vector2(currentOffsetX, currentOffsetY);
         }
@@ -67,9 +73,16 @@ public class FlockRadiusVisualizer : MonoBehaviour
             float x = radius * Mathf.Cos(theta);
             float y = radius * Mathf.Sin(theta);
             
-            // Đặt Z dương nhẹ để đảm bảo vòng tròn nằm dưới chân cừu
-            Vector3 pos = new Vector3(x, y, 0.1f) + (Vector3)center; 
-            lineRenderer.SetPosition(i, pos);
+            // 1. Vòng chữ nằm ở Z = 0.1f
+            Vector3 runePos = new Vector3(x, y, 0.1f) + (Vector3)center; 
+            runeLineRenderer.SetPosition(i, runePos);
+
+            // 2. Vòng nền nằm ở Z = 0.12f (Hơi lùi về sau một chút để nằm DƯỚI chữ)
+            if (backgroundLineRenderer != null)
+            {
+                Vector3 bgPos = new Vector3(x, y, 0.12f) + (Vector3)center;
+                backgroundLineRenderer.SetPosition(i, bgPos);
+            }
 
             theta += deltaTheta;
         }

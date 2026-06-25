@@ -325,7 +325,7 @@ MonoBehaviour:
   waveSprite: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
   waveColor: {r: 0.55646133, g: 0.9245283, b: 0.90842384, a: 0.4}
   waveDuration: 2
-  spawnInterval: 1
+  spawnInterval: 0.6
   sortingOrder: -5
   sizeMultiplier: 1
 --- !u!1 &519420028
@@ -876,7 +876,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 820386635
+  GlobalObjectIdHash: 3607473543
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
