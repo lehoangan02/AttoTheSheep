@@ -37,11 +37,6 @@ public class LambAI : NetworkEntity
     [SerializeField] private float unstuckSideStepDistance = 1.2f;
     [SerializeField] private float unstuckClearanceRadius = 0.25f;
 
-    [Header("Pig Transform")]
-    [SerializeField] private Color pigTint = new Color(1f, 0.6f, 0.7f, 1f);
-    [SerializeField] private Sprite pigSprite;
-    public NetworkVariable<bool> IsPig = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
-
     private bool isPanicking = false;
     private float panicTimer = 0f;
     private Vector2 panicTargetPos;
@@ -119,26 +114,6 @@ public class LambAI : NetworkEntity
         base.Die();
     }
 
-    public void TransformIntoPig()
-    {
-        if (!IsServer) return;
-        if (IsPig.Value) return; // already pig — idempotent
-
-        IsPig.Value = true;
-        myManager?.RemoveLamb(this); // drops from flock count + tier immediately
-        Debug.Log($"[LambAI] {gameObject.name} has transformed into a pig!");
-        if (spriteRenderer != null)
-        {
-            Debug.Log($"[LambAI] {gameObject.name} is changing sprite to pigSprite: {pigSprite}");
-            if (pigSprite != null)
-                spriteRenderer.sprite = pigSprite;
-            else
-                spriteRenderer.color = pigTint;
-        }
-
-        if (rb != null) rb.linearVelocity = Vector2.zero;
-    }
-
     public void SetFlockData(Vector2 center, float radius)
     {
         flockCenter = center;
@@ -189,7 +164,7 @@ public class LambAI : NetworkEntity
 
     void FixedUpdate()
     {
-        if (!IsSpawned || !IsServer || isMovementLocked || IsPig.Value) return;
+        if (!IsSpawned || !IsServer || isMovementLocked) return;
 
         // 1. CẬP NHẬT TIMER HOẢNG LOẠN
         if (isPanicking)
@@ -414,7 +389,7 @@ public class LambAI : NetworkEntity
         if (IsServer && currentHealth.Value < healthBefore)
         {
             // TÍNH NĂNG MỚI: Báo cáo bầy trưởng để kích hoạt hoảng loạn diện rộng
-            if (!IsPig.Value && myManager != null)
+            if (myManager != null)
             {
                 myManager.ReportLambAttacked(this);
             }

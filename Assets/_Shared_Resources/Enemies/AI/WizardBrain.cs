@@ -15,6 +15,7 @@ public class WizardBrain : EnemyBrain
     [SerializeField] private float transformRange = 3f;
     [SerializeField] private float transformCooldown = 8f;
     [SerializeField] private GameObject transformSpellVFXPrefab;
+    [SerializeField] private GameObject pigPrefab;
 
     private float lastThrowTime;
     private float lastTransformTime;
@@ -48,7 +49,7 @@ public class WizardBrain : EnemyBrain
         if (!base.IsValidTarget(c)) return false;
         // Reject pigged lambs — they are no longer valid targets
         LambAI lamb = c as LambAI;
-        if (lamb != null && lamb.IsPig.Value) return false;
+        if (lamb != null) return false;
         return true;
     }
 
@@ -91,7 +92,7 @@ public class WizardBrain : EnemyBrain
         float dist = DistanceTo(target);
 
         LambAI lambTarget = target as LambAI;
-        if (lambTarget != null && lambTarget.IsAlive && !lambTarget.IsPig.Value
+        if (lambTarget != null && lambTarget.IsAlive
             && dist <= transformRange && IsTransformReady())
         {
             SetState(EnemyState.Guard);
@@ -179,16 +180,25 @@ public class WizardBrain : EnemyBrain
     public void OnTransformHit()
     {
         if (!IsServer) return;
-        if (currentTransformTarget == null || !currentTransformTarget.IsAlive || currentTransformTarget.IsPig.Value) return;
+        if (currentTransformTarget == null || !currentTransformTarget.IsAlive) return;
+
+        Vector3 spawnPos = currentTransformTarget.transform.position;
 
         if (transformSpellVFXPrefab != null)
         {
-            GameObject vfx = Instantiate(transformSpellVFXPrefab, currentTransformTarget.transform.position, Quaternion.identity);
+            GameObject vfx = Instantiate(transformSpellVFXPrefab, spawnPos, Quaternion.identity);
             NetworkObject vfxNetObj = vfx.GetComponent<NetworkObject>();
             if (vfxNetObj != null) vfxNetObj.Spawn();
         }
 
-        currentTransformTarget.TransformIntoPig();
+        currentTransformTarget.TakeDamage(9999, entity);
+
+        if (pigPrefab != null)
+        {
+            GameObject pig = Instantiate(pigPrefab, spawnPos, Quaternion.identity);
+            NetworkObject pigNetObj = pig.GetComponent<NetworkObject>();
+            if (pigNetObj != null) pigNetObj.Spawn();
+        }
     }
 
     public void OnTransformEnd()
