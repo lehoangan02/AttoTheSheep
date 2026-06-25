@@ -109,4 +109,6 @@ InitTestScene*.unity*
 .DS_Store
 .cursor
 .agents
-.omo
+.omo/*
+!.omo/rules/
+!.omo/rules/**
