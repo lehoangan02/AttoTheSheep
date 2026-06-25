@@ -5,9 +5,9 @@ using System.Collections;
 [RequireComponent(typeof(EnemyEntity))]
 public abstract class EnemyBrain : NetworkBehaviour
 {
-    [SerializeField] float scanRadius = 30f;
-    [SerializeField] string targetTag = "Player";
-    [SerializeField] LayerMask targetLayers = ~0;
+    [SerializeField] protected float scanRadius = 30f;
+    [SerializeField] protected string targetTag = "Player";
+    [SerializeField] protected LayerMask targetLayers = ~0;
 
     [HideInInspector] public NetworkEntity target;
     [HideInInspector] public float lastAttackTime;
@@ -65,13 +65,13 @@ public abstract class EnemyBrain : NetworkBehaviour
 
     protected bool IsAttackReady() => Time.time >= lastAttackTime + (entity?.Data?.attackCooldown ?? 1.25f);
 
-    public void AcquireTarget()
+    public virtual void AcquireTarget()
     {
         if (IsValidTarget(target)) return;
         target = FindTarget();
     }
 
-    NetworkEntity FindTarget()
+    protected virtual NetworkEntity FindTarget()
     {
         Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, scanRadius, targetLayers);
         NetworkEntity nearest = null;
@@ -86,7 +86,7 @@ public abstract class EnemyBrain : NetworkBehaviour
         return nearest;
     }
 
-    bool IsValidTarget(NetworkEntity c)
+    protected virtual bool IsValidTarget(NetworkEntity c)
     {
         if (c == null || c == entity || !c.IsAlive) return false;
         return string.IsNullOrEmpty(targetTag) || c.CompareTag(targetTag);

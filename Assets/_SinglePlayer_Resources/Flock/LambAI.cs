@@ -107,11 +107,11 @@ public class LambAI : NetworkEntity
 
     protected override void Die()
     {
-        if (myManager != null) 
+        if (myManager != null)
         {
             myManager.RemoveLamb(this);
         }
-        base.Die(); 
+        base.Die();
     }
 
     public void SetFlockData(Vector2 center, float radius)
@@ -164,7 +164,7 @@ public class LambAI : NetworkEntity
 
     void FixedUpdate()
     {
-        if (!IsSpawned || !IsServer || isMovementLocked) return; 
+        if (!IsSpawned || !IsServer || isMovementLocked) return;
 
         // 1. CẬP NHẬT TIMER HOẢNG LOẠN
         if (isPanicking)
