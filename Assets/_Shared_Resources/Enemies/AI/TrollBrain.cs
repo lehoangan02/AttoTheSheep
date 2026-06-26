@@ -252,12 +252,6 @@ public class TrollBrain : EnemyBrain
         smashHitbox?.Disable();
         SetState(EnemyState.Idle);
     }
-    public void OnChargeEnd() { if (!IsServer) return; EndCharge(); }
-    public void OnTornadoEnd()
-    {
-        if (!IsServer) return;
-        EndTornado();
-    }
 
     private void EndCharge() { chargeHitbox?.Disable(); SetState(EnemyState.Idle); }
     private void CleanupTornado()

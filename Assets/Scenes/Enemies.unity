@@ -892,7 +892,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 3919428034
+  GlobalObjectIdHash: 162385937
   InScenePlacedSourceGlobalObjectIdHash: 1719275420
   DeferredDespawnTick: 0
   Ownership: 1
@@ -1109,7 +1109,7 @@ MonoBehaviour:
       MinSecondsBetweenUpdates: 0
       MaxSecondsBetweenUpdates: 0
     m_InternalValue: 0
-  data: {fileID: 11400000, guid: 5e30a25e98f9207be81cc6d0cfeca168, type: 2}
+  data: {fileID: 11400000, guid: 7553716166628ca86a9dced37a34e884, type: 2}
 --- !u!1001 &2495357980944787089
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1657,7 +1657,7 @@ Animator:
   m_GameObject: {fileID: 8412613484418248268}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 5382dea7cddc8ffca96c64a0db242456, type: 2}
+  m_Controller: {fileID: 9100000, guid: aca5f39e228cdbb48be6a04af666d6e1, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -1750,14 +1750,12 @@ MonoBehaviour:
   tornadoCooldown: 9
   aiDecisionInterval: 0.6
   smashDamage: 40
-  smashRadius: 1.8
-  smashHitMask:
-    serializedVersion: 2
-    m_Bits: 0
   smashEffects: []
   smashKnockbackForce: 8
   smashKnockbackDuration: 0.25
+  smashWindupTime: 0.5
   smashMaxAttackTime: 2
+  smashHitbox: {fileID: 0}
   chargeSpeed: 12
   chargeMaxDistance: 10
   chargeDamage: 35
@@ -1767,12 +1765,14 @@ MonoBehaviour:
   obstacleMask:
     serializedVersion: 2
     m_Bits: 0
+  chargeWindupTime: 0.5
   chargeMaxAttackTime: 3
   chargeHitbox: {fileID: 0}
   tornadoSpeed: 6
   tornadoDuration: 4
   tornadoTickInterval: 0.5
   tornadoDamagePerTick: 8
+  tornadoWindupTime: 0.5
   tornadoMaxAttackTime: 8
   tornadoHitbox: {fileID: 0}
   tornadoVfxPrefab: {fileID: 0}
