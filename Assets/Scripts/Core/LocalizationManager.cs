@@ -15,6 +15,7 @@ namespace AttoTheSheep.Core
         
         // 0: English, 1: Vietnamese (Must match Dropdown indexes)
         private int _currentLanguageIndex = 0;
+        public int CurrentLanguageIndex => _currentLanguageIndex;
 
         private void Awake()
         {

@@ -87,7 +87,16 @@ public class DialogueManager : MonoBehaviour
         _data      = data;
         _lineIndex = 0;
 
-        if (speakerNameText != null) speakerNameText.text = data.speakerName;
+        if (speakerNameText != null) 
+        {
+            string finalSpeakerName = data.speakerName;
+            if (AttoTheSheep.Core.LocalizationManager.Instance != null && AttoTheSheep.Core.LocalizationManager.Instance.CurrentLanguageIndex == 1)
+            {
+                if (!string.IsNullOrEmpty(data.speakerNameVietnamese))
+                    finalSpeakerName = data.speakerNameVietnamese;
+            }
+            speakerNameText.text = finalSpeakerName;
+        }
         if (avatarImage != null)
         {
             avatarImage.sprite  = data.speakerAvatar;
@@ -121,11 +130,22 @@ public class DialogueManager : MonoBehaviour
     private void StreamLine(int index)
     {
         if (_streamCoroutine != null) StopCoroutine(_streamCoroutine);
-        _streamCoroutine = StartCoroutine(StreamCoroutine(_data.lines[index]));
+        
+        string lineToStream = _data.lines[index];
+        if (AttoTheSheep.Core.LocalizationManager.Instance != null && AttoTheSheep.Core.LocalizationManager.Instance.CurrentLanguageIndex == 1)
+        {
+            if (_data.vietnameseLines != null && index < _data.vietnameseLines.Length && !string.IsNullOrEmpty(_data.vietnameseLines[index]))
+            {
+                lineToStream = _data.vietnameseLines[index];
+            }
+        }
+        
+        _streamCoroutine = StartCoroutine(StreamCoroutine(lineToStream));
     }
 
     private IEnumerator StreamCoroutine(string fullLine)
     {
+
         _isStreaming   = true;
         _skipStreaming  = false;
         dialogueText.text = "";

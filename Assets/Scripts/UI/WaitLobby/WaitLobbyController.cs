@@ -36,6 +36,8 @@ public class WaitLobbyController : MonoBehaviour
 
     private void Start()
     {
+        AttoTheSheep.Core.LoadingManager.Instance?.Hide();
+
         if (leaveButton != null) leaveButton.onClick.AddListener(OnLeaveClicked);
         if (readyButton != null) readyButton.onClick.AddListener(OnReadyClicked);
 
@@ -209,6 +211,8 @@ public class WaitLobbyController : MonoBehaviour
     private void OnReadyClicked()
     {
         Debug.Log("[WaitLobby] Ready clicked! Proceeding to Game...");
+        AttoTheSheep.Core.LoadingManager.Instance?.Show("msg_loading_game");
+        
         if (OnRequestReady != null)
         {
             OnRequestReady.Invoke();
