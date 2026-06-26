@@ -6,13 +6,11 @@ public class EnemyEntity : NetworkEntity
 
     private EnemyBrain brain;
     private EnemyMotor motor;
-    private EnemyHitbox hitbox;
     private EnemyAudio enemyAudio;
 
     public EnemyData Data => data;
     public EnemyBrain Brain => brain;
     public EnemyMotor Motor => motor;
-    public EnemyHitbox Hitbox => hitbox;
 
     public float MoveSpeed => Data != null ? Data.MoveSpeed : 5f;
     public int AttackDamage => Data != null ? Data.attackDamage : 20;
@@ -23,7 +21,6 @@ public class EnemyEntity : NetworkEntity
     {
         brain = GetComponent<EnemyBrain>();
         motor = GetComponent<EnemyMotor>();
-        hitbox = GetComponentInChildren<EnemyHitbox>(true);
         enemyAudio = GetComponent<EnemyAudio>();
         if (enemyAudio == null)
             enemyAudio = gameObject.AddComponent<EnemyAudio>();

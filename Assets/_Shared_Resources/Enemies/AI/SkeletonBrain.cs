@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class SkeletonBrain : EnemyBrain
 {
+    [SerializeField] private EnemyHitbox hitbox;
+
     protected void FixedUpdate()
     {
         if (!IsServer) return;
@@ -56,13 +58,17 @@ public class SkeletonBrain : EnemyBrain
                 anim.SetBool("IsChasing", false);
                 break;
             case EnemyState.Attack:
-                Hitbox.Disable();
+                hitbox?.Disable();
                 break;
         }
     }
 
     // Animation events
-    public void OnAttackHitStart() => Hitbox.Enable(entity.Data.attackDamage);
-    public void OnAttackHitEnd() => Hitbox.Disable();
+    public void OnAttackHitStart()
+    {
+        if (hitbox == null) { Debug.LogWarning($"[{GetType().Name}] hitbox not wired on {gameObject.name}"); return; }
+        hitbox?.Enable(entity.Data.attackDamage);
+    }
+    public void OnAttackHitEnd() => hitbox?.Disable();
     public void OnAttackEnd() => SetState(EnemyState.Idle);
 }

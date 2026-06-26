@@ -21,7 +21,6 @@ public abstract class EnemyBrain : NetworkBehaviour
     protected EnemyEntity entity;
     protected EnemyMotor motor;
     protected StatusEffectController effectController;
-    protected EnemyHitbox hitbox;
     protected EnemyAudio enemyAudio;
     protected Animator anim;
     protected string currentAttackAudioId;
@@ -30,14 +29,12 @@ public abstract class EnemyBrain : NetworkBehaviour
     public EnemyMotor Motor => motor;
     public StatusEffectController EffectController => effectController;
     public string CurrentAttackAudioId => currentAttackAudioId;
-    protected EnemyHitbox Hitbox => hitbox;
 
     void Awake()
     {
         entity = GetComponent<EnemyEntity>();
         motor = GetComponent<EnemyMotor>();
         effectController = GetComponent<StatusEffectController>();
-        hitbox = GetComponentInChildren<EnemyHitbox>(true);
         enemyAudio = GetComponent<EnemyAudio>();
         if (enemyAudio == null)
             enemyAudio = gameObject.AddComponent<EnemyAudio>();

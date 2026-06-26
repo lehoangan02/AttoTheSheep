@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class BlueKnightBrain : EnemyBrain
 {
+    [SerializeField] private EnemyHitbox hitbox;
     [SerializeField] float guardChance = 0.2f;
 
     protected void FixedUpdate()
@@ -68,7 +69,7 @@ public class BlueKnightBrain : EnemyBrain
                 anim.SetBool("IsChasing", false);
                 break;
             case EnemyState.Attack:
-                Hitbox.Disable();
+                hitbox?.Disable();
                 break;
         }
     }
@@ -78,8 +79,12 @@ public class BlueKnightBrain : EnemyBrain
     bool ShouldGuard() => Random.value < guardChance;
 
     // Animation events
-    public void OnAttackHitStart() => Hitbox.Enable(entity.Data.attackDamage);
-    public void OnAttackHitEnd() => Hitbox.Disable();
+    public void OnAttackHitStart()
+    {
+        if (hitbox == null) { Debug.LogWarning($"[{GetType().Name}] hitbox not wired on {gameObject.name}"); return; }
+        hitbox?.Enable(entity.Data.attackDamage);
+    }
+    public void OnAttackHitEnd() => hitbox?.Disable();
     public void OnAttackEnd() => SetState(EnemyState.Idle);
     public void OnGuardEnd() => SetState(EnemyState.Idle);
 }

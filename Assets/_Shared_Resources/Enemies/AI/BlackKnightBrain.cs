@@ -4,6 +4,8 @@ public class BlackKnightBrain : EnemyBrain
 {
     [SerializeField] float guardChance = 0.3f;
     bool isLeftAttack = true;
+    [SerializeField] private EnemyHitbox leftHitbox;
+    [SerializeField] private EnemyHitbox rightHitbox;
 
     protected void FixedUpdate()
     {
@@ -72,7 +74,8 @@ public class BlackKnightBrain : EnemyBrain
                 anim.SetBool("IsChasing", false);
                 break;
             case EnemyState.Attack:
-                Hitbox.Disable();
+                leftHitbox?.Disable();
+                rightHitbox?.Disable();
                 break;
         }
     }
@@ -82,8 +85,18 @@ public class BlackKnightBrain : EnemyBrain
     bool ShouldGuard() => Random.value < guardChance;
 
     // Animation events
-    public void OnAttackHitStart() => Hitbox.Enable(entity.Data.attackDamage);
-    public void OnAttackHitEnd() => Hitbox.Disable();
+    public void OnLeftAttackHitStart()
+    {
+        if (leftHitbox == null) { Debug.LogWarning("[BlackKnightBrain] OnLeftAttackHitStart: leftHitbox is not assigned."); return; }
+        leftHitbox.Enable(entity.Data.attackDamage);
+    }
+    public void OnLeftAttackHitEnd() => leftHitbox?.Disable();
+    public void OnRightAttackHitStart()
+    {
+        if (rightHitbox == null) { Debug.LogWarning("[BlackKnightBrain] OnRightAttackHitStart: rightHitbox is not assigned."); return; }
+        rightHitbox.Enable(entity.Data.attackDamage);
+    }
+    public void OnRightAttackHitEnd() => rightHitbox?.Disable();
     public void OnAttackEnd() => SetState(EnemyState.Idle);
     public void OnGuardEnd() => SetState(EnemyState.Idle);
 }

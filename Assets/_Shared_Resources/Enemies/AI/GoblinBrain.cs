@@ -3,7 +3,8 @@ using UnityEngine;
 public class GoblinBrain : EnemyBrain
 {
     [SerializeField] bool isFastAttack = true;
-    int currentAttackDamage;
+    [SerializeField] private EnemyHitbox fastHitbox;
+    [SerializeField] private EnemyHitbox strongHitbox;
 
     protected void FixedUpdate()
     {
@@ -44,7 +45,6 @@ public class GoblinBrain : EnemyBrain
                 string trigger = useFastAttack ? "AttackFast" : "AttackStrong";
                 SetAttackAudioId(useFastAttack ? "Fast" : "Strong");
                 anim.SetTrigger(trigger);
-                currentAttackDamage = useFastAttack ? entity.Data.attackDamage : entity.Data.attackDamage * 2;
                 isFastAttack = !isFastAttack;
                 lastAttackTime = Time.time;
                 motor.Stop();
@@ -64,13 +64,24 @@ public class GoblinBrain : EnemyBrain
                 anim.SetBool("IsChasing", false);
                 break;
             case EnemyState.Attack:
-                Hitbox.Disable();
+                fastHitbox?.Disable();
+                strongHitbox?.Disable();
                 break;
         }
     }
 
     // Animation events
-    public void OnAttackHitStart() => Hitbox.Enable(currentAttackDamage);
-    public void OnAttackHitEnd() => Hitbox.Disable();
+    public void OnFastAttackHitStart()
+    {
+        if (fastHitbox == null) { Debug.LogWarning("GoblinBrain: fastHitbox not assigned.", this); return; }
+        fastHitbox.Enable(entity.Data.attackDamage);
+    }
+    public void OnFastAttackHitEnd() => fastHitbox?.Disable();
+    public void OnStrongAttackHitStart()
+    {
+        if (strongHitbox == null) { Debug.LogWarning("GoblinBrain: strongHitbox not assigned.", this); return; }
+        strongHitbox.Enable(entity.Data.attackDamage * 2);
+    }
+    public void OnStrongAttackHitEnd() => strongHitbox?.Disable();
     public void OnAttackEnd() => SetState(EnemyState.Idle);
 }

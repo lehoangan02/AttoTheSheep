@@ -1,5 +1,88 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &183602644101380392
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2864768230595537063}
+  - component: {fileID: 7807317371227535378}
+  - component: {fileID: 7689674288747742823}
+  m_Layer: 6
+  m_Name: GoblinHitboxStrong
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2864768230595537063
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 183602644101380392}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0.2278227, w: 0.9737026}
+  m_LocalPosition: {x: 0.926, y: 0.118, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3055164010490647127}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -26.338}
+--- !u!114 &7807317371227535378
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 183602644101380392}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 211899e69eb96be20be51bf576dc8197, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyHitbox
+  hitboxCollider: {fileID: 0}
+--- !u!70 &7689674288747742823
+CapsuleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 183602644101380392}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: -0.58180416, y: 0.62061447}
+  m_Size: {x: 2.6193566, y: 1.1357772}
+  m_Direction: 1
 --- !u!1 &1006597540975089474
 GameObject:
   m_ObjectHideFlags: 0
@@ -10,9 +93,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1339966403061034150}
   - component: {fileID: 6153255769359383660}
-  - component: {fileID: 1019231238830495767}
+  - component: {fileID: 7480871568134830030}
   m_Layer: 6
-  m_Name: GoblinHitbox
+  m_Name: GoblinHitboxFast
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -27,7 +110,7 @@ Transform:
   m_GameObject: {fileID: 1006597540975089474}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.25, y: -0.15, z: 0}
+  m_LocalPosition: {x: 1, y: 0.23, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -46,8 +129,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyHitbox
   hitboxCollider: {fileID: 0}
---- !u!58 &1019231238830495767
-CircleCollider2D:
+--- !u!70 &7480871568134830030
+CapsuleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -80,8 +163,9 @@ CircleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -0.65357065, y: 0.4}
-  m_Radius: 1.0251908
+  m_Offset: {x: -0.7790552, y: 0.28221643}
+  m_Size: {x: 2.55812, y: 1.6712031}
+  m_Direction: 1
 --- !u!1 &5753693385531744272
 GameObject:
   m_ObjectHideFlags: 0
@@ -121,6 +205,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1339966403061034150}
+  - {fileID: 2864768230595537063}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &128439464852622794
@@ -355,6 +440,8 @@ MonoBehaviour:
   IsFrozen: 0
   IsStunned: 0
   isFastAttack: 1
+  fastHitbox: {fileID: 6153255769359383660}
+  strongHitbox: {fileID: 7807317371227535378}
 --- !u!114 &8414506706315818385
 MonoBehaviour:
   m_ObjectHideFlags: 0
