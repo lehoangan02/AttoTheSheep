@@ -87,7 +87,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 12
+  m_SortingOrder: 10
   m_MaskInteraction: 0
   m_Sprite: {fileID: -6879290243380990860, guid: e792cc737c2a7854b824e3c72ac38c7a, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -200,6 +200,32 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LambAI
   ShowTopMostFoldoutHeaderGroup: 1
+  baseMoveSpeed: 5
+  baseMaxHealth: 100
+  baseMaxMana: 100
+  baseAttackRange: 1
+  baseAttackDamage: 10
+  effectController: {fileID: 0}
+  currentMoveSpeed:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 0
+  currentHealth:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 0
+  currentMana:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 0
+  isInvulnerable:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 0
   stoppingDistance: 0.1
   slowingRadius: 2
   accelerationRate: 3
@@ -208,6 +234,14 @@ MonoBehaviour:
   flashDuration: 0.15
   knockbackForce: 10
   knockbackDuration: 0.15
+  panicSpeedMultiplier: 1.6
+  returnSpeedMultiplier: 1.3
+  stuckCheckInterval: 0.25
+  stuckMinMoveDistance: 0.03
+  stuckTimeToRecover: 0.75
+  unstuckDuration: 0.8
+  unstuckSideStepDistance: 1.2
+  unstuckClearanceRadius: 0.25
 --- !u!95 &6930791931804656902
 Animator:
   serializedVersion: 7
