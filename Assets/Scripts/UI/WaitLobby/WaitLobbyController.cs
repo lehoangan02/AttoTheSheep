@@ -36,6 +36,8 @@ public class WaitLobbyController : MonoBehaviour
 
     private void Start()
     {
+        AttoTheSheep.Core.LoadingManager.Instance?.Hide();
+
         if (leaveButton != null) leaveButton.onClick.AddListener(OnLeaveClicked);
         if (readyButton != null) readyButton.onClick.AddListener(OnReadyClicked);
 

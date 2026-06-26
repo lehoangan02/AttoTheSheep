@@ -259,6 +259,7 @@ public class MatchMakingController : MonoBehaviour
 
             if (LobbyManager.Instance != null)
             {
+                AttoTheSheep.Core.LoadingManager.Instance?.Show("msg_creating_lobby");
                 string defaultPlayerName = await GetCloudPlayerName();
                 try 
                 {
@@ -273,6 +274,7 @@ public class MatchMakingController : MonoBehaviour
                 }
                 catch (System.Exception e)
                 {
+                    AttoTheSheep.Core.LoadingManager.Instance?.Hide();
                     Debug.LogError($"[MatchMaking] Failed to create lobby: {e}");
                 }
             }
@@ -300,6 +302,7 @@ public class MatchMakingController : MonoBehaviour
 
             if (LobbyManager.Instance != null)
             {
+                AttoTheSheep.Core.LoadingManager.Instance?.Show("msg_joining_lobby");
                 string defaultPlayerName = await GetCloudPlayerName();
                 try 
                 {
@@ -314,6 +317,7 @@ public class MatchMakingController : MonoBehaviour
                 }
                 catch (System.Exception e)
                 {
+                    AttoTheSheep.Core.LoadingManager.Instance?.Hide();
                     Debug.LogError($"[MatchMaking] Failed to join private lobby: {e}");
                 }
             }
@@ -339,6 +343,7 @@ public class MatchMakingController : MonoBehaviour
 
         if (LobbyManager.Instance != null)
         {
+            AttoTheSheep.Core.LoadingManager.Instance?.Show("msg_joining_lobby");
             string defaultPlayerName = await GetCloudPlayerName();
             try 
             {
@@ -353,6 +358,7 @@ public class MatchMakingController : MonoBehaviour
             }
             catch (System.Exception e)
             {
+                AttoTheSheep.Core.LoadingManager.Instance?.Hide();
                 Debug.LogError($"[MatchMaking] Failed to join public lobby: {e}");
             }
         }
