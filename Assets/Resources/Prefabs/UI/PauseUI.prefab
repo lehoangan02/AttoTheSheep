@@ -135,7 +135,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 1
-  m_AdditionalShaderChannelsFlag: 1
+  m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: 0
@@ -574,6 +574,7 @@ GameObject:
   - component: {fileID: 5214994870564009679}
   - component: {fileID: 5815835205344930925}
   - component: {fileID: 988020336126799349}
+  - component: {fileID: 8306648042323388571}
   m_Layer: 0
   m_Name: Text
   m_TagString: Untagged
@@ -700,6 +701,19 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &8306648042323388571
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4037118241609066876}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6aedfa3279ed09e4a8bc8590a12f02f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AttoTheSheep.UI.Shared.LocalizedText
+  textID: btn_main_menu
 --- !u!1 &4183325908720938288
 GameObject:
   m_ObjectHideFlags: 0
@@ -1311,6 +1325,7 @@ GameObject:
   - component: {fileID: 6789448847755782603}
   - component: {fileID: 8653580668551713191}
   - component: {fileID: 7037217053074407184}
+  - component: {fileID: 2292556485768629002}
   m_Layer: 0
   m_Name: Text
   m_TagString: Untagged
@@ -1437,6 +1452,19 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &2292556485768629002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6439263432428758719}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6aedfa3279ed09e4a8bc8590a12f02f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AttoTheSheep.UI.Shared.LocalizedText
+  textID: btn_resume
 --- !u!1 &7397582930247202030
 GameObject:
   m_ObjectHideFlags: 0
@@ -1448,6 +1476,7 @@ GameObject:
   - component: {fileID: 5182685742056156928}
   - component: {fileID: 21064901785634121}
   - component: {fileID: 553702668777738110}
+  - component: {fileID: 7888028577739943369}
   m_Layer: 0
   m_Name: Text
   m_TagString: Untagged
@@ -1574,6 +1603,19 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &7888028577739943369
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7397582930247202030}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6aedfa3279ed09e4a8bc8590a12f02f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AttoTheSheep.UI.Shared.LocalizedText
+  textID: btn_options
 --- !u!1 &8467910013751005002
 GameObject:
   m_ObjectHideFlags: 0

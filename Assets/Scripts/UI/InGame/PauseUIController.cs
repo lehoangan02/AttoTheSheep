@@ -15,8 +15,21 @@ namespace AttoTheSheep.UI.InGame
         [SerializeField] private string mainMenuSceneName = "MainMenu";
 
         [Header("Pause Panel")]
-        [Tooltip("Kéo Panel chứa nền đen mờ và giao diện Pause vào đây")]
+        [Tooltip("Kéo Panel chứa nền đen mờ và giao diện Pause vào đây (không bắt buộc nữa)")]
         [SerializeField] private GameObject pausePanel; 
+
+        private Canvas _canvas;
+
+        private void Awake()
+        {
+            _canvas = GetComponent<Canvas>();
+
+            // Tự động tích hợp Stop.cs vào chính Prefab này nếu chưa có
+            if (GetComponent<Stop>() == null && Stop.Instance == null)
+            {
+                gameObject.AddComponent<Stop>();
+            }
+        }
 
         private void Start()
         {
@@ -24,8 +37,11 @@ namespace AttoTheSheep.UI.InGame
             if (optionsButton != null) optionsButton.onClick.AddListener(OnOptionsClicked);
             if (mainMenuButton != null) mainMenuButton.onClick.AddListener(OnMainMenuClicked);
 
-            // Mặc định ẩn giao diện Pause khi mới vào game
-            if (pausePanel != null) pausePanel.SetActive(false);
+            // Mặc định ẩn toàn bộ Canvas khi mới vào game
+            if (_canvas != null) 
+                _canvas.enabled = false;
+            else if (pausePanel != null) 
+                pausePanel.SetActive(false);
         }
 
         private void Update()
@@ -50,10 +66,13 @@ namespace AttoTheSheep.UI.InGame
         /// </summary>
         private void UpdateUIVisibility()
         {
-            if (Stop.Instance == null || pausePanel == null) return;
+            if (Stop.Instance == null) return;
             
             // Hiện panel nếu game đang pause, ẩn panel nếu game đang resume
-            pausePanel.SetActive(Stop.Instance.IsPaused);
+            if (_canvas != null)
+                _canvas.enabled = Stop.Instance.IsPaused;
+            else if (pausePanel != null)
+                pausePanel.SetActive(Stop.Instance.IsPaused);
         }
 
         private void OnResumeClicked()
