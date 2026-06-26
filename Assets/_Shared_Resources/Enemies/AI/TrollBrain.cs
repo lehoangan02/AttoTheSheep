@@ -136,6 +136,7 @@ public class TrollBrain : EnemyBrain
                 break;
             case EnemyState.Attack:
                 windupComplete = false;
+                anim.SetBool("IsAttacking", true);
                 switch (currentAttack)
                 {
                     case TrollAttack.Smash: lastSmashTime = Time.time; break;
@@ -149,6 +150,7 @@ public class TrollBrain : EnemyBrain
                 break;
             case EnemyState.Idle:
                 motor.Stop();
+                anim.SetBool("IsAttacking", false);
                 smashHitbox?.Disable();
                 chargeHitbox?.Disable();
                 CleanupTornado();
@@ -175,6 +177,7 @@ public class TrollBrain : EnemyBrain
                 break;
             case EnemyState.Attack:
                 smashHitbox?.Disable();
+                anim.SetBool("IsAttacking", false);
                 break;
         }
     }
@@ -225,12 +228,12 @@ public class TrollBrain : EnemyBrain
                 else
                     dashDir = transform.right;
                 dashDistanceLeft = chargeMaxDistance;
-                chargeHitbox.Enable(chargeDamage, chargeEffects, true, chargeKnockbackForce, chargeKnockbackDuration);
+                chargeHitbox?.Enable(chargeDamage, chargeEffects, true, chargeKnockbackForce, chargeKnockbackDuration);
                 break;
             case TrollAttack.Tornado:
                 if (NetworkObject.IsSpawned)
                     entity.isInvulnerable.Value = true;
-                tornadoHitbox.Enable(tornadoDamagePerTick, null, false, 0f, 0f, tornadoTickInterval);
+                tornadoHitbox?.Enable(tornadoDamagePerTick, null, false, 0f, 0f, tornadoTickInterval);
                 if (tornadoVfxPrefab != null)
                 {
                     tornadoVfxInstance = Instantiate(tornadoVfxPrefab, transform);
@@ -239,21 +242,23 @@ public class TrollBrain : EnemyBrain
                 break;
         }
         anim.SetTrigger("Attack" + currentAttack);
+        Debug.Log("[TrollBrain] Completed windup for attack: " + currentAttack);
     }
 
     public void OnSmashImpact()
     {
         if (!IsServer) return;
-        smashHitbox.Enable(smashDamage, smashEffects, true, smashKnockbackForce, smashKnockbackDuration);
+        smashHitbox?.Enable(smashDamage, smashEffects, true, smashKnockbackForce, smashKnockbackDuration);
     }
     public void OnSmashEnd()
     {
         if (!IsServer) return;
         smashHitbox?.Disable();
+        anim.SetBool("IsAttacking", false);
         SetState(EnemyState.Idle);
     }
 
-    private void EndCharge() { chargeHitbox?.Disable(); SetState(EnemyState.Idle); }
+    private void EndCharge() { chargeHitbox?.Disable(); anim.SetBool("IsAttacking", false); SetState(EnemyState.Idle); }
     private void CleanupTornado()
     {
         tornadoHitbox?.Disable();
@@ -265,6 +270,7 @@ public class TrollBrain : EnemyBrain
     private void EndTornado()
     {
         CleanupTornado();
+        anim.SetBool("IsAttacking", false);
         SetState(EnemyState.Idle);
     }
 }
