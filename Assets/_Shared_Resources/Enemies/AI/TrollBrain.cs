@@ -79,7 +79,7 @@ public class TrollBrain : EnemyBrain
         if (CurrentState == EnemyState.Attack && !windupComplete && stateTimer >= GetWindupTime())
             CompleteWindup();
 
-        if (CurrentState == EnemyState.Attack && currentAttack == TrollAttack.Tornado && target != null)
+        if (CurrentState == EnemyState.Attack && currentAttack == TrollAttack.Tornado && windupComplete && target != null)
         {
             motor.MoveToward(target.transform.position, tornadoSpeed);
             tornadoTimer += Time.fixedDeltaTime;
@@ -87,7 +87,7 @@ public class TrollBrain : EnemyBrain
                 EndTornado();
         }
 
-        if (CurrentState == EnemyState.Attack && currentAttack == TrollAttack.Charge)
+        if (CurrentState == EnemyState.Attack && currentAttack == TrollAttack.Charge && windupComplete)
         {
             float step = chargeSpeed * Time.fixedDeltaTime;
             if (dashDistanceLeft <= 0) { EndCharge(); return; }
@@ -113,13 +113,17 @@ public class TrollBrain : EnemyBrain
 
         float dist = DistanceTo(target);
 
-        if (dist <= smashRange && Time.time - lastSmashTime >= smashCooldown)
+        bool smashAvailable  = dist <= smashRange   && Time.time - lastSmashTime   >= smashCooldown;
+        bool chargeAvailable = dist <= chargeRange  && Time.time - lastChargeTime  >= chargeCooldown;
+        bool tornadoAvailable = dist > chargeRange  && Time.time - lastTornadoTime >= tornadoCooldown;
+
+        if (smashAvailable)
         { currentAttack = TrollAttack.Smash; SetState(EnemyState.Attack); return; }
 
-        if (dist <= chargeRange && Time.time - lastChargeTime >= chargeCooldown)
+        if (chargeAvailable)
         { currentAttack = TrollAttack.Charge; SetState(EnemyState.Attack); return; }
 
-        if (dist > chargeRange && Time.time - lastTornadoTime >= tornadoCooldown)
+        if (tornadoAvailable)
         { currentAttack = TrollAttack.Tornado; SetState(EnemyState.Attack); return; }
 
         SetState(EnemyState.Chase);
@@ -137,15 +141,21 @@ public class TrollBrain : EnemyBrain
             case EnemyState.Attack:
                 windupComplete = false;
                 anim.SetBool("IsAttacking", true);
+                motor.Stop();
                 switch (currentAttack)
                 {
                     case TrollAttack.Smash: lastSmashTime = Time.time; break;
                     case TrollAttack.Charge: lastChargeTime = Time.time; break;
                     case TrollAttack.Tornado: lastTornadoTime = Time.time; break;
                 }
+                if (currentAttack == TrollAttack.Charge)
+                {
+                    if (target != null)
+                        dashDir = ((Vector2)(target.transform.position - transform.position)).normalized;
+                    else
+                        dashDir = transform.right;
+                }
                 anim.SetTrigger("Windup" + currentAttack);
-                if (currentAttack != TrollAttack.Tornado)
-                    motor.Stop();
                 SetAttackAudioId(currentAttack.ToString());
                 break;
             case EnemyState.Idle:
@@ -223,10 +233,6 @@ public class TrollBrain : EnemyBrain
                 /* Smash hitbox is enabled by OnSmashImpact anim event */
                 break;
             case TrollAttack.Charge:
-                if (target != null)
-                    dashDir = ((Vector2)(target.transform.position - transform.position)).normalized;
-                else
-                    dashDir = transform.right;
                 dashDistanceLeft = chargeMaxDistance;
                 chargeHitbox?.Enable(chargeDamage, chargeEffects, true, chargeKnockbackForce, chargeKnockbackDuration);
                 break;
