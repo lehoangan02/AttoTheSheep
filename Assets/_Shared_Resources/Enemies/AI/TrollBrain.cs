@@ -57,6 +57,13 @@ public class TrollBrain : EnemyBrain
     [SerializeField] private EnemyHitbox tornadoHitbox;
     [SerializeField] private VisualEffect tornadoVfx;
 
+    // Earth Spikes
+    [Header("Troll - Earth Spikes")]
+    [SerializeField] private GameObject spikePrefab;
+    [SerializeField] private int spikeCount = 5;
+    [SerializeField] private float spikeSpacing = 1.2f;
+    [SerializeField] private float spikeSpawnInterval = 0.12f;
+
     // Recovery
     [Header("Troll - Recovery")]
     [SerializeField] private float recoveryInterval = 30f;
@@ -328,9 +335,31 @@ public class TrollBrain : EnemyBrain
     public void OnSmashEnd()
     {
         if (!IsServer) return;
+        
+        if (spikePrefab != null && target != null)
+        {
+            Vector2 dir = ((Vector2)(target.transform.position - transform.position)).normalized;
+            StartCoroutine(SpawnSpikesRoutine(dir));
+        }
+
         smashHitbox?.Disable();
         anim.SetBool("IsAttacking", false);
         EndAttackTransition();
+    }
+    private System.Collections.IEnumerator SpawnSpikesRoutine(Vector2 dir)
+    {
+        for (int i = 0; i < spikeCount; i++)
+        {
+            Vector3 pos = transform.position + (Vector3)(dir * (i * spikeSpacing));
+            GameObject spikeObj = Instantiate(spikePrefab, pos, Quaternion.identity);
+            NetworkObject netObj = spikeObj.GetComponent<NetworkObject>();
+            if (netObj != null) netObj.Spawn();
+            EarthSpike spike = spikeObj.GetComponent<EarthSpike>();
+            if (spike != null)
+                spike.Initialize(smashDamage, smashEffects, smashKnockbackForce > 0f, smashKnockbackForce, smashKnockbackDuration, entity, dir);
+            if (i < spikeCount - 1)
+                yield return new WaitForSeconds(spikeSpawnInterval);
+        }
     }
 
     private void EndCharge() { chargeHitbox?.Disable(); anim.SetBool("IsAttacking", false); EndAttackTransition(); }

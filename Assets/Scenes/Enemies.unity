@@ -2018,6 +2018,10 @@ MonoBehaviour:
   tornadoMaxAttackTime: 8
   tornadoHitbox: {fileID: 0}
   tornadoVfx: {fileID: 170524137}
+  spikePrefab: {fileID: 4418561806473106449, guid: 2bdae8036da53e63aa5386fd0fbc64a8, type: 3}
+  spikeCount: 5
+  spikeSpacing: 1.2
+  spikeSpawnInterval: 0.12
   recoveryInterval: 15
   recoveryDuration: 3
   logRecoveryState: 0
