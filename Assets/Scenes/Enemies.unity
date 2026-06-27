@@ -2018,6 +2018,9 @@ MonoBehaviour:
   tornadoMaxAttackTime: 8
   tornadoHitbox: {fileID: 0}
   tornadoVfx: {fileID: 170524137}
+  recoveryInterval: 15
+  recoveryDuration: 3
+  logRecoveryState: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
