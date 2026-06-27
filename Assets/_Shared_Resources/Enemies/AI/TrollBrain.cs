@@ -1,6 +1,6 @@
 using UnityEngine;
 using Unity.Netcode;
-using System.Collections.Generic;
+using UnityEngine.VFX;
 
 public class TrollBrain : EnemyBrain
 {
@@ -18,6 +18,10 @@ public class TrollBrain : EnemyBrain
     private float lastSmashTime;
     private float lastChargeTime;
     private float lastTornadoTime;
+
+    // Windup
+    [Header("Troll - Windup")]
+    [SerializeField] private VisualEffect windupAuraVfx;
 
     // Smash
     [Header("Troll - Smash")]
@@ -51,7 +55,7 @@ public class TrollBrain : EnemyBrain
     [SerializeField] private float tornadoWindupTime = 0.5f;
     [SerializeField] private float tornadoMaxAttackTime = 8f;
     [SerializeField] private EnemyHitbox tornadoHitbox;
-    [SerializeField] private GameObject tornadoVfxPrefab;
+    [SerializeField] private VisualEffect tornadoVfx;
 
     // Runtime state
     private TrollAttack currentAttack;
@@ -59,7 +63,6 @@ public class TrollBrain : EnemyBrain
     private Vector2 dashDir;
     private float dashDistanceLeft;
     private float tornadoTimer;
-    private GameObject tornadoVfxInstance;
 
     protected void FixedUpdate()
     {
@@ -82,6 +85,8 @@ public class TrollBrain : EnemyBrain
         if (CurrentState == EnemyState.Attack && currentAttack == TrollAttack.Tornado && windupComplete && target != null)
         {
             motor.MoveToward(target.transform.position, tornadoSpeed);
+            Vector3 scale = transform.localScale;
+            transform.localScale = new Vector3(Mathf.Abs(scale.x), scale.y, scale.z);
             tornadoTimer += Time.fixedDeltaTime;
             if (tornadoTimer >= tornadoDuration)
                 EndTornado();
@@ -240,15 +245,29 @@ public class TrollBrain : EnemyBrain
                 if (NetworkObject.IsSpawned)
                     entity.isInvulnerable.Value = true;
                 tornadoHitbox?.Enable(tornadoDamagePerTick, null, false, 0f, 0f, tornadoTickInterval);
-                if (tornadoVfxPrefab != null)
-                {
-                    tornadoVfxInstance = Instantiate(tornadoVfxPrefab, transform);
-                    tornadoVfxInstance.transform.localPosition = Vector3.zero;
-                }
+                if (tornadoVfx != null)
+                    tornadoVfx.Play();
                 break;
         }
         anim.SetTrigger("Attack" + currentAttack);
-        Debug.Log("[TrollBrain] Completed windup for attack: " + currentAttack);
+    }
+
+    public void EmitWindupAura()
+    {
+        if (windupAuraVfx != null)
+        {
+            // Number of aura particle to emit: Smash = 1, Charge = 2, Tornado = 3
+            int auraCount = 1;
+            switch (currentAttack)
+            {
+                case TrollAttack.Smash: auraCount = 1; break;
+                case TrollAttack.Charge: auraCount = 2; break;
+                case TrollAttack.Tornado: auraCount = 3; break;
+            }
+            VFXEventAttribute eventAttribute = windupAuraVfx.CreateVFXEventAttribute();
+            eventAttribute.SetInt("BurstAmount", auraCount);
+            windupAuraVfx.SendEvent("OnPlay", eventAttribute);
+        }
     }
 
     public void OnSmashImpact()
@@ -270,7 +289,8 @@ public class TrollBrain : EnemyBrain
         tornadoHitbox?.Disable();
         if (NetworkObject.IsSpawned)
             entity.isInvulnerable.Value = false;
-        if (tornadoVfxInstance != null) { Destroy(tornadoVfxInstance); tornadoVfxInstance = null; }
+        if (tornadoVfx != null)
+            tornadoVfx.Stop();
         tornadoTimer = 0f;
     }
     private void EndTornado()
