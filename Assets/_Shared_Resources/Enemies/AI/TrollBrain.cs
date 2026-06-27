@@ -57,12 +57,20 @@ public class TrollBrain : EnemyBrain
     [SerializeField] private EnemyHitbox tornadoHitbox;
     [SerializeField] private VisualEffect tornadoVfx;
 
+    // Recovery
+    [Header("Troll - Recovery")]
+    [SerializeField] private float recoveryInterval = 30f;
+    [SerializeField] private float recoveryDuration = 3f;
+    [SerializeField] private bool logRecoveryState = false;
+
     // Runtime state
     private TrollAttack currentAttack;
     private bool windupComplete;
     private Vector2 dashDir;
     private float dashDistanceLeft;
     private float tornadoTimer;
+    private float recoveryTimer;
+    private bool recoveryPending;
 
     protected void FixedUpdate()
     {
@@ -73,7 +81,23 @@ public class TrollBrain : EnemyBrain
         if (CurrentState == EnemyState.Hurt) { if (!IsCCLocked()) SetState(EnemyState.Idle); return; }
 
         AcquireTarget();
-        if (CurrentState != EnemyState.Attack)
+
+        // Recovery timer (pauses during Hurt/Dead — those early-return before this point)
+        if (CurrentState != EnemyState.Recovery)
+            recoveryTimer += Time.fixedDeltaTime;
+
+        // Recovery trigger: enter Recovery if timer elapsed and not attacking
+        if (recoveryTimer >= recoveryInterval && CurrentState != EnemyState.Attack && CurrentState != EnemyState.Recovery)
+        {
+            SetState(EnemyState.Recovery);
+        }
+        else if (recoveryTimer >= recoveryInterval && CurrentState == EnemyState.Attack)
+        {
+            recoveryPending = true;
+            if (logRecoveryState) Debug.Log($"[TrollRecovery] pending=true (timer={recoveryTimer:F1}, attacking)");
+        }
+
+        if (CurrentState != EnemyState.Attack && CurrentState != EnemyState.Recovery)
             DecideNextState();
 
         if (CurrentState == EnemyState.Chase && target != null)
@@ -103,6 +127,12 @@ public class TrollBrain : EnemyBrain
         }
 
         stateTimer += Time.fixedDeltaTime;
+
+        if (CurrentState == EnemyState.Recovery && stateTimer >= recoveryDuration)
+        {
+            SetState(EnemyState.Idle);
+            if (logRecoveryState) Debug.Log("[TrollRecovery] Idle (recovery ended)");
+        }
 
         if (CurrentState == EnemyState.Attack && stateTimer > CurrentAttackMaxTime())
             ForceEndAttack();
@@ -171,13 +201,22 @@ public class TrollBrain : EnemyBrain
                 CleanupTornado();
                 break;
             case EnemyState.Hurt:
+                recoveryPending = false;
                 motor.Stop();
                 smashHitbox?.Disable();
                 chargeHitbox?.Disable();
                 CleanupTornado();
                 break;
             case EnemyState.Dead:
+                recoveryPending = false;
                 ForceEndAttack();
+                break;
+            case EnemyState.Recovery:
+                motor.Stop();
+                anim.SetBool("IsRecovering", true);
+                recoveryTimer = 0f;
+                recoveryPending = false;
+                if (logRecoveryState) Debug.Log($"[TrollRecovery] Recovery (timer={recoveryInterval:F1})");
                 break;
         }
     }
@@ -193,6 +232,9 @@ public class TrollBrain : EnemyBrain
             case EnemyState.Attack:
                 smashHitbox?.Disable();
                 anim.SetBool("IsAttacking", false);
+                break;
+            case EnemyState.Recovery:
+                anim.SetBool("IsRecovering", false);
                 break;
         }
     }
@@ -225,6 +267,14 @@ public class TrollBrain : EnemyBrain
         chargeHitbox?.Disable();
         EndTornado();
         if (CurrentState == EnemyState.Attack)
+            SetState(EnemyState.Idle);
+    }
+
+    private void EndAttackTransition()
+    {
+        if (recoveryPending)
+            SetState(EnemyState.Recovery);
+        else
             SetState(EnemyState.Idle);
     }
 
@@ -280,10 +330,10 @@ public class TrollBrain : EnemyBrain
         if (!IsServer) return;
         smashHitbox?.Disable();
         anim.SetBool("IsAttacking", false);
-        SetState(EnemyState.Idle);
+        EndAttackTransition();
     }
 
-    private void EndCharge() { chargeHitbox?.Disable(); anim.SetBool("IsAttacking", false); SetState(EnemyState.Idle); }
+    private void EndCharge() { chargeHitbox?.Disable(); anim.SetBool("IsAttacking", false); EndAttackTransition(); }
     private void CleanupTornado()
     {
         tornadoHitbox?.Disable();
@@ -297,6 +347,6 @@ public class TrollBrain : EnemyBrain
     {
         CleanupTornado();
         anim.SetBool("IsAttacking", false);
-        SetState(EnemyState.Idle);
+        EndAttackTransition();
     }
 }
