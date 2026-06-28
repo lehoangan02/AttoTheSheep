@@ -348,7 +348,7 @@ public class TrollBrain : EnemyBrain
     }
     private System.Collections.IEnumerator SpawnSpikesRoutine(Vector2 dir)
     {
-        for (int i = 0; i < spikeCount; i++)
+        for (int i = 1; i <= spikeCount; i++)
         {
             Vector3 pos = transform.position + (Vector3)(dir * (i * spikeSpacing));
             GameObject spikeObj = Instantiate(spikePrefab, pos, Quaternion.identity);
@@ -357,7 +357,7 @@ public class TrollBrain : EnemyBrain
             EarthSpike spike = spikeObj.GetComponent<EarthSpike>();
             if (spike != null)
                 spike.Initialize(smashDamage, smashEffects, smashKnockbackForce > 0f, smashKnockbackForce, smashKnockbackDuration, entity, dir);
-            if (i < spikeCount - 1)
+            if (i < spikeCount)
                 yield return new WaitForSeconds(spikeSpawnInterval);
         }
     }
