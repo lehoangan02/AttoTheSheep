@@ -480,6 +480,7 @@ MonoBehaviour:
   baseMaxMana: 100
   baseAttackRange: 1
   baseAttackDamage: 10
+  damageFont: {fileID: 11400000, guid: 2745a675487b843419622b8727c36f50, type: 2}
   effectController: {fileID: 0}
   currentMoveSpeed:
     UpdateTraits:
@@ -524,14 +525,14 @@ MonoBehaviour:
   lastAttackTime: 0
   IsFrozen: 0
   IsStunned: 0
-  smashRange: 2
-  chargeRange: 8
+  smashRange: 3
+  chargeRange: 6
   smashCooldown: 3
   chargeCooldown: 5
   tornadoCooldown: 9
   aiDecisionInterval: 0.6
   windupAuraVfx: {fileID: 6724723388781401745}
-  smashDamage: 40
+  smashDamage: 20
   smashEffects: []
   smashKnockbackForce: 8
   smashKnockbackDuration: 0.25
@@ -553,7 +554,7 @@ MonoBehaviour:
   tornadoSpeed: 3
   tornadoDuration: 4
   tornadoTickInterval: 0.5
-  tornadoDamagePerTick: 8
+  tornadoDamagePerTick: 20
   tornadoWindupTime: 2
   tornadoMaxAttackTime: 8
   tornadoHitbox: {fileID: 7837135803375008793}
