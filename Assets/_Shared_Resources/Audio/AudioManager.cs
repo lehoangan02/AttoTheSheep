@@ -13,20 +13,37 @@ public class AudioManager : MonoBehaviour
     public int poolSize = 20; 
     private List<AudioSource> audioPool = new List<AudioSource>();
 
-    [System.Serializable]
-    public struct SceneMusicMapping
+    public enum MusicType
     {
-        public string sceneName;
-        public AudioClip musicClip;
+        None,
+        UI,
+        FTUE,
+        Level1,
+        Level2,
+        Level3
     }
 
-    [Header("Background Music Settings")]
-    [Tooltip("Khai báo Scene nào sẽ phát bài nhạc nào. Nếu đổi scene mà chung bài nhạc, nó sẽ không restart lại.")]
-    public List<SceneMusicMapping> sceneMusicMap = new List<SceneMusicMapping>();
+    [Header("Music Tracks (Auto-Assigned)")]
+    public AudioClip uiMusic;
+    public AudioClip ftueMusic;
+    public AudioClip level1Music;
+    public AudioClip level2Music;
+    public AudioClip level3Music;
     
     [Header("BGM Volume")]
     [Range(0f, 1f)] public float bgmVolume = 0.5f;
     private AudioSource bgmSource;
+
+#if UNITY_EDITOR
+    private void OnValidate()
+    {
+        if (uiMusic == null) uiMusic = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/_Shared_Resources/Background_Music/MENU_Derp Nugget.mp3");
+        if (ftueMusic == null) ftueMusic = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/_Shared_Resources/Background_Music/FTUE_Ave Marimba.mp3");
+        if (level1Music == null) level1Music = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/_Shared_Resources/Background_Music/LEVEL1_Club Seamus.mp3");
+        if (level2Music == null) level2Music = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/_Shared_Resources/Background_Music/LEVEL2_Galway.mp3");
+        if (level3Music == null) level3Music = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/_Shared_Resources/Background_Music/LEVEL3_Mountain Emperor.mp3");
+    }
+#endif
 
     private void Awake()
     {
@@ -37,7 +54,6 @@ public class AudioManager : MonoBehaviour
             DontDestroyOnLoad(gameObject); // Không bị hủy khi load màn mới
             InitializePool(); // Khởi tạo kho loa ngay khi game chạy
             InitializeBGM();
-            SceneManager.sceneLoaded += OnSceneLoaded;
         }
         else 
         {
@@ -48,10 +64,6 @@ public class AudioManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (Instance == this)
-        {
-            SceneManager.sceneLoaded -= OnSceneLoaded;
-        }
     }
 
     private void InitializeBGM()
@@ -65,32 +77,37 @@ public class AudioManager : MonoBehaviour
         bgmSource.volume = bgmVolume; 
     }
 
-    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    private AudioClip GetClipFromType(MusicType type)
     {
-        AudioClip clipToPlay = null;
-
-        // Find the music for this scene
-        foreach (var mapping in sceneMusicMap)
+        switch (type)
         {
-            if (mapping.sceneName == scene.name)
-            {
-                clipToPlay = mapping.musicClip;
-                break;
-            }
+            case MusicType.UI: return uiMusic;
+            case MusicType.FTUE: return ftueMusic;
+            case MusicType.Level1: return level1Music;
+            case MusicType.Level2: return level2Music;
+            case MusicType.Level3: return level3Music;
+            default: return null;
+        }
+    }
+
+    public void PlayMusic(MusicType targetType)
+    {
+        AudioClip clipToPlay = GetClipFromType(targetType);
+
+        // Nếu chọn None thì tắt nhạc
+        if (clipToPlay == null)
+        {
+            bgmSource.Stop();
+            return;
         }
 
-        // If no music is mapped to this scene, we can just let the old one play
-        // (Or stop it if you prefer: if (clipToPlay == null) bgmSource.Stop(); )
-        if (clipToPlay == null)
-            return;
-
-        // If the same music is already playing, DO NOT RESTART
+        // Nếu bài nhạc đó ĐANG PHÁT rồi, thì KHÔNG RESTART LẠI (rất quan trọng cho UI scenes)
         if (bgmSource.isPlaying && bgmSource.clip == clipToPlay)
         {
             return;
         }
 
-        // Otherwise, switch the track and play
+        // Nếu là bài mới thì đổi qua bài đó và phát
         bgmSource.clip = clipToPlay;
         bgmSource.Play();
     }
