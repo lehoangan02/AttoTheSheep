@@ -12,6 +12,9 @@ public class NetworkEntity : NetworkBehaviour
 
     [SerializeField] protected float baseAttackRange = 1f;
     [SerializeField] protected float baseAttackDamage = 10f;
+    
+    [Header("Damage Popup")]
+    [SerializeField] protected TMPro.TMP_FontAsset damageFont;
 
     [HideInInspector] public StatusEffectController effectController;
 
@@ -58,6 +61,31 @@ public class NetworkEntity : NetworkBehaviour
             currentHealth.Value = baseMaxHealth;
             currentMana.Value = baseMaxMana;
         }
+
+        currentHealth.OnValueChanged += OnHealthChangedBase;
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        currentHealth.OnValueChanged -= OnHealthChangedBase;
+    }
+
+    private void OnHealthChangedBase(int previousValue, int newValue)
+    {
+        int damage = previousValue - newValue;
+        if (damage > 0)
+        {
+            ShowDamagePopup(damage);
+        }
+    }
+
+    private void ShowDamagePopup(int damage)
+    {
+        GameObject popup = new GameObject("DamagePopup");
+        popup.transform.position = transform.position + Vector3.up * 1.5f;
+        DamagePopup dp = popup.AddComponent<DamagePopup>();
+        bool isPlayer = CompareTag("Player");
+        dp.Setup(damage, isPlayer, damageFont);
     }
 
     // Basic interaction functions (Virtual so child classes can override/modify)
