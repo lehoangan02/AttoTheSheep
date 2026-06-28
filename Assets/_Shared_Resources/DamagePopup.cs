@@ -9,6 +9,8 @@ public class DamagePopup : MonoBehaviour
     private Vector3 moveDirection;
     private float moveSpeed = 2f;
     
+    private static TMP_FontAsset cachedFont;
+    
     public void Setup(int damageAmount, bool isPlayer = false, TMP_FontAsset customFont = null)
     {
         textMesh = GetComponent<TextMeshPro>();
@@ -25,8 +27,10 @@ public class DamagePopup : MonoBehaviour
         textMesh.text = damageAmount.ToString();
         textMesh.fontSize = 5;
         textMesh.alignment = TextAlignmentOptions.Center;
-        // Optionally different color for player vs enemy damage
+        
+        // Base color
         textMesh.color = isPlayer ? Color.red : Color.yellow;
+        
         textMesh.sortingOrder = 100;
 
         timer = lifetime;

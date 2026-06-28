@@ -5116,7 +5116,7 @@ MonoBehaviour:
   baseMaxMana: 100
   baseAttackRange: 1
   baseAttackDamage: 10
-  damageFont: {fileID: 0}
+  damageFont: {fileID: 11400000, guid: 2745a675487b843419622b8727c36f50, type: 2}
   effectController: {fileID: 0}
   currentMoveSpeed:
     UpdateTraits:
@@ -20528,7 +20528,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &6208284458746283082
 RectTransform:
   m_ObjectHideFlags: 0
