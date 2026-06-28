@@ -149,12 +149,12 @@ TextureImporter:
       name: Seahorse Boat_Idle_0
       rect:
         serializedVersion: 2
-        x: 61
-        y: 41
-        width: 83
-        height: 85
+        x: 0
+        y: 0
+        width: 192
+        height: 192
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -171,12 +171,12 @@ TextureImporter:
       name: Seahorse Boat_Idle_1
       rect:
         serializedVersion: 2
-        x: 254
-        y: 42
-        width: 82
-        height: 84
+        x: 192
+        y: 0
+        width: 192
+        height: 192
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -193,12 +193,12 @@ TextureImporter:
       name: Seahorse Boat_Idle_2
       rect:
         serializedVersion: 2
-        x: 446
-        y: 74
-        width: 6
-        height: 10
+        x: 384
+        y: 0
+        width: 192
+        height: 192
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -215,12 +215,12 @@ TextureImporter:
       name: Seahorse Boat_Idle_3
       rect:
         serializedVersion: 2
-        x: 449
-        y: 41
-        width: 78
-        height: 85
+        x: 576
+        y: 0
+        width: 192
+        height: 192
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -237,12 +237,12 @@ TextureImporter:
       name: Seahorse Boat_Idle_4
       rect:
         serializedVersion: 2
-        x: 638
-        y: 40
-        width: 82
-        height: 84
+        x: 768
+        y: 0
+        width: 192
+        height: 192
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -259,12 +259,12 @@ TextureImporter:
       name: Seahorse Boat_Idle_5
       rect:
         serializedVersion: 2
-        x: 830
-        y: 39
-        width: 82
-        height: 85
+        x: 960
+        y: 0
+        width: 192
+        height: 192
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -281,12 +281,12 @@ TextureImporter:
       name: Seahorse Boat_Idle_6
       rect:
         serializedVersion: 2
-        x: 1022
-        y: 39
-        width: 82
-        height: 84
+        x: 1152
+        y: 0
+        width: 192
+        height: 192
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -303,12 +303,12 @@ TextureImporter:
       name: Seahorse Boat_Idle_7
       rect:
         serializedVersion: 2
-        x: 1213
-        y: 68
-        width: 8
-        height: 15
+        x: 1344
+        y: 0
+        width: 192
+        height: 192
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -321,99 +321,11 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
-    - serializedVersion: 2
-      name: Seahorse Boat_Idle_8
-      rect:
-        serializedVersion: 2
-        x: 1216
-        y: 41
-        width: 80
-        height: 83
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 71133d24cc4619330800000000000000
-      internalID: 3715861996014612759
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Seahorse Boat_Idle_9
-      rect:
-        serializedVersion: 2
-        x: 1405
-        y: 71
-        width: 6
-        height: 11
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 72b49ef78452014a0800000000000000
-      internalID: -6624754058548131033
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Seahorse Boat_Idle_10
-      rect:
-        serializedVersion: 2
-        x: 1407
-        y: 41
-        width: 81
-        height: 84
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 779abf065fe5bb490800000000000000
-      internalID: -7729479927464220297
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Seahorse Boat_Idle_11
-      rect:
-        serializedVersion: 2
-        x: 279
-        y: 41
-        width: 24
-        height: 20
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 8d610694e0434ebf0800000000000000
-      internalID: -296054439534389544
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
     outline: []
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: d4c4d6497e0bf46f98a23bfb4f7446de
     internalID: 0
     vertices: []
     indices: 
@@ -421,20 +333,18 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     spriteCustomMetadata:
-      entries: []
+      entries:
+      - key: SpriteEditor.SliceSettings
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":8.0,"y":1.0},"gridSpriteSize":{"x":192.0,"y":192.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":2,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
       Seahorse Boat_Idle_0: -7010591647040895799
       Seahorse Boat_Idle_1: 152489495532746151
-      Seahorse Boat_Idle_10: -7729479927464220297
-      Seahorse Boat_Idle_11: -296054439534389544
       Seahorse Boat_Idle_2: -6716851642931428848
       Seahorse Boat_Idle_3: 2659611113231379851
       Seahorse Boat_Idle_4: -3921654563342086831
       Seahorse Boat_Idle_5: -701971094624385683
       Seahorse Boat_Idle_6: 1399389548498346541
       Seahorse Boat_Idle_7: 4311232652278926336
-      Seahorse Boat_Idle_8: 3715861996014612759
-      Seahorse Boat_Idle_9: -6624754058548131033
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
