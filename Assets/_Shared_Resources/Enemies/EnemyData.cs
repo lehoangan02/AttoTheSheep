@@ -17,5 +17,11 @@ public class EnemyData : ScriptableObject
     [Header("Audio")]
     public EnemyAudioSet audio = new EnemyAudioSet();
 
+    [Header("Spawn / Death VFX")]
+    public GameObject spawnVFXPrefab;
+    public GameObject deathVFXPrefab;
+    public float spawnFadeDuration = 0.5f;
+    public float deathFadeDuration = 0.5f;
+
     public float MoveSpeed => moveSpeed;
 }

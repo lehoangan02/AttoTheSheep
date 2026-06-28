@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: 8059245908609101459}
   - component: {fileID: 9177904550777391619}
   - component: {fileID: 1211527052160459364}
+  - component: {fileID: 6955583148007242378}
   m_Layer: 6
   m_Name: BlackKnight
   m_TagString: Enemy
@@ -300,6 +301,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c192f053ff4f469fdb3e6c5e2376ae11, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StatusEffectController
+  ShowTopMostFoldoutHeaderGroup: 1
+--- !u!114 &6955583148007242378
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2495840725773875051}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c992677bc8aab13d48eb28f1d52f5a8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemySpawnDeath
   ShowTopMostFoldoutHeaderGroup: 1
 --- !u!1 &8481833668905633483
 GameObject:

@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: 8295163450808458972}
   - component: {fileID: 1155625615522297754}
   - component: {fileID: 7145579840219437702}
+  - component: {fileID: 8670519833361643901}
   m_Layer: 6
   m_Name: Pawn
   m_TagString: Enemy
@@ -298,6 +299,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c192f053ff4f469fdb3e6c5e2376ae11, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StatusEffectController
+  ShowTopMostFoldoutHeaderGroup: 1
+--- !u!114 &8670519833361643901
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2149372858635268260}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c992677bc8aab13d48eb28f1d52f5a8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemySpawnDeath
   ShowTopMostFoldoutHeaderGroup: 1
 --- !u!1 &2771796199278568966
 GameObject:

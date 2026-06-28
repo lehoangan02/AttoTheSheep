@@ -37,6 +37,8 @@ public class NetworkEntity : NetworkBehaviour
 
     public event Action OnDied;
 
+    protected void InvokeOnDied() => OnDied?.Invoke();
+
     public float BaseMoveSpeed => baseMoveSpeed;
     public float BaseAttackRange => baseAttackRange;
     public float BaseAttackDamage => baseAttackDamage;
