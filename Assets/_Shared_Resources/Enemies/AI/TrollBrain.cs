@@ -352,6 +352,10 @@ public class TrollBrain : EnemyBrain
         {
             Vector3 pos = transform.position + (Vector3)(dir * (i * spikeSpacing));
             GameObject spikeObj = Instantiate(spikePrefab, pos, Quaternion.identity);
+            Vector3 spikeScale = spikeObj.transform.localScale;
+            float travelFacingSign = dir.x >= 0 ? 1f : -1f;
+            spikeObj.transform.localScale = new Vector3(travelFacingSign * Mathf.Abs(spikeScale.x), spikeScale.y, spikeScale.z);
+
             NetworkObject netObj = spikeObj.GetComponent<NetworkObject>();
             if (netObj != null) netObj.Spawn();
             EarthSpike spike = spikeObj.GetComponent<EarthSpike>();
