@@ -184,6 +184,7 @@ GameObject:
   - component: {fileID: 6342863579529224448}
   - component: {fileID: 8414506706315818385}
   - component: {fileID: 8676959025195992803}
+  - component: {fileID: -1637247925003190703}
   m_Layer: 6
   m_Name: Goblin
   m_TagString: Enemy
@@ -467,4 +468,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c192f053ff4f469fdb3e6c5e2376ae11, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StatusEffectController
+  ShowTopMostFoldoutHeaderGroup: 1
+--- !u!114 &-1637247925003190703
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5753693385531744272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c992677bc8aab13d48eb28f1d52f5a8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemySpawnDeath
   ShowTopMostFoldoutHeaderGroup: 1

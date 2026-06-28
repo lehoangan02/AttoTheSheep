@@ -100,6 +100,7 @@ GameObject:
   - component: {fileID: 3221528501908904135}
   - component: {fileID: 7711539553068198587}
   - component: {fileID: 7849640760919338362}
+  - component: {fileID: -2113963242613932927}
   m_Layer: 6
   m_Name: Spider
   m_TagString: Enemy
@@ -380,4 +381,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c192f053ff4f469fdb3e6c5e2376ae11, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StatusEffectController
+  ShowTopMostFoldoutHeaderGroup: 1
+--- !u!114 &-2113963242613932927
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8481652928192273667}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c992677bc8aab13d48eb28f1d52f5a8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemySpawnDeath
   ShowTopMostFoldoutHeaderGroup: 1

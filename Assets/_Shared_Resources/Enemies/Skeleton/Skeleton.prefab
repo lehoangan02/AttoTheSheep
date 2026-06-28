@@ -101,6 +101,7 @@ GameObject:
   - component: {fileID: 1391891449951702887}
   - component: {fileID: 4508125577496492425}
   - component: {fileID: 1835900202279474326}
+  - component: {fileID: 2015854573734301502}
   m_Layer: 6
   m_Name: Skeleton
   m_TagString: Enemy
@@ -381,4 +382,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c192f053ff4f469fdb3e6c5e2376ae11, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StatusEffectController
+  ShowTopMostFoldoutHeaderGroup: 1
+--- !u!114 &2015854573734301502
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8842079955634194191}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c992677bc8aab13d48eb28f1d52f5a8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemySpawnDeath
   ShowTopMostFoldoutHeaderGroup: 1

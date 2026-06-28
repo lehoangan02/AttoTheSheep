@@ -86,4 +86,19 @@ public class EnemyEntity : NetworkEntity
 
         enemyAudio.Play(currentHealth.Value <= 0 ? EnemyAudioCueType.Death : EnemyAudioCueType.Hurt);
     }
+
+    protected override void Die()
+    {
+        InvokeOnDied();
+
+        var fx = GetComponent<EnemySpawnDeath>();
+        if (fx != null && IsServer)
+        {
+            fx.PlayDeathSequence();
+        }
+        else if (fx == null && NetworkObject != null && NetworkObject.IsSpawned)
+        {
+            NetworkObject.Despawn(true);
+        }
+    }
 }

@@ -265,6 +265,7 @@ GameObject:
   - component: {fileID: 1025186044901014169}
   - component: {fileID: 2847624209071512021}
   - component: {fileID: 2660826806706247188}
+  - component: {fileID: 312727644065568402}
   m_Layer: 6
   m_Name: Troll
   m_TagString: Enemy
@@ -304,7 +305,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 162385937
+  GlobalObjectIdHash: 3122325986
   InScenePlacedSourceGlobalObjectIdHash: 1719275420
   DeferredDespawnTick: 0
   Ownership: 1
@@ -589,6 +590,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c192f053ff4f469fdb3e6c5e2376ae11, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StatusEffectController
+  ShowTopMostFoldoutHeaderGroup: 1
+--- !u!114 &312727644065568402
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5747648402609233995}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c992677bc8aab13d48eb28f1d52f5a8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemySpawnDeath
   ShowTopMostFoldoutHeaderGroup: 1
 --- !u!1 &7048237791726301114
 GameObject:
