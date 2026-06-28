@@ -177,6 +177,23 @@ public class NetworkEntity : NetworkBehaviour
         if (brain != null) brain.IsFrozen = false;
     }
 
+    [ClientRpc]
+    protected virtual void HandleDeathClientRpc()
+    {
+        if (gameObject != null)
+            Destroy(gameObject);
+    }
+
+#if UNITY_EDITOR
+    protected virtual void OnValidate()
+    {
+        if (damageFont == null)
+        {
+            damageFont = UnityEditor.AssetDatabase.LoadAssetAtPath<TMPro.TMP_FontAsset>("Assets/TextMesh Pro/Fonts/Fredoka-Bold SDF.asset");
+        }
+    }
+#endif
+
     protected virtual void Die()
     {
         OnDied?.Invoke();
