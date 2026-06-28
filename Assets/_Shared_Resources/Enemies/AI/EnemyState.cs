@@ -6,5 +6,6 @@ public enum EnemyState
     Cast,
     Guard,
     Hurt,
-    Dead
+    Dead,
+    Recovery
 }

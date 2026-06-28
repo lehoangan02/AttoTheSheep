@@ -1,6 +1,6 @@
 using UnityEngine;
 using Unity.Netcode;
-using System.Collections.Generic;
+using UnityEngine.VFX;
 
 public class TrollBrain : EnemyBrain
 {
@@ -18,6 +18,10 @@ public class TrollBrain : EnemyBrain
     private float lastSmashTime;
     private float lastChargeTime;
     private float lastTornadoTime;
+
+    // Windup
+    [Header("Troll - Windup")]
+    [SerializeField] private VisualEffect windupAuraVfx;
 
     // Smash
     [Header("Troll - Smash")]
@@ -51,7 +55,20 @@ public class TrollBrain : EnemyBrain
     [SerializeField] private float tornadoWindupTime = 0.5f;
     [SerializeField] private float tornadoMaxAttackTime = 8f;
     [SerializeField] private EnemyHitbox tornadoHitbox;
-    [SerializeField] private GameObject tornadoVfxPrefab;
+    [SerializeField] private VisualEffect tornadoVfx;
+
+    // Earth Spikes
+    [Header("Troll - Earth Spikes")]
+    [SerializeField] private GameObject spikePrefab;
+    [SerializeField] private int spikeCount = 5;
+    [SerializeField] private float spikeSpacing = 1.2f;
+    [SerializeField] private float spikeSpawnInterval = 0.12f;
+
+    // Recovery
+    [Header("Troll - Recovery")]
+    [SerializeField] private float recoveryInterval = 30f;
+    [SerializeField] private float recoveryDuration = 3f;
+    [SerializeField] private bool logRecoveryState = false;
 
     // Runtime state
     private TrollAttack currentAttack;
@@ -59,7 +76,8 @@ public class TrollBrain : EnemyBrain
     private Vector2 dashDir;
     private float dashDistanceLeft;
     private float tornadoTimer;
-    private GameObject tornadoVfxInstance;
+    private float recoveryTimer;
+    private bool recoveryPending;
 
     protected void FixedUpdate()
     {
@@ -70,7 +88,23 @@ public class TrollBrain : EnemyBrain
         if (CurrentState == EnemyState.Hurt) { if (!IsCCLocked()) SetState(EnemyState.Idle); return; }
 
         AcquireTarget();
-        if (CurrentState != EnemyState.Attack)
+
+        // Recovery timer (pauses during Hurt/Dead — those early-return before this point)
+        if (CurrentState != EnemyState.Recovery)
+            recoveryTimer += Time.fixedDeltaTime;
+
+        // Recovery trigger: enter Recovery if timer elapsed and not attacking
+        if (recoveryTimer >= recoveryInterval && CurrentState != EnemyState.Attack && CurrentState != EnemyState.Recovery)
+        {
+            SetState(EnemyState.Recovery);
+        }
+        else if (recoveryTimer >= recoveryInterval && CurrentState == EnemyState.Attack)
+        {
+            recoveryPending = true;
+            if (logRecoveryState) Debug.Log($"[TrollRecovery] pending=true (timer={recoveryTimer:F1}, attacking)");
+        }
+
+        if (CurrentState != EnemyState.Attack && CurrentState != EnemyState.Recovery)
             DecideNextState();
 
         if (CurrentState == EnemyState.Chase && target != null)
@@ -82,6 +116,8 @@ public class TrollBrain : EnemyBrain
         if (CurrentState == EnemyState.Attack && currentAttack == TrollAttack.Tornado && windupComplete && target != null)
         {
             motor.MoveToward(target.transform.position, tornadoSpeed);
+            Vector3 scale = transform.localScale;
+            transform.localScale = new Vector3(Mathf.Abs(scale.x), scale.y, scale.z);
             tornadoTimer += Time.fixedDeltaTime;
             if (tornadoTimer >= tornadoDuration)
                 EndTornado();
@@ -98,6 +134,12 @@ public class TrollBrain : EnemyBrain
         }
 
         stateTimer += Time.fixedDeltaTime;
+
+        if (CurrentState == EnemyState.Recovery && stateTimer >= recoveryDuration)
+        {
+            SetState(EnemyState.Idle);
+            if (logRecoveryState) Debug.Log("[TrollRecovery] Idle (recovery ended)");
+        }
 
         if (CurrentState == EnemyState.Attack && stateTimer > CurrentAttackMaxTime())
             ForceEndAttack();
@@ -166,13 +208,22 @@ public class TrollBrain : EnemyBrain
                 CleanupTornado();
                 break;
             case EnemyState.Hurt:
+                recoveryPending = false;
                 motor.Stop();
                 smashHitbox?.Disable();
                 chargeHitbox?.Disable();
                 CleanupTornado();
                 break;
             case EnemyState.Dead:
+                recoveryPending = false;
                 ForceEndAttack();
+                break;
+            case EnemyState.Recovery:
+                motor.Stop();
+                anim.SetBool("IsRecovering", true);
+                recoveryTimer = 0f;
+                recoveryPending = false;
+                if (logRecoveryState) Debug.Log($"[TrollRecovery] Recovery (timer={recoveryInterval:F1})");
                 break;
         }
     }
@@ -188,6 +239,9 @@ public class TrollBrain : EnemyBrain
             case EnemyState.Attack:
                 smashHitbox?.Disable();
                 anim.SetBool("IsAttacking", false);
+                break;
+            case EnemyState.Recovery:
+                anim.SetBool("IsRecovering", false);
                 break;
         }
     }
@@ -223,6 +277,14 @@ public class TrollBrain : EnemyBrain
             SetState(EnemyState.Idle);
     }
 
+    private void EndAttackTransition()
+    {
+        if (recoveryPending)
+            SetState(EnemyState.Recovery);
+        else
+            SetState(EnemyState.Idle);
+    }
+
     private void CompleteWindup()
     {
         if (!IsServer) return;
@@ -240,15 +302,29 @@ public class TrollBrain : EnemyBrain
                 if (NetworkObject.IsSpawned)
                     entity.isInvulnerable.Value = true;
                 tornadoHitbox?.Enable(tornadoDamagePerTick, null, false, 0f, 0f, tornadoTickInterval);
-                if (tornadoVfxPrefab != null)
-                {
-                    tornadoVfxInstance = Instantiate(tornadoVfxPrefab, transform);
-                    tornadoVfxInstance.transform.localPosition = Vector3.zero;
-                }
+                if (tornadoVfx != null)
+                    tornadoVfx.Play();
                 break;
         }
         anim.SetTrigger("Attack" + currentAttack);
-        Debug.Log("[TrollBrain] Completed windup for attack: " + currentAttack);
+    }
+
+    public void EmitWindupAura()
+    {
+        if (windupAuraVfx != null)
+        {
+            // Number of aura particle to emit: Smash = 1, Charge = 2, Tornado = 3
+            int auraCount = 1;
+            switch (currentAttack)
+            {
+                case TrollAttack.Smash: auraCount = 1; break;
+                case TrollAttack.Charge: auraCount = 2; break;
+                case TrollAttack.Tornado: auraCount = 3; break;
+            }
+            VFXEventAttribute eventAttribute = windupAuraVfx.CreateVFXEventAttribute();
+            eventAttribute.SetInt("BurstAmount", auraCount);
+            windupAuraVfx.SendEvent("OnPlay", eventAttribute);
+        }
     }
 
     public void OnSmashImpact()
@@ -259,24 +335,51 @@ public class TrollBrain : EnemyBrain
     public void OnSmashEnd()
     {
         if (!IsServer) return;
+        
+        if (spikePrefab != null && target != null)
+        {
+            Vector2 dir = ((Vector2)(target.transform.position - transform.position)).normalized;
+            StartCoroutine(SpawnSpikesRoutine(dir));
+        }
+
         smashHitbox?.Disable();
         anim.SetBool("IsAttacking", false);
-        SetState(EnemyState.Idle);
+        EndAttackTransition();
+    }
+    private System.Collections.IEnumerator SpawnSpikesRoutine(Vector2 dir)
+    {
+        for (int i = 1; i <= spikeCount; i++)
+        {
+            Vector3 pos = transform.position + (Vector3)(dir * (i * spikeSpacing));
+            GameObject spikeObj = Instantiate(spikePrefab, pos, Quaternion.identity);
+            Vector3 spikeScale = spikeObj.transform.localScale;
+            float travelFacingSign = dir.x >= 0 ? 1f : -1f;
+            spikeObj.transform.localScale = new Vector3(travelFacingSign * Mathf.Abs(spikeScale.x), spikeScale.y, spikeScale.z);
+
+            NetworkObject netObj = spikeObj.GetComponent<NetworkObject>();
+            if (netObj != null) netObj.Spawn();
+            EarthSpike spike = spikeObj.GetComponent<EarthSpike>();
+            if (spike != null)
+                spike.Initialize(smashDamage, smashEffects, smashKnockbackForce > 0f, smashKnockbackForce, smashKnockbackDuration, entity, dir);
+            if (i < spikeCount)
+                yield return new WaitForSeconds(spikeSpawnInterval);
+        }
     }
 
-    private void EndCharge() { chargeHitbox?.Disable(); anim.SetBool("IsAttacking", false); SetState(EnemyState.Idle); }
+    private void EndCharge() { chargeHitbox?.Disable(); anim.SetBool("IsAttacking", false); EndAttackTransition(); }
     private void CleanupTornado()
     {
         tornadoHitbox?.Disable();
         if (NetworkObject.IsSpawned)
             entity.isInvulnerable.Value = false;
-        if (tornadoVfxInstance != null) { Destroy(tornadoVfxInstance); tornadoVfxInstance = null; }
+        if (tornadoVfx != null)
+            tornadoVfx.Stop();
         tornadoTimer = 0f;
     }
     private void EndTornado()
     {
         CleanupTornado();
         anim.SetBool("IsAttacking", false);
-        SetState(EnemyState.Idle);
+        EndAttackTransition();
     }
 }
