@@ -1,6 +1,8 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Collections;
+using UnityEngine.SceneManagement;
+
 public class AudioManager : MonoBehaviour
 {
     // Singleton pattern
@@ -11,6 +13,38 @@ public class AudioManager : MonoBehaviour
     public int poolSize = 20; 
     private List<AudioSource> audioPool = new List<AudioSource>();
 
+    public enum MusicType
+    {
+        None,
+        UI,
+        FTUE,
+        Level1,
+        Level2,
+        Level3
+    }
+
+    [Header("Music Tracks (Auto-Assigned)")]
+    public AudioClip uiMusic;
+    public AudioClip ftueMusic;
+    public AudioClip level1Music;
+    public AudioClip level2Music;
+    public AudioClip level3Music;
+    
+    [Header("BGM Volume")]
+    [Range(0f, 1f)] public float bgmVolume = 0.5f;
+    private AudioSource bgmSource;
+
+#if UNITY_EDITOR
+    private void OnValidate()
+    {
+        if (uiMusic == null) uiMusic = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/_Shared_Resources/Background_Music/MENU_Derp Nugget.mp3");
+        if (ftueMusic == null) ftueMusic = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/_Shared_Resources/Background_Music/FTUE_Ave Marimba.mp3");
+        if (level1Music == null) level1Music = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/_Shared_Resources/Background_Music/LEVEL1_Club Seamus.mp3");
+        if (level2Music == null) level2Music = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/_Shared_Resources/Background_Music/LEVEL2_Galway.mp3");
+        if (level3Music == null) level3Music = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/_Shared_Resources/Background_Music/LEVEL3_Mountain Emperor.mp3");
+    }
+#endif
+
     private void Awake()
     {
         // Setup Singleton và giữ cho nó sống xuyên suốt các Scene
@@ -19,12 +53,63 @@ public class AudioManager : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject); // Không bị hủy khi load màn mới
             InitializePool(); // Khởi tạo kho loa ngay khi game chạy
+            InitializeBGM();
         }
         else 
         {
             // Nếu lỡ có 2 cái AudioManager sinh ra, hủy cái mới đi
             Destroy(gameObject);
         }
+    }
+
+    private void OnDestroy()
+    {
+    }
+
+    private void InitializeBGM()
+    {
+        GameObject bgmObj = new GameObject("BGM_Player");
+        bgmObj.transform.SetParent(this.transform);
+        bgmSource = bgmObj.AddComponent<AudioSource>();
+        bgmSource.loop = true; // Loop the music
+        bgmSource.playOnAwake = false;
+        bgmSource.spatialBlend = 0f; // 2D sound for BGM
+        bgmSource.volume = bgmVolume; 
+    }
+
+    private AudioClip GetClipFromType(MusicType type)
+    {
+        switch (type)
+        {
+            case MusicType.UI: return uiMusic;
+            case MusicType.FTUE: return ftueMusic;
+            case MusicType.Level1: return level1Music;
+            case MusicType.Level2: return level2Music;
+            case MusicType.Level3: return level3Music;
+            default: return null;
+        }
+    }
+
+    public void PlayMusic(MusicType targetType)
+    {
+        AudioClip clipToPlay = GetClipFromType(targetType);
+
+        // Nếu chọn None thì tắt nhạc
+        if (clipToPlay == null)
+        {
+            bgmSource.Stop();
+            return;
+        }
+
+        // Nếu bài nhạc đó ĐANG PHÁT rồi, thì KHÔNG RESTART LẠI (rất quan trọng cho UI scenes)
+        if (bgmSource.isPlaying && bgmSource.clip == clipToPlay)
+        {
+            return;
+        }
+
+        // Nếu là bài mới thì đổi qua bài đó và phát
+        bgmSource.clip = clipToPlay;
+        bgmSource.Play();
     }
 
     private void InitializePool()
