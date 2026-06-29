@@ -6,7 +6,7 @@ using Unity.Netcode;
 public class PlayerFartSkill : BaseSkillComponent
 {
     [Header("References")]
-    [SerializeField] private ParticleSystem fartGasParticle;
+    [SerializeField] private List<TrailRenderer> dashTrails;
     [SerializeField] private Collider2D parentCollider; 
     [SerializeField] private Rigidbody2D parentRb;
     [SerializeField] private SpriteRenderer playerSprite; 
@@ -14,6 +14,29 @@ public class PlayerFartSkill : BaseSkillComponent
     private FartSkillData currentFartData;
     private PlayerController fartController;
     private bool isDashing = false; // Biến cờ để kiểm tra trạng thái đang lướt
+    private List<Vector3> originalTrailLocalPositions;
+
+    private void Start()
+    {
+        if (dashTrails == null || dashTrails.Count == 0)
+        {
+            dashTrails = new List<TrailRenderer>(GetComponentsInChildren<TrailRenderer>(true));
+        }
+
+        originalTrailLocalPositions = new List<Vector3>();
+        foreach (var trail in dashTrails)
+        {
+            if (trail != null)
+            {
+                originalTrailLocalPositions.Add(trail.transform.localPosition);
+                trail.emitting = false; // Disable emitting by default
+            }
+            else
+            {
+                originalTrailLocalPositions.Add(Vector3.zero);
+            }
+        }
+    }
 
     public override void ServerExecute(SkillData data, NetworkEntity caster, PlayerController controller = null)
     {
@@ -28,23 +51,39 @@ public class PlayerFartSkill : BaseSkillComponent
     public override void ClientPlayVisual(SkillData data)
     {        
         base.ClientPlayVisual(data);
-        if (fartGasParticle != null) 
+        if (data is FartSkillData fartData)
         {
-            fartGasParticle.transform.localRotation = Quaternion.identity;
+            StartCoroutine(PlayTrailRoutine(fartData.dashDuration));
+        }
+    }
 
-            if (playerSprite != null)
+    private IEnumerator PlayTrailRoutine(float duration)
+    {
+        if (dashTrails == null || dashTrails.Count == 0) yield break;
+
+        bool flip = playerSprite != null && playerSprite.flipX;
+
+        for (int i = 0; i < dashTrails.Count; i++)
+        {
+            if (dashTrails[i] == null) continue;
+
+            Vector3 originalPos = (originalTrailLocalPositions != null && originalTrailLocalPositions.Count > i)
+                ? originalTrailLocalPositions[i]
+                : dashTrails[i].transform.localPosition;
+
+            float targetX = flip ? -originalPos.x : originalPos.x;
+            dashTrails[i].transform.localPosition = new Vector3(targetX, originalPos.y, originalPos.z);
+            dashTrails[i].emitting = true;
+        }
+
+        yield return new WaitForSeconds(duration);
+
+        for (int i = 0; i < dashTrails.Count; i++)
+        {
+            if (dashTrails[i] != null)
             {
-                var shapeModule = fartGasParticle.shape;
-                if (playerSprite.flipX) 
-                {
-                    shapeModule.rotation = new Vector3(0, 90, 0); 
-                }
-                else 
-                {
-                    shapeModule.rotation = new Vector3(0, -90, 0); 
-                }
+                dashTrails[i].emitting = false;
             }
-            fartGasParticle.Play();
         }
     }
 
