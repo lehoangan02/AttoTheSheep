@@ -30,8 +30,10 @@ public class ContextSteering2D : MonoBehaviour
     [SerializeField] private float strafeRange = 2f;
 
     [Header("Separation")]
-    [SerializeField] private float separationBiasAngle = 20f; // +clockwise, "pass right"
-    [SerializeField] private float allyScanRadius = 1.5f;
+    [SerializeField] private float separationBiasAngle = 35f; // +clockwise, "pass right"
+    [SerializeField] private float allyScanRadius = 2.5f;
+    [SerializeField] private float closeRepulsionRadius = 0.8f;
+    [SerializeField] private float closeRepulsionStrength = 2f;
 
     [Header("Synthesis")]
     [SerializeField] private float blendAngleThreshold = 45f;
@@ -55,7 +57,8 @@ public class ContextSteering2D : MonoBehaviour
     // Static scratch buffers (shared, safe: single-threaded FixedUpdate).
     // Safe ONLY because Unity's FixedUpdate is single-threaded.
     // If Burst/Jobs are added later, move to instance buffers.
-    static readonly RaycastHit2D[] s_wallHits = new RaycastHit2D[8];
+    // Sized for max 32 rays (rayCount is configurable)
+    static readonly RaycastHit2D[] s_wallHits = new RaycastHit2D[32];
     static readonly Collider2D[] s_allyHits = new Collider2D[16];
 
     void Awake()
@@ -87,16 +90,18 @@ public class ContextSteering2D : MonoBehaviour
     /// <param name="toTargetDir">Normalized direction from self to target.</param>
     /// <param name="distanceToTarget">Current distance to target.</param>
     /// <returns>Normalized blended direction, or Vector2.zero if no viable path.</returns>
-    public Vector2 ComputeDirection(Vector2 toTargetDir, float distanceToTarget)
+    public Vector2 ComputeDirection(Vector2 toTargetDir, float distanceToTarget, bool allowStrafe = true)
     {
         // 1. Compute base interest (dot product of each compass dir vs target direction)
         SteeringMath.ComputeInterest(toTargetDir, dirs8, interest);
 
         // 2. Apply distance scaling: within approachRange, reduce toward-target interest
-        SteeringMath.ApplyDistanceScaling(interest, distanceToTarget, approachRange, approachRangePause);
+        //    Skip when attack is ready (allowStrafe=false) so enemy beelines in
+        if (allowStrafe)
+            SteeringMath.ApplyDistanceScaling(interest, distanceToTarget, approachRange, approachRangePause);
 
         // 3. If strafe enabled and within strafeRange, replace interest with perpendicular direction
-        if (enableStrafe && distanceToTarget <= strafeRange)
+        if (enableStrafe && allowStrafe && distanceToTarget <= strafeRange)
         {
             SteeringMath.ApplyStrafe(interest, dirs8, toTargetDir, transform, ref strafeSign, ref inStrafeMode, strafeRange);
             lastStrafeDir = SteeringMath.Perpendicular(toTargetDir, strafeSign);
@@ -112,7 +117,7 @@ public class ContextSteering2D : MonoBehaviour
         SteeringMath.ComputeDangerRay(transform.position, dirs8, sensorLength, obstacleMask, s_wallHits, danger);
 
         // 5. Add ally separation danger (OverlapCircle for nearby Enemy-layer entities, rotated by bias angle)
-        SteeringMath.AddAllyDanger(transform.position, allyScanRadius, allyMask, selfCollider, s_allyHits, dirs8, separationBiasAngle, danger);
+        SteeringMath.AddAllyDanger(transform.position, allyScanRadius, allyMask, selfCollider, s_allyHits, dirs8, separationBiasAngle, danger, closeRepulsionRadius, closeRepulsionStrength);
 
         // 6. Final = max(0, Interest - Danger) per slot
         for (int i = 0; i < interest.Length; i++)
@@ -212,7 +217,7 @@ public static class SteeringMath
             interest[i] *= t;
     }
 
-    /// <summary>Replace interest with strafe perpendicular. Called when within strafeRange.
+    /// <summary>Blend strafe perpendicular into interest. Called when within strafeRange.
     /// Sign selection: on entry, picks the sign that keeps current facing (dot with self.right). Cached with hysteresis.</summary>
     public static void ApplyStrafe(float[] interest, Vector2[] dirs, Vector2 toTargetDir, Transform self, ref int strafeSign, ref bool inStrafeMode, float strafeRange)
     {
@@ -241,7 +246,7 @@ public static class SteeringMath
 
     /// <summary>OverlapCircle for nearby Enemy-layer colliders. For each ally, weight (1-dist/radius)
     /// into the NEAREST compass slot, then rotate the slot index by biasAngle (clockwise +).</summary>
-    public static void AddAllyDanger(Vector2 origin, float scanRadius, LayerMask allyMask, Collider2D self, Collider2D[] allyHits, Vector2[] dirs, float biasAngle, float[] outDanger)
+    public static void AddAllyDanger(Vector2 origin, float scanRadius, LayerMask allyMask, Collider2D self, Collider2D[] allyHits, Vector2[] dirs, float biasAngle, float[] outDanger, float closeRepulsionRadius = 0f, float closeRepulsionStrength = 1f)
     {
         int count = Physics2D.OverlapCircleNonAlloc(origin, scanRadius, allyHits, allyMask);
         if (count <= 0) return;
@@ -257,6 +262,10 @@ public static class SteeringMath
             if (dist < 0.001f) continue;
             float weight = 1f - (dist / scanRadius);
             if (weight <= 0f) continue;
+
+            // Extra repulsion for very close allies
+            if (dist < closeRepulsionRadius)
+                weight = Mathf.Max(weight, closeRepulsionStrength * (1f - dist / closeRepulsionRadius));
 
             // Find nearest compass slot (unbiased)
             float goalAngle = Mathf.Atan2(toAlly.y, toAlly.x) * Mathf.Rad2Deg;

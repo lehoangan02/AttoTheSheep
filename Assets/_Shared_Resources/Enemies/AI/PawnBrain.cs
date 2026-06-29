@@ -26,7 +26,7 @@ public class PawnBrain : EnemyBrain
         float dist = DistanceTo(target);
         if (dist > entity.Data.attackRange) { SetState(EnemyState.Chase); return; }
         if (IsAttackReady()) { SetState(EnemyState.Attack); return; }
-        SetState(EnemyState.Idle);
+        SetState(EnemyState.Chase);
     }
 
     protected override void OnStateEnter(EnemyState state)
@@ -70,5 +70,5 @@ public class PawnBrain : EnemyBrain
         hitbox?.Enable(entity.Data.attackDamage);
     }
     public void OnAttackHitEnd() => hitbox?.Disable();
-    public void OnAttackEnd() => SetState(EnemyState.Idle);
+    public void OnAttackEnd() => SetState(EnemyState.Chase);
 }

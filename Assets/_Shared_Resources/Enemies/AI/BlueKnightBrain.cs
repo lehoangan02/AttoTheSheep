@@ -32,7 +32,7 @@ public class BlueKnightBrain : EnemyBrain
         float dist = DistanceTo(target);
         if (dist > entity.Data.attackRange) { SetState(EnemyState.Chase); return; }
         if (IsAttackReady()) { SetState(ShouldGuard() ? EnemyState.Guard : EnemyState.Attack); return; }
-        SetState(EnemyState.Idle);
+        SetState(EnemyState.Chase);
     }
 
     protected override void OnStateEnter(EnemyState state)
@@ -85,6 +85,6 @@ public class BlueKnightBrain : EnemyBrain
         hitbox?.Enable(entity.Data.attackDamage);
     }
     public void OnAttackHitEnd() => hitbox?.Disable();
-    public void OnAttackEnd() => SetState(EnemyState.Idle);
-    public void OnGuardEnd() => SetState(EnemyState.Idle);
+    public void OnAttackEnd() => SetState(EnemyState.Chase);
+    public void OnGuardEnd() => SetState(EnemyState.Chase);
 }

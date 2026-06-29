@@ -28,7 +28,7 @@ public class GoblinBrain : EnemyBrain
         float dist = DistanceTo(target);
         if (dist > entity.Data.attackRange) { SetState(EnemyState.Chase); return; }
         if (IsAttackReady()) { SetState(EnemyState.Attack); return; }
-        SetState(EnemyState.Idle);
+        SetState(EnemyState.Chase);
     }
 
     protected override void OnStateEnter(EnemyState state)
@@ -83,5 +83,5 @@ public class GoblinBrain : EnemyBrain
         strongHitbox.Enable(entity.Data.attackDamage * 2);
     }
     public void OnStrongAttackHitEnd() => strongHitbox?.Disable();
-    public void OnAttackEnd() => SetState(EnemyState.Idle);
+    public void OnAttackEnd() => SetState(EnemyState.Chase);
 }

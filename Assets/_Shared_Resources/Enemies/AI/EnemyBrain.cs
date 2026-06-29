@@ -88,7 +88,8 @@ public abstract class EnemyBrain : NetworkBehaviour
             return;
         }
         Vector2 toTarget = (Vector2)(target.transform.position - transform.position);
-        Vector2 dir = steering.ComputeDirection(toTarget.normalized, toTarget.magnitude);
+        bool canStrafe = !IsAttackReady();
+        Vector2 dir = steering.ComputeDirection(toTarget.normalized, toTarget.magnitude, canStrafe);
         if (dir == Vector2.zero)
             motor.Stop();
         else
