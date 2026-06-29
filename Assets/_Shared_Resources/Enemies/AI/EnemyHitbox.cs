@@ -17,6 +17,10 @@ public class EnemyHitbox : MonoBehaviour
     HashSet<NetworkEntity> hitTargets = new HashSet<NetworkEntity>();
     Dictionary<Collider2D, float> nextTickTime = new Dictionary<Collider2D, float>();
 
+    [Header("Building Destruction")]
+    [SerializeField] private bool canDestroyBuildings = false;
+    [SerializeField] private LayerMask buildingLayer = 0;
+
     void Awake()
     {
         brain = GetComponentInParent<EnemyBrain>();
@@ -62,6 +66,16 @@ public class EnemyHitbox : MonoBehaviour
         if (currentDamage == 0 || brain == null) return;
         if (!brain.IsServer) return;
 
+        // Building destruction check (separate path — buildings are NOT NetworkEntity)
+        if (canDestroyBuildings && buildingLayer.value != 0 &&
+            ((buildingLayer.value & (1 << other.gameObject.layer)) != 0))
+        {
+            DestructibleBuilding building = other.GetComponentInParent<DestructibleBuilding>();
+            if (building != null)
+                building.PlayDestructionSequence();
+            return;
+        }
+
         NetworkEntity target = other.GetComponentInParent<NetworkEntity>();
         if (target == null) return;
         if (target == brain.Entity) return;
@@ -90,6 +104,17 @@ public class EnemyHitbox : MonoBehaviour
     {
         if (currentDamage == 0 || brain == null) return;
         if (!brain.IsServer) return;
+
+        // Building destruction check (separate path — buildings are NOT NetworkEntity)
+        if (canDestroyBuildings && buildingLayer.value != 0 &&
+            ((buildingLayer.value & (1 << other.gameObject.layer)) != 0))
+        {
+            DestructibleBuilding building = other.GetComponentInParent<DestructibleBuilding>();
+            if (building != null)
+                building.PlayDestructionSequence();
+            return;
+        }
+
         if (tickInterval <= 0f) return;
 
         NetworkEntity target = other.GetComponentInParent<NetworkEntity>();
