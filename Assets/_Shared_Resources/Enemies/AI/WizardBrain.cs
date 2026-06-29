@@ -33,8 +33,8 @@ public class WizardBrain : EnemyBrain
         if (CurrentState != EnemyState.Attack && CurrentState != EnemyState.Cast)
             DecideNextState();
 
-        if (CurrentState == EnemyState.Chase && target != null)
-            motor.MoveToward(target.transform.position, entity.MoveSpeed * (effectController?.GetSpeedMultiplier() ?? 1f));
+        if (CurrentState == EnemyState.Chase)
+            MoveChaseTarget();
 
         stateTimer += Time.fixedDeltaTime;
 

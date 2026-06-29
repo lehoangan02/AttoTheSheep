@@ -13,8 +13,8 @@ public class SpiderBrain : EnemyBrain
         if (CurrentState == EnemyState.Hurt) { if (!IsCCLocked()) SetState(EnemyState.Idle); return; }
         AcquireTarget();
         if (CurrentState != EnemyState.Attack) DecideNextState();
-        if (CurrentState == EnemyState.Chase && target != null)
-            motor.MoveToward(target.transform.position, entity.MoveSpeed * (effectController?.GetSpeedMultiplier() ?? 1f));
+        if (CurrentState == EnemyState.Chase)
+            MoveChaseTarget();
         stateTimer += Time.fixedDeltaTime;
         if (CurrentState == EnemyState.Attack && stateTimer > 3f)
             SetState(EnemyState.Idle);

@@ -107,8 +107,8 @@ public class TrollBrain : EnemyBrain
         if (CurrentState != EnemyState.Attack && CurrentState != EnemyState.Recovery)
             DecideNextState();
 
-        if (CurrentState == EnemyState.Chase && target != null)
-            motor.MoveToward(target.transform.position, entity.MoveSpeed * (effectController?.GetSpeedMultiplier() ?? 1f));
+        if (CurrentState == EnemyState.Chase)
+            MoveChaseTarget();
 
         if (CurrentState == EnemyState.Attack && !windupComplete && stateTimer >= GetWindupTime())
             CompleteWindup();

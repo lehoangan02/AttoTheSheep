@@ -182,7 +182,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 5.304286
+  orthographic size: 6
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -207,7 +207,7 @@ Transform:
   m_GameObject: {fileID: 35470464}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.89429, y: 0.48195, z: -10}
+  m_LocalPosition: {x: 2.92, y: -2.7, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -390,6 +390,10 @@ PrefabInstance:
       propertyPath: GlobalObjectIdHash
       value: 2159189513
       objectReference: {fileID: 0}
+    - target: {fileID: 5540880923896196431, guid: ec8f1e749bbaf1fb99e6539c8f35d6cb, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8845649309317091640, guid: ec8f1e749bbaf1fb99e6539c8f35d6cb, type: 3}
       propertyPath: m_LocalPosition.x
       value: 5.53
@@ -434,6 +438,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Purple Tower
       objectReference: {fileID: 0}
+    - target: {fileID: 8926151127337413757, guid: ec8f1e749bbaf1fb99e6539c8f35d6cb, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -458,6 +466,14 @@ PrefabInstance:
     - target: {fileID: 5270105802375341375, guid: 64dea76998fccd78ea047e38e6e0e918, type: 3}
       propertyPath: m_Name
       value: Goblin Hut
+      objectReference: {fileID: 0}
+    - target: {fileID: 5270105802375341375, guid: 64dea76998fccd78ea047e38e6e0e918, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5782839809052201189, guid: 64dea76998fccd78ea047e38e6e0e918, type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8102234928606919409, guid: 64dea76998fccd78ea047e38e6e0e918, type: 3}
       propertyPath: m_LocalPosition.x
@@ -751,11 +767,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5214352752191870431, guid: 5067e08349ce7b54d830d89cee772b3a, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -1.89429
+      value: 2.92
       objectReference: {fileID: 0}
     - target: {fileID: 5214352752191870431, guid: 5067e08349ce7b54d830d89cee772b3a, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.48195
+      value: -2.7
       objectReference: {fileID: 0}
     - target: {fileID: 5214352752191870431, guid: 5067e08349ce7b54d830d89cee772b3a, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1059,7 +1075,7 @@ MonoBehaviour:
     CustomLookAtTarget: 0
   Lens:
     FieldOfView: 60
-    OrthographicSize: 5.304286
+    OrthographicSize: 6
     NearClipPlane: 0.3
     FarClipPlane: 1000
     Dutch: 0
@@ -1086,7 +1102,7 @@ Transform:
   m_GameObject: {fileID: 1931734141}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.89429, y: 0.48195, z: -10}
+  m_LocalPosition: {x: 2.92, y: -2.7, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1191,15 +1207,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2149372858635268260, guid: 3238abe42df3f7a7ca5c1fbf8d5eaab1, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8741374443718038099, guid: 3238abe42df3f7a7ca5c1fbf8d5eaab1, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.41
+      value: 2.98
       objectReference: {fileID: 0}
     - target: {fileID: 8741374443718038099, guid: 3238abe42df3f7a7ca5c1fbf8d5eaab1, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 3.87
+      value: 2.89
       objectReference: {fileID: 0}
     - target: {fileID: 8741374443718038099, guid: 3238abe42df3f7a7ca5c1fbf8d5eaab1, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1236,8 +1252,44 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2149372858635268260, guid: 3238abe42df3f7a7ca5c1fbf8d5eaab1, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 309519025487368575}
   m_SourcePrefab: {fileID: 100100000, guid: 3238abe42df3f7a7ca5c1fbf8d5eaab1, type: 3}
+--- !u!1 &309519025487368574 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2149372858635268260, guid: 3238abe42df3f7a7ca5c1fbf8d5eaab1, type: 3}
+  m_PrefabInstance: {fileID: 309519025487368573}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &309519025487368575
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 309519025487368574}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65e4600b56ca75106aa247bf05ac4847, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ContextSteering2D
+  rayCount: 8
+  sensorLength: 2
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 1048832
+  allyMask:
+    serializedVersion: 2
+    m_Bits: 64
+  approachRange: 5
+  approachRangePause: 1.5
+  enableStrafe: 1
+  strafeRange: 2
+  separationBiasAngle: 20
+  allyScanRadius: 1.5
+  blendAngleThreshold: 45
+  drawGizmos: 1
 --- !u!1001 &1272872015625805443
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1779,9 +1831,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3991630347313862510, guid: 24782c5f264a30cd5b5a6e138bc3d25f, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4580063459017841068, guid: 24782c5f264a30cd5b5a6e138bc3d25f, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5747648402609233995, guid: 24782c5f264a30cd5b5a6e138bc3d25f, type: 3}
       propertyPath: m_Name
       value: Troll
+      objectReference: {fileID: 0}
+    - target: {fileID: 5747648402609233995, guid: 24782c5f264a30cd5b5a6e138bc3d25f, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6169221454852917242, guid: 24782c5f264a30cd5b5a6e138bc3d25f, type: 3}
       propertyPath: GlobalObjectIdHash

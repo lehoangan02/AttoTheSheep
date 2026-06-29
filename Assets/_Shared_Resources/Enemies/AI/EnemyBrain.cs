@@ -8,6 +8,7 @@ public abstract class EnemyBrain : NetworkBehaviour
     [SerializeField] protected float scanRadius = 30f;
     [SerializeField] protected string targetTag = "Player";
     [SerializeField] protected LayerMask targetLayers = ~0;
+    [SerializeField] protected ContextSteering2D steering;
 
     [HideInInspector] public NetworkEntity target;
     [HideInInspector] public float lastAttackTime;
@@ -34,6 +35,7 @@ public abstract class EnemyBrain : NetworkBehaviour
     {
         entity = GetComponent<EnemyEntity>();
         motor = GetComponent<EnemyMotor>();
+        if (steering == null) steering = GetComponent<ContextSteering2D>();
         effectController = GetComponent<StatusEffectController>();
         enemyAudio = GetComponent<EnemyAudio>();
         if (enemyAudio == null)
@@ -66,6 +68,31 @@ public abstract class EnemyBrain : NetworkBehaviour
     {
         if (IsValidTarget(target)) return;
         target = FindTarget();
+    }
+
+    /// <summary>Context-steered chase move. If ContextSteering2D is attached, uses the
+    /// 8-way compass against obstacle/ally layers; otherwise falls back to pure seek
+    /// (identical to the old motor.MoveToward(target.position, speed)).</summary>
+    public void MoveChaseTarget()
+    {
+        if (target == null)
+        {
+            motor.Stop();
+            return;
+        }
+        if (IsCCLocked()) { motor.Stop(); return; }
+        float speed = entity.MoveSpeed * (effectController?.GetSpeedMultiplier() ?? 1f);
+        if (steering == null)
+        {
+            motor.MoveToward(target.transform.position, speed);
+            return;
+        }
+        Vector2 toTarget = (Vector2)(target.transform.position - transform.position);
+        Vector2 dir = steering.ComputeDirection(toTarget.normalized, toTarget.magnitude);
+        if (dir == Vector2.zero)
+            motor.Stop();
+        else
+            motor.MoveWith(dir, speed);
     }
 
     protected virtual NetworkEntity FindTarget()

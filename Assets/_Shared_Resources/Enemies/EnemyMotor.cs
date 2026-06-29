@@ -35,6 +35,21 @@ public class EnemyMotor : MonoBehaviour
             transform.localScale = new Vector3(-Mathf.Abs(scale.x), scale.y, scale.z);
     }
 
+    /// <summary>Apply a pre-computed context-steering direction at the given speed.
+    /// Preserves facing-flip + IsMoving semantics of MoveToward. Called by EnemyBrain.MoveChaseTarget.</summary>
+    public void MoveWith(Vector2 dir, float baseSpeed)
+    {
+        if (IsFrozen) { Stop(); return; }
+        if (rb == null) return;
+        if (dir.sqrMagnitude < 0.0001f) { Stop(); return; }
+        dir.Normalize();
+        rb.linearVelocity = dir * baseSpeed * speedMultiplier;
+        IsMoving = true;
+        Vector3 scale = transform.localScale;
+        if (dir.x > 0.01f)      transform.localScale = new Vector3(Mathf.Abs(scale.x), scale.y, scale.z);
+        else if (dir.x < -0.01f) transform.localScale = new Vector3(-Mathf.Abs(scale.x), scale.y, scale.z);
+    }
+
     public void Stop()
     {
         if (rb != null) { rb.linearVelocity = Vector2.zero; rb.Sleep(); }
