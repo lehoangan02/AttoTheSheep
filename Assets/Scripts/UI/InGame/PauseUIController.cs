@@ -11,19 +11,17 @@ namespace AttoTheSheep.UI.InGame
         [SerializeField] private Button optionsButton;
         [SerializeField] private Button mainMenuButton;
 
+        [SerializeField] private Button pauseButton;
+
         [Header("Scene Settings")]
         [SerializeField] private string mainMenuSceneName = "MainMenu";
 
         [Header("Pause Panel")]
-        [Tooltip("Kéo Panel chứa nền đen mờ và giao diện Pause vào đây (không bắt buộc nữa)")]
+        [Tooltip("Kéo Panel chứa nền đen mờ và giao diện Pause vào đây")]
         [SerializeField] private GameObject pausePanel; 
-
-        private Canvas _canvas;
 
         private void Awake()
         {
-            _canvas = GetComponent<Canvas>();
-
             // Tự động tích hợp Stop.cs vào chính Prefab này nếu chưa có
             if (GetComponent<Stop>() == null && Stop.Instance == null)
             {
@@ -36,12 +34,10 @@ namespace AttoTheSheep.UI.InGame
             if (resumeButton != null) resumeButton.onClick.AddListener(OnResumeClicked);
             if (optionsButton != null) optionsButton.onClick.AddListener(OnOptionsClicked);
             if (mainMenuButton != null) mainMenuButton.onClick.AddListener(OnMainMenuClicked);
+            if (pauseButton != null) pauseButton.onClick.AddListener(OnPauseClicked);
 
-            // Mặc định ẩn toàn bộ Canvas khi mới vào game
-            if (_canvas != null) 
-                _canvas.enabled = false;
-            else if (pausePanel != null) 
-                pausePanel.SetActive(false);
+            // Mặc định ẩn giao diện Pause (Overlay) khi mới vào game
+            if (pausePanel != null) pausePanel.SetActive(false);
         }
 
         private void Update()
@@ -66,13 +62,19 @@ namespace AttoTheSheep.UI.InGame
         /// </summary>
         private void UpdateUIVisibility()
         {
-            if (Stop.Instance == null) return;
+            if (Stop.Instance == null || pausePanel == null) return;
             
             // Hiện panel nếu game đang pause, ẩn panel nếu game đang resume
-            if (_canvas != null)
-                _canvas.enabled = Stop.Instance.IsPaused;
-            else if (pausePanel != null)
-                pausePanel.SetActive(Stop.Instance.IsPaused);
+            pausePanel.SetActive(Stop.Instance.IsPaused);
+        }
+
+        private void OnPauseClicked()
+        {
+            if (Stop.Instance != null)
+            {
+                Stop.Instance.TogglePause();
+                UpdateUIVisibility();
+            }
         }
 
         private void OnResumeClicked()
