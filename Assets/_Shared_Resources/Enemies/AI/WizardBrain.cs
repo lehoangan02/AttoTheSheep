@@ -12,9 +12,14 @@ public class WizardBrain : EnemyBrain
     private float lastTransformTime;
     private LambAI currentTransformTarget;
 
-    protected override void Awake()
+    void Awake()
     {
-        base.Awake();
+        entity = GetComponent<EnemyEntity>();
+        motor = GetComponent<EnemyMotor>();
+        steering = GetComponent<ContextSteering2D>();
+        effectController = GetComponent<StatusEffectController>();
+        enemyAudio = GetComponent<EnemyAudio>();
+        anim = GetComponent<Animator>();
         wizData = entity.GetData<WizardEnemyData>();
     }
 

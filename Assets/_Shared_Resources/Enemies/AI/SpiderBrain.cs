@@ -5,9 +5,14 @@ public class SpiderBrain : EnemyBrain
     [SerializeField] private EnemyHitbox hitbox;
     private MeleeEnemyData meleeData;
 
-    protected override void Awake()
+    void Awake()
     {
-        base.Awake();
+        entity = GetComponent<EnemyEntity>();
+        motor = GetComponent<EnemyMotor>();
+        steering = GetComponent<ContextSteering2D>();
+        effectController = GetComponent<StatusEffectController>();
+        enemyAudio = GetComponent<EnemyAudio>();
+        anim = GetComponent<Animator>();
         meleeData = entity.GetData<MeleeEnemyData>();
     }
 

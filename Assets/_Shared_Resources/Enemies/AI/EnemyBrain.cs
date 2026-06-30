@@ -8,7 +8,6 @@ public abstract class EnemyBrain : NetworkBehaviour
     [SerializeField] protected float scanRadius = 30f;
     [SerializeField] protected string targetTag = "Player";
     [SerializeField] protected LayerMask targetLayers = ~0;
-    [SerializeField] protected ContextSteering2D steering;
 
     [HideInInspector] public NetworkEntity target;
     [HideInInspector] public float lastAttackTime;
@@ -20,6 +19,7 @@ public abstract class EnemyBrain : NetworkBehaviour
 
     protected EnemyEntity entity;
     protected EnemyMotor motor;
+    protected ContextSteering2D steering;
     protected StatusEffectController effectController;
     protected EnemyAudio enemyAudio;
     protected Animator anim;
@@ -28,15 +28,13 @@ public abstract class EnemyBrain : NetworkBehaviour
     public EnemyMotor Motor => motor;
     public StatusEffectController EffectController => effectController;
 
-    protected virtual void Awake()
+    void Awake()
     {
         entity = GetComponent<EnemyEntity>();
         motor = GetComponent<EnemyMotor>();
-        if (steering == null) steering = GetComponent<ContextSteering2D>();
+        steering = GetComponent<ContextSteering2D>();
         effectController = GetComponent<StatusEffectController>();
         enemyAudio = GetComponent<EnemyAudio>();
-        if (enemyAudio == null)
-            enemyAudio = gameObject.AddComponent<EnemyAudio>();
         anim = GetComponent<Animator>();
     }
 

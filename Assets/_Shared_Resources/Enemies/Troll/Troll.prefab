@@ -287,6 +287,8 @@ GameObject:
   - component: {fileID: 2847624209071512021}
   - component: {fileID: 2660826806706247188}
   - component: {fileID: 312727644065568402}
+  - component: {fileID: 3047683984879775189}
+  - component: {fileID: 409582896825743840}
   m_Layer: 6
   m_Name: Troll
   m_TagString: Enemy
@@ -543,7 +545,6 @@ MonoBehaviour:
   targetLayers:
     serializedVersion: 2
     m_Bits: 128
-  steering: {fileID: 0}
   target: {fileID: 0}
   lastAttackTime: 0
   IsFrozen: 0
@@ -597,6 +598,49 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemySpawnDeath
   ShowTopMostFoldoutHeaderGroup: 1
+--- !u!114 &3047683984879775189
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5747648402609233995}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65e4600b56ca75106aa247bf05ac4847, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ContextSteering2D
+  rayCount: 8
+  sensorLength: 2
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 1048832
+  allyMask:
+    serializedVersion: 2
+    m_Bits: 64
+  approachRange: 6
+  approachRangePause: 1.5
+  enableStrafe: 1
+  strafeRange: 2
+  separationBiasAngle: 60
+  allyScanRadius: 6
+  closeRepulsionRadius: 3
+  closeRepulsionStrength: 10
+  blendAngleThreshold: 45
+  drawGizmos: 1
+--- !u!114 &409582896825743840
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5747648402609233995}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a3b7ed941b44f3d8a6c89c8df3d6504, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyAudio
+  cues: []
 --- !u!1 &7048237791726301114
 GameObject:
   m_ObjectHideFlags: 0

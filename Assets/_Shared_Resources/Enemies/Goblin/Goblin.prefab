@@ -199,6 +199,8 @@ GameObject:
   - component: {fileID: 8414506706315818385}
   - component: {fileID: 8676959025195992803}
   - component: {fileID: -1637247925003190703}
+  - component: {fileID: 2647072403574727352}
+  - component: {fileID: 3353935197104696619}
   m_Layer: 6
   m_Name: Goblin
   m_TagString: Enemy
@@ -452,7 +454,6 @@ MonoBehaviour:
   targetLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  steering: {fileID: 0}
   target: {fileID: 0}
   lastAttackTime: 0
   IsFrozen: 0
@@ -499,3 +500,46 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemySpawnDeath
   ShowTopMostFoldoutHeaderGroup: 1
+--- !u!114 &2647072403574727352
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5753693385531744272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65e4600b56ca75106aa247bf05ac4847, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ContextSteering2D
+  rayCount: 8
+  sensorLength: 2
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 1048832
+  allyMask:
+    serializedVersion: 2
+    m_Bits: 64
+  approachRange: 6
+  approachRangePause: 1.5
+  enableStrafe: 1
+  strafeRange: 2
+  separationBiasAngle: 60
+  allyScanRadius: 6
+  closeRepulsionRadius: 3
+  closeRepulsionStrength: 10
+  blendAngleThreshold: 45
+  drawGizmos: 1
+--- !u!114 &3353935197104696619
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5753693385531744272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a3b7ed941b44f3d8a6c89c8df3d6504, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyAudio
+  cues: []
