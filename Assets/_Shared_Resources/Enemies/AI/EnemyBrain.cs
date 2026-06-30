@@ -13,7 +13,6 @@ public abstract class EnemyBrain : NetworkBehaviour
     [HideInInspector] public NetworkEntity target;
     [HideInInspector] public float lastAttackTime;
     [HideInInspector] public bool IsFrozen;
-    [HideInInspector] public bool IsStunned;
 
     public EnemyState CurrentState { get; private set; } = EnemyState.Idle;
 

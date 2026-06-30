@@ -106,7 +106,7 @@ public class EarthSpike : NetworkBehaviour
         var ctrl = target.GetComponent<StatusEffectController>();
         if (ctrl == null) return;
         float duration = effectData.duration > 0 ? effectData.duration : effectData.effect.duration;
-        ctrl.ApplyEffect(effectData.effect, duration, source);
+        ctrl.ApplyEffect(effectData.effect, duration, source, effectData.damagePerTick);
     }
 
     private void Despawn()

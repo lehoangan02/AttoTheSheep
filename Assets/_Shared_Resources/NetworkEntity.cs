@@ -3,7 +3,7 @@ using Unity.Netcode;
 using System;
 
 // Common base class for all living entities in the game
-public class NetworkEntity : NetworkBehaviour
+public class NetworkEntity : NetworkBehaviour, IStatusTarget
 {
     [Header("Base Entity Stats")]
     [SerializeField] protected float baseMoveSpeed = 5f;
@@ -15,6 +15,13 @@ public class NetworkEntity : NetworkBehaviour
     
     [Header("Damage Popup")]
     [SerializeField] protected TMPro.TMP_FontAsset damageFont;
+
+    [Header("Status Effect VFX")]
+    [Tooltip("Where status effect VFX should be parented. Defaults to this transform if unassigned.")]
+    [SerializeField] private Transform vfxAnchor;
+
+    /// <summary>Anchor for status effect VFX. Falls back to this transform.</summary>
+    public Transform VfxAnchor => vfxAnchor != null ? vfxAnchor : transform;
 
     [HideInInspector] public StatusEffectController effectController;
 

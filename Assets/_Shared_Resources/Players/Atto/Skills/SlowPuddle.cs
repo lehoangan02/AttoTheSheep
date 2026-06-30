@@ -2,99 +2,101 @@ using UnityEngine;
 using Unity.Netcode;
 using System.Collections.Generic;
 
+/// <summary>
+/// Area effect that applies a slow status effect to entities inside it.
+/// Uses the unified StatusEffectController system. Server-only: trigger
+/// handlers guard with IsServer so effects are not applied on clients.
+/// </summary>
 public class SlowPuddle : NetworkBehaviour
 {
-    [Header("Target Settings (Bộ Lọc Mục Tiêu)")]
-    [Tooltip("Các Layer sẽ bị vũng nước làm chậm (VD: Enemy, Monster)")]
+    [Header("Target Settings")]
+    [Tooltip("Layers that will be slowed by this puddle.")]
     [SerializeField] private LayerMask affectedLayers;
-    
-    [Tooltip("Các Tag sẽ bị làm chậm (VD: Boss, Minion). Bỏ trống nếu không muốn dùng Tag.")]
+
+    [Tooltip("Tags that will be slowed. Leave empty to use only the Layer filter.")]
     [SerializeField] private List<string> affectedTags = new List<string>();
 
-    private float slowMultiplier;
+    private StatusEffectSO slowEffect;
+    private NetworkEntity source;
     private float duration;
-    
-    private List<GameObject> objectsInside = new List<GameObject>();
 
-    public void Initialize(float multiplier, float time)
+    private List<NetworkEntity> entitiesInside = new List<NetworkEntity>();
+
+    public void Initialize(StatusEffectSO effect, NetworkEntity src, float time)
     {
-        slowMultiplier = multiplier;
+        slowEffect = effect;
+        source = src;
         duration = time;
-        
-        Debug.Log($"🌊 [SlowPuddle] Đã khởi tạo vũng nước! Bán kính/Làm chậm: {multiplier}, Tồn tại: {time}s");
 
-        // Chỉ Server mới có quyền đếm ngược thời gian để hủy vũng nước
         if (IsServer)
         {
             Invoke(nameof(DespawnPuddle), duration);
         }
     }
 
-    /// <summary>
-    /// Kiểm tra xem đối tượng có nằm trong danh sách Layer hoặc Tag cho phép hay không.
-    /// </summary>
     private bool IsValidTarget(GameObject target)
     {
-        // 1. Kiểm tra theo Layer
-        // Toán tử bitwise để xem layer của target có nằm trong LayerMask hay không
         if ((affectedLayers.value & (1 << target.layer)) != 0)
-        {
             return true;
-        }
 
-        // 2. Kiểm tra theo Tag
         if (affectedTags != null && affectedTags.Count > 0)
         {
             if (affectedTags.Contains(target.tag))
-            {
                 return true;
-            }
         }
 
-        // Nếu không khớp cả Layer lẫn Tag thì bỏ qua
         return false;
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        GameObject target = other.gameObject;
+        if (!IsServer) return;
+        if (!IsValidTarget(other.gameObject)) return;
 
-        // BỘ LỌC TÙY CHỌN: Dừng lại ngay nếu mục tiêu không hợp lệ
-        if (!IsValidTarget(target)) return;
+        NetworkEntity target = other.GetComponentInParent<NetworkEntity>();
+        if (target == null) return;
 
-        if (!objectsInside.Contains(target))
+        StatusEffectController ctrl = target.GetComponent<StatusEffectController>();
+        if (ctrl == null) return;
+
+        if (!entitiesInside.Contains(target))
         {
-            Debug.Log($"🚶‍♂️ [SlowPuddle] VỪA BƯỚC VÀO: {target.name}");
-            objectsInside.Add(target);
-            ApplySpeedModifier(target, slowMultiplier);
+            entitiesInside.Add(target);
+            // 0 duration = indefinite; removed when entity leaves or puddle despawns.
+            ctrl.ApplyEffect(slowEffect, 0f, source);
         }
     }
 
     private void OnTriggerExit2D(Collider2D other)
     {
-        GameObject target = other.gameObject;
+        if (!IsServer) return;
+        if (!IsValidTarget(other.gameObject)) return;
 
-        // BỘ LỌC TÙY CHỌN: Chỉ xử lý xóa debuff cho những mục tiêu hợp lệ
-        if (!IsValidTarget(target)) return;
+        NetworkEntity target = other.GetComponentInParent<NetworkEntity>();
+        if (target == null) return;
 
-        if (objectsInside.Contains(target))
+        if (entitiesInside.Contains(target))
         {
-            Debug.Log($"🏃‍♂️ [SlowPuddle] VỪA BƯỚC RA: {target.name}");
-            objectsInside.Remove(target);
-            ApplySpeedModifier(target, 1f); // Trả lại tốc độ bình thường
+            entitiesInside.Remove(target);
+            StatusEffectController ctrl = target.GetComponent<StatusEffectController>();
+            if (ctrl != null) ctrl.RemoveEffect(EffectKind.Slow);
         }
     }
 
     public override void OnNetworkDespawn()
     {
-        Debug.Log("💥 [SlowPuddle] Vũng nước bốc hơi! Đang xóa debuff cho những ai còn đứng bên trong...");
-        
-        // Khi vũng nước biến mất, dọn dẹp debuff cho những ai còn đứng trong đó
-        foreach (var obj in objectsInside)
+        // Remove slow from any entities still inside when the puddle disappears.
+        if (IsServer)
         {
-            if (obj != null) ApplySpeedModifier(obj, 1f);
+            foreach (var entity in entitiesInside)
+            {
+                if (entity == null) continue;
+                StatusEffectController ctrl = entity.GetComponent<StatusEffectController>();
+                if (ctrl != null) ctrl.RemoveEffect(EffectKind.Slow);
+            }
         }
-        objectsInside.Clear();
+        entitiesInside.Clear();
+        base.OnNetworkDespawn();
     }
 
     private void DespawnPuddle()
@@ -102,43 +104,6 @@ public class SlowPuddle : NetworkBehaviour
         if (IsServer && NetworkObject.IsSpawned)
         {
             NetworkObject.Despawn(true);
-        }
-    }
-
-    private void ApplySpeedModifier(GameObject target, float multiplier)
-    {
-        // Tìm Rigidbody2D của đối tượng (bắt buộc phải có Rigidbody mới di chuyển được)
-        Rigidbody2D targetRb = target.GetComponent<Rigidbody2D>() ?? target.GetComponentInParent<Rigidbody2D>();
-        
-        if (targetRb == null) 
-        {
-            Debug.Log($"⚠️ [SlowPuddle] BỎ QUA: {target.name} vì không tìm thấy Rigidbody2D.");
-            return; 
-        }
-
-        GameObject rootObj = targetRb.gameObject;
-        
-        // Kiểm tra xem đối tượng này đã bị gắn script SlowDebuff chưa?
-        SlowDebuff debuff = rootObj.GetComponent<SlowDebuff>();
-
-        if (multiplier < 1f) 
-        {
-            // BƯỚC VÀO VŨNG NƯỚC: Tự động gán script Debuff bằng code
-            if (debuff == null) 
-            {
-                debuff = rootObj.AddComponent<SlowDebuff>(); 
-                Debug.Log($"🐌 [SlowPuddle] ĐÃ GẮN script SlowDebuff vào: {rootObj.name}");
-            }
-            debuff.slowMultiplier = multiplier;
-        }
-        else 
-        {
-            // BƯỚC RA NGOÀI: Tự động xóa script Debuff
-            if (debuff != null)
-            {
-                Destroy(debuff);
-                Debug.Log($"✨ [SlowPuddle] ĐÃ XÓA script SlowDebuff khỏi: {rootObj.name}");
-            }
         }
     }
 }

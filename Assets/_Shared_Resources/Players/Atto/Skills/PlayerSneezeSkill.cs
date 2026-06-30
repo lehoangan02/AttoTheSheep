@@ -16,7 +16,7 @@ public class PlayerSneezeSkill : BaseSkillComponent
         {
             currentSneezeData = sneezeData;
             sneezeController = controller;
-            StartCoroutine(SneezeRoutine(sneezeData, controller));
+            StartCoroutine(SneezeRoutine(sneezeData, controller, caster));
         }
     }
 
@@ -25,7 +25,7 @@ public class PlayerSneezeSkill : BaseSkillComponent
         base.ClientPlayVisual(data); 
     }
 
-    private IEnumerator SneezeRoutine(SneezeSkillData data, PlayerController controller)
+    private IEnumerator SneezeRoutine(SneezeSkillData data, PlayerController controller, NetworkEntity caster)
     {
 
         Debug.Log($"🤧 [SNEEZE] Atto hắt xì! Bắn {data.projectileCount} tia nước mũi!");
@@ -80,7 +80,7 @@ public class PlayerSneezeSkill : BaseSkillComponent
             SneezeProjectile projectile = projectileObj.GetComponent<SneezeProjectile>();
             if (projectile != null)
             {
-                projectile.Initialize(projectileDir, data, damagePerProjectile, flipX);
+                projectile.Initialize(projectileDir, data, damagePerProjectile, flipX, caster);
             }
         }
 

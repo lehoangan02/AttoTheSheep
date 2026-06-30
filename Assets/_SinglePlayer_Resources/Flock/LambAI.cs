@@ -165,6 +165,7 @@ public class LambAI : NetworkEntity
     void FixedUpdate()
     {
         if (!IsSpawned || !IsServer || isMovementLocked) return;
+        if (effectController != null && effectController.IsMovementLocked()) return;
 
         // 1. CẬP NHẬT TIMER HOẢNG LOẠN
         if (isPanicking)
@@ -179,7 +180,8 @@ public class LambAI : NetworkEntity
 
         // 2. PHÂN CẤP ƯU TIÊN DI CHUYỂN (STATE MACHINE)
         Vector2 actualTarget = Vector2.zero;
-        float maxSpeedWithNoise = currentMoveSpeed.Value * personalSpeedMultiplier;
+        float effectMult = effectController != null ? effectController.GetSpeedMultiplier() : 1f;
+        float maxSpeedWithNoise = currentMoveSpeed.Value * personalSpeedMultiplier * effectMult;
         float targetSpeed = maxSpeedWithNoise;
         
         bool shouldMove = false;

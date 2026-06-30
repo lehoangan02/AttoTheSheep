@@ -38,7 +38,7 @@ MonoBehaviour:
   projectileMaxDistance: 8
   puddlePrefab: {fileID: 8849798543113921564, guid: 8866c3ed94c78a64fa0fdf9a633ae376, type: 3}
   puddleDuration: 5
-  slowMultiplier: 0.5
+  slowEffect: {fileID: 11400000, guid: 6ed46aef80dfdf01287c162141ef10ae, type: 2}
   hitLayer:
     serializedVersion: 2
     m_Bits: 64

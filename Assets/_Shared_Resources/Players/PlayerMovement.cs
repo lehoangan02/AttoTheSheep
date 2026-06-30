@@ -62,7 +62,8 @@ public class PlayerMovement : NetworkBehaviour
             else if (currentInput.x < 0) spriteRenderer.flipX = true;
         }
 
-        if (isMoving && !isMovementLocked && entity != null && entity.IsAlive)
+        if (isMoving && !isMovementLocked && entity != null && entity.IsAlive
+            && !(entity.effectController != null && entity.effectController.IsMovementLocked()))
         {
             playerAudio?.TryPlayFootstep(transform.position);
         }
@@ -73,8 +74,13 @@ public class PlayerMovement : NetworkBehaviour
         // Change IsServer to IsOwner to match Authority Mode: Owner on NetworkTransform
         if (!IsOwner || isMovementLocked || rb == null) return;
 
-        // Get speed from parent's NetworkEntity, use default 5 if not available
-        float currentSpeed = (entity != null) ? entity.currentMoveSpeed.Value : 5f;
+        // Status effect movement lock (e.g. freeze, stun) — synced via NetworkVariables
+        if (entity != null && entity.effectController != null && entity.effectController.IsMovementLocked())
+            return;
+
+        // Get speed from parent's NetworkEntity, apply status effect speed multiplier
+        float effectMult = (entity != null && entity.effectController != null) ? entity.effectController.GetSpeedMultiplier() : 1f;
+        float currentSpeed = (entity != null) ? entity.currentMoveSpeed.Value * effectMult : 5f;
         
         rb.linearVelocity = localMoveInput * currentSpeed;
     }

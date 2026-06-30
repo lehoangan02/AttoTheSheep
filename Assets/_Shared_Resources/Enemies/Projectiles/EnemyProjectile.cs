@@ -60,7 +60,7 @@ public class EnemyProjectile : NetworkBehaviour
                 {
                     if (effectData?.effect == null) continue;
                     float duration = effectData.duration > 0 ? effectData.duration : effectData.effect.duration;
-                    effectController.ApplyEffect(effectData.effect, duration, source);
+                    effectController.ApplyEffect(effectData.effect, duration, source, effectData.damagePerTick);
                 }
             }
         }

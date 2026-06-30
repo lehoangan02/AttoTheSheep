@@ -145,6 +145,6 @@ public class EnemyHitbox : MonoBehaviour
         var ctrl = target.GetComponent<StatusEffectController>();
         if (ctrl == null) return;
         float duration = effectData.duration > 0 ? effectData.duration : effectData.effect.duration;
-        ctrl.ApplyEffect(effectData.effect, duration, brain.Entity);
+        ctrl.ApplyEffect(effectData.effect, duration, brain.Entity, effectData.damagePerTick);
     }
 }

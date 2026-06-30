@@ -11,14 +11,16 @@ public class SneezeProjectile : NetworkBehaviour
     private float speed;
     private float maxDistance;
     private int damage;
+    private NetworkEntity sourceEntity;
 
     private Vector2 startPosition;
     private bool hasTriggeredPuddle = false; // Ngăn chặn việc sinh ra nhiều vũng nước cùng lúc
 
-    public void Initialize(Vector2 direction, SneezeSkillData data, int overrideDamage = 0, bool flipX = false)
+    public void Initialize(Vector2 direction, SneezeSkillData data, int overrideDamage = 0, bool flipX = false, NetworkEntity source = null)
     {
         // QUAN TRỌNG: Reset lại trạng thái để tránh lỗi khi Object được tái sử dụng (Pooling)
         hasTriggeredPuddle = false; 
+        sourceEntity = source;
 
         skillData = data;
         speed = data.projectileSpeed;
@@ -109,7 +111,7 @@ public class SneezeProjectile : NetworkBehaviour
             SlowPuddle puddleScript = puddleObj.GetComponent<SlowPuddle>();
             if (puddleScript != null)
             {
-                puddleScript.Initialize(skillData.slowMultiplier, skillData.puddleDuration);
+                puddleScript.Initialize(skillData.slowEffect, sourceEntity, skillData.puddleDuration);
             }
         }
 
