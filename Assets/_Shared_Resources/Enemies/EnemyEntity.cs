@@ -12,10 +12,7 @@ public class EnemyEntity : NetworkEntity
     public EnemyBrain Brain => brain;
     public EnemyMotor Motor => motor;
 
-    public float MoveSpeed => Data != null ? Data.MoveSpeed : 5f;
-    public int AttackDamage => Data != null ? Data.attackDamage : 20;
-    public float AttackRange => Data != null ? Data.attackRange : 1.2f;
-    public float AttackCooldown => Data != null ? Data.attackCooldown : 1.25f;
+    public T GetData<T>() where T : EnemyData => data as T;
 
     void Awake()
     {
@@ -48,16 +45,14 @@ public class EnemyEntity : NetworkEntity
     {
         if (data == null) return;
         baseMaxHealth = data.maxHealth;
-        baseMoveSpeed = data.MoveSpeed;
-        baseAttackDamage = data.attackDamage;
-        baseAttackRange = data.attackRange;
+        baseMoveSpeed = data.moveSpeed;
     }
 
     public override void TakeDamage(int damage)
     {
         if (brain != null && brain.ShouldBlockDamage())
         {
-            enemyAudio?.Play(EnemyAudioCueType.Guard);
+            enemyAudio?.Play("Guard");
             return;
         }
 
@@ -70,7 +65,7 @@ public class EnemyEntity : NetworkEntity
     {
         if (brain != null && brain.ShouldBlockDamage())
         {
-            enemyAudio?.Play(EnemyAudioCueType.Guard);
+            enemyAudio?.Play("Guard");
             return;
         }
 
@@ -84,7 +79,7 @@ public class EnemyEntity : NetworkEntity
         if (!IsServer || enemyAudio == null) return;
         if (previousHealth <= 0 || currentHealth.Value >= previousHealth) return;
 
-        enemyAudio.Play(currentHealth.Value <= 0 ? EnemyAudioCueType.Death : EnemyAudioCueType.Hurt);
+        enemyAudio.Play(currentHealth.Value <= 0 ? "Death" : "Hurt");
     }
 
     protected override void Die()

@@ -5,6 +5,12 @@ public class GoblinBrain : EnemyBrain
     [SerializeField] bool isFastAttack = true;
     [SerializeField] private EnemyHitbox fastHitbox;
     [SerializeField] private EnemyHitbox strongHitbox;
+    private MeleeEnemyData meleeData;
+
+    void Awake()
+    {
+        meleeData = entity.GetData<MeleeEnemyData>();
+    }
 
     protected void FixedUpdate()
     {
@@ -26,7 +32,7 @@ public class GoblinBrain : EnemyBrain
     {
         if (target == null) { SetState(EnemyState.Idle); return; }
         float dist = DistanceTo(target);
-        if (dist > entity.Data.attackRange) { SetState(EnemyState.Chase); return; }
+        if (dist > meleeData.attackRange) { SetState(EnemyState.Chase); return; }
         if (IsAttackReady()) { SetState(EnemyState.Attack); return; }
         SetState(EnemyState.Chase);
     }
@@ -38,12 +44,12 @@ public class GoblinBrain : EnemyBrain
         {
             case EnemyState.Chase:
                 anim.SetBool("IsChasing", true);
-                motor.MoveToward(target.transform.position, entity.MoveSpeed * speedMult);
+                motor.MoveToward(target.transform.position, entity.Data.moveSpeed * speedMult);
                 break;
             case EnemyState.Attack:
                 bool useFastAttack = isFastAttack;
                 string trigger = useFastAttack ? "AttackFast" : "AttackStrong";
-                SetAttackAudioId(useFastAttack ? "Fast" : "Strong");
+                enemyAudio.Play(useFastAttack ? "FastStart" : "StrongStart");
                 anim.SetTrigger(trigger);
                 isFastAttack = !isFastAttack;
                 lastAttackTime = Time.time;
@@ -74,13 +80,13 @@ public class GoblinBrain : EnemyBrain
     public void OnFastAttackHitStart()
     {
         if (fastHitbox == null) { Debug.LogWarning("GoblinBrain: fastHitbox not assigned.", this); return; }
-        fastHitbox.Enable(entity.Data.attackDamage);
+        fastHitbox.Enable(meleeData.attackDamage);
     }
     public void OnFastAttackHitEnd() => fastHitbox?.Disable();
     public void OnStrongAttackHitStart()
     {
         if (strongHitbox == null) { Debug.LogWarning("GoblinBrain: strongHitbox not assigned.", this); return; }
-        strongHitbox.Enable(entity.Data.attackDamage * 2);
+        strongHitbox.Enable(meleeData.attackDamage * 2);
     }
     public void OnStrongAttackHitEnd() => strongHitbox?.Disable();
     public void OnAttackEnd() => SetState(EnemyState.Chase);

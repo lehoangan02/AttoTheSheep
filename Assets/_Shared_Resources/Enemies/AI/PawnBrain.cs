@@ -3,6 +3,12 @@ using UnityEngine;
 public class PawnBrain : EnemyBrain
 {
     [SerializeField] private EnemyHitbox hitbox;
+    private MeleeEnemyData meleeData;
+
+    void Awake()
+    {
+        meleeData = entity.GetData<MeleeEnemyData>();
+    }
 
     protected void FixedUpdate()
     {
@@ -24,7 +30,7 @@ public class PawnBrain : EnemyBrain
     {
         if (target == null) { SetState(EnemyState.Idle); return; }
         float dist = DistanceTo(target);
-        if (dist > entity.Data.attackRange) { SetState(EnemyState.Chase); return; }
+        if (dist > meleeData.attackRange) { SetState(EnemyState.Chase); return; }
         if (IsAttackReady()) { SetState(EnemyState.Attack); return; }
         SetState(EnemyState.Chase);
     }
@@ -36,12 +42,13 @@ public class PawnBrain : EnemyBrain
         {
             case EnemyState.Chase:
                 anim.SetBool("IsChasing", true);
-                motor.MoveToward(target.transform.position, entity.MoveSpeed * speedMult);
+                motor.MoveToward(target.transform.position, entity.Data.moveSpeed * speedMult);
                 break;
             case EnemyState.Attack:
                 anim.SetTrigger("Attack");
                 motor.Stop();
                 lastAttackTime = Time.time;
+                enemyAudio.Play("AttackStart");
                 break;
             case EnemyState.Idle:
                 motor.Stop();
@@ -67,7 +74,7 @@ public class PawnBrain : EnemyBrain
     public void OnAttackHitStart()
     {
         if (hitbox == null) { Debug.LogWarning($"[{GetType().Name}] hitbox not wired on {gameObject.name}"); return; }
-        hitbox?.Enable(entity.Data.attackDamage);
+        hitbox?.Enable(meleeData.attackDamage);
     }
     public void OnAttackHitEnd() => hitbox?.Disable();
     public void OnAttackEnd() => SetState(EnemyState.Chase);

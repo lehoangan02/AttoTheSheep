@@ -14,8 +14,7 @@ public class EarthSpike : NetworkBehaviour
     [Header("Earth Spike Configuration")]
     [SerializeField] private Collider2D spikeCollider;
     [SerializeField] private LayerMask targetLayers = ~0;
-    [SerializeField] private EnemyAudio enemyAudio;
-    [SerializeField] private string attackAudioId = "Smash";
+    [SerializeField] private AudioCue hitCue;
 
     private int damage;
     private EffectData[] onHitEffects;
@@ -86,7 +85,9 @@ public class EarthSpike : NetworkBehaviour
 
         hitTargets.Add(target);
         target.TakeDamage(damage, source);
-        enemyAudio?.PlayAttackHit(attackAudioId, target.transform.position);
+
+        if (hitCue != null && hitCue.HasAudio() && AudioManager.Instance != null)
+            AudioManager.Instance.PlaySFX_Directional2D(hitCue.clip, target.transform.position, hitCue.duration);
 
         if (onHitEffects != null)
             foreach (var e in onHitEffects) ApplyEffect(target, e);

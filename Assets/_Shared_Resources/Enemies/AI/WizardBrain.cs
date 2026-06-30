@@ -4,22 +4,18 @@ using Unity.Netcode;
 public class WizardBrain : EnemyBrain
 {
     [Header("Throw Ball")]
-    [SerializeField] private float throwRange = 8f;
-    [SerializeField] private float throwCooldown = 1.5f;
-    [SerializeField] private int throwDamage = 40;
-    [SerializeField] private float ballSpeed = 7f;
-    [SerializeField] private GameObject explosionBallPrefab;
     [SerializeField] private Transform throwSpawn;
 
-    [Header("Transform")]
-    [SerializeField] private float transformRange = 3f;
-    [SerializeField] private float transformCooldown = 8f;
-    [SerializeField] private GameObject transformSpellVFXPrefab;
-    [SerializeField] private GameObject pigPrefab;
+    private WizardEnemyData wizData;
 
     private float lastThrowTime;
     private float lastTransformTime;
     private LambAI currentTransformTarget;
+
+    void Awake()
+    {
+        wizData = entity.GetData<WizardEnemyData>();
+    }
 
     protected void FixedUpdate()
     {
@@ -84,13 +80,13 @@ public class WizardBrain : EnemyBrain
 
         LambAI lambTarget = target as LambAI;
         if (lambTarget != null && lambTarget.IsAlive
-            && dist <= transformRange && IsTransformReady())
+            && dist <= wizData.transformRange && IsTransformReady())
         {
             SetState(EnemyState.Cast);
             return;
         }
 
-        if (dist <= throwRange && IsThrowReady())
+        if (dist <= wizData.throwRange && IsThrowReady())
         {
             SetState(EnemyState.Attack);
             return;
@@ -107,13 +103,13 @@ public class WizardBrain : EnemyBrain
             case EnemyState.Chase:
                 anim.SetBool("IsChasing", true);
                 if (target != null)
-                    motor.MoveToward(target.transform.position, entity.MoveSpeed * speedMult);
+                    motor.MoveToward(target.transform.position, entity.Data.moveSpeed * speedMult);
                 break;
             case EnemyState.Attack:
                 anim.SetTrigger("Attack");
                 motor.Stop();
                 lastThrowTime = Time.time;
-                SetAttackAudioId("Throw");
+                enemyAudio.Play("ThrowStart");
                 break;
             case EnemyState.Cast:
                 Debug.Log("[WizardBrain] Transforming lamb: " + target.name);
@@ -121,7 +117,7 @@ public class WizardBrain : EnemyBrain
                 motor.Stop();
                 lastTransformTime = Time.time;
                 currentTransformTarget = target as LambAI;
-                SetAttackAudioId("Transform");
+                enemyAudio.Play("TransformStart");
                 break;
             case EnemyState.Idle:
                 motor.Stop();
@@ -144,23 +140,23 @@ public class WizardBrain : EnemyBrain
         }
     }
 
-    private bool IsThrowReady() => Time.time >= lastThrowTime + throwCooldown;
-    private bool IsTransformReady() => Time.time >= lastTransformTime + transformCooldown;
+    private bool IsThrowReady() => Time.time >= lastThrowTime + wizData.throwCooldown;
+    private bool IsTransformReady() => Time.time >= lastTransformTime + wizData.transformCooldown;
 
     public void OnThrowSpawnBall()
     {
         if (!IsServer) return;
-        if (explosionBallPrefab == null || throwSpawn == null) return;
+        if (wizData.explosionBallPrefab == null || throwSpawn == null) return;
         if (target == null) return;
 
         Vector2 dir = (target.transform.position - throwSpawn.position).normalized;
-        GameObject ballObj = Instantiate(explosionBallPrefab, throwSpawn.position, Quaternion.identity);
+        GameObject ballObj = Instantiate(wizData.explosionBallPrefab, throwSpawn.position, Quaternion.identity);
         NetworkObject netObj = ballObj.GetComponent<NetworkObject>();
         if (netObj != null) netObj.Spawn();
 
         ExplosionBallProjectile proj = ballObj.GetComponent<ExplosionBallProjectile>();
         if (proj != null)
-            proj.Initialize(dir, ballSpeed, throwDamage, null, entity);
+            proj.Initialize(dir, wizData.ballSpeed, wizData.throwDamage, null, entity);
     }
 
     public void OnThrowEnd()
@@ -176,18 +172,18 @@ public class WizardBrain : EnemyBrain
 
         Vector3 spawnPos = currentTransformTarget.transform.position;
 
-        if (transformSpellVFXPrefab != null)
+        if (wizData.transformSpellVFXPrefab != null)
         {
-            GameObject vfx = Instantiate(transformSpellVFXPrefab, spawnPos, Quaternion.identity);
+            GameObject vfx = Instantiate(wizData.transformSpellVFXPrefab, spawnPos, Quaternion.identity);
             NetworkObject vfxNetObj = vfx.GetComponent<NetworkObject>();
             if (vfxNetObj != null) vfxNetObj.Spawn();
         }
 
         currentTransformTarget.TakeDamage(9999, entity);
 
-        if (pigPrefab != null)
+        if (wizData.pigPrefab != null)
         {
-            GameObject pig = Instantiate(pigPrefab, spawnPos, Quaternion.identity);
+            GameObject pig = Instantiate(wizData.pigPrefab, spawnPos, Quaternion.identity);
             NetworkObject pigNetObj = pig.GetComponent<NetworkObject>();
             if (pigNetObj != null) pigNetObj.Spawn();
         }

@@ -6,6 +6,12 @@ public class BlackKnightBrain : EnemyBrain
     bool isLeftAttack = true;
     [SerializeField] private EnemyHitbox leftHitbox;
     [SerializeField] private EnemyHitbox rightHitbox;
+    private MeleeEnemyData meleeData;
+
+    void Awake()
+    {
+        meleeData = entity.GetData<MeleeEnemyData>();
+    }
 
     protected void FixedUpdate()
     {
@@ -32,7 +38,7 @@ public class BlackKnightBrain : EnemyBrain
     {
         if (target == null) { SetState(EnemyState.Idle); return; }
         float dist = DistanceTo(target);
-        if (dist > entity.Data.attackRange) { SetState(EnemyState.Chase); return; }
+        if (dist > meleeData.attackRange) { SetState(EnemyState.Chase); return; }
         if (IsAttackReady()) { SetState(ShouldGuard() ? EnemyState.Guard : EnemyState.Attack); return; }
         SetState(EnemyState.Chase);
     }
@@ -44,11 +50,11 @@ public class BlackKnightBrain : EnemyBrain
         {
             case EnemyState.Chase:
                 anim.SetBool("IsChasing", true);
-                motor.MoveToward(target.transform.position, entity.MoveSpeed * speedMult);
+                motor.MoveToward(target.transform.position, entity.Data.moveSpeed * speedMult);
                 break;
             case EnemyState.Attack:
                 bool useLeftAttack = isLeftAttack;
-                SetAttackAudioId(useLeftAttack ? "Left" : "Right");
+                enemyAudio.Play(useLeftAttack ? "LeftStart" : "RightStart");
                 anim.SetTrigger(useLeftAttack ? "AttackLeft" : "AttackRight");
                 isLeftAttack = !isLeftAttack;
                 motor.Stop();
@@ -88,13 +94,13 @@ public class BlackKnightBrain : EnemyBrain
     public void OnLeftAttackHitStart()
     {
         if (leftHitbox == null) { Debug.LogWarning("[BlackKnightBrain] OnLeftAttackHitStart: leftHitbox is not assigned."); return; }
-        leftHitbox.Enable(entity.Data.attackDamage);
+        leftHitbox.Enable(meleeData.attackDamage);
     }
     public void OnLeftAttackHitEnd() => leftHitbox?.Disable();
     public void OnRightAttackHitStart()
     {
         if (rightHitbox == null) { Debug.LogWarning("[BlackKnightBrain] OnRightAttackHitStart: rightHitbox is not assigned."); return; }
-        rightHitbox.Enable(entity.Data.attackDamage);
+        rightHitbox.Enable(meleeData.attackDamage);
     }
     public void OnRightAttackHitEnd() => rightHitbox?.Disable();
     public void OnAttackEnd() => SetState(EnemyState.Chase);

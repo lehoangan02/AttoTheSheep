@@ -13,9 +13,11 @@ public class EnemyHitbox : MonoBehaviour
     float currentKnockbackDuration;
     float tickInterval;
     EnemyBrain brain;
-    EnemyAudio enemyAudio;
     HashSet<NetworkEntity> hitTargets = new HashSet<NetworkEntity>();
     Dictionary<Collider2D, float> nextTickTime = new Dictionary<Collider2D, float>();
+
+    [Header("Audio")]
+    [SerializeField] private AudioCue hitCue;
 
     [Header("Building Destruction")]
     [SerializeField] private bool canDestroyBuildings = false;
@@ -24,9 +26,6 @@ public class EnemyHitbox : MonoBehaviour
     void Awake()
     {
         brain = GetComponentInParent<EnemyBrain>();
-        enemyAudio = GetComponentInParent<EnemyAudio>();
-        if (enemyAudio == null && brain != null)
-            enemyAudio = brain.gameObject.AddComponent<EnemyAudio>();
         if (hitboxCollider == null)
             hitboxCollider = GetComponent<Collider2D>();
         Disable();
@@ -88,7 +87,8 @@ public class EnemyHitbox : MonoBehaviour
         if (tickInterval > 0f)
             nextTickTime[other] = Time.time + tickInterval;
         target.TakeDamage(currentDamage, brain.Entity);
-        enemyAudio?.PlayAttackHit(brain.CurrentAttackAudioId, target.transform.position);
+        if (hitCue != null && hitCue.HasAudio() && AudioManager.Instance != null)
+            AudioManager.Instance.PlaySFX_Directional2D(hitCue.clip, target.transform.position, hitCue.duration);
 
         if (currentEffects != null)
             foreach (var e in currentEffects) ApplyEffect(target, e);
@@ -127,7 +127,8 @@ public class EnemyHitbox : MonoBehaviour
 
         nextTickTime[other] = Time.time + tickInterval;
         target.TakeDamage(currentDamage, brain.Entity);
-        enemyAudio?.PlayAttackHit(brain.CurrentAttackAudioId, target.transform.position);
+        if (hitCue != null && hitCue.HasAudio() && AudioManager.Instance != null)
+            AudioManager.Instance.PlaySFX_Directional2D(hitCue.clip, target.transform.position, hitCue.duration);
 
         if (currentEffects != null)
             foreach (var e in currentEffects) ApplyEffect(target, e);

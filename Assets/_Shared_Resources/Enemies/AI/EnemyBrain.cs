@@ -23,12 +23,10 @@ public abstract class EnemyBrain : NetworkBehaviour
     protected StatusEffectController effectController;
     protected EnemyAudio enemyAudio;
     protected Animator anim;
-    protected string currentAttackAudioId;
 
     public EnemyEntity Entity => entity;
     public EnemyMotor Motor => motor;
     public StatusEffectController EffectController => effectController;
-    public string CurrentAttackAudioId => currentAttackAudioId;
 
     void Awake()
     {
@@ -61,7 +59,7 @@ public abstract class EnemyBrain : NetworkBehaviour
 
     protected bool IsCCLocked() => IsFrozen || (effectController != null && effectController.IsMovementLocked());
 
-    protected bool IsAttackReady() => Time.time >= lastAttackTime + (entity?.Data?.attackCooldown ?? 1.25f);
+    protected bool IsAttackReady() => Time.time >= lastAttackTime + (entity.GetData<MeleeEnemyData>()?.attackCooldown ?? 0f);
 
     public virtual void AcquireTarget()
     {
@@ -80,7 +78,7 @@ public abstract class EnemyBrain : NetworkBehaviour
             return;
         }
         if (IsCCLocked()) { motor.Stop(); return; }
-        float speed = entity.MoveSpeed * (effectController?.GetSpeedMultiplier() ?? 1f);
+        float speed = entity.Data.moveSpeed * (effectController?.GetSpeedMultiplier() ?? 1f);
         if (steering == null)
         {
             motor.MoveToward(target.transform.position, speed);
@@ -121,25 +119,17 @@ public abstract class EnemyBrain : NetworkBehaviour
 
     protected abstract void DecideNextState();
 
-    protected void SetAttackAudioId(string attackId)
-    {
-        currentAttackAudioId = attackId;
-    }
-
     private void PlayStateAudio(EnemyState state)
     {
         if (enemyAudio == null) return;
 
         switch (state)
         {
-            case EnemyState.Attack:
-                enemyAudio.PlayAttackStart(currentAttackAudioId);
-                break;
             case EnemyState.Hurt:
-                enemyAudio.Play(EnemyAudioCueType.Hurt);
+                enemyAudio.Play("Hurt");
                 break;
             case EnemyState.Dead:
-                enemyAudio.Play(EnemyAudioCueType.Death);
+                enemyAudio.Play("Death");
                 break;
         }
     }

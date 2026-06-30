@@ -4,6 +4,12 @@ public class BlueKnightBrain : EnemyBrain
 {
     [SerializeField] private EnemyHitbox hitbox;
     [SerializeField] float guardChance = 0.2f;
+    private MeleeEnemyData meleeData;
+
+    void Awake()
+    {
+        meleeData = entity.GetData<MeleeEnemyData>();
+    }
 
     protected void FixedUpdate()
     {
@@ -30,7 +36,7 @@ public class BlueKnightBrain : EnemyBrain
     {
         if (target == null) { SetState(EnemyState.Idle); return; }
         float dist = DistanceTo(target);
-        if (dist > entity.Data.attackRange) { SetState(EnemyState.Chase); return; }
+        if (dist > meleeData.attackRange) { SetState(EnemyState.Chase); return; }
         if (IsAttackReady()) { SetState(ShouldGuard() ? EnemyState.Guard : EnemyState.Attack); return; }
         SetState(EnemyState.Chase);
     }
@@ -42,12 +48,13 @@ public class BlueKnightBrain : EnemyBrain
         {
             case EnemyState.Chase:
                 anim.SetBool("IsChasing", true);
-                motor.MoveToward(target.transform.position, entity.MoveSpeed * speedMult);
+                motor.MoveToward(target.transform.position, entity.Data.moveSpeed * speedMult);
                 break;
             case EnemyState.Attack:
                 anim.SetTrigger("Attack");
                 motor.Stop();
                 lastAttackTime = Time.time;
+                enemyAudio.Play("AttackStart");
                 break;
             case EnemyState.Guard:
                 anim.SetTrigger("Guard");
@@ -82,7 +89,7 @@ public class BlueKnightBrain : EnemyBrain
     public void OnAttackHitStart()
     {
         if (hitbox == null) { Debug.LogWarning($"[{GetType().Name}] hitbox not wired on {gameObject.name}"); return; }
-        hitbox?.Enable(entity.Data.attackDamage);
+        hitbox?.Enable(meleeData.attackDamage);
     }
     public void OnAttackHitEnd() => hitbox?.Disable();
     public void OnAttackEnd() => SetState(EnemyState.Chase);
