@@ -7,7 +7,7 @@ public class EnemyHitbox : MonoBehaviour
     [SerializeField] private Collider2D hitboxCollider;
 
     int currentDamage;
-    EffectData[] currentEffects;
+    StatusEffectData[] currentEffects;
     bool currentCausesKnockback;
     float currentKnockbackForce;
     float currentKnockbackDuration;
@@ -31,7 +31,7 @@ public class EnemyHitbox : MonoBehaviour
         Disable();
     }
 
-    public void Enable(int damage, EffectData[] onHitEffects = null, bool causesKnockback = false, float knockbackForce = 0f, float knockbackDuration = 0f, float tickInterval = 0f)
+    public void Enable(int damage, StatusEffectData[] onHitEffects = null, bool causesKnockback = false, float knockbackForce = 0f, float knockbackDuration = 0f, float tickInterval = 0f)
     {
         currentDamage = damage;
         currentEffects = onHitEffects;
@@ -140,12 +140,11 @@ public class EnemyHitbox : MonoBehaviour
         }
     }
 
-    void ApplyEffect(NetworkEntity target, EffectData effectData)
+    void ApplyEffect(NetworkEntity target, StatusEffectData effect)
     {
-        if (effectData == null || effectData.effect == null) return;
+        if (effect == null) return;
         var ctrl = target.GetComponent<StatusEffectController>();
         if (ctrl == null) return;
-        float duration = effectData.duration > 0 ? effectData.duration : effectData.effect.duration;
-        ctrl.ApplyEffect(effectData.effect, duration, brain.Entity, effectData.damagePerTick);
+        ctrl.ApplyEffect(effect, 0f, brain.Entity);
     }
 }

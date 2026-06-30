@@ -13,6 +13,6 @@ public class SneezeSkillData : SkillData
     [Header("Cài đặt Vùng Làm Chậm (Puddle)")]
     public GameObject puddlePrefab;         // Prefab vũng nước mũi rơi xuống đất
     public float puddleDuration = 5f;       // Thời gian vũng nước tồn tại
-    public StatusEffectSO slowEffect;       // Hiệu ứng làm chậm (gán trong Editor)
+    public StatusEffectData slowEffect;       // Hiệu ứng làm chậm (gán trong Editor)
     public LayerMask hitLayer;              // Layer để đạn dừng lại (Nên bao gồm Quái vật và Môi trường/Tường)
 }

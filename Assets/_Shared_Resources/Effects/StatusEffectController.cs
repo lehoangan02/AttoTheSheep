@@ -139,7 +139,7 @@ public class StatusEffectController : NetworkBehaviour
     /// <param name="duration">Override duration. &lt;=0 uses the SO default; if SO duration is also 0, the effect is indefinite.</param>
     /// <param name="source">The entity that applied the effect (for damage attribution, knockback direction).</param>
     /// <param name="damagePerTickOverride">Override DoT damage. &lt;=0 uses the SO default.</param>
-    public void ApplyEffect(StatusEffectSO data, float duration, NetworkEntity source, int damagePerTickOverride = 0)
+    public void ApplyEffect(StatusEffectData data, float duration, NetworkEntity source, int damagePerTickOverride = 0)
     {
         if (!IsServer || data == null) return;
 

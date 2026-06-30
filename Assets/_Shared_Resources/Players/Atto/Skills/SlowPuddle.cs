@@ -16,13 +16,13 @@ public class SlowPuddle : NetworkBehaviour
     [Tooltip("Tags that will be slowed. Leave empty to use only the Layer filter.")]
     [SerializeField] private List<string> affectedTags = new List<string>();
 
-    private StatusEffectSO slowEffect;
+    private StatusEffectData slowEffect;
     private NetworkEntity source;
     private float duration;
 
     private List<NetworkEntity> entitiesInside = new List<NetworkEntity>();
 
-    public void Initialize(StatusEffectSO effect, NetworkEntity src, float time)
+    public void Initialize(StatusEffectData effect, NetworkEntity src, float time)
     {
         slowEffect = effect;
         source = src;

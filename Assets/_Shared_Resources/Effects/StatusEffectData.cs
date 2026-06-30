@@ -19,7 +19,7 @@ public enum EffectStacking
 /// Create assets via Create &gt; Gameplay &gt; Effects &gt; Status Effect.
 /// </summary>
 [CreateAssetMenu(menuName = "Gameplay/Effects/Status Effect")]
-public class StatusEffectSO : ScriptableObject
+public class StatusEffectData : ScriptableObject
 {
     [Header("Identity")]
     [Tooltip("Effect category — used for stacking, queries, and VFX mapping.")]

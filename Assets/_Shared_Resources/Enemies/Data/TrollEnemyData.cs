@@ -7,7 +7,7 @@ public class TrollEnemyData : EnemyData
     public float smashRange = 2f;
     public float smashCooldown = 3f;
     public int smashDamage = 40;
-    public EffectData[] smashEffects;
+    public StatusEffectData[] smashEffects;
     public float smashKnockbackForce = 8f;
     public float smashKnockbackDuration = 0.25f;
     public float smashWindupTime = 0.5f;
@@ -19,7 +19,7 @@ public class TrollEnemyData : EnemyData
     public float chargeSpeed = 12f;
     public float chargeMaxDistance = 10f;
     public int chargeDamage = 35;
-    public EffectData[] chargeEffects;
+    public StatusEffectData[] chargeEffects;
     public float chargeKnockbackForce = 10f;
     public float chargeKnockbackDuration = 0.2f;
     public float chargeWindupTime = 0.5f;

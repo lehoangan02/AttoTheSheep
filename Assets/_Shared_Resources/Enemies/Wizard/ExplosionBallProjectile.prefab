@@ -222,10 +222,7 @@ MonoBehaviour:
   speed: 8
   maxDistance: 15
   damage: 100
-  onHitEffectData:
-  - effect: {fileID: 0}
-    duration: 0
-    damagePerTick: 0
+  onHitEffects: []
   targetLayers:
     serializedVersion: 2
     m_Bits: 128

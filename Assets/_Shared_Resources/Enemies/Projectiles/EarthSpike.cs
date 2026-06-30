@@ -17,7 +17,7 @@ public class EarthSpike : NetworkBehaviour
     [SerializeField] private AudioCue hitCue;
 
     private int damage;
-    private EffectData[] onHitEffects;
+    private StatusEffectData[] onHitEffects;
     private bool causesKnockback;
     private float knockbackForce;
     private float knockbackDuration;
@@ -30,7 +30,7 @@ public class EarthSpike : NetworkBehaviour
     /// Disables the collider and clears hit history; the collider only becomes
     /// active once OnSpikeRisen() fires from the rise animation.
     /// </summary>
-    public void Initialize(int dmg, EffectData[] effects, bool kb, float kbForce, float kbDuration, NetworkEntity src, Vector2 dir)
+    public void Initialize(int dmg, StatusEffectData[] effects, bool kb, float kbForce, float kbDuration, NetworkEntity src, Vector2 dir)
     {
         damage = dmg;
         onHitEffects = effects;
@@ -101,13 +101,12 @@ public class EarthSpike : NetworkBehaviour
         }
     }
 
-    private void ApplyEffect(NetworkEntity target, EffectData effectData)
+    private void ApplyEffect(NetworkEntity target, StatusEffectData effect)
     {
-        if (effectData == null || effectData.effect == null) return;
+        if (effect == null) return;
         var ctrl = target.GetComponent<StatusEffectController>();
         if (ctrl == null) return;
-        float duration = effectData.duration > 0 ? effectData.duration : effectData.effect.duration;
-        ctrl.ApplyEffect(effectData.effect, duration, source, effectData.damagePerTick);
+        ctrl.ApplyEffect(effect, 0f, source);
     }
 
     private void Despawn()

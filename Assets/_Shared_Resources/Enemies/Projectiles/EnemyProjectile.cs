@@ -6,7 +6,7 @@ public class EnemyProjectile : NetworkBehaviour
     [SerializeField] protected float speed = 8f;
     [SerializeField] protected float maxDistance = 15f;
     [SerializeField] protected int damage = 100;
-    [SerializeField] protected EffectData[] onHitEffectData;
+    [SerializeField] protected StatusEffectData[] onHitEffects;
     [SerializeField] protected LayerMask targetLayers = ~0;
 
     protected Rigidbody2D rb;
@@ -20,12 +20,12 @@ public class EnemyProjectile : NetworkBehaviour
         rb = GetComponent<Rigidbody2D>();
     }
 
-    public virtual void Initialize(Vector2 dir, float spd, int dmg, EffectData[] effectDatas, NetworkEntity src)
+    public virtual void Initialize(Vector2 dir, float spd, int dmg, StatusEffectData[] effects, NetworkEntity src)
     {
         direction = dir.normalized;
         speed = spd;
         damage = dmg;
-        onHitEffectData = effectDatas;
+        onHitEffects = effects;
         source = src;
         startPosition = transform.position;
         hasHit = false;
@@ -51,16 +51,15 @@ public class EnemyProjectile : NetworkBehaviour
         hasHit = true;
         target.TakeDamage(damage);
 
-        if (onHitEffectData != null && onHitEffectData.Length > 0)
+        if (onHitEffects != null && onHitEffects.Length > 0)
         {
             StatusEffectController effectController = target.GetComponent<StatusEffectController>();
             if (effectController != null)
             {
-                foreach (EffectData effectData in onHitEffectData)
+                foreach (StatusEffectData effect in onHitEffects)
                 {
-                    if (effectData?.effect == null) continue;
-                    float duration = effectData.duration > 0 ? effectData.duration : effectData.effect.duration;
-                    effectController.ApplyEffect(effectData.effect, duration, source, effectData.damagePerTick);
+                    if (effect == null) continue;
+                    effectController.ApplyEffect(effect, 0f, source);
                 }
             }
         }

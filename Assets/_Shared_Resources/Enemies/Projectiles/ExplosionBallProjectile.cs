@@ -44,16 +44,15 @@ public class ExplosionBallProjectile : EnemyProjectile
             if (target == null || target == source || !target.IsAlive) continue;
             target.TakeDamage(damage, source);
 
-            if (onHitEffectData != null && onHitEffectData.Length > 0)
+            if (onHitEffects != null && onHitEffects.Length > 0)
             {
                 StatusEffectController effectController = target.GetComponent<StatusEffectController>();
                 if (effectController != null)
                 {
-                    foreach (EffectData effectData in onHitEffectData)
+                    foreach (StatusEffectData effect in onHitEffects)
                     {
-                        if (effectData?.effect == null) continue;
-                        float duration = effectData.duration > 0 ? effectData.duration : effectData.effect.duration;
-                        effectController.ApplyEffect(effectData.effect, duration, source, effectData.damagePerTick);
+                        if (effect == null) continue;
+                        effectController.ApplyEffect(effect, 0f, source);
                     }
                 }
             }
