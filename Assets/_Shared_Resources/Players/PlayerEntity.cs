@@ -5,6 +5,9 @@ using System.Collections;
 
 public class PlayerEntity : NetworkEntity
 {
+    // Cờ báo hiệu toàn cầu khi có bất kỳ người chơi nào chết (Dùng cho Game Over)
+    public static event System.Action OnAnyPlayerDied;
+
     [Header("Damage Feedback (Hiệu ứng trúng đòn)")]
     [SerializeField] private SpriteRenderer spriteRenderer;
     [SerializeField] private Color damageColor = Color.red; 
@@ -72,6 +75,9 @@ public class PlayerEntity : NetworkEntity
         PlayDeathClientRpc();
         base.Die();
         Debug.Log("Player has been defeated! Showing Game Over screen...");
+        
+        // Phát tín hiệu cho các Manager biết Player vừa chết
+        OnAnyPlayerDied?.Invoke();
     }
 
     // ==========================================

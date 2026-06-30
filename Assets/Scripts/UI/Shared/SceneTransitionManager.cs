@@ -117,11 +117,24 @@ public class SceneTransitionManager : MonoBehaviour
         }
         SetDoorsProgress(1f);
 
+        // Tích hợp Loading Screen: Bật con cừu chạy sau khi cửa đã đóng kín
+        if (AttoTheSheep.Core.LoadingManager.Instance != null)
+        {
+            AttoTheSheep.Core.LoadingManager.Instance.Show("msg_loading_game");
+            yield return null; // Đợi 1 frame để UI update
+        }
+
         // 2. Load Scene
         yield return SceneManager.LoadSceneAsync(sceneName);
 
         // Optional short delay
         yield return new WaitForSecondsRealtime(0.1f);
+
+        // Tắt Loading Screen trước khi mở cửa
+        if (AttoTheSheep.Core.LoadingManager.Instance != null)
+        {
+            AttoTheSheep.Core.LoadingManager.Instance.Hide();
+        }
 
         // 3. Open doors
         elapsed = 0f;

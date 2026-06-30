@@ -100,9 +100,13 @@ public class MapLobbyController : MonoBehaviour
 
     private void OnLevelClicked(int levelIndex)
     {
-        Debug.Log($"[MapLobby] Entering Level {levelIndex}...");
-        // Here you would transition to the actual gameplay scene:
-        // if (SceneTransitionManager.Instance != null) SceneTransitionManager.Instance.TransitionTo("GameplayScene");
+        string sceneName = "Level" + levelIndex;
+        Debug.Log($"[MapLobby] Entering {sceneName}...");
+        
+        if (SceneTransitionManager.Instance != null)
+            SceneTransitionManager.Instance.TransitionTo(sceneName);
+        else
+            UnityEngine.SceneManagement.SceneManager.LoadScene(sceneName);
     }
 
     private void OnBackClicked()
