@@ -5165,7 +5165,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 3842194212
+  GlobalObjectIdHash: 863338691
   InScenePlacedSourceGlobalObjectIdHash: 1192057837
   DeferredDespawnTick: 0
   Ownership: 1
@@ -5272,7 +5272,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerEntity
   ShowTopMostFoldoutHeaderGroup: 1
   baseMoveSpeed: 5
-  baseMaxHealth: 100
+  baseMaxHealth: 1000
   baseMaxMana: 100
   baseAttackRange: 1
   baseAttackDamage: 10
@@ -5334,7 +5334,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerEntity
   ShowTopMostFoldoutHeaderGroup: 1
   baseMoveSpeed: 2
-  baseMaxHealth: 100
+  baseMaxHealth: 1000
   baseMaxMana: 100
   baseAttackRange: 1
   baseAttackDamage: 10
@@ -5414,8 +5414,8 @@ CircleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
-  m_Radius: 0.27
+  m_Offset: {x: 0, y: 0.17673984}
+  m_Radius: 0.17531791
 --- !u!114 &5768902246884596341
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -15,8 +15,8 @@ public class GoblinBrain : EnemyBrain
         if (CurrentState == EnemyState.Hurt) { if (!IsCCLocked()) SetState(EnemyState.Idle); return; }
         AcquireTarget();
         if (CurrentState != EnemyState.Attack) DecideNextState();
-        if (CurrentState == EnemyState.Chase && target != null)
-            motor.MoveToward(target.transform.position, entity.MoveSpeed * (effectController?.GetSpeedMultiplier() ?? 1f));
+        if (CurrentState == EnemyState.Chase)
+            MoveChaseTarget();
         stateTimer += Time.fixedDeltaTime;
         if (CurrentState == EnemyState.Attack && stateTimer > 3f)
             SetState(EnemyState.Idle);
@@ -28,7 +28,7 @@ public class GoblinBrain : EnemyBrain
         float dist = DistanceTo(target);
         if (dist > entity.Data.attackRange) { SetState(EnemyState.Chase); return; }
         if (IsAttackReady()) { SetState(EnemyState.Attack); return; }
-        SetState(EnemyState.Idle);
+        SetState(EnemyState.Chase);
     }
 
     protected override void OnStateEnter(EnemyState state)
@@ -83,5 +83,5 @@ public class GoblinBrain : EnemyBrain
         strongHitbox.Enable(entity.Data.attackDamage * 2);
     }
     public void OnStrongAttackHitEnd() => strongHitbox?.Disable();
-    public void OnAttackEnd() => SetState(EnemyState.Idle);
+    public void OnAttackEnd() => SetState(EnemyState.Chase);
 }

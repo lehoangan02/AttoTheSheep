@@ -16,8 +16,8 @@ public class BlackKnightBrain : EnemyBrain
         if (CurrentState == EnemyState.Hurt) { if (!IsCCLocked()) SetState(EnemyState.Idle); return; }
         AcquireTarget();
         if (CurrentState != EnemyState.Attack && CurrentState != EnemyState.Guard) DecideNextState();
-        if (CurrentState == EnemyState.Chase && target != null)
-            motor.MoveToward(target.transform.position, entity.MoveSpeed * (effectController?.GetSpeedMultiplier() ?? 1f));
+        if (CurrentState == EnemyState.Chase)
+            MoveChaseTarget();
         stateTimer += Time.fixedDeltaTime;
         if (CurrentState == EnemyState.Attack && stateTimer > 3f)
             SetState(EnemyState.Idle);
@@ -34,7 +34,7 @@ public class BlackKnightBrain : EnemyBrain
         float dist = DistanceTo(target);
         if (dist > entity.Data.attackRange) { SetState(EnemyState.Chase); return; }
         if (IsAttackReady()) { SetState(ShouldGuard() ? EnemyState.Guard : EnemyState.Attack); return; }
-        SetState(EnemyState.Idle);
+        SetState(EnemyState.Chase);
     }
 
     protected override void OnStateEnter(EnemyState state)
@@ -97,6 +97,6 @@ public class BlackKnightBrain : EnemyBrain
         rightHitbox.Enable(entity.Data.attackDamage);
     }
     public void OnRightAttackHitEnd() => rightHitbox?.Disable();
-    public void OnAttackEnd() => SetState(EnemyState.Idle);
-    public void OnGuardEnd() => SetState(EnemyState.Idle);
+    public void OnAttackEnd() => SetState(EnemyState.Chase);
+    public void OnGuardEnd() => SetState(EnemyState.Chase);
 }
