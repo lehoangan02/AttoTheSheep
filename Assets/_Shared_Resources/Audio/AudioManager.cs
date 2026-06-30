@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Collections;
 using UnityEngine.SceneManagement;
+using UnityEngine.EventSystems;
 
 public class AudioManager : MonoBehaviour
 {
@@ -30,6 +31,12 @@ public class AudioManager : MonoBehaviour
     public AudioClip level2Music;
     public AudioClip level3Music;
     
+    [Header("UI SFX")]
+    [Tooltip("Âm thanh mặc định khi click vào bất kỳ UI Button nào")]
+    public AudioClip defaultUIButtonClickSFX;
+    [Tooltip("Âm thanh khi lướt chuột ngang qua Button (Hover)")]
+    public AudioClip defaultUIButtonHoverSFX;
+
     [Header("BGM Volume")]
     [Range(0f, 1f)] public float bgmVolume = 0.5f;
     private AudioSource bgmSource;
@@ -59,6 +66,60 @@ public class AudioManager : MonoBehaviour
         {
             // Nếu lỡ có 2 cái AudioManager sinh ra, hủy cái mới đi
             Destroy(gameObject);
+        }
+    }
+
+    private GameObject _lastHoveredButton = null;
+
+    private void Update()
+    {
+        if (EventSystem.current == null) return;
+
+        PointerEventData pointerData = new PointerEventData(EventSystem.current)
+        {
+            position = Input.mousePosition
+        };
+        List<RaycastResult> results = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(pointerData, results);
+
+        // --- 1. XỬ LÝ CLICK ---
+        if (Input.GetMouseButtonDown(0) && defaultUIButtonClickSFX != null)
+        {
+            foreach (RaycastResult result in results)
+            {
+                if (result.gameObject.GetComponentInParent<UnityEngine.UI.Button>() != null)
+                {
+                    PlaySFX_2D(defaultUIButtonClickSFX);
+                    break;
+                }
+            }
+        }
+
+        // --- 2. XỬ LÝ HOVER ---
+        if (defaultUIButtonHoverSFX != null)
+        {
+            GameObject currentHoveredButton = null;
+            foreach (RaycastResult result in results)
+            {
+                UnityEngine.UI.Button btn = result.gameObject.GetComponentInParent<UnityEngine.UI.Button>();
+                if (btn != null && btn.interactable) // Thêm điều kiện nút phải bấm được thì mới kêu
+                {
+                    currentHoveredButton = btn.gameObject;
+                    break;
+                }
+            }
+
+            // Nếu con chuột vừa trỏ vào một cục Button MỚI (chưa phải cái cũ)
+            if (currentHoveredButton != _lastHoveredButton)
+            {
+                if (currentHoveredButton != null)
+                {
+                    // Phát tiếng Hover!
+                    PlaySFX_2D(defaultUIButtonHoverSFX);
+                }
+                // Cập nhật lại thằng đang bị trỏ
+                _lastHoveredButton = currentHoveredButton;
+            }
         }
     }
 
@@ -150,6 +211,7 @@ public class AudioManager : MonoBehaviour
         if (clip == null) return;
 
         AudioSource speaker = GetAvailableSpeaker();
+        speaker.spatialBlend = 1f; // Trả lại 3D cho âm thanh trong game
         speaker.transform.position = new Vector3(spawnPosition.x, spawnPosition.y, 0f);
         speaker.clip = clip;
         speaker.pitch = Random.Range(0.95f, 1.05f); 
@@ -160,6 +222,17 @@ public class AudioManager : MonoBehaviour
         {
             StartCoroutine(ForceStopSpeaker(speaker, clip, duration));
         }
+    }
+
+    // Hàm phát âm thanh 2D toàn cục (dùng cho UI không gian phẳng)
+    public void PlaySFX_2D(AudioClip clip)
+    {
+        if (clip == null) return;
+        AudioSource speaker = GetAvailableSpeaker();
+        speaker.spatialBlend = 0f; // Force 2D
+        speaker.clip = clip;
+        speaker.pitch = Random.Range(0.95f, 1.05f); 
+        speaker.Play();
     }
 
     // Coroutine canh giờ tắt loa
