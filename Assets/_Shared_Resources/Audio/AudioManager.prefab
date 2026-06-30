@@ -45,3 +45,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AudioManager
   poolSize: 20
+  uiMusic: {fileID: 8300000, guid: 28a535fd10fa14b3f8760dc3ac5d549f, type: 3}
+  ftueMusic: {fileID: 8300000, guid: bacaf80b0598243d5a02b06c09c7bcdb, type: 3}
+  level1Music: {fileID: 8300000, guid: b6de68e0af4f64f8393cbd0f2d3433ae, type: 3}
+  level2Music: {fileID: 8300000, guid: 0b98721cd768048fba9f3b28b7c42086, type: 3}
+  level3Music: {fileID: 8300000, guid: 79cbb13eda14e4ddfa7f3ddf20ce4f7a, type: 3}
+  defaultUIButtonClickSFX: {fileID: 8300000, guid: 37c601b13fb457c48930bd8dd1132ca1, type: 3}
+  defaultUIButtonHoverSFX: {fileID: 8300000, guid: b0e031653442ef445a007be19ad0d53f, type: 3}
+  bgmVolume: 0.5

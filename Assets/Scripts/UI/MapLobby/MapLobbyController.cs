@@ -29,6 +29,27 @@ public class MapLobbyController : MonoBehaviour
         // Fetch progression from PlayerPrefs (Default is 1)
         int maxUnlockedLevel = PlayerPrefs.GetInt("MaxUnlockedLevel", defaultUnlockedLevel);
 
+        // Tự động tìm và liên kết các nút Node_1, Node_2... nếu bạn chưa kéo thả vào Inspector
+        if (levelNodes == null || levelNodes.Count == 0)
+        {
+            levelNodes = new List<Button>();
+            int nodeIndex = 1;
+            while (true)
+            {
+                GameObject nodeObj = GameObject.Find("Node_" + nodeIndex);
+                if (nodeObj != null)
+                {
+                    Button btn = nodeObj.GetComponent<Button>();
+                    if (btn != null) levelNodes.Add(btn);
+                }
+                else
+                {
+                    break; // Không tìm thấy Node tiếp theo, dừng vòng lặp
+                }
+                nodeIndex++;
+            }
+        }
+
         // Setup Level Nodes
         for (int i = 0; i < levelNodes.Count; i++)
         {
@@ -86,11 +107,11 @@ public class MapLobbyController : MonoBehaviour
 
     private void OnBackClicked()
     {
-        Debug.Log("[MapLobby] Back clicked! Returning to KhoaMenu...");
+        Debug.Log("[MapLobby] Back clicked! Returning to MainMenu...");
         if (SceneTransitionManager.Instance != null)
-            SceneTransitionManager.Instance.TransitionTo("KhoaMenu");
+            SceneTransitionManager.Instance.TransitionTo("MainMenu");
         else
-            UnityEngine.SceneManagement.SceneManager.LoadScene("KhoaMenu");
+            UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenu");
     }
 
     // Call this to cheat or progress the game
