@@ -7,8 +7,9 @@ public class GoblinBrain : EnemyBrain
     [SerializeField] private EnemyHitbox strongHitbox;
     private MeleeEnemyData meleeData;
 
-    void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         meleeData = entity.GetData<MeleeEnemyData>();
     }
 

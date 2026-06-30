@@ -6,8 +6,9 @@ public class BlueKnightBrain : EnemyBrain
     [SerializeField] float guardChance = 0.2f;
     private MeleeEnemyData meleeData;
 
-    void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         meleeData = entity.GetData<MeleeEnemyData>();
     }
 

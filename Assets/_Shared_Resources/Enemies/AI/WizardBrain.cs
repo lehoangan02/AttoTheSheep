@@ -12,8 +12,9 @@ public class WizardBrain : EnemyBrain
     private float lastTransformTime;
     private LambAI currentTransformTarget;
 
-    void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         wizData = entity.GetData<WizardEnemyData>();
     }
 

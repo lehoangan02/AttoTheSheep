@@ -229,6 +229,8 @@ MonoBehaviour:
   baseMaxMana: 100
   baseAttackRange: 1
   baseAttackDamage: 10
+  damageFont: {fileID: 11400000, guid: 2745a675487b843419622b8727c36f50, type: 2}
+  vfxAnchor: {fileID: 0}
   effectController: {fileID: 0}
   currentMoveSpeed:
     UpdateTraits:
@@ -250,7 +252,7 @@ MonoBehaviour:
       MinSecondsBetweenUpdates: 0
       MaxSecondsBetweenUpdates: 0
     m_InternalValue: 0
-  data: {fileID: 11400000, guid: 0c6684fe373913a9ba24b6e7797e0047, type: 2}
+  data: {fileID: 11400000, guid: 03be99d8119eb862486f375ce5218e9f, type: 2}
 --- !u!114 &8059245908609101459
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -269,10 +271,10 @@ MonoBehaviour:
   targetLayers:
     serializedVersion: 2
     m_Bits: 4294967295
+  steering: {fileID: 0}
   target: {fileID: 0}
   lastAttackTime: 0
   IsFrozen: 0
-  IsStunned: 0
   guardChance: 0.15
   leftHitbox: {fileID: 3301362216779134942}
   rightHitbox: {fileID: 3301362216779134942}
@@ -302,6 +304,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StatusEffectController
   ShowTopMostFoldoutHeaderGroup: 1
+  vfxEntries: []
 --- !u!114 &6955583148007242378
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -361,6 +364,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyHitbox
   hitboxCollider: {fileID: 0}
+  hitCue:
+    clip: {fileID: 0}
+    duration: 0
+  canDestroyBuildings: 0
+  buildingLayer:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!58 &12486887805624649
 CircleCollider2D:
   m_ObjectHideFlags: 0

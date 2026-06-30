@@ -46,6 +46,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyHitbox
   hitboxCollider: {fileID: 0}
+  hitCue:
+    clip: {fileID: 0}
+    duration: 0
+  canDestroyBuildings: 0
+  buildingLayer:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!58 &9139998892679857601
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -128,6 +135,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyHitbox
   hitboxCollider: {fileID: 0}
+  hitCue:
+    clip: {fileID: 0}
+    duration: 0
+  canDestroyBuildings: 0
+  buildingLayer:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!70 &6394766402811377092
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -211,6 +225,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyHitbox
   hitboxCollider: {fileID: 0}
+  hitCue:
+    clip: {fileID: 0}
+    duration: 0
+  canDestroyBuildings: 0
+  buildingLayer:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!58 &2355665478945738455
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -481,6 +502,7 @@ MonoBehaviour:
   baseAttackRange: 1
   baseAttackDamage: 10
   damageFont: {fileID: 11400000, guid: 2745a675487b843419622b8727c36f50, type: 2}
+  vfxAnchor: {fileID: 0}
   effectController: {fileID: 0}
   currentMoveSpeed:
     UpdateTraits:
@@ -502,7 +524,7 @@ MonoBehaviour:
       MinSecondsBetweenUpdates: 0
       MaxSecondsBetweenUpdates: 0
     m_InternalValue: 0
-  data: {fileID: 11400000, guid: 7553716166628ca86a9dced37a34e884, type: 2}
+  data: {fileID: 11400000, guid: 93477a7d99eda3ca49ea89a8e82620a0, type: 2}
 --- !u!114 &1025186044901014169
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -521,50 +543,19 @@ MonoBehaviour:
   targetLayers:
     serializedVersion: 2
     m_Bits: 128
+  steering: {fileID: 0}
   target: {fileID: 0}
   lastAttackTime: 0
   IsFrozen: 0
-  IsStunned: 0
-  smashRange: 3
-  chargeRange: 6
-  smashCooldown: 3
-  chargeCooldown: 5
-  tornadoCooldown: 9
   aiDecisionInterval: 0.6
   windupAuraVfx: {fileID: 6724723388781401745}
-  smashDamage: 20
-  smashEffects: []
-  smashKnockbackForce: 8
-  smashKnockbackDuration: 0.25
-  smashWindupTime: 1
-  smashMaxAttackTime: 2
   smashHitbox: {fileID: 5491215656913851801}
-  chargeSpeed: 12
-  chargeMaxDistance: 10
-  chargeDamage: 35
-  chargeEffects: []
-  chargeKnockbackForce: 10
-  chargeKnockbackDuration: 0.2
   obstacleMask:
     serializedVersion: 2
     m_Bits: 0
-  chargeWindupTime: 1.5
-  chargeMaxAttackTime: 3
   chargeHitbox: {fileID: 9186866502278753989}
-  tornadoSpeed: 3
-  tornadoDuration: 4
-  tornadoTickInterval: 0.5
-  tornadoDamagePerTick: 20
-  tornadoWindupTime: 2
-  tornadoMaxAttackTime: 8
   tornadoHitbox: {fileID: 7837135803375008793}
   tornadoVfx: {fileID: 1243946857997395774}
-  spikePrefab: {fileID: 4418561806473106449, guid: 2bdae8036da53e63aa5386fd0fbc64a8, type: 3}
-  spikeCount: 5
-  spikeSpacing: 1.2
-  spikeSpawnInterval: 0.12
-  recoveryInterval: 15
-  recoveryDuration: 3
   logRecoveryState: 0
 --- !u!114 &2847624209071512021
 MonoBehaviour:
@@ -592,6 +583,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StatusEffectController
   ShowTopMostFoldoutHeaderGroup: 1
+  vfxEntries: []
 --- !u!114 &312727644065568402
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -5,8 +5,9 @@ public class PawnBrain : EnemyBrain
     [SerializeField] private EnemyHitbox hitbox;
     private MeleeEnemyData meleeData;
 
-    void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         meleeData = entity.GetData<MeleeEnemyData>();
     }
 

@@ -28,7 +28,7 @@ public abstract class EnemyBrain : NetworkBehaviour
     public EnemyMotor Motor => motor;
     public StatusEffectController EffectController => effectController;
 
-    void Awake()
+    protected virtual void Awake()
     {
         entity = GetComponent<EnemyEntity>();
         motor = GetComponent<EnemyMotor>();

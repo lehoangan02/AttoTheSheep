@@ -47,8 +47,9 @@ public class TrollBrain : EnemyBrain
     private float recoveryTimer;
     private bool recoveryPending;
 
-    void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         trollData = entity.GetData<TrollEnemyData>();
     }
 

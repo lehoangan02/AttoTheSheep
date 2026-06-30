@@ -8,8 +8,9 @@ public class BlackKnightBrain : EnemyBrain
     [SerializeField] private EnemyHitbox rightHitbox;
     private MeleeEnemyData meleeData;
 
-    void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         meleeData = entity.GetData<MeleeEnemyData>();
     }
 
