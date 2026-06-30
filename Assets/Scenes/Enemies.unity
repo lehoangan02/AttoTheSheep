@@ -490,8 +490,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65e4600b56ca75106aa247bf05ac4847, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ContextSteering2D
-  rayCount: 12
-  sensorLength: 1.5
+  rayCount: 8
+  sensorLength: 1.2
   obstacleMask:
     serializedVersion: 2
     m_Bits: 1048832
@@ -499,13 +499,13 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   approachRange: 5
-  approachRangePause: 2
+  approachRangePause: 1.5
   enableStrafe: 1
   strafeRange: 2
-  separationBiasAngle: 45
-  allyScanRadius: 5
-  closeRepulsionRadius: 3
-  closeRepulsionStrength: 10
+  separationBiasAngle: 35
+  allyScanRadius: 2.5
+  closeRepulsionRadius: 0.8
+  closeRepulsionStrength: 2
   blendAngleThreshold: 45
   drawGizmos: 1
 --- !u!1001 &859700513
@@ -620,8 +620,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65e4600b56ca75106aa247bf05ac4847, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ContextSteering2D
-  rayCount: 12
-  sensorLength: 1.5
+  rayCount: 8
+  sensorLength: 1.2
   obstacleMask:
     serializedVersion: 2
     m_Bits: 1048832
@@ -629,13 +629,13 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   approachRange: 5
-  approachRangePause: 2
+  approachRangePause: 1.5
   enableStrafe: 1
   strafeRange: 2
-  separationBiasAngle: 45
-  allyScanRadius: 5
-  closeRepulsionRadius: 3
-  closeRepulsionStrength: 10
+  separationBiasAngle: 35
+  allyScanRadius: 2.5
+  closeRepulsionRadius: 0.8
+  closeRepulsionStrength: 2
   blendAngleThreshold: 45
   drawGizmos: 1
 --- !u!1001 &901081044
@@ -1949,8 +1949,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65e4600b56ca75106aa247bf05ac4847, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ContextSteering2D
-  rayCount: 12
-  sensorLength: 1.5
+  rayCount: 8
+  sensorLength: 1.2
   obstacleMask:
     serializedVersion: 2
     m_Bits: 1048832
@@ -1958,13 +1958,13 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   approachRange: 5
-  approachRangePause: 2
+  approachRangePause: 1.5
   enableStrafe: 1
   strafeRange: 2
-  separationBiasAngle: 45
-  allyScanRadius: 5
-  closeRepulsionRadius: 3
-  closeRepulsionStrength: 10
+  separationBiasAngle: 35
+  allyScanRadius: 2.5
+  closeRepulsionRadius: 0.8
+  closeRepulsionStrength: 2
   blendAngleThreshold: 45
   drawGizmos: 1
 --- !u!1001 &2495357980944787089
