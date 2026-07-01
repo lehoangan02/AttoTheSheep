@@ -108,7 +108,6 @@ GameObject:
   - component: {fileID: 4462203474856128897}
   - component: {fileID: 3128900724010514036}
   - component: {fileID: 6602339222227685321}
-  - component: {fileID: 6015189231865511273}
   - component: {fileID: 6081351614517381144}
   - component: {fileID: 8375650598100894838}
   m_Layer: 6
@@ -408,19 +407,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemySpawnDeath
   ShowTopMostFoldoutHeaderGroup: 1
---- !u!114 &6015189231865511273
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8276238298806300973}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8a3b7ed941b44f3d8a6c89c8df3d6504, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EnemyAudio
-  cues: []
 --- !u!114 &6081351614517381144
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -463,4 +449,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a3b7ed941b44f3d8a6c89c8df3d6504, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAudio
-  cues: []
+  cues:
+  - id: Hurt
+    cue:
+      clip: {fileID: 8300000, guid: c19eb6af73b1e2a47b0c76d1bb4f8659, type: 3}
+      duration: 0
+  - id: Death
+    cue:
+      clip: {fileID: 8300000, guid: 6f07a912466a8b348b589263938d9880, type: 3}
+      duration: 0
+  - id: AttackStart
+    cue:
+      clip: {fileID: 8300000, guid: 1d3802b5c8787a2489e4a2061a292a89, type: 3}
+      duration: 0
+  - id: Guard
+    cue:
+      clip: {fileID: 8300000, guid: 51cdfac4573b24e47ba6b31e3e1f487a, type: 3}
+      duration: 0

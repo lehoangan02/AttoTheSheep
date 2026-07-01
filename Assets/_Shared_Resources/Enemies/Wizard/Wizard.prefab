@@ -390,4 +390,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a3b7ed941b44f3d8a6c89c8df3d6504, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAudio
-  cues: []
+  cues:
+  - id: Hurt
+    cue:
+      clip: {fileID: 8300000, guid: 1122fadb52ce2724c948773d182ef4b3, type: 3}
+      duration: 0
+  - id: Death
+    cue:
+      clip: {fileID: 8300000, guid: 6f07a912466a8b348b589263938d9880, type: 3}
+      duration: 0
+  - id: ThrowStart
+    cue:
+      clip: {fileID: 8300000, guid: 4524da26b5d98754c901c53d70f8b62d, type: 3}
+      duration: 0
+  - id: TransformStart
+    cue:
+      clip: {fileID: 8300000, guid: e86eb6a4f74871c45b30d13e91c71e76, type: 3}
+      duration: 0

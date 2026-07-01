@@ -640,7 +640,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a3b7ed941b44f3d8a6c89c8df3d6504, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAudio
-  cues: []
+  cues:
+  - id: Hurt
+    cue:
+      clip: {fileID: 8300000, guid: 1122fadb52ce2724c948773d182ef4b3, type: 3}
+      duration: 0
+  - id: Death
+    cue:
+      clip: {fileID: 8300000, guid: 6f07a912466a8b348b589263938d9880, type: 3}
+      duration: 0
+  - id: SmashStart
+    cue:
+      clip: {fileID: 8300000, guid: adcf8612a72eb054f97046365f9147e4, type: 3}
+      duration: 0
+  - id: ChargeStart
+    cue:
+      clip: {fileID: 8300000, guid: 0484f89df132d804d9a484ac5ae945d1, type: 3}
+      duration: 0
+  - id: TornadoStart
+    cue:
+      clip: {fileID: 8300000, guid: 872014647df35264dbc037f0dc6c8144, type: 3}
+      duration: 0
 --- !u!1 &7048237791726301114
 GameObject:
   m_ObjectHideFlags: 0
