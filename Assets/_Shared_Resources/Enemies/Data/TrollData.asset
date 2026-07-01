@@ -18,7 +18,7 @@ MonoBehaviour:
   deathVFXPrefab: {fileID: 7154831219701261189, guid: 7698cce7c2fa4d2e694b2dec1e4c3095, type: 3}
   spawnFadeDuration: 0.5
   deathFadeDuration: 0.5
-  smashRange: 3
+  smashRange: 4
   smashCooldown: 3
   smashDamage: 20
   smashEffects: []
@@ -26,8 +26,8 @@ MonoBehaviour:
   smashKnockbackDuration: 0.25
   smashWindupTime: 1
   smashMaxAttackTime: 2
-  chargeRange: 6
-  chargeCooldown: 5
+  chargeRange: 7
+  chargeCooldown: 6
   chargeSpeed: 12
   chargeMaxDistance: 10
   chargeDamage: 35
@@ -36,6 +36,7 @@ MonoBehaviour:
   chargeKnockbackDuration: 0.2
   chargeWindupTime: 1.5
   chargeMaxAttackTime: 3
+  tornadoRange: 10
   tornadoCooldown: 9
   tornadoSpeed: 4
   tornadoDuration: 5
@@ -47,5 +48,5 @@ MonoBehaviour:
   spikeCount: 5
   spikeSpacing: 1.2
   spikeSpawnInterval: 0.12
-  recoveryInterval: 30
+  recoveryInterval: 15
   recoveryDuration: 3

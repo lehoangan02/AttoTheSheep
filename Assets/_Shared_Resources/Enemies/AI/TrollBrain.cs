@@ -136,18 +136,40 @@ public class TrollBrain : EnemyBrain
 
         float dist = DistanceTo(target);
 
-        bool smashAvailable  = dist <= trollData.smashRange   && Time.time - lastSmashTime   >= trollData.smashCooldown;
-        bool chargeAvailable = dist <= trollData.chargeRange  && Time.time - lastChargeTime  >= trollData.chargeCooldown;
-        bool tornadoAvailable = dist > trollData.chargeRange  && Time.time - lastTornadoTime >= trollData.tornadoCooldown;
+        // Beyond max attack range: close the distance instead of attacking.
+        if (dist > trollData.tornadoRange) { SetState(EnemyState.Chase); return; }
 
-        if (smashAvailable)
-        { currentAttack = TrollAttack.Smash; SetState(EnemyState.Attack); return; }
+        bool smashReady   = Time.time - lastSmashTime   >= trollData.smashCooldown;
+        bool chargeReady  = Time.time - lastChargeTime  >= trollData.chargeCooldown;
+        bool tornadoReady = Time.time - lastTornadoTime >= trollData.tornadoCooldown;
 
-        if (chargeAvailable)
-        { currentAttack = TrollAttack.Charge; SetState(EnemyState.Attack); return; }
+        bool smashInRange   = dist <= trollData.smashRange;
+        bool chargeInRange  = dist <= trollData.chargeRange;
+        bool tornadoInRange = dist <= trollData.tornadoRange;
 
-        if (tornadoAvailable)
-        { currentAttack = TrollAttack.Tornado; SetState(EnemyState.Attack); return; }
+        // Each range prioritizes its matching attack, but falls back to any other
+        // off-cooldown attack that is still within its own usable range.
+        if (smashInRange)
+        {
+            // Close range: Smash > Charge > Tornado
+            if (smashReady)                     { currentAttack = TrollAttack.Smash;   SetState(EnemyState.Attack); return; }
+            if (chargeReady && chargeInRange)   { currentAttack = TrollAttack.Charge;  SetState(EnemyState.Attack); return; }
+            if (tornadoReady && tornadoInRange) { currentAttack = TrollAttack.Tornado; SetState(EnemyState.Attack); return; }
+        }
+        else if (chargeInRange)
+        {
+            // Mid range: Charge > Tornado > Smash
+            if (chargeReady)                    { currentAttack = TrollAttack.Charge;  SetState(EnemyState.Attack); return; }
+            if (tornadoReady && tornadoInRange) { currentAttack = TrollAttack.Tornado; SetState(EnemyState.Attack); return; }
+            if (smashReady && smashInRange)     { currentAttack = TrollAttack.Smash;   SetState(EnemyState.Attack); return; }
+        }
+        else
+        {
+            // Far range: Tornado > Charge > Smash
+            if (tornadoReady && tornadoInRange) { currentAttack = TrollAttack.Tornado; SetState(EnemyState.Attack); return; }
+            if (chargeReady && chargeInRange)   { currentAttack = TrollAttack.Charge;  SetState(EnemyState.Attack); return; }
+            if (smashReady && smashInRange)     { currentAttack = TrollAttack.Smash;   SetState(EnemyState.Attack); return; }
+        }
 
         SetState(EnemyState.Chase);
     }
@@ -170,13 +192,6 @@ public class TrollBrain : EnemyBrain
                     case TrollAttack.Smash: lastSmashTime = Time.time; break;
                     case TrollAttack.Charge: lastChargeTime = Time.time; break;
                     case TrollAttack.Tornado: lastTornadoTime = Time.time; break;
-                }
-                if (currentAttack == TrollAttack.Charge)
-                {
-                    if (target != null)
-                        dashDir = ((Vector2)(target.transform.position - transform.position)).normalized;
-                    else
-                        dashDir = transform.right;
                 }
                 anim.SetTrigger("Windup" + currentAttack);
                 enemyAudio.Play(currentAttack.ToString() + "Start");
@@ -276,6 +291,9 @@ public class TrollBrain : EnemyBrain
                 /* Smash hitbox is enabled by OnSmashImpact anim event */
                 break;
             case TrollAttack.Charge:
+                dashDir = target != null
+                    ? ((Vector2)(target.transform.position - transform.position)).normalized
+                    : transform.right;
                 dashDistanceLeft = trollData.chargeMaxDistance;
                 chargeHitbox?.Enable(trollData.chargeDamage, trollData.chargeEffects, true, trollData.chargeKnockbackForce, trollData.chargeKnockbackDuration);
                 break;

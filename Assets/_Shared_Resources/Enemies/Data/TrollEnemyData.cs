@@ -26,6 +26,7 @@ public class TrollEnemyData : EnemyData
     public float chargeMaxAttackTime = 3f;
 
     [Header("Tornado")]
+    public float tornadoRange = 14f;
     public float tornadoCooldown = 9f;
     public float tornadoSpeed = 6f;
     public float tornadoDuration = 4f;
