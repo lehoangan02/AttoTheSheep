@@ -138,10 +138,10 @@ MonoBehaviour:
   hitCue:
     clip: {fileID: 0}
     duration: 0
-  canDestroyBuildings: 0
+  canDestroyBuildings: 1
   buildingLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 256
 --- !u!70 &6394766402811377092
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
