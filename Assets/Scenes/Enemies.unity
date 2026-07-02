@@ -1804,6 +1804,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 409582896825743840, guid: 24782c5f264a30cd5b5a6e138bc3d25f, type: 3}
+      propertyPath: cues.Array.data[2].cue.duration
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1025186044901014169, guid: 24782c5f264a30cd5b5a6e138bc3d25f, type: 3}
+      propertyPath: aiDecisionInterval
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2859446108901527686, guid: 24782c5f264a30cd5b5a6e138bc3d25f, type: 3}
       propertyPath: m_LocalPosition.x
       value: -5.28

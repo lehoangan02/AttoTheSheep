@@ -194,7 +194,6 @@ public class TrollBrain : EnemyBrain
                     case TrollAttack.Tornado: lastTornadoTime = Time.time; break;
                 }
                 anim.SetTrigger("Windup" + currentAttack);
-                enemyAudio.Play(currentAttack.ToString() + "Start");
                 break;
             case EnemyState.Idle:
                 motor.Stop();
@@ -308,6 +307,7 @@ public class TrollBrain : EnemyBrain
                 break;
         }
         anim.SetTrigger("Attack" + currentAttack);
+        enemyAudio.Play(currentAttack.ToString() + "Start");
     }
 
     public void EmitWindupAura()

@@ -652,15 +652,15 @@ MonoBehaviour:
   - id: SmashStart
     cue:
       clip: {fileID: 8300000, guid: adcf8612a72eb054f97046365f9147e4, type: 3}
-      duration: 0
+      duration: 0.5
   - id: ChargeStart
     cue:
       clip: {fileID: 8300000, guid: 0484f89df132d804d9a484ac5ae945d1, type: 3}
-      duration: 0
+      duration: 1.2
   - id: TornadoStart
     cue:
       clip: {fileID: 8300000, guid: 872014647df35264dbc037f0dc6c8144, type: 3}
-      duration: 0
+      duration: 5
 --- !u!1 &7048237791726301114
 GameObject:
   m_ObjectHideFlags: 0
