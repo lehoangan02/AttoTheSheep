@@ -222,7 +222,8 @@ MonoBehaviour:
   speed: 8
   maxDistance: 15
   damage: 100
-  onHitEffects: []
+  onHitEffects:
+  - {fileID: 11400000, guid: 7b4e3ac689b3406880e0ab3dde76dba5, type: 2}
   targetLayers:
     serializedVersion: 2
     m_Bits: 128

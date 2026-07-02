@@ -3,8 +3,7 @@ using UnityEngine;
 public class BlueKnightBrain : EnemyBrain
 {
     [SerializeField] private EnemyHitbox hitbox;
-    [SerializeField] float guardChance = 0.2f;
-    private MeleeEnemyData meleeData;
+    private KnightEnemyData knightData;
 
     void Awake()
     {
@@ -14,7 +13,7 @@ public class BlueKnightBrain : EnemyBrain
         effectController = GetComponent<StatusEffectController>();
         enemyAudio = GetComponent<EnemyAudio>();
         anim = GetComponent<Animator>();
-        meleeData = entity.GetData<MeleeEnemyData>();
+        knightData = entity.GetData<KnightEnemyData>();
     }
 
     protected void FixedUpdate()
@@ -42,7 +41,7 @@ public class BlueKnightBrain : EnemyBrain
     {
         if (target == null) { SetState(EnemyState.Idle); return; }
         float dist = DistanceTo(target);
-        if (dist > meleeData.attackRange) { SetState(EnemyState.Chase); return; }
+        if (dist > knightData.attackRange) { SetState(EnemyState.Chase); return; }
         if (IsAttackReady()) { SetState(ShouldGuard() ? EnemyState.Guard : EnemyState.Attack); return; }
         SetState(EnemyState.Chase);
     }
@@ -89,13 +88,13 @@ public class BlueKnightBrain : EnemyBrain
 
     public override bool ShouldBlockDamage() => CurrentState == EnemyState.Guard;
 
-    bool ShouldGuard() => Random.value < guardChance;
+    bool ShouldGuard() => Random.value < knightData.guardChance;
 
     // Animation events
     public void OnAttackHitStart()
     {
         if (hitbox == null) { Debug.LogWarning($"[{GetType().Name}] hitbox not wired on {gameObject.name}"); return; }
-        hitbox?.Enable(meleeData.attackDamage);
+        hitbox?.Enable(knightData.attackDamage);
     }
     public void OnAttackHitEnd() => hitbox?.Disable();
     public void OnAttackEnd() => SetState(EnemyState.Chase);

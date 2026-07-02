@@ -2,11 +2,10 @@ using UnityEngine;
 
 public class BlackKnightBrain : EnemyBrain
 {
-    [SerializeField] float guardChance = 0.3f;
     bool isLeftAttack = true;
     [SerializeField] private EnemyHitbox leftHitbox;
     [SerializeField] private EnemyHitbox rightHitbox;
-    private MeleeEnemyData meleeData;
+    private KnightEnemyData knightData;
 
     void Awake()
     {
@@ -16,7 +15,7 @@ public class BlackKnightBrain : EnemyBrain
         effectController = GetComponent<StatusEffectController>();
         enemyAudio = GetComponent<EnemyAudio>();
         anim = GetComponent<Animator>();
-        meleeData = entity.GetData<MeleeEnemyData>();
+        knightData = entity.GetData<KnightEnemyData>();
     }
 
     protected void FixedUpdate()
@@ -44,7 +43,7 @@ public class BlackKnightBrain : EnemyBrain
     {
         if (target == null) { SetState(EnemyState.Idle); return; }
         float dist = DistanceTo(target);
-        if (dist > meleeData.attackRange) { SetState(EnemyState.Chase); return; }
+        if (dist > knightData.attackRange) { SetState(EnemyState.Chase); return; }
         if (IsAttackReady()) { SetState(ShouldGuard() ? EnemyState.Guard : EnemyState.Attack); return; }
         SetState(EnemyState.Chase);
     }
@@ -94,19 +93,19 @@ public class BlackKnightBrain : EnemyBrain
 
     public override bool ShouldBlockDamage() => CurrentState == EnemyState.Guard;
 
-    bool ShouldGuard() => Random.value < guardChance;
+    bool ShouldGuard() => Random.value < knightData.guardChance;
 
     // Animation events
     public void OnLeftAttackHitStart()
     {
         if (leftHitbox == null) { Debug.LogWarning("[BlackKnightBrain] OnLeftAttackHitStart: leftHitbox is not assigned."); return; }
-        leftHitbox.Enable(meleeData.attackDamage);
+        leftHitbox.Enable(knightData.attackDamage);
     }
     public void OnLeftAttackHitEnd() => leftHitbox?.Disable();
     public void OnRightAttackHitStart()
     {
         if (rightHitbox == null) { Debug.LogWarning("[BlackKnightBrain] OnRightAttackHitStart: rightHitbox is not assigned."); return; }
-        rightHitbox.Enable(meleeData.attackDamage);
+        rightHitbox.Enable(knightData.attackDamage);
     }
     public void OnRightAttackHitEnd() => rightHitbox?.Disable();
     public void OnAttackEnd() => SetState(EnemyState.Chase);

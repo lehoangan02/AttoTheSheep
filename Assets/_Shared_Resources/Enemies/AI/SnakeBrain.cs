@@ -3,7 +3,7 @@ using UnityEngine;
 public class SnakeBrain : EnemyBrain
 {
     [SerializeField] private EnemyHitbox hitbox;
-    private MeleeEnemyData meleeData;
+    private CaveEnemyData caveData;
 
     void Awake()
     {
@@ -13,7 +13,7 @@ public class SnakeBrain : EnemyBrain
         effectController = GetComponent<StatusEffectController>();
         enemyAudio = GetComponent<EnemyAudio>();
         anim = GetComponent<Animator>();
-        meleeData = entity.GetData<MeleeEnemyData>();
+        caveData = entity.GetData<CaveEnemyData>();
     }
 
     protected void FixedUpdate()
@@ -36,7 +36,7 @@ public class SnakeBrain : EnemyBrain
     {
         if (target == null) { SetState(EnemyState.Idle); return; }
         float dist = DistanceTo(target);
-        if (dist > meleeData.attackRange) { SetState(EnemyState.Chase); return; }
+        if (dist > caveData.attackRange) { SetState(EnemyState.Chase); return; }
         if (IsAttackReady()) { SetState(EnemyState.Attack); return; }
         SetState(EnemyState.Chase);
     }
@@ -80,7 +80,7 @@ public class SnakeBrain : EnemyBrain
     public void OnAttackHitStart()
     {
         if (hitbox == null) { Debug.LogWarning($"[{GetType().Name}] hitbox not wired on {gameObject.name}"); return; }
-        hitbox?.Enable(meleeData.attackDamage);
+        hitbox?.Enable(caveData.attackDamage, caveData.onHitEffects);
     }
     public void OnAttackHitEnd() => hitbox?.Disable();
     public void OnAttackEnd() => SetState(EnemyState.Chase);

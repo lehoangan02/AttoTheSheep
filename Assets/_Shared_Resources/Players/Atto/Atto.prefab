@@ -5069,6 +5069,7 @@ GameObject:
   - component: {fileID: 2762547472229503846}
   - component: {fileID: 1963130586316328227}
   - component: {fileID: 5768902246884596341}
+  - component: {fileID: -7979202511421666267}
   m_Layer: 7
   m_Name: Atto
   m_TagString: Player
@@ -5165,7 +5166,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 863338691
+  GlobalObjectIdHash: 1192057837
   InScenePlacedSourceGlobalObjectIdHash: 1192057837
   DeferredDespawnTick: 0
   Ownership: 1
@@ -5277,6 +5278,7 @@ MonoBehaviour:
   baseAttackRange: 1
   baseAttackDamage: 10
   damageFont: {fileID: 11400000, guid: 2745a675487b843419622b8727c36f50, type: 2}
+  vfxAnchor: {fileID: 0}
   effectController: {fileID: 0}
   currentMoveSpeed:
     UpdateTraits:
@@ -5339,6 +5341,7 @@ MonoBehaviour:
   baseAttackRange: 1
   baseAttackDamage: 10
   damageFont: {fileID: 11400000, guid: 2745a675487b843419622b8727c36f50, type: 2}
+  vfxAnchor: {fileID: 0}
   effectController: {fileID: 0}
   currentMoveSpeed:
     UpdateTraits:
@@ -5440,6 +5443,20 @@ MonoBehaviour:
   deathSFX:
     clip: {fileID: 8300000, guid: 3625e24cfbd6089428b7857f29ceacb2, type: 3}
     duration: 0
+--- !u!114 &-7979202511421666267
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2149695861835639596}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c192f053ff4f469fdb3e6c5e2376ae11, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StatusEffectController
+  ShowTopMostFoldoutHeaderGroup: 1
+  vfxEntries: []
 --- !u!1 &2271741925598155448
 GameObject:
   m_ObjectHideFlags: 0
