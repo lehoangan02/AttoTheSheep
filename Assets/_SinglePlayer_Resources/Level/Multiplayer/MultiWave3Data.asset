@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2d2362934f4f7a1b807039005e920aa, type: 3}
+  m_Name: MultiWave3Data
+  m_EditorClassIdentifier: Assembly-CSharp::WaveData
+  enemyPrefabs:
+  - {fileID: 736431478501333566, guid: 3bb04c46540f936b8a90a4ea82e005ff, type: 3}
+  - {fileID: 8481652928192273667, guid: 433b1f558e92c9ddeb83ddc67800a11d, type: 3}
+  - {fileID: 8842079955634194191, guid: 5536ede37ecaceed594a3b21a9f9f46d, type: 3}
+  - {fileID: 5753693385531744272, guid: 45d7e47c9ee2e4202b70de24e0955c27, type: 3}
+  totalEnemyCount: 8
+  spawnInterval: 1.5
+  maxAliveAtOnce: 0
