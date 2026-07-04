@@ -15154,6 +15154,7 @@ MonoBehaviour:
   flockManager: {fileID: 31982070}
   instructionBubble: {fileID: 1505930773}
   bubbleOffset: {x: -5, y: 5}
+  hiddenPosition: {x: 9999, y: 9999, z: 0}
   tutorialSteps:
   - stepName: "B\u01B0\u1EDBc 0 - T\u1EA3i m\xE0n ch\u01A1i"
     instructionText: "\u0110ang t\u1EA3i m\xE0n ch\u01A1i..."
@@ -15179,10 +15180,10 @@ MonoBehaviour:
     onStepStart:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1053043803}
-          m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-          m_MethodName: SetActive
-          m_Mode: 6
+        - m_Target: {fileID: 561229989}
+          m_TargetAssemblyTypeName: TutorialManager, Assembly-CSharp
+          m_MethodName: TeleportEnemyBack
+          m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -17758,7 +17759,7 @@ PrefabInstance:
     - target: {fileID: 7335084586799056515, guid: 37b33631d8760c8409510c86ab13be0f, type: 3}
       propertyPath: npcRenderer
       value: 
-      objectReference: {fileID: 1316641283}
+      objectReference: {fileID: 977737731}
     - target: {fileID: 7335084586799056515, guid: 37b33631d8760c8409510c86ab13be0f, type: 3}
       propertyPath: chopDuration
       value: 9
@@ -18408,6 +18409,11 @@ PrefabInstance:
 --- !u!4 &977737728 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5770000807968274643, guid: 37b33631d8760c8409510c86ab13be0f, type: 3}
+  m_PrefabInstance: {fileID: 857603435}
+  m_PrefabAsset: {fileID: 0}
+--- !u!212 &977737731 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 6130837374368733227, guid: 37b33631d8760c8409510c86ab13be0f, type: 3}
   m_PrefabInstance: {fileID: 857603435}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &982042762 stripped

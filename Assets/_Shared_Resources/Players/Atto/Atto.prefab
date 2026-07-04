@@ -4867,7 +4867,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3478572267434883359}
-  m_Father: {fileID: 8449501306487202680}
+  m_Father: {fileID: 1235488546585286335}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &6261496820048716688
 MonoBehaviour:
@@ -10475,7 +10475,7 @@ ParticleSystemRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1000
   m_MaskInteraction: 0
   m_RenderMode: 0
   m_MeshDistribution: 0
@@ -15936,8 +15936,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 7658202682737986263}
+  m_Children: []
   m_Father: {fileID: 1235488546585286335}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7338613021342365268
@@ -16744,6 +16743,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 7658202682737986263}
   - {fileID: 77565061955431801}
   - {fileID: 2288682488833027602}
   - {fileID: 8449501306487202680}
