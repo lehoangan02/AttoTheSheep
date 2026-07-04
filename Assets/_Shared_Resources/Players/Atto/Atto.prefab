@@ -5167,7 +5167,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 1855868505
+  GlobalObjectIdHash: 1192057837
   InScenePlacedSourceGlobalObjectIdHash: 1192057837
   DeferredDespawnTick: 0
   Ownership: 1
@@ -5471,10 +5471,35 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerCheats
   ShowTopMostFoldoutHeaderGroup: 1
-  shieldDuration: 10
-  speedMultiplier: 1.5
-  speedDuration: 8
-  speedAccelerationDuration: 0.5
+  cheatSlots:
+  - cheatId: 1
+    cheatName: Flock Shield
+    buffs:
+    - buffType: 0
+      value: 1.25
+      duration: 10
+      extraValue: 0.5
+  - cheatId: 2
+    cheatName: Spawn Max Lambs
+    buffs:
+    - buffType: 1
+      value: 1.25
+      duration: 8
+      extraValue: 0.5
+  - cheatId: 3
+    cheatName: Skill Damage Boost
+    buffs:
+    - buffType: 2
+      value: 1.25
+      duration: 8
+      extraValue: 0.5
+  - cheatId: 4
+    cheatName: Speed Boost
+    buffs:
+    - buffType: 3
+      value: 1.5
+      duration: 8
+      extraValue: 0.5
 --- !u!1 &2271741925598155448
 GameObject:
   m_ObjectHideFlags: 0
@@ -16033,7 +16058,7 @@ MonoBehaviour:
     DissipationMode: 2
     DissipationDistance: 100
     PropagationSpeed: 343
-  DefaultVelocity: {x: 1, y: 1, z: 0}
+  DefaultVelocity: {x: 0.5, y: 0.5, z: 0}
 --- !u!1 &6507065971102882970
 GameObject:
   m_ObjectHideFlags: 0
