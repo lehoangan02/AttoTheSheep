@@ -7,14 +7,8 @@ public class GoblinBrain : EnemyBrain
     [SerializeField] private EnemyHitbox strongHitbox;
     private MeleeEnemyData meleeData;
 
-    void Awake()
+    protected override void Init()
     {
-        entity = GetComponent<EnemyEntity>();
-        motor = GetComponent<EnemyMotor>();
-        steering = GetComponent<ContextSteering2D>();
-        effectController = GetComponent<StatusEffectController>();
-        enemyAudio = GetComponent<EnemyAudio>();
-        anim = GetComponent<Animator>();
         meleeData = entity.GetData<MeleeEnemyData>();
     }
 

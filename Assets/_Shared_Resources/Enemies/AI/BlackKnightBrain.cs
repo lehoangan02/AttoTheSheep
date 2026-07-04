@@ -7,14 +7,8 @@ public class BlackKnightBrain : EnemyBrain
     [SerializeField] private EnemyHitbox rightHitbox;
     private KnightEnemyData knightData;
 
-    void Awake()
+    protected override void Init()
     {
-        entity = GetComponent<EnemyEntity>();
-        motor = GetComponent<EnemyMotor>();
-        steering = GetComponent<ContextSteering2D>();
-        effectController = GetComponent<StatusEffectController>();
-        enemyAudio = GetComponent<EnemyAudio>();
-        anim = GetComponent<Animator>();
         knightData = entity.GetData<KnightEnemyData>();
     }
 

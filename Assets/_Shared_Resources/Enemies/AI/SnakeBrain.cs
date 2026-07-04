@@ -5,14 +5,8 @@ public class SnakeBrain : EnemyBrain
     [SerializeField] private EnemyHitbox hitbox;
     private CaveEnemyData caveData;
 
-    void Awake()
+    protected override void Init()
     {
-        entity = GetComponent<EnemyEntity>();
-        motor = GetComponent<EnemyMotor>();
-        steering = GetComponent<ContextSteering2D>();
-        effectController = GetComponent<StatusEffectController>();
-        enemyAudio = GetComponent<EnemyAudio>();
-        anim = GetComponent<Animator>();
         caveData = entity.GetData<CaveEnemyData>();
     }
 

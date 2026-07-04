@@ -53,6 +53,8 @@ public class ContextSteering2D : MonoBehaviour
     Vector2 lastStrafeDir;   // for gizmos
     Rigidbody2D rb;
     Collider2D selfCollider;
+    Vector2 steeringOriginOffset;
+    public Vector2 SteeringOrigin => (Vector2)transform.position + steeringOriginOffset;
 
     // Static scratch buffers (shared, safe: single-threaded FixedUpdate).
     // Safe ONLY because Unity's FixedUpdate is single-threaded.
@@ -70,6 +72,7 @@ public class ContextSteering2D : MonoBehaviour
 
         rb = GetComponent<Rigidbody2D>();
         selfCollider = GetComponent<Collider2D>();
+        steeringOriginOffset = selfCollider != null ? selfCollider.offset : Vector2.zero;
 
         // Build the compass directions (0°, 45°, 90°, 135°, 180°, 225°, 270°, 315°)
         dirs8 = new Vector2[rayCount];
@@ -114,10 +117,10 @@ public class ContextSteering2D : MonoBehaviour
         }
 
         // 4. Compute wall danger (8 raycasts against Building|Terrain)
-        SteeringMath.ComputeDangerRay(transform.position, dirs8, sensorLength, obstacleMask, s_wallHits, danger);
+        SteeringMath.ComputeDangerRay(SteeringOrigin, dirs8, sensorLength, obstacleMask, s_wallHits, danger);
 
         // 5. Add ally separation danger (OverlapCircle for nearby Enemy-layer entities, rotated by bias angle)
-        SteeringMath.AddAllyDanger(transform.position, allyScanRadius, allyMask, selfCollider, s_allyHits, dirs8, separationBiasAngle, danger, closeRepulsionRadius, closeRepulsionStrength);
+        SteeringMath.AddAllyDanger(SteeringOrigin, allyScanRadius, allyMask, selfCollider, s_allyHits, dirs8, separationBiasAngle, danger, closeRepulsionRadius, closeRepulsionStrength);
 
         // 6. Final = max(0, Interest - Danger) per slot
         for (int i = 0; i < interest.Length; i++)
@@ -133,7 +136,7 @@ public class ContextSteering2D : MonoBehaviour
     {
         if (!drawGizmos) return;
         if (dirs8 == null) return;
-        Vector3 pos = transform.position;
+        Vector3 pos = SteeringOrigin;
 
         // Draw range circles
         Gizmos.color = new Color(1, 1, 1, 0.15f);
@@ -257,7 +260,7 @@ public static class SteeringMath
         {
             Collider2D col = allyHits[j];
             if (col == null || col == self) continue;
-            Vector2 toAlly = (Vector2)(col.transform.position - (Vector3)origin);
+            Vector2 toAlly = (Vector2)(col.bounds.center - (Vector3)origin);
             float dist = toAlly.magnitude;
             if (dist < 0.001f) continue;
             float weight = 1f - (dist / scanRadius);

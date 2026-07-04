@@ -95,7 +95,7 @@ public class EnemyHitbox : MonoBehaviour
 
         if (currentCausesKnockback)
         {
-            Vector2 dir = ((Vector2)(target.transform.position - brain.transform.position)).normalized;
+            Vector2 dir = ((Vector2)(target.transform.position - (Vector3)brain.ColliderCenter)).normalized;
             target.ApplyKnockback(dir * currentKnockbackForce, currentKnockbackDuration);
         }
     }
@@ -135,7 +135,7 @@ public class EnemyHitbox : MonoBehaviour
 
         if (currentCausesKnockback)
         {
-            Vector2 dir = ((Vector2)(target.transform.position - brain.transform.position)).normalized;
+            Vector2 dir = ((Vector2)(target.transform.position - (Vector3)brain.ColliderCenter)).normalized;
             target.ApplyKnockback(dir * currentKnockbackForce, currentKnockbackDuration);
         }
     }

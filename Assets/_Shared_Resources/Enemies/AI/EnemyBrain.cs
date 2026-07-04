@@ -36,7 +36,12 @@ public abstract class EnemyBrain : NetworkBehaviour
         effectController = GetComponent<StatusEffectController>();
         enemyAudio = GetComponent<EnemyAudio>();
         anim = GetComponent<Animator>();
+        Init();
     }
+
+    protected virtual void Init() { }
+
+    public Vector2 ColliderCenter => steering != null ? steering.SteeringOrigin : (Vector2)transform.position;
 
     protected void SetState(EnemyState state)
     {
@@ -53,7 +58,7 @@ public abstract class EnemyBrain : NetworkBehaviour
 
     public virtual bool ShouldBlockDamage() => false;
 
-    protected float DistanceTo(NetworkEntity t) => Vector2.Distance(transform.position, t.transform.position);
+    protected float DistanceTo(NetworkEntity t) => Vector2.Distance(ColliderCenter, t.transform.position);
 
     protected bool IsCCLocked() => IsFrozen || (effectController != null && effectController.IsMovementLocked());
 
@@ -82,7 +87,7 @@ public abstract class EnemyBrain : NetworkBehaviour
             motor.MoveToward(target.transform.position, speed);
             return;
         }
-        Vector2 toTarget = (Vector2)(target.transform.position - transform.position);
+        Vector2 toTarget = (Vector2)(target.transform.position - (Vector3)ColliderCenter);
         bool canStrafe = !IsAttackReady();
         Vector2 dir = steering.ComputeDirection(toTarget.normalized, toTarget.magnitude, canStrafe);
         if (dir == Vector2.zero)
@@ -93,14 +98,14 @@ public abstract class EnemyBrain : NetworkBehaviour
 
     protected virtual NetworkEntity FindTarget()
     {
-        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, scanRadius, targetLayers);
+        Collider2D[] hits = Physics2D.OverlapCircleAll(ColliderCenter, scanRadius, targetLayers);
         NetworkEntity nearest = null;
         float nearestDist = float.MaxValue;
         foreach (var hit in hits)
         {
             NetworkEntity candidate = hit.GetComponentInParent<NetworkEntity>();
             if (!IsValidTarget(candidate)) continue;
-            float d = ((Vector2)candidate.transform.position - (Vector2)transform.position).sqrMagnitude;
+            float d = ((Vector2)candidate.transform.position - ColliderCenter).sqrMagnitude;
             if (d < nearestDist) { nearest = candidate; nearestDist = d; }
         }
         return nearest;
