@@ -180,7 +180,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  - {fileID: 2100000, guid: 16a715479a29903e8a57b1f7c8fb2e5d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -276,7 +276,6 @@ MonoBehaviour:
   target: {fileID: 0}
   lastAttackTime: 0
   IsFrozen: 0
-  guardChance: 0.15
   leftHitbox: {fileID: 3301362216779134942}
   rightHitbox: {fileID: 3301362216779134942}
 --- !u!114 &9177904550777391619
@@ -319,6 +318,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemySpawnDeath
   ShowTopMostFoldoutHeaderGroup: 1
+  damageFlashColor: {r: 1, g: 1, b: 1, a: 1}
+  damageFlashDuration: 0.15
 --- !u!114 &4986655033410483987
 MonoBehaviour:
   m_ObjectHideFlags: 0

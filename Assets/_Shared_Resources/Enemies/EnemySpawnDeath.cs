@@ -6,10 +6,15 @@ using Unity.Netcode;
 [RequireComponent(typeof(EnemyEntity))]
 public class EnemySpawnDeath : NetworkBehaviour
 {
+    [Header("Damage Flash")]
+    [SerializeField] private Color damageFlashColor = Color.white;
+    [SerializeField] private float damageFlashDuration = 0.15f;
+
     private EnemyEntity entity;
     private EnemyBrain brain;
     private SpriteRenderer[] spriteRenderers;
     private Color[] originalColors;
+    private MaterialPropertyBlock flashPropertyBlock;
     private bool isDying;
     private bool _despawned;
 
@@ -17,6 +22,7 @@ public class EnemySpawnDeath : NetworkBehaviour
     {
         entity = GetComponent<EnemyEntity>();
         brain = GetComponent<EnemyBrain>();
+        flashPropertyBlock = new MaterialPropertyBlock();
     }
 
     public override void OnNetworkSpawn()
@@ -29,6 +35,8 @@ public class EnemySpawnDeath : NetworkBehaviour
         {
             originalColors[i] = spriteRenderers[i].color;
         }
+
+        entity.currentHealth.OnValueChanged += OnEnemyHealthChanged;
 
         if (!entity.IsAlive) return;
 
@@ -79,6 +87,37 @@ public class EnemySpawnDeath : NetworkBehaviour
             Color c = originalColors[i];
             c.a = alpha;
             spriteRenderers[i].color = c;
+        }
+    }
+
+    private void OnEnemyHealthChanged(int previousValue, int newValue)
+    {
+        if (newValue < previousValue)
+        {
+            StopCoroutine(nameof(DamageFlashRoutine));
+            StartCoroutine(DamageFlashRoutine());
+        }
+    }
+
+    private IEnumerator DamageFlashRoutine()
+    {
+        if (spriteRenderers == null) yield break;
+
+        flashPropertyBlock.SetColor("_Flash", damageFlashColor);
+        flashPropertyBlock.SetFloat("_Amount", 1f);
+        for (int i = 0; i < spriteRenderers.Length; i++)
+        {
+            if (spriteRenderers[i] == null) continue;
+            spriteRenderers[i].SetPropertyBlock(flashPropertyBlock);
+        }
+
+        yield return new WaitForSeconds(damageFlashDuration);
+
+        flashPropertyBlock.SetFloat("_Amount", 0f);
+        for (int i = 0; i < spriteRenderers.Length; i++)
+        {
+            if (spriteRenderers[i] == null) continue;
+            spriteRenderers[i].SetPropertyBlock(flashPropertyBlock);
         }
     }
 
@@ -140,6 +179,7 @@ public class EnemySpawnDeath : NetworkBehaviour
 
     public override void OnNetworkDespawn()
     {
+        entity.currentHealth.OnValueChanged -= OnEnemyHealthChanged;
         _despawned = true;
         StopAllCoroutines();
         base.OnNetworkDespawn();
