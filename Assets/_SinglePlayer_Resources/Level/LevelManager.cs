@@ -24,10 +24,15 @@ public class LevelManager : MonoBehaviour
     [Tooltip("Drag every WaveController in this level here.")]
     [SerializeField] private List<WaveController> allWaves = new List<WaveController>();
 
+    [Header("Infinite Mode")]
+    [Tooltip("When enabled, waves must be completed in the listed order. After all waves are cleared, the cycle repeats indefinitely.")]
+    [SerializeField] private bool infiniteMode;
+
     [Header("Debug")]
     [SerializeField] private bool logStateChanges;
 
     private readonly HashSet<WaveController> _clearedWaves = new HashSet<WaveController>();
+    private int _currentWaveIndex;
     private LevelState _currentState = LevelState.Idle;
 
     public LevelState CurrentState => _currentState;
@@ -89,11 +94,33 @@ public class LevelManager : MonoBehaviour
             return false;
         }
 
-        if (_clearedWaves.Contains(wave))
+        if (infiniteMode)
         {
-            if (logStateChanges)
-                Debug.Log($"[LevelManager] Rejected start of '{wave.name}' — already cleared.");
-            return false;
+            int expectedIndex = _currentWaveIndex % allWaves.Count;
+            int requestedIndex = allWaves.IndexOf(wave);
+
+            if (requestedIndex != expectedIndex)
+            {
+                if (logStateChanges)
+                    Debug.Log($"[LevelManager] Rejected start of '{wave.name}' — expected wave at index {expectedIndex}, got index {requestedIndex}.");
+                return false;
+            }
+
+            if (_clearedWaves.Contains(wave))
+            {
+                if (logStateChanges)
+                    Debug.Log($"[LevelManager] Rejected start of '{wave.name}' — already cleared this round.");
+                return false;
+            }
+        }
+        else
+        {
+            if (_clearedWaves.Contains(wave))
+            {
+                if (logStateChanges)
+                    Debug.Log($"[LevelManager] Rejected start of '{wave.name}' — already cleared.");
+                return false;
+            }
         }
 
         SetState(LevelState.WaveInProgress);
@@ -107,6 +134,7 @@ public class LevelManager : MonoBehaviour
         if (logStateChanges) Debug.Log("[LevelManager] Resetting level.");
 
         _clearedWaves.Clear();
+        _currentWaveIndex = 0;
 
         foreach (WaveController wave in allWaves)
         {
@@ -123,18 +151,45 @@ public class LevelManager : MonoBehaviour
     {
         _clearedWaves.Add(wave);
 
-        if (logStateChanges)
-            Debug.Log($"[LevelManager] Wave cleared: '{wave.name}'. {_clearedWaves.Count}/{allWaves.Count}.");
-
-        if (_clearedWaves.Count >= allWaves.Count)
+        if (infiniteMode)
         {
-            SetState(LevelState.LevelComplete);
-            OnLevelComplete?.Invoke();
-            Debug.Log("[LevelManager] Level Complete!");
+            _currentWaveIndex++;
+
+            if (logStateChanges)
+                Debug.Log($"[LevelManager] Wave cleared: '{wave.name}'. {_clearedWaves.Count}/{allWaves.Count}.");
+
+            if (_clearedWaves.Count >= allWaves.Count)
+            {
+                Debug.Log("[LevelManager] Round complete! Restarting wave cycle.");
+                foreach (WaveController w in allWaves)
+                {
+                    if (w != null)
+                        w.ResetWave();
+                }
+                _clearedWaves.Clear();
+                _currentWaveIndex = 0;
+                SetState(LevelState.Idle);
+            }
+            else
+            {
+                SetState(LevelState.Idle);
+            }
         }
         else
         {
-            SetState(LevelState.Idle);
+            if (logStateChanges)
+                Debug.Log($"[LevelManager] Wave cleared: '{wave.name}'. {_clearedWaves.Count}/{allWaves.Count}.");
+
+            if (_clearedWaves.Count >= allWaves.Count)
+            {
+                SetState(LevelState.LevelComplete);
+                OnLevelComplete?.Invoke();
+                Debug.Log("[LevelManager] Level Complete!");
+            }
+            else
+            {
+                SetState(LevelState.Idle);
+            }
         }
     }
 
