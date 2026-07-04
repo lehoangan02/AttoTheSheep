@@ -10,6 +10,7 @@ public class SceneTransitionManager : MonoBehaviour
     private Canvas _canvas;
     private RectTransform _leftDoor;
     private RectTransform _rightDoor;
+    private CanvasGroup _fadeGroup;
 
     [SerializeField] private float transitionDuration = 0.5f;
 
@@ -79,6 +80,21 @@ public class SceneTransitionManager : MonoBehaviour
         _rightDoor.offsetMin = Vector2.zero;
         _rightDoor.offsetMax = Vector2.zero;
 
+        // 4. Setup Fade Overlay (Nằm trên cùng hoặc dưới cửa đều được, ta để dưới cửa cho đẹp)
+        GameObject fadeObj = new GameObject("FadeOverlay");
+        fadeObj.transform.SetParent(canvasObj.transform, false);
+        fadeObj.transform.SetSiblingIndex(0); // Để fade nằm dưới 2 cánh cửa
+        RectTransform fadeRect = fadeObj.AddComponent<RectTransform>();
+        fadeRect.anchorMin = Vector2.zero;
+        fadeRect.anchorMax = Vector2.one;
+        fadeRect.offsetMin = Vector2.zero;
+        fadeRect.offsetMax = Vector2.zero;
+        Image fadeImg = fadeObj.AddComponent<Image>();
+        fadeImg.color = Color.black;
+        _fadeGroup = fadeObj.AddComponent<CanvasGroup>();
+        _fadeGroup.alpha = 0f;
+        _fadeGroup.blocksRaycasts = false;
+
         // Hide doors initially
         SetDoorsProgress(0f);
     }
@@ -98,6 +114,9 @@ public class SceneTransitionManager : MonoBehaviour
 
         if (_leftDoor != null) _leftDoor.anchoredPosition = new Vector2(-offset, 0);
         if (_rightDoor != null) _rightDoor.anchoredPosition = new Vector2(offset, 0);
+        
+        // Cập nhật luôn độ mờ của Fade chung nhịp độ với 2 cánh cửa
+        if (_fadeGroup != null) _fadeGroup.alpha = eased;
     }
 
     public void TransitionTo(string sceneName)
@@ -111,7 +130,8 @@ public class SceneTransitionManager : MonoBehaviour
         float elapsed = 0f;
         while (elapsed < transitionDuration)
         {
-            elapsed += Time.unscaledDeltaTime;
+            float dt = Mathf.Min(Time.unscaledDeltaTime, 0.1f); // Giới hạn deltaTime để chống giật lag skip frame
+            elapsed += dt;
             SetDoorsProgress(elapsed / transitionDuration);
             yield return null;
         }
@@ -136,11 +156,15 @@ public class SceneTransitionManager : MonoBehaviour
             AttoTheSheep.Core.LoadingManager.Instance.Hide();
         }
 
+        // Đợi thêm 1 frame cuối cùng để Unity xả hết cục lag (nếu có) khi chuyển cảnh
+        yield return null;
+
         // 3. Open doors
         elapsed = 0f;
         while (elapsed < transitionDuration)
         {
-            elapsed += Time.unscaledDeltaTime;
+            float dt = Mathf.Min(Time.unscaledDeltaTime, 0.1f); // Chống skip frame lúc mở cửa
+            elapsed += dt;
             SetDoorsProgress(1f - (elapsed / transitionDuration));
             yield return null;
         }
