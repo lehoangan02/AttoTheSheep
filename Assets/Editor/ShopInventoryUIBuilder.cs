@@ -233,16 +233,17 @@ namespace AttoTheSheep.Editor
             // Left Grid
             GameObject grid = new GameObject("ItemsGrid");
             grid.transform.SetParent(shopPanel, false);
+            // Lưới hiển thị căn giữa, thiết kế dành riêng cho đúng 4 Item
             RectTransform gridRect = grid.AddComponent<RectTransform>();
-            gridRect.anchorMin = new Vector2(0.05f, 0.1f);
+            gridRect.anchorMin = new Vector2(0.05f, 0.2f);
             gridRect.anchorMax = new Vector2(0.95f, 0.8f);
             gridRect.offsetMin = Vector2.zero;
             gridRect.offsetMax = Vector2.zero;
             
             GridLayoutGroup layout = grid.AddComponent<GridLayoutGroup>();
-            layout.cellSize = new Vector2(200, 250);
-            layout.spacing = new Vector2(25, 25);
-            layout.childAlignment = TextAnchor.UpperCenter;
+            layout.cellSize = new Vector2(190, 260); // Phóng to 1 xíu
+            layout.spacing = new Vector2(30, 0); // Cách xa nhau ra 1 xíu
+            layout.childAlignment = TextAnchor.MiddleCenter; // Canh đúng chính giữa màn hình
 
             // Generate Slots
             foreach(var item in sm.shopItems)
@@ -479,13 +480,13 @@ namespace AttoTheSheep.Editor
             GameObject grid = new GameObject("ItemsGrid");
             grid.transform.SetParent(invPanel, false);
             RectTransform gridRect = grid.AddComponent<RectTransform>();
-            gridRect.anchorMin = new Vector2(0.05f, 0.1f);
-            gridRect.anchorMax = new Vector2(0.55f, 0.75f);
+            gridRect.anchorMin = new Vector2(0.05f, 0.2f);
+            gridRect.anchorMax = new Vector2(0.55f, 0.85f);
             gridRect.offsetMin = Vector2.zero;
             gridRect.offsetMax = Vector2.zero;
             
             GridLayoutGroup layout = grid.AddComponent<GridLayoutGroup>();
-            layout.cellSize = new Vector2(100, 100);
+            layout.cellSize = new Vector2(85, 85); // Nhỏ lại để vừa 20 ô không bị tràn
             layout.spacing = new Vector2(10, 10);
             so.FindProperty("slotsParent").objectReferenceValue = grid.transform;
 
@@ -502,11 +503,18 @@ namespace AttoTheSheep.Editor
             GameObject count = new GameObject("CountTxt");
             count.transform.SetParent(slotPref.transform, false);
             RectTransform cRect = count.AddComponent<RectTransform>();
-            cRect.anchoredPosition = new Vector2(20, -20);
+            cRect.anchorMin = new Vector2(1, 0);
+            cRect.anchorMax = new Vector2(1, 0);
+            cRect.pivot = new Vector2(1, 0);
+            cRect.anchoredPosition = new Vector2(-5, 5);
             cRect.sizeDelta = new Vector2(40, 40);
             TextMeshProUGUI cTmp = count.AddComponent<TextMeshProUGUI>();
             cTmp.text = "x1";
             cTmp.color = Color.white;
+            cTmp.alignment = TextAlignmentOptions.BottomRight;
+            cTmp.fontSizeMax = 30;
+            cTmp.fontSizeMin = 10;
+            cTmp.enableAutoSizing = true;
             if (font != null) cTmp.font = font;
             count.AddComponent<Outline>().effectColor = Color.black;
             
@@ -534,66 +542,163 @@ namespace AttoTheSheep.Editor
             DestroyImmediate(slotPref);
             so.FindProperty("slotPrefab").objectReferenceValue = savedSlot;
 
-            // Right Panel (Details)
+            // Right Panel (Details Container)
             GameObject detailPanel = new GameObject("DetailPanel");
             detailPanel.transform.SetParent(invPanel, false);
             RectTransform dRect = detailPanel.AddComponent<RectTransform>();
-            dRect.anchorMin = new Vector2(0.6f, 0.1f);
-            dRect.anchorMax = new Vector2(0.95f, 0.75f);
+            dRect.anchorMin = new Vector2(0.57f, 0.2f); // Căn lề dưới bằng với Grid
+            dRect.anchorMax = new Vector2(0.95f, 0.85f);
             dRect.offsetMin = Vector2.zero;
             dRect.offsetMax = Vector2.zero;
-            detailPanel.AddComponent<Image>().color = new Color(0,0,0,0.3f);
+            detailPanel.AddComponent<Image>().color = new Color(0,0,0,0.5f);
+
+            // Placeholder View
+            GameObject placeholderView = new GameObject("Placeholder");
+            placeholderView.transform.SetParent(detailPanel.transform, false);
+            RectTransform pRect = placeholderView.AddComponent<RectTransform>();
+            pRect.anchorMin = Vector2.zero;
+            pRect.anchorMax = Vector2.one;
+            pRect.offsetMin = Vector2.zero;
+            pRect.offsetMax = Vector2.zero;
+            TextMeshProUGUI pTxt = placeholderView.AddComponent<TextMeshProUGUI>();
+            pTxt.text = "Select an item to view details";
+            pTxt.alignment = TextAlignmentOptions.Center;
+            pTxt.color = new Color(1, 1, 1, 0.5f);
+            pTxt.fontSize = 24;
+            if (font != null) pTxt.font = font;
+
+            so.FindProperty("placeholderView").objectReferenceValue = placeholderView;
+
+            // Detail View
+            GameObject detailView = new GameObject("DetailView");
+            detailView.transform.SetParent(detailPanel.transform, false);
+            RectTransform dvRect = detailView.AddComponent<RectTransform>();
+            dvRect.anchorMin = Vector2.zero;
+            dvRect.anchorMax = Vector2.one;
+            dvRect.offsetMin = Vector2.zero;
+            dvRect.offsetMax = Vector2.zero;
+
+            so.FindProperty("detailView").objectReferenceValue = detailView;
 
             GameObject dIcon = new GameObject("DetailIcon");
-            dIcon.transform.SetParent(detailPanel.transform, false);
+            dIcon.transform.SetParent(detailView.transform, false);
             RectTransform diRect = dIcon.AddComponent<RectTransform>();
-            diRect.anchoredPosition = new Vector2(0, 100);
+            diRect.anchoredPosition = new Vector2(0, 80);
             diRect.sizeDelta = new Vector2(150, 150);
             so.FindProperty("detailIcon").objectReferenceValue = dIcon.AddComponent<Image>();
 
             GameObject dName = new GameObject("DetailName");
-            dName.transform.SetParent(detailPanel.transform, false);
+            dName.transform.SetParent(detailView.transform, false);
             RectTransform dnRect = dName.AddComponent<RectTransform>();
-            dnRect.anchoredPosition = new Vector2(0, 0);
-            dnRect.sizeDelta = new Vector2(300, 50);
+            dnRect.anchoredPosition = new Vector2(0, -20);
+            dnRect.sizeDelta = new Vector2(300, 40);
             TextMeshProUGUI dnTmp = dName.AddComponent<TextMeshProUGUI>();
             dnTmp.alignment = TextAlignmentOptions.Center;
-            dnTmp.fontSize = 40;
-            dnTmp.color = Color.yellow; // Nổi trên nền đen mờ
+            dnTmp.fontSize = 35;
+            dnTmp.color = Color.yellow; 
             if (font != null) dnTmp.font = font;
             so.FindProperty("detailName").objectReferenceValue = dnTmp;
 
             GameObject dDesc = new GameObject("DetailDesc");
-            dDesc.transform.SetParent(detailPanel.transform, false);
+            dDesc.transform.SetParent(detailView.transform, false);
             RectTransform ddRect = dDesc.AddComponent<RectTransform>();
-            ddRect.anchoredPosition = new Vector2(0, -100);
-            ddRect.sizeDelta = new Vector2(300, 150);
+            ddRect.anchoredPosition = new Vector2(0, -90);
+            ddRect.sizeDelta = new Vector2(300, 100);
             TextMeshProUGUI ddTmp = dDesc.AddComponent<TextMeshProUGUI>();
-            ddTmp.alignment = TextAlignmentOptions.TopLeft;
+            ddTmp.alignment = TextAlignmentOptions.Top;
             ddTmp.enableWordWrapping = true;
             ddTmp.color = Color.white;
             if (font != null) ddTmp.font = font;
             so.FindProperty("detailDesc").objectReferenceValue = ddTmp;
 
-            // Upload / Fetch Buttons
-            GameObject upBtn = new GameObject("UploadBtn");
-            upBtn.transform.SetParent(detailPanel.transform, false);
-            RectTransform upRect = upBtn.AddComponent<RectTransform>();
-            upRect.anchoredPosition = new Vector2(-80, -200);
-            upRect.sizeDelta = new Vector2(140, 50);
-            upBtn.AddComponent<Image>().sprite = btnSprite;
-            upBtn.GetComponent<Image>().type = Image.Type.Sliced;
-            upBtn.GetComponent<Image>().alphaHitTestMinimumThreshold = 0.1f;
+            // Use / Drop Buttons (Inside Detail View)
+            GameObject useBtnObj = new GameObject("UseBtn");
+            useBtnObj.transform.SetParent(detailView.transform, false);
+            RectTransform useRect = useBtnObj.AddComponent<RectTransform>();
+            useRect.anchoredPosition = new Vector2(-75, -170);
+            useRect.sizeDelta = new Vector2(130, 45);
+            useBtnObj.AddComponent<Image>().sprite = btnSprite;
+            useBtnObj.GetComponent<Image>().type = Image.Type.Sliced;
+            useBtnObj.GetComponent<Image>().alphaHitTestMinimumThreshold = 0.1f;
+            Button uBtn = useBtnObj.AddComponent<Button>();
             
-            Button uBtn = upBtn.AddComponent<Button>();
-            HoverCursor hcUp = upBtn.AddComponent<HoverCursor>();
+            GameObject useTxtObj = new GameObject("Txt");
+            useTxtObj.transform.SetParent(useBtnObj.transform, false);
+            RectTransform useTxtRect = useTxtObj.AddComponent<RectTransform>();
+            useTxtRect.anchorMin = Vector2.zero;
+            useTxtRect.anchorMax = Vector2.one;
+            useTxtRect.offsetMin = new Vector2(5, 5);
+            useTxtRect.offsetMax = new Vector2(-5, -5);
+            TextMeshProUGUI useTmp = useTxtObj.AddComponent<TextMeshProUGUI>();
+            useTmp.text = "Use";
+            useTmp.color = Color.white;
+            useTmp.alignment = TextAlignmentOptions.Center;
+            useTmp.enableAutoSizing = true;
+            if (font != null) useTmp.font = font;
+            useTxtObj.AddComponent<Outline>().effectColor = Color.black;
+            
+            HoverCursor hcUse = useBtnObj.AddComponent<HoverCursor>();
+            var hsoUse = new SerializedObject(hcUse);
+            hsoUse.FindProperty("defaultCursor").objectReferenceValue = defCursor;
+            hsoUse.FindProperty("hoverCursor").objectReferenceValue = hovCursor;
+            hsoUse.ApplyModifiedProperties();
+            
+            so.FindProperty("useButton").objectReferenceValue = uBtn;
+
+            GameObject dropBtnObj = new GameObject("DropBtn");
+            dropBtnObj.transform.SetParent(detailView.transform, false);
+            RectTransform dropRect = dropBtnObj.AddComponent<RectTransform>();
+            dropRect.anchoredPosition = new Vector2(75, -170);
+            dropRect.sizeDelta = new Vector2(130, 45);
+            dropBtnObj.AddComponent<Image>().sprite = btnSprite;
+            dropBtnObj.GetComponent<Image>().type = Image.Type.Sliced;
+            dropBtnObj.GetComponent<Image>().alphaHitTestMinimumThreshold = 0.1f;
+            Button dBtn = dropBtnObj.AddComponent<Button>();
+            
+            GameObject dropTxtObj = new GameObject("Txt");
+            dropTxtObj.transform.SetParent(dropBtnObj.transform, false);
+            RectTransform dropTxtRect = dropTxtObj.AddComponent<RectTransform>();
+            dropTxtRect.anchorMin = Vector2.zero;
+            dropTxtRect.anchorMax = Vector2.one;
+            dropTxtRect.offsetMin = new Vector2(5, 5);
+            dropTxtRect.offsetMax = new Vector2(-5, -5);
+            TextMeshProUGUI dropTmp = dropTxtObj.AddComponent<TextMeshProUGUI>();
+            dropTmp.text = "Drop";
+            dropTmp.color = Color.white;
+            dropTmp.alignment = TextAlignmentOptions.Center;
+            dropTmp.enableAutoSizing = true;
+            if (font != null) dropTmp.font = font;
+            dropTxtObj.AddComponent<Outline>().effectColor = Color.black;
+            
+            HoverCursor hcDrop = dropBtnObj.AddComponent<HoverCursor>();
+            var hsoDrop = new SerializedObject(hcDrop);
+            hsoDrop.FindProperty("defaultCursor").objectReferenceValue = defCursor;
+            hsoDrop.FindProperty("hoverCursor").objectReferenceValue = hovCursor;
+            hsoDrop.ApplyModifiedProperties();
+
+            so.FindProperty("dropButton").objectReferenceValue = dBtn;
+
+            // Upload / Fetch Buttons (Moved to bottom left outside Detail Panel)
+            GameObject upBtnObj = new GameObject("UploadBtn");
+            upBtnObj.transform.SetParent(invPanel, false);
+            RectTransform upRect = upBtnObj.AddComponent<RectTransform>();
+            upRect.anchorMin = new Vector2(0.3f, 0.1f);
+            upRect.anchorMax = new Vector2(0.3f, 0.1f);
+            upRect.anchoredPosition = Vector2.zero;
+            upRect.sizeDelta = new Vector2(130, 45);
+            upBtnObj.AddComponent<Image>().sprite = btnSprite;
+            upBtnObj.GetComponent<Image>().type = Image.Type.Sliced;
+            upBtnObj.GetComponent<Image>().alphaHitTestMinimumThreshold = 0.1f;
+            
+            Button upBtn = upBtnObj.AddComponent<Button>();
+            HoverCursor hcUp = upBtnObj.AddComponent<HoverCursor>();
             var hsoUp = new SerializedObject(hcUp);
             hsoUp.FindProperty("defaultCursor").objectReferenceValue = defCursor;
             hsoUp.FindProperty("hoverCursor").objectReferenceValue = hovCursor;
             hsoUp.ApplyModifiedProperties();
             
             GameObject upTxt = new GameObject("Txt");
-            upTxt.transform.SetParent(upBtn.transform, false);
+            upTxt.transform.SetParent(upBtnObj.transform, false);
             RectTransform utRect = upTxt.AddComponent<RectTransform>();
             utRect.anchorMin = Vector2.zero;
             utRect.anchorMax = Vector2.one;
@@ -603,32 +708,34 @@ namespace AttoTheSheep.Editor
             uTmp.text = "Upload";
             uTmp.color = Color.white;
             uTmp.alignment = TextAlignmentOptions.Center;
-            uTmp.fontSizeMax = 40;
+            uTmp.fontSizeMax = 35;
             uTmp.fontSizeMin = 10;
             uTmp.enableAutoSizing = true;
             if (font != null) uTmp.font = font;
             upTxt.AddComponent<Outline>().effectColor = Color.black;
-            so.FindProperty("uploadButton").objectReferenceValue = uBtn;
+            so.FindProperty("uploadButton").objectReferenceValue = upBtn;
 
-            GameObject ftBtn = new GameObject("FetchBtn");
-            ftBtn.transform.SetParent(detailPanel.transform, false);
-            RectTransform ftRect = ftBtn.AddComponent<RectTransform>();
-            ftRect.anchoredPosition = new Vector2(80, -200);
-            ftRect.sizeDelta = new Vector2(140, 50);
+            GameObject ftBtnObj = new GameObject("FetchBtn");
+            ftBtnObj.transform.SetParent(invPanel, false);
+            RectTransform ftRect = ftBtnObj.AddComponent<RectTransform>();
+            ftRect.anchorMin = new Vector2(0.45f, 0.1f);
+            ftRect.anchorMax = new Vector2(0.45f, 0.1f);
+            ftRect.anchoredPosition = Vector2.zero;
+            ftRect.sizeDelta = new Vector2(130, 45);
             
-            ftBtn.AddComponent<Image>().sprite = btnSprite;
-            ftBtn.GetComponent<Image>().type = Image.Type.Sliced;
-            ftBtn.GetComponent<Image>().alphaHitTestMinimumThreshold = 0.1f;
+            ftBtnObj.AddComponent<Image>().sprite = btnSprite;
+            ftBtnObj.GetComponent<Image>().type = Image.Type.Sliced;
+            ftBtnObj.GetComponent<Image>().alphaHitTestMinimumThreshold = 0.1f;
             
-            Button fBtn = ftBtn.AddComponent<Button>();
-            HoverCursor hcFt = ftBtn.AddComponent<HoverCursor>();
+            Button fBtn = ftBtnObj.AddComponent<Button>();
+            HoverCursor hcFt = ftBtnObj.AddComponent<HoverCursor>();
             var hsoFt = new SerializedObject(hcFt);
             hsoFt.FindProperty("defaultCursor").objectReferenceValue = defCursor;
             hsoFt.FindProperty("hoverCursor").objectReferenceValue = hovCursor;
             hsoFt.ApplyModifiedProperties();
 
             GameObject ftTxt = new GameObject("Txt");
-            ftTxt.transform.SetParent(ftBtn.transform, false);
+            ftTxt.transform.SetParent(ftBtnObj.transform, false);
             RectTransform fttRect = ftTxt.AddComponent<RectTransform>();
             fttRect.anchorMin = Vector2.zero;
             fttRect.anchorMax = Vector2.one;
@@ -638,31 +745,33 @@ namespace AttoTheSheep.Editor
             fTmp.text = "Fetch";
             fTmp.color = Color.white;
             fTmp.alignment = TextAlignmentOptions.Center;
-            fTmp.fontSizeMax = 40;
+            fTmp.fontSizeMax = 35;
             fTmp.fontSizeMin = 10;
             fTmp.enableAutoSizing = true;
             if (font != null) fTmp.font = font;
             ftTxt.AddComponent<Outline>().effectColor = Color.black;
             so.FindProperty("fetchButton").objectReferenceValue = fBtn;
 
-            // Gold Label
+            // Gold Label (Moved below the grid, matching design)
             GameObject goldLabel = new GameObject("GoldIcon");
             goldLabel.transform.SetParent(invPanel, false);
             RectTransform glRect = goldLabel.AddComponent<RectTransform>();
-            glRect.anchorMin = new Vector2(0.1f, 0.85f);
-            glRect.anchorMax = new Vector2(0.1f, 0.85f);
-            glRect.sizeDelta = new Vector2(50, 50);
+            glRect.anchorMin = new Vector2(0.1f, 0.1f);
+            glRect.anchorMax = new Vector2(0.1f, 0.1f);
+            glRect.anchoredPosition = Vector2.zero;
+            glRect.sizeDelta = new Vector2(40, 40);
             goldLabel.AddComponent<Image>().sprite = coinSprite;
 
             GameObject goldTxt = new GameObject("GoldTxt");
             goldTxt.transform.SetParent(invPanel, false);
             RectTransform gtRect = goldTxt.AddComponent<RectTransform>();
-            gtRect.anchorMin = new Vector2(0.15f, 0.85f);
-            gtRect.anchorMax = new Vector2(0.15f, 0.85f);
-            gtRect.sizeDelta = new Vector2(200, 50);
+            gtRect.anchorMin = new Vector2(0.14f, 0.1f);
+            gtRect.anchorMax = new Vector2(0.14f, 0.1f);
+            gtRect.anchoredPosition = Vector2.zero;
+            gtRect.sizeDelta = new Vector2(150, 40);
             TextMeshProUGUI gTmp = goldTxt.AddComponent<TextMeshProUGUI>();
             gTmp.text = "1000";
-            gTmp.fontSize = 40;
+            gTmp.fontSize = 35;
             gTmp.alignment = TextAlignmentOptions.Left;
             gTmp.color = Color.yellow;
             gTmp.fontStyle = FontStyles.Bold;
