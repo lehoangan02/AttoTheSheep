@@ -21,6 +21,9 @@ public class PlayerSkills : NetworkBehaviour
     // Is the player standing within the flock's radius
     public NetworkVariable<bool> isInsideFlock = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
+    // Damage multiplier for all skills (1.0 = normal, 1.25 = +25% boost)
+    public NetworkVariable<float> damageMultiplier = new NetworkVariable<float>(1.0f, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+
     [Header("Equipped Skill Board (Drag and drop here)")]
     public List<SkillSlot> equippedSkills = new List<SkillSlot>();
 

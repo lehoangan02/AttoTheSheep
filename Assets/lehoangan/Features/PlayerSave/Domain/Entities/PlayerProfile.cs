@@ -8,6 +8,10 @@ public class PlayerProfile
     public int HerdHpLevel { get; private set; }
     public bool HasArmor { get; private set; }
     public bool HasHorn { get; private set; }
+    public int FlockShieldCount { get; private set; }
+    public int SpawnMaxLambsCount { get; private set; }
+    public int SkillDamageBoostCount { get; private set; }
+    public int SpeedBoostCount { get; private set; }
 
     public void AddExp(int amount)
     {
@@ -21,7 +25,8 @@ public class PlayerProfile
     }
 
     public void RestoreState(int coins, int exp, int unlockedStage, 
-        int damageLevel, int hpLevel, int herdHpLevel, bool hasArmor, bool hasHorn)
+        int damageLevel, int hpLevel, int herdHpLevel, bool hasArmor, bool hasHorn, 
+        int flockShieldCount, int spawnMaxLambsCount, int skillDamageBoostCount, int speedBoostCount)
     {
         Coins = coins;
         Exp = exp;
@@ -31,5 +36,9 @@ public class PlayerProfile
         HerdHpLevel = herdHpLevel;
         HasArmor = hasArmor;
         HasHorn = hasHorn;
+        FlockShieldCount = flockShieldCount;
+        SpawnMaxLambsCount = spawnMaxLambsCount;
+        SkillDamageBoostCount = skillDamageBoostCount;
+        SpeedBoostCount = speedBoostCount;
     }
 }

@@ -122,9 +122,17 @@ public class PlayerRollingSkill : BaseSkillComponent
         // --- 3. KẾT THÚC SKILL VÀ TÍNH TOÁN SÁT THƯƠNG 1 LẦN ---
         Debug.Log("🛑 [ROLL] Kết thúc cuộn tròn, chuẩn bị nhả địch!");
 
-        // LƯU Ý: Nếu muốn sát thương tổng bằng với tổng sát thương DoT cũ, bạn có thể nhân data.damage với data.duration.
+                // LƯU Ý: Nếu muốn sát thương tổng bằng với tổng sát thương DoT cũ, bạn có thể nhân data.damage với data.duration.
         // Ở đây mặc định lấy thẳng lượng sát thương data.damage
-        int burstDamage = Mathf.FloorToInt(data.damage); 
+        // Get damage multiplier from PlayerSkills
+        float damageMultiplier = 1f;
+        if (rollController != null)
+        {
+            PlayerSkills skills = rollController.GetComponentInChildren<PlayerSkills>();
+            if (skills == null) skills = rollController.GetComponentInParent<PlayerSkills>();
+            if (skills != null) damageMultiplier = skills.damageMultiplier.Value;
+        }
+        int burstDamage = Mathf.RoundToInt(data.damage * damageMultiplier); 
 
         for (int i = stomach.Count - 1; i >= 0; i--)
         {

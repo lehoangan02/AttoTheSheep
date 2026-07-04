@@ -98,6 +98,12 @@ public class PlayerFartSkill : BaseSkillComponent
         PlayerMovement movement = controller.GetComponentInChildren<PlayerMovement>();
         if (movement == null) movement = controller.GetComponentInParent<PlayerMovement>();
 
+        // Get damage multiplier from PlayerSkills
+        float damageMultiplier = 1f;
+        PlayerSkills skills = controller.GetComponentInChildren<PlayerSkills>();
+        if (skills == null) skills = controller.GetComponentInParent<PlayerSkills>();
+        if (skills != null) damageMultiplier = skills.damageMultiplier.Value;
+
         Vector2 dashDir = parentRb.linearVelocity.normalized;
         if (dashDir == Vector2.zero)
         {
@@ -145,7 +151,8 @@ public class PlayerFartSkill : BaseSkillComponent
                     NetworkEntity enemyEntity = hit.collider.GetComponent<NetworkEntity>();
                     if (enemyEntity != null)
                     {
-                        enemyEntity.TakeDamage((int)data.damage);
+                        int finalDamage = Mathf.RoundToInt(data.damage * damageMultiplier);
+                        enemyEntity.TakeDamage(finalDamage);
                         Vector2 knockbackDir = ((Vector2)hit.collider.transform.position - (Vector2)parentCollider.bounds.center).normalized;
                         enemyEntity.ApplyKnockback(knockbackDir * data.knockupForce, 0.3f);
                     }
@@ -185,8 +192,17 @@ public class PlayerFartSkill : BaseSkillComponent
             NetworkEntity enemyEntity = collision.gameObject.GetComponent<NetworkEntity>();
             if (enemyEntity != null)
             {
+                // Get damage multiplier from PlayerSkills
+                float damageMultiplier = 1f;
+                if (fartController != null)
+                {
+                    PlayerSkills skills = fartController.GetComponentInChildren<PlayerSkills>();
+                    if (skills == null) skills = fartController.GetComponentInParent<PlayerSkills>();
+                    if (skills != null) damageMultiplier = skills.damageMultiplier.Value;
+                }
+                int finalDamage = Mathf.RoundToInt(currentFartData.damage * damageMultiplier);
                 // Gây sát thương
-                enemyEntity.TakeDamage((int)currentFartData.damage);
+                enemyEntity.TakeDamage(finalDamage);
 
                 // Tính toán hướng hất văng AN TOÀN: Chỉ lấy hướng Trái hoặc Phải dựa trên trục X
                 float dirX = collision.transform.position.x > fartController.transform.position.x ? 1f : -1f;
