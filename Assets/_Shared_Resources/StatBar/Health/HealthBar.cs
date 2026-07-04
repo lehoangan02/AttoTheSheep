@@ -3,13 +3,17 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public class HealthBar : MonoBehaviour
 {
+    [SerializeField] private RectTransform barBounds;
+
     [SerializeField] private RectTransform barFill;
 
-    // Bar fill max width in pixels. This is the width of the bar when health is full.
-    private float barFillMaxWidth;
+    [SerializeField] private bool scaleWidthWithMaxHealth;
 
-    // Entity to track. If null, this component is a no-op.
+    [SerializeField] private float maxHealthReference = 100f;
+
     [SerializeField] private NetworkEntity entity;
+
+    private float baseBoundsWidth;
 
     private void Awake()
     {
@@ -19,18 +23,16 @@ public class HealthBar : MonoBehaviour
         }
     }
 
-    // Get max width of bar fill in pixels. This is the width of the bar when health is full.
     private void Start()
     {
-        if (barFill != null)
+        if (barBounds != null)
         {
-            barFillMaxWidth = barFill.rect.width;
+            baseBoundsWidth = barBounds.rect.width;
         }
 
-        if (entity != null && barFill != null)
+        if (entity != null && barFill != null && barBounds != null)
         {
             entity.currentHealth.OnValueChanged += OnHealthChanged;
-            UpdateFill(entity.currentHealth.Value, entity.BaseMaxHealth);
         }
     }
 
@@ -50,9 +52,16 @@ public class HealthBar : MonoBehaviour
 
     private void UpdateFill(int currentHealth, int maxHealth)
     {
-        if (barFill == null || maxHealth <= 0) return;
+        if (barFill == null || barBounds == null || maxHealth <= 0) return;
+
+        if (scaleWidthWithMaxHealth && maxHealthReference > 0f)
+        {
+            float scaleFactor = entity.BaseMaxHealth / maxHealthReference;
+            barBounds.sizeDelta = new Vector2(baseBoundsWidth * scaleFactor, barBounds.sizeDelta.y);
+        }
+
         float ratio = Mathf.Clamp01((float)currentHealth / maxHealth);
-        barFill.sizeDelta = new Vector2(barFillMaxWidth * ratio, barFill.sizeDelta.y);
+        barFill.sizeDelta = new Vector2(barBounds.rect.width * ratio, barFill.sizeDelta.y);
     }
 
     private void LateUpdate()
