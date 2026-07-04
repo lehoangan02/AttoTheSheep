@@ -17759,7 +17759,7 @@ PrefabInstance:
     - target: {fileID: 7335084586799056515, guid: 37b33631d8760c8409510c86ab13be0f, type: 3}
       propertyPath: npcRenderer
       value: 
-      objectReference: {fileID: 1316641283}
+      objectReference: {fileID: 977737731}
     - target: {fileID: 7335084586799056515, guid: 37b33631d8760c8409510c86ab13be0f, type: 3}
       propertyPath: chopDuration
       value: 9
@@ -18409,6 +18409,11 @@ PrefabInstance:
 --- !u!4 &977737728 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5770000807968274643, guid: 37b33631d8760c8409510c86ab13be0f, type: 3}
+  m_PrefabInstance: {fileID: 857603435}
+  m_PrefabAsset: {fileID: 0}
+--- !u!212 &977737731 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 6130837374368733227, guid: 37b33631d8760c8409510c86ab13be0f, type: 3}
   m_PrefabInstance: {fileID: 857603435}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &982042762 stripped
