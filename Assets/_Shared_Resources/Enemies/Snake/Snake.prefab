@@ -333,21 +333,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ContextSteering2D
   rayCount: 8
-  sensorLength: 2
+  sensorLength: 1.2
   obstacleMask:
     serializedVersion: 2
     m_Bits: 1048832
   allyMask:
     serializedVersion: 2
     m_Bits: 64
-  approachRange: 6
+  approachRange: 5
   approachRangePause: 1.5
   enableStrafe: 1
   strafeRange: 2
-  separationBiasAngle: 60
-  allyScanRadius: 6
-  closeRepulsionRadius: 3
-  closeRepulsionStrength: 10
+  allyScanRadius: 2.5
+  closeRepulsionRadius: 0.8
+  closeRepulsionStrength: 1
   blendAngleThreshold: 45
   drawGizmos: 1
 --- !u!114 &-7971564159336550881
