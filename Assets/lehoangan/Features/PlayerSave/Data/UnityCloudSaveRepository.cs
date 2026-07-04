@@ -13,7 +13,10 @@ public class UnityCloudSaveRepository : IPlayerRepository
     private const string KEY_HERD_HP_LEVEL = "heard_hp_level"; 
     private const string KEY_HAS_AMOR = "has_amor"; 
     private const string KEY_HAS_HORN = "has_horn";
-    private const string KEY_POTION_COUNT = "potion_count";
+    private const string KEY_FLOCK_SHIELD_COUNT = "flock_shield_count";
+    private const string KEY_SPAWN_MAX_LAMBS_COUNT = "spawn_max_lambs_count";
+    private const string KEY_SKILL_DAMAGE_BOOST_COUNT = "skill_damage_boost_count";
+    private const string KEY_SPEED_BOOST_COUNT = "speed_boost_count";
 
     public async Task SaveAsync(PlayerProfile profile)
     {
@@ -27,7 +30,10 @@ public class UnityCloudSaveRepository : IPlayerRepository
             { KEY_HERD_HP_LEVEL, profile.HerdHpLevel },
             { KEY_HAS_AMOR, profile.HasArmor },
             { KEY_HAS_HORN, profile.HasHorn },
-            { KEY_POTION_COUNT, profile.PotionCount }
+            { KEY_FLOCK_SHIELD_COUNT, profile.FlockShieldCount },
+            { KEY_SPAWN_MAX_LAMBS_COUNT, profile.SpawnMaxLambsCount },
+            { KEY_SKILL_DAMAGE_BOOST_COUNT, profile.SkillDamageBoostCount },
+            { KEY_SPEED_BOOST_COUNT, profile.SpeedBoostCount }
         };
 
         await CloudSaveService.Instance.Data.Player.SaveAsync(dataToSave);
@@ -47,10 +53,14 @@ public class UnityCloudSaveRepository : IPlayerRepository
         int herdHpLevel = loadedData.TryGetValue(KEY_HERD_HP_LEVEL, out var hhl) ? hhl.Value.GetAs<int>() : 0;
         bool hasArmor = loadedData.TryGetValue(KEY_HAS_AMOR, out var ha) ? ha.Value.GetAs<bool>() : false;
         bool hasHorn = loadedData.TryGetValue(KEY_HAS_HORN, out var hh) ? hh.Value.GetAs<bool>() : false;
-        int potionCount = loadedData.TryGetValue(KEY_POTION_COUNT, out var pc) ? pc.Value.GetAs<int>() : 0;
+        int flockShieldCount = loadedData.TryGetValue(KEY_FLOCK_SHIELD_COUNT, out var fsc) ? fsc.Value.GetAs<int>() : 0;
+        int spawnMaxLambsCount = loadedData.TryGetValue(KEY_SPAWN_MAX_LAMBS_COUNT, out var smlc) ? smlc.Value.GetAs<int>() : 0;
+        int skillDamageBoostCount = loadedData.TryGetValue(KEY_SKILL_DAMAGE_BOOST_COUNT, out var sdbc) ? sdbc.Value.GetAs<int>() : 0;
+        int speedBoostCount = loadedData.TryGetValue(KEY_SPEED_BOOST_COUNT, out var sbc) ? sbc.Value.GetAs<int>() : 0;
 
         var profile = new PlayerProfile();
-        profile.RestoreState(coins, exp, unlockedStage, damageLevel, hpLevel, herdHpLevel, hasArmor, hasHorn, potionCount);
+        profile.RestoreState(coins, exp, unlockedStage, damageLevel, hpLevel, herdHpLevel, hasArmor, hasHorn, 
+            flockShieldCount, spawnMaxLambsCount, skillDamageBoostCount, speedBoostCount);
         
         return profile;
     }
