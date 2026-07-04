@@ -5,6 +5,15 @@ using System.Collections;
 // Kế thừa trực tiếp từ NetworkEntity
 public class LambAI : NetworkEntity 
 {
+    [Header("Shield / Invulnerability Settings")]
+    public NetworkVariable<bool> isShielded = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    [SerializeField] private Color shieldColor = new Color(0f, 0.7f, 1f, 0.5f);
+    [SerializeField] private float shieldFadeDuration = 0.5f;
+
+    [Header("Speed Boost Settings")]
+    private Coroutine shieldRoutine;
+    private Coroutine speedBoostRoutine;
+
     [Header("Movement Settings")]
     [SerializeField] private float stoppingDistance = 0.1f; 
     [SerializeField] private float slowingRadius = 2f; 
@@ -382,8 +391,73 @@ public class LambAI : NetworkEntity
     // ==========================================
     // SỬA ĐỔI LOGIC: BÁO CÁO LÊN FLOCKMANAGER KHI TRÚNG ĐÒN
     // ==========================================
+    // ==========================================
+    // SHIELD / INVULNERABILITY SYSTEM
+    // ==========================================
+    public void SetShieldedState(bool shielded, float duration)
+    {
+        if (!IsServer) return;
+
+        if (shieldRoutine != null)
+        {
+            StopCoroutine(shieldRoutine);
+            shieldRoutine = null;
+        }
+
+        isShielded.Value = shielded;
+        UpdateShieldVisualClientRpc(shielded);
+
+        if (shielded && duration > 0f)
+        {
+            shieldRoutine = StartCoroutine(ShieldTimerRoutine(duration));
+        }
+    }
+
+    private System.Collections.IEnumerator ShieldTimerRoutine(float duration)
+    {
+        yield return new WaitForSeconds(duration);
+        if (isShielded.Value)
+        {
+            isShielded.Value = false;
+            UpdateShieldVisualClientRpc(false);
+        }
+
+        shieldRoutine = null;
+    }
+
+    [ClientRpc]
+    private void UpdateShieldVisualClientRpc(bool shielded)
+    {
+        if (spriteRenderer != null)
+        {
+            if (shielded)
+            {
+                // Store original color and apply shield color
+                originalColor = spriteRenderer.color;
+                spriteRenderer.color = shieldColor;
+            }
+            else
+            {
+                spriteRenderer.color = originalColor;
+            }
+        }
+    }
+
     public override void TakeDamage(int damage, NetworkEntity source)
     {
+        // BLOCK DAMAGE IF SHIELDED
+        if (isShielded.Value)
+        {
+            Debug.Log($"🛡️ [Shield] Lamb '{name}' blocked {damage} damage!");
+            // Still play a little visual feedback to show the shield absorbed hit
+            if (spriteRenderer != null)
+            {
+                StopCoroutine(nameof(FlashShieldRoutine));
+                StartCoroutine(nameof(FlashShieldRoutine));
+            }
+            return; // NO DAMAGE TAKEN
+        }
+
         int healthBefore = currentHealth.Value; 
 
         base.TakeDamage(damage, source);
@@ -404,6 +478,56 @@ public class LambAI : NetworkEntity
                 ApplyKnockbackClientRpc(appliedForce);
             }
         }
+    }
+
+    private IEnumerator FlashShieldRoutine()
+    {
+        if (spriteRenderer != null)
+        {
+            spriteRenderer.color = Color.white;
+            yield return new WaitForSeconds(0.08f);
+            spriteRenderer.color = shieldColor;
+        }
+    }
+
+    // ==========================================
+    // SPEED BOOST SYSTEM
+    // ==========================================
+    public void ApplySpeedBoost(float multiplier, float duration)
+    {
+        if (!IsServer) return;
+
+        if (speedBoostRoutine != null)
+        {
+            StopCoroutine(speedBoostRoutine);
+            currentMoveSpeed.Value = BaseMoveSpeed;
+        }
+
+        speedBoostRoutine = StartCoroutine(SpeedBoostRoutine(multiplier, duration));
+    }
+
+    public void RevertSpeedBoost()
+    {
+        if (!IsServer) return;
+
+        if (speedBoostRoutine != null)
+        {
+            StopCoroutine(speedBoostRoutine);
+            speedBoostRoutine = null;
+        }
+        currentMoveSpeed.Value = BaseMoveSpeed;
+    }
+
+    private System.Collections.IEnumerator SpeedBoostRoutine(float multiplier, float duration)
+    {
+        float baseSpeed = BaseMoveSpeed;
+        float boostedSpeed = baseSpeed * multiplier;
+
+        currentMoveSpeed.Value = boostedSpeed;
+        yield return new WaitForSeconds(duration);
+
+        currentMoveSpeed.Value = baseSpeed;
+        speedBoostRoutine = null;
     }
 
     private void OnHealthChanged(int previousValue, int newValue)

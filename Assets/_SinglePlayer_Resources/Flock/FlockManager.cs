@@ -255,7 +255,7 @@ public class FlockManager : NetworkBehaviour
         }
     }
 
-    private FlockLevelConfig GetCurrentLevelConfig()
+    public FlockLevelConfig GetCurrentLevelConfig()
     {
         int index = Mathf.Clamp(currentLevel.Value - 1, 0, levelConfigs.Length - 1);
         return levelConfigs[index];

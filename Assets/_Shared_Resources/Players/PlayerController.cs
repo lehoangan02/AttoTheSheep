@@ -9,11 +9,37 @@ public class PlayerController : NetworkBehaviour
     // Events (Interfaces) for child components to plug into and get data
     public event Action<Vector2> OnMoveInputChanged;
     public event Action<int> OnSkillActivated; // Returns Skill ID (0, 1, 2, 3, 4)
+    public event Action<int> OnCheatActivated; // Returns Cheat ID (1, 2, 3, 4)
     public event Action<Vector2> OnMapClicked; 
 
     // ----------------------------------------------------
     // RECEIVE MOVEMENT INPUT
     // ----------------------------------------------------
+    private void Update()
+    {
+        if (!IsOwner || Keyboard.current == null) return;
+
+        if (Keyboard.current.jKey.wasPressedThisFrame)
+        {
+            OnSkillActivated?.Invoke(0);
+        }
+
+        if (Keyboard.current.uKey.wasPressedThisFrame)
+        {
+            OnSkillActivated?.Invoke(1);
+        }
+
+        if (Keyboard.current.iKey.wasPressedThisFrame)
+        {
+            OnSkillActivated?.Invoke(2);
+        }
+
+        if (Keyboard.current.oKey.wasPressedThisFrame)
+        {
+            OnSkillActivated?.Invoke(3);
+        }
+    }
+
     public void OnMove(InputValue value)
     {
         if (!IsOwner) return;
@@ -52,12 +78,39 @@ public class PlayerController : NetworkBehaviour
     }
 
     // ----------------------------------------------------
-    // RECEIVE HEADBUTT INPUT (SKILL 4) - Press 0 to activate! Always available, no flock/tier needed.
+    // RECEIVE HEADBUTT INPUT (SKILL 4) - Triggered by its dedicated input binding.
     // ----------------------------------------------------
     public void OnHeadbutt(InputValue value)
     {
         if (!IsOwner || !value.isPressed) return;
         OnSkillActivated?.Invoke(4); // Call SkillSlot with skillId=4 (Headbutt)
+    }
+
+    // ----------------------------------------------------
+    // RECEIVE CHEAT INPUT (Cheat1..Cheat4 from Input Actions)
+    // ----------------------------------------------------
+    public void OnCheat1(InputValue value)
+    {
+        if (!IsOwner || !value.isPressed) return;
+        OnCheatActivated?.Invoke(1);
+    }
+
+    public void OnCheat2(InputValue value)
+    {
+        if (!IsOwner || !value.isPressed) return;
+        OnCheatActivated?.Invoke(2);
+    }
+
+    public void OnCheat3(InputValue value)
+    {
+        if (!IsOwner || !value.isPressed) return;
+        OnCheatActivated?.Invoke(3);
+    }
+
+    public void OnCheat4(InputValue value)
+    {
+        if (!IsOwner || !value.isPressed) return;
+        OnCheatActivated?.Invoke(4);
     }
 
     // ----------------------------------------------------
