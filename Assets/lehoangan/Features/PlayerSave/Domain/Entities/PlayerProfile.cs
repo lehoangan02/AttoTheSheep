@@ -8,6 +8,7 @@ public class PlayerProfile
     public int HerdHpLevel { get; private set; }
     public bool HasArmor { get; private set; }
     public bool HasHorn { get; private set; }
+    public int PotionCount { get; private set; }
 
     public void AddExp(int amount)
     {
@@ -21,7 +22,7 @@ public class PlayerProfile
     }
 
     public void RestoreState(int coins, int exp, int unlockedStage, 
-        int damageLevel, int hpLevel, int herdHpLevel, bool hasArmor, bool hasHorn)
+        int damageLevel, int hpLevel, int herdHpLevel, bool hasArmor, bool hasHorn, int potionCount)
     {
         Coins = coins;
         Exp = exp;
@@ -31,5 +32,6 @@ public class PlayerProfile
         HerdHpLevel = herdHpLevel;
         HasArmor = hasArmor;
         HasHorn = hasHorn;
+        PotionCount = potionCount;
     }
 }

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Unity.Services.CloudSave;
+using UnityEngine.InputSystem;
 
 public class UnityCloudSaveRepository : IPlayerRepository
 {
@@ -12,6 +13,7 @@ public class UnityCloudSaveRepository : IPlayerRepository
     private const string KEY_HERD_HP_LEVEL = "heard_hp_level"; 
     private const string KEY_HAS_AMOR = "has_amor"; 
     private const string KEY_HAS_HORN = "has_horn";
+    private const string KEY_POTION_COUNT = "potion_count";
 
     public async Task SaveAsync(PlayerProfile profile)
     {
@@ -24,7 +26,8 @@ public class UnityCloudSaveRepository : IPlayerRepository
             { KEY_HP_LEVEL, profile.HpLevel },
             { KEY_HERD_HP_LEVEL, profile.HerdHpLevel },
             { KEY_HAS_AMOR, profile.HasArmor },
-            { KEY_HAS_HORN, profile.HasHorn }
+            { KEY_HAS_HORN, profile.HasHorn },
+            { KEY_POTION_COUNT, profile.PotionCount }
         };
 
         await CloudSaveService.Instance.Data.Player.SaveAsync(dataToSave);
@@ -44,9 +47,10 @@ public class UnityCloudSaveRepository : IPlayerRepository
         int herdHpLevel = loadedData.TryGetValue(KEY_HERD_HP_LEVEL, out var hhl) ? hhl.Value.GetAs<int>() : 0;
         bool hasArmor = loadedData.TryGetValue(KEY_HAS_AMOR, out var ha) ? ha.Value.GetAs<bool>() : false;
         bool hasHorn = loadedData.TryGetValue(KEY_HAS_HORN, out var hh) ? hh.Value.GetAs<bool>() : false;
+        int potionCount = loadedData.TryGetValue(KEY_POTION_COUNT, out var pc) ? pc.Value.GetAs<int>() : 0;
 
         var profile = new PlayerProfile();
-        profile.RestoreState(coins, exp, unlockedStage, damageLevel, hpLevel, herdHpLevel, hasArmor, hasHorn);
+        profile.RestoreState(coins, exp, unlockedStage, damageLevel, hpLevel, herdHpLevel, hasArmor, hasHorn, potionCount);
         
         return profile;
     }
