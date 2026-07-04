@@ -15154,6 +15154,7 @@ MonoBehaviour:
   flockManager: {fileID: 31982070}
   instructionBubble: {fileID: 1505930773}
   bubbleOffset: {x: -5, y: 5}
+  hiddenPosition: {x: 9999, y: 9999, z: 0}
   tutorialSteps:
   - stepName: "B\u01B0\u1EDBc 0 - T\u1EA3i m\xE0n ch\u01A1i"
     instructionText: "\u0110ang t\u1EA3i m\xE0n ch\u01A1i..."
@@ -15179,10 +15180,10 @@ MonoBehaviour:
     onStepStart:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1053043803}
-          m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-          m_MethodName: SetActive
-          m_Mode: 6
+        - m_Target: {fileID: 561229989}
+          m_TargetAssemblyTypeName: TutorialManager, Assembly-CSharp
+          m_MethodName: TeleportEnemyBack
+          m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
