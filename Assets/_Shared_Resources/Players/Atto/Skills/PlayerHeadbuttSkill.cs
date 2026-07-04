@@ -46,6 +46,12 @@ public class PlayerHeadbuttSkill : BaseSkillComponent
         if (movement == null) movement = controller.GetComponentInParent<PlayerMovement>();
         if (movement != null) movement.isMovementLocked = true;
 
+        // Get damage multiplier from PlayerSkills
+        float damageMultiplier = 1f;
+        PlayerSkills skills = controller.GetComponentInChildren<PlayerSkills>();
+        if (skills == null) skills = controller.GetComponentInParent<PlayerSkills>();
+        if (skills != null) damageMultiplier = skills.damageMultiplier.Value;
+
         yield return new WaitForSeconds(data.attackDelay);
 
         // --- SỬ DỤNG BIẾN playerSprite ĐỂ XÁC ĐỊNH HƯỚNG ---
@@ -70,7 +76,8 @@ public class PlayerHeadbuttSkill : BaseSkillComponent
                 NetworkEntity enemyEntity = hit.GetComponent<NetworkEntity>();
                 if (enemyEntity != null) 
                 {
-                    enemyEntity.TakeDamage((int)data.damage);
+                    int finalDamage = Mathf.RoundToInt(data.damage * damageMultiplier);
+                    enemyEntity.TakeDamage(finalDamage);
 
                     // Đẩy lùi
                     enemyEntity.ApplyKnockback(facingDir * data.knockbackForce, 0.2f);

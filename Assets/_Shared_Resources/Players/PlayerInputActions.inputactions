@@ -59,6 +59,42 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Cheat1",
+                    "type": "Button",
+                    "id": "21cda762-866d-4a7b-b85f-859911312b4a",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Cheat2",
+                    "type": "Button",
+                    "id": "e9a8b240-16bf-4b01-a08a-a77bf05dca34",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Cheat3",
+                    "type": "Button",
+                    "id": "ef594e49-9dcb-4c10-9f2a-d0f6b3fbbcf3",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Cheat4",
+                    "type": "Button",
+                    "id": "fa3ee802-bcc7-4b9d-af35-789f34aa73d2",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -131,7 +167,7 @@
                 {
                     "name": "",
                     "id": "20c153d1-cabc-41d6-9da3-1de9e340c27d",
-                    "path": "<Keyboard>/1",
+                    "path": "<Keyboard>/u",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -142,7 +178,7 @@
                 {
                     "name": "",
                     "id": "33cfe39d-c662-4a6e-8e72-ef8bfcf6ae58",
-                    "path": "<Keyboard>/2",
+                    "path": "<Keyboard>/i",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -164,7 +200,7 @@
                 {
                     "name": "",
                     "id": "0c2450a2-0a48-4d2f-8918-1f2d78c83633",
-                    "path": "<Keyboard>/3",
+                    "path": "<Keyboard>/o",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -186,11 +222,55 @@
                 {
                     "name": "",
                     "id": "b7f72c78-fd3e-44d7-a045-35210542e173",
-                    "path": "<Keyboard>/0",
+                    "path": "<Keyboard>/j",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "Headbutt",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "61478287-ba6c-459b-9b3b-1aa9bdad6c15",
+                    "path": "<Keyboard>/1",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Cheat1",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "210a01ba-1f06-4574-ae9d-ee48160c4c8a",
+                    "path": "<Keyboard>/2",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Cheat2",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "f4c6d9a4-27f8-41f8-8794-fc301f172511",
+                    "path": "<Keyboard>/3",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Cheat3",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "7c2429e7-7ce2-4f38-b3a2-be5a344ef92d",
+                    "path": "<Keyboard>/4",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Cheat4",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

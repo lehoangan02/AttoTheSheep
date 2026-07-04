@@ -5070,6 +5070,7 @@ GameObject:
   - component: {fileID: 1963130586316328227}
   - component: {fileID: 5768902246884596341}
   - component: {fileID: -7979202511421666267}
+  - component: {fileID: 7287703922640957452}
   m_Layer: 7
   m_Name: Atto
   m_TagString: Player
@@ -5166,7 +5167,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 1192057837
+  GlobalObjectIdHash: 1855868505
   InScenePlacedSourceGlobalObjectIdHash: 1192057837
   DeferredDespawnTick: 0
   Ownership: 1
@@ -5457,6 +5458,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::StatusEffectController
   ShowTopMostFoldoutHeaderGroup: 1
   vfxEntries: []
+--- !u!114 &7287703922640957452
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2149695861835639596}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e5d63e1ad9db82419143ae82655815e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerCheats
+  ShowTopMostFoldoutHeaderGroup: 1
+  shieldDuration: 10
+  speedMultiplier: 1.5
+  speedDuration: 8
+  speedAccelerationDuration: 0.5
 --- !u!1 &2271741925598155448
 GameObject:
   m_ObjectHideFlags: 0
@@ -16729,6 +16747,11 @@ MonoBehaviour:
       MinSecondsBetweenUpdates: 0
       MaxSecondsBetweenUpdates: 0
     m_InternalValue: 0
+  damageMultiplier:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 1
   equippedSkills:
   - slotName: 
     data: {fileID: 11400000, guid: 7ed33f3afac745e41ba8fd5e67a16fde, type: 2}
