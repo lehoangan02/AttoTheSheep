@@ -1,16 +1,16 @@
 fileFormatVersion: 2
-guid: d810f4d2c57e8ef429aeff364d10d372
+guid: 8f9a9932a922a3649ae4dabb2ef83839
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -1056237759172199722
-    second: SmallBar_Base_0
+      213: -3465317980554678828
+    second: BigBar_Base_0
   - first:
-      213: -2020892919288343516
-    second: SmallBar_Base_1
+      213: -7829629924064644357
+    second: BigBar_Base_1
   - first:
-      213: -8602477449284256100
-    second: SmallBar_Base_2
+      213: -8870829451628287298
+    second: BigBar_Base_2
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -43,7 +43,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -106,67 +106,67 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: SmallBar_Base_0
+      name: BigBar_Base_0
       rect:
         serializedVersion: 2
-        x: 48
-        y: 22
-        width: 17
-        height: 21
+        x: 40
+        y: 4
+        width: 24
+        height: 51
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 6dabf2eaa5d7751f0800000000000000
-      internalID: -1056237759172199722
+      spriteID: 4dda34f18a7b8efc0800000000000000
+      internalID: -3465317980554678828
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: SmallBar_Base_1
+      name: BigBar_Base_1
       rect:
         serializedVersion: 2
-        x: 127
-        y: 22
-        width: 66
-        height: 21
+        x: 128
+        y: 4
+        width: 64
+        height: 51
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 42457b8d89854f3e0800000000000000
-      internalID: -2020892919288343516
+      spriteID: bf2bb553111975390800000000000000
+      internalID: -7829629924064644357
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: SmallBar_Base_2
+      name: BigBar_Base_2
       rect:
         serializedVersion: 2
-        x: 255
-        y: 22
-        width: 17
-        height: 21
+        x: 256
+        y: 4
+        width: 24
+        height: 51
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: c9e7a17765cdd9880800000000000000
-      internalID: -8602477449284256100
+      spriteID: eba6f980d9b74e480800000000000000
+      internalID: -8870829451628287298
       vertices: []
       indices: 
       edges: []
@@ -183,11 +183,13 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     spriteCustomMetadata:
-      entries: []
+      entries:
+      - key: SpriteEditor.SliceSettings
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":64.0,"y":64.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":0,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
-      SmallBar_Base_0: -1056237759172199722
-      SmallBar_Base_1: -2020892919288343516
-      SmallBar_Base_2: -8602477449284256100
+      BigBar_Base_0: -3465317980554678828
+      BigBar_Base_1: -7829629924064644357
+      BigBar_Base_2: -8870829451628287298
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
