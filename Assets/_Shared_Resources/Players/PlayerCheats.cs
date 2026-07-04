@@ -159,6 +159,11 @@ public class PlayerCheats : NetworkBehaviour
 
     private void HandleCheatActivated(int cheatId)
     {
+        ActivateCheat(cheatId);
+    }
+
+    public void ActivateCheat(int cheatId)
+    {
         if (!IsOwner) return;
 
         CheatSlotConfig slot = FindSlot(cheatId);

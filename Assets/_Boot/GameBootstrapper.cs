@@ -69,6 +69,30 @@ public class GameBootstrapper : MonoBehaviour
             // 4. Load the player's profile data
             CurrentProfile = await PlayerRepository.LoadAsync();
             Debug.Log("[Bootstrapper] Player Profile successfully loaded from Cloud Save.");
+
+            // 5. Ensure every item count is at least 1
+            bool itemCountsModified = false;
+            int flockShieldCount = CurrentProfile.FlockShieldCount;
+            int spawnMaxLambsCount = CurrentProfile.SpawnMaxLambsCount;
+            int skillDamageBoostCount = CurrentProfile.SkillDamageBoostCount;
+            int speedBoostCount = CurrentProfile.SpeedBoostCount;
+
+            if (flockShieldCount < 1) { flockShieldCount = 1; itemCountsModified = true; }
+            if (spawnMaxLambsCount < 1) { spawnMaxLambsCount = 1; itemCountsModified = true; }
+            if (skillDamageBoostCount < 1) { skillDamageBoostCount = 1; itemCountsModified = true; }
+            if (speedBoostCount < 1) { speedBoostCount = 1; itemCountsModified = true; }
+
+            if (itemCountsModified)
+            {
+                CurrentProfile.RestoreState(
+                    CurrentProfile.Coins, CurrentProfile.Exp, CurrentProfile.UnlockedStage,
+                    CurrentProfile.DamageLevel, CurrentProfile.HpLevel, CurrentProfile.HerdHpLevel,
+                    CurrentProfile.HasArmor, CurrentProfile.HasHorn,
+                    flockShieldCount, spawnMaxLambsCount, skillDamageBoostCount, speedBoostCount
+                );
+                await PlayerRepository.SaveAsync(CurrentProfile);
+                Debug.Log("[Bootstrapper] Minimum item counts enforced and saved.");
+            }
             
             OnBootstrapped?.Invoke();
         }

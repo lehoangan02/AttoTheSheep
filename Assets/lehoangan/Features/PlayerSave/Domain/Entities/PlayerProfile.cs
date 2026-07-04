@@ -1,5 +1,9 @@
+using System;
+
 public class PlayerProfile
 {
+    public event Action OnProfileUpdated;
+
     public int Coins { get; private set; }
     public int Exp { get; private set; }
     public int UnlockedStage { get; private set; }
@@ -40,5 +44,27 @@ public class PlayerProfile
         SpawnMaxLambsCount = spawnMaxLambsCount;
         SkillDamageBoostCount = skillDamageBoostCount;
         SpeedBoostCount = speedBoostCount;
+        
+        OnProfileUpdated?.Invoke();
+    }
+
+    public bool ConsumeItem(string itemName)
+    {
+        switch (itemName)
+        {
+            case "Shield":
+                if (FlockShieldCount > 0) { FlockShieldCount--; return true; }
+                break;
+            case "DeathTotem":
+                if (SpawnMaxLambsCount > 0) { SpawnMaxLambsCount--; return true; }
+                break;
+            case "Meat":
+                if (SkillDamageBoostCount > 0) { SkillDamageBoostCount--; return true; }
+                break;
+            case "MushShroom":
+                if (SpeedBoostCount > 0) { SpeedBoostCount--; return true; }
+                break;
+        }
+        return false;
     }
 }
