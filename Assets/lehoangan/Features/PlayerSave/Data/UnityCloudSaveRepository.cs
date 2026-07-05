@@ -18,8 +18,13 @@ public class UnityCloudSaveRepository : IPlayerRepository
     private const string KEY_SKILL_DAMAGE_BOOST_COUNT = "skill_damage_boost_count";
     private const string KEY_SPEED_BOOST_COUNT = "speed_boost_count";
 
+    private static PlayerProfile _cachedProfile;
+
     public async Task SaveAsync(PlayerProfile profile)
     {
+        // Update local cache immediately to guarantee correctness
+        _cachedProfile = profile;
+
         var dataToSave = new Dictionary<string, object>
         {
             { KEY_COIN, profile.Coins },
@@ -41,9 +46,19 @@ public class UnityCloudSaveRepository : IPlayerRepository
 
     public async Task<PlayerProfile> LoadAsync()
     {
+        // Return cached profile if it exists to prevent unnecessary network requests
+        if (_cachedProfile != null)
+        {
+            return _cachedProfile;
+        }
+
         var loadedData = await CloudSaveService.Instance.Data.Player.LoadAllAsync();
         
-        if (loadedData.Count == 0) return new PlayerProfile();
+        if (loadedData.Count == 0) 
+        {
+            _cachedProfile = new PlayerProfile();
+            return _cachedProfile;
+        }
 
         int coins = loadedData.TryGetValue(KEY_COIN, out var c) ? c.Value.GetAs<int>() : 0;
         int exp = loadedData.TryGetValue(KEY_EXP, out var e) ? e.Value.GetAs<int>() : 0;
@@ -62,6 +77,7 @@ public class UnityCloudSaveRepository : IPlayerRepository
         profile.RestoreState(coins, exp, unlockedStage, damageLevel, hpLevel, herdHpLevel, hasArmor, hasHorn, 
             flockShieldCount, spawnMaxLambsCount, skillDamageBoostCount, speedBoostCount);
         
+        _cachedProfile = profile;
         return profile;
     }
 }

@@ -92,25 +92,25 @@ public class PlayerController : NetworkBehaviour
     public void OnCheat1(InputValue value)
     {
         if (!IsOwner || !value.isPressed) return;
-        OnCheatActivated?.Invoke(1);
+        // OnCheatActivated?.Invoke(1); // Disabled to let ActionBarController handle it and consume items
     }
 
     public void OnCheat2(InputValue value)
     {
         if (!IsOwner || !value.isPressed) return;
-        OnCheatActivated?.Invoke(2);
+        // OnCheatActivated?.Invoke(2);
     }
 
     public void OnCheat3(InputValue value)
     {
         if (!IsOwner || !value.isPressed) return;
-        OnCheatActivated?.Invoke(3);
+        // OnCheatActivated?.Invoke(3);
     }
 
     public void OnCheat4(InputValue value)
     {
         if (!IsOwner || !value.isPressed) return;
-        OnCheatActivated?.Invoke(4);
+        // OnCheatActivated?.Invoke(4);
     }
 
     // ----------------------------------------------------

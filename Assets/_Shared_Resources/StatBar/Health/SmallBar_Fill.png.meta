@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: c54a4f11c73ffcb46ac7f1475bca62a8
+guid: 15bcd4cebb42ee74994d1aa38d165c60
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 1939341058771299228
-    second: BigBar_Fill_0
+      213: -4072196366049256429
+    second: SmallBar_Fill_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -37,7 +37,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -100,23 +100,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: BigBar_Fill_0
+      name: SmallBar_Fill_0
       rect:
         serializedVersion: 2
         x: 0
-        y: 19
+        y: 0
         width: 64
-        height: 26
+        height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: c9ba46afa6ce9ea10800000000000000
-      internalID: 1939341058771299228
+      spriteID: 31c5ff10bf6ac77c0800000000000000
+      internalID: -4072196366049256429
       vertices: []
       indices: 
       edges: []
@@ -125,7 +125,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: a01b2b16d855151629a4359a58c82335
     internalID: 0
     vertices: []
     indices: 
@@ -133,9 +133,11 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     spriteCustomMetadata:
-      entries: []
+      entries:
+      - key: SpriteEditor.SliceSettings
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":64.0,"y":64.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":0,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
-      BigBar_Fill_0: 1939341058771299228
+      SmallBar_Fill_0: -4072196366049256429
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

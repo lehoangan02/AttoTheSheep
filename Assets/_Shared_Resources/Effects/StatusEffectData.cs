@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>Identifies an effect type for queries (HasEffect, RemoveEffect, VFX mapping).</summary>
-public enum EffectKind { Poison, Burn, Freeze, Stun, Knockback, Slow, Bleed }
+public enum EffectKind { Poison, Burn, Freeze, Stun, Knockback, Slow, Bleed, Curse }
 
 /// <summary>How to handle applying an effect when one of the same kind is already active.</summary>
 public enum EffectStacking

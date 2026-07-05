@@ -22,7 +22,9 @@ MonoBehaviour:
   throwCooldown: 1.5
   throwDamage: 40
   ballSpeed: 7
-  explosionBallPrefab: {fileID: 4839114781525419965, guid: 2f57c81e57981d4cf9ef6cf83cd746ee, type: 3}
+  ballPrefab: {fileID: 4839114781525419965, guid: 2f57c81e57981d4cf9ef6cf83cd746ee, type: 3}
+  ballOnHitEffects:
+  - {fileID: 11400000, guid: 7b4e3ac689b3406880e0ab3dde76dba5, type: 2}
   transformRange: 3
   transformCooldown: 8
   transformSpellVFXPrefab: {fileID: 7154831219701261189, guid: 2d908b937a60be8e08cf3442ce76f67a, type: 3}

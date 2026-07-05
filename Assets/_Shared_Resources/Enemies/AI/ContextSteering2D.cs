@@ -30,10 +30,9 @@ public class ContextSteering2D : MonoBehaviour
     [SerializeField] private float strafeRange = 2f;
 
     [Header("Separation")]
-    [SerializeField] private float separationBiasAngle = 35f; // +clockwise, "pass right"
     [SerializeField] private float allyScanRadius = 2.5f;
     [SerializeField] private float closeRepulsionRadius = 0.8f;
-    [SerializeField] private float closeRepulsionStrength = 2f;
+    [SerializeField] private float closeRepulsionStrength = 1f;
 
     [Header("Synthesis")]
     [SerializeField] private float blendAngleThreshold = 45f;
@@ -47,19 +46,20 @@ public class ContextSteering2D : MonoBehaviour
     float[] danger;
     float[] finalScores;     // max(0, interest - danger) for blending and gizmos
     int strafeSign = 1;
-    float lastStrafeDot;
     bool inStrafeMode;
     Vector2 lastBlendedDir;  // for gizmos
     Vector2 lastStrafeDir;   // for gizmos
-    Rigidbody2D rb;
     Collider2D selfCollider;
+    Vector2 steeringOriginOffset;
+    public Vector2 SteeringOrigin => (Vector2)transform.position + steeringOriginOffset;
 
     // Static scratch buffers (shared, safe: single-threaded FixedUpdate).
     // Safe ONLY because Unity's FixedUpdate is single-threaded.
-    // If Burst/Jobs are added later, move to instance buffers.
+    // If Burst/Jobs are added later, move to instance buffers.d
     // Sized for max 32 rays (rayCount is configurable)
     static readonly RaycastHit2D[] s_wallHits = new RaycastHit2D[32];
-    static readonly Collider2D[] s_allyHits = new Collider2D[16];
+    static readonly Collider2D[] s_allyHits = new Collider2D[32];
+    static readonly ContactFilter2D s_allyFilter = ContactFilter2D.noFilter;
 
     void Awake()
     {
@@ -68,8 +68,8 @@ public class ContextSteering2D : MonoBehaviour
         if (allyMask.value == 0)
             allyMask = LayerMask.GetMask("Enemy");
 
-        rb = GetComponent<Rigidbody2D>();
         selfCollider = GetComponent<Collider2D>();
+        steeringOriginOffset = selfCollider != null ? selfCollider.offset : Vector2.zero;
 
         // Build the compass directions (0°, 45°, 90°, 135°, 180°, 225°, 270°, 315°)
         dirs8 = new Vector2[rayCount];
@@ -114,10 +114,10 @@ public class ContextSteering2D : MonoBehaviour
         }
 
         // 4. Compute wall danger (8 raycasts against Building|Terrain)
-        SteeringMath.ComputeDangerRay(transform.position, dirs8, sensorLength, obstacleMask, s_wallHits, danger);
+        SteeringMath.ComputeDangerRay(SteeringOrigin, dirs8, sensorLength, obstacleMask, s_wallHits, danger);
 
-        // 5. Add ally separation danger (OverlapCircle for nearby Enemy-layer entities, rotated by bias angle)
-        SteeringMath.AddAllyDanger(transform.position, allyScanRadius, allyMask, selfCollider, s_allyHits, dirs8, separationBiasAngle, danger, closeRepulsionRadius, closeRepulsionStrength);
+        // 5. Add ally separation danger (OverlapCircle for nearby Enemy-layer entities)
+        SteeringMath.AddAllyDanger(SteeringOrigin, allyScanRadius, allyMask, selfCollider, s_allyHits, s_allyFilter, dirs8, danger, closeRepulsionRadius, closeRepulsionStrength);
 
         // 6. Final = max(0, Interest - Danger) per slot
         for (int i = 0; i < interest.Length; i++)
@@ -133,7 +133,7 @@ public class ContextSteering2D : MonoBehaviour
     {
         if (!drawGizmos) return;
         if (dirs8 == null) return;
-        Vector3 pos = transform.position;
+        Vector3 pos = SteeringOrigin;
 
         // Draw range circles
         Gizmos.color = new Color(1, 1, 1, 0.15f);
@@ -245,38 +245,32 @@ public static class SteeringMath
     }
 
     /// <summary>OverlapCircle for nearby Enemy-layer colliders. For each ally, weight (1-dist/radius)
-    /// into the NEAREST compass slot, then rotate the slot index by biasAngle (clockwise +).</summary>
-    public static void AddAllyDanger(Vector2 origin, float scanRadius, LayerMask allyMask, Collider2D self, Collider2D[] allyHits, Vector2[] dirs, float biasAngle, float[] outDanger, float closeRepulsionRadius = 0f, float closeRepulsionStrength = 1f)
+    /// into the NEAREST compass slot as repulsion danger.</summary>
+    public static void AddAllyDanger(Vector2 origin, float scanRadius, LayerMask allyMask, Collider2D self, Collider2D[] allyHits, ContactFilter2D allyFilter, Vector2[] dirs, float[] outDanger, float closeRepulsionRadius = 0f, float closeRepulsionStrength = 1f)
     {
-        int count = Physics2D.OverlapCircleNonAlloc(origin, scanRadius, allyHits, allyMask);
+        allyFilter.layerMask = allyMask;
+        int count = Physics2D.OverlapCircle(origin, scanRadius, allyFilter, allyHits);
         if (count <= 0) return;
         float anglePerSlot = 360f / dirs.Length;
-        int biasSlots = Mathf.RoundToInt(biasAngle / anglePerSlot); // convert degrees to nearest slot offset
 
         for (int j = 0; j < count; j++)
         {
             Collider2D col = allyHits[j];
             if (col == null || col == self) continue;
-            Vector2 toAlly = (Vector2)(col.transform.position - (Vector3)origin);
+            Vector2 toAlly = (Vector2)(col.bounds.center - (Vector3)origin);
             float dist = toAlly.magnitude;
             if (dist < 0.001f) continue;
             float weight = 1f - (dist / scanRadius);
             if (weight <= 0f) continue;
 
-            // Extra repulsion for very close allies
             if (dist < closeRepulsionRadius)
                 weight = Mathf.Max(weight, closeRepulsionStrength * (1f - dist / closeRepulsionRadius));
 
-            // Find nearest compass slot (unbiased)
             float goalAngle = Mathf.Atan2(toAlly.y, toAlly.x) * Mathf.Rad2Deg;
-            int nearest = Mathf.RoundToInt(goalAngle / anglePerSlot);
-            if (nearest < 0) nearest += dirs.Length;
+            int slot = Mathf.RoundToInt(goalAngle / anglePerSlot);
+            if (slot < 0) slot += dirs.Length;
 
-            // Apply bias: shift slot by biasSlots (clockwise +), wrap
-            int biasedSlot = (nearest + biasSlots) % dirs.Length;
-            if (biasedSlot < 0) biasedSlot += dirs.Length;
-
-            outDanger[biasedSlot] = Mathf.Min(1f, outDanger[biasedSlot] + weight);
+            outDanger[slot] = Mathf.Min(1f, outDanger[slot] + weight);
         }
     }
 

@@ -10,11 +10,30 @@ public class ActionSlot : MonoBehaviour
     [Header("UI References")]
     public Image iconDisplay;
     public TextMeshProUGUI amountText;
+    public Image counterImage;
 
-    private int currentAmount = 0;
+    private PlayerProfile _playerProfile;
+    private IPlayerRepository _playerRepository;
+
+    void Awake()
+    {
+        // Auto-assign counterImage early so InitializeUI can dim it even before Start
+        if (counterImage == null)
+        {
+            foreach (var img in GetComponentsInChildren<Image>(true))
+            {
+                if (img.gameObject.name == "Counter")
+                {
+                    counterImage = img;
+                    break;
+                }
+            }
+        }
+    }
 
     void Start()
     {
+
         if (itemData != null && iconDisplay != null)
         {
             iconDisplay.sprite = itemData.icon;
@@ -25,57 +44,85 @@ public class ActionSlot : MonoBehaviour
         }
     }
 
-    public void SetInitialAmount(int loadedAmount)
+    public void InjectDependencies(PlayerProfile profile, IPlayerRepository repository)
     {
-        currentAmount = loadedAmount;
+        _playerProfile = profile;
+        _playerRepository = repository;
+    }
+
+    public void InitializeUI()
+    {
+        Debug.Log($"[ActionSlot] InitializeUI called for {itemData?.itemName}. Profile is null? {_playerProfile == null}. GetCurrentAmount(): {GetCurrentAmount()}");
         UpdateUI();
     }
 
     // Called by the ActionBarController when the player presses a hotkey
-    public void UseItem()
+    public bool UseItem()
     {
         // Safety check to ensure there is an item assigned to this slot
         if (itemData == null) 
         {
             Debug.LogWarning("No ActionItem assigned to this slot!");
-            return; 
+            return false; 
         }
 
-        if (currentAmount > 0)
+        if (_playerProfile == null)
         {
-            // 1. Decrease the amount
-            currentAmount--;
-            
-            // 2. Update the visual UI
+            Debug.LogWarning("PlayerProfile not loaded yet!");
+            return false;
+        }
+
+        if (_playerProfile.ConsumeItem(itemData.itemName))
+        {
+            // Update the visual UI directly from the new profile state
             UpdateUI();
             
-            // 3. Trigger the skill/item effect here
-            Debug.Log($"Used {itemData.itemName}! Remaining: {currentAmount}");
+            Debug.Log($"Used {itemData.itemName}! Remaining: {GetCurrentAmount()}");
 
-            // ----------------------------------------------------
-            // YOUR CUSTOM CODE HERE:
-            // Use itemData.itemName to update your save system.
-            // Example: MySaveManager.SaveItemCount(itemData.itemName, currentAmount);
-            // ----------------------------------------------------
+            // Save the updated profile to the cloud
+            if (_playerRepository != null)
+            {
+                _playerRepository.SaveAsync(_playerProfile);
+            }
+
+            return true;
         }
         else
         {
             Debug.Log($"{itemData.itemName} is empty!");
+            return false;
+        }
+    }
+
+    private int GetCurrentAmount()
+    {
+        if (_playerProfile == null || itemData == null) return 0;
+        
+        switch (itemData.itemName)
+        {
+            case "Shield": return _playerProfile.FlockShieldCount;
+            case "DeathTotem": return _playerProfile.SpawnMaxLambsCount;
+            case "Meat": return _playerProfile.SkillDamageBoostCount;
+            case "MushShroom": return _playerProfile.SpeedBoostCount;
+            default: return 0;
         }
     }
 
     private void UpdateUI()
     {
-        amountText.text = currentAmount.ToString();
+        int amount = GetCurrentAmount();
+        amountText.text = amount.ToString();
         
-        // Visual feedback: Dim the icon if we run out of items
-        if (currentAmount <= 0)
+        // Visual feedback: Dim the icon and counter if we run out of items
+        if (amount <= 0)
         {
             iconDisplay.color = new Color(1f, 1f, 1f, 0.4f); // Dimmed
+            if (counterImage != null) counterImage.color = new Color(1f, 1f, 1f, 0.4f);
         }
         else
         {
             iconDisplay.color = Color.white; // Normal
+            if (counterImage != null) counterImage.color = Color.white;
         }
     }
 }

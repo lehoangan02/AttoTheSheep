@@ -48,14 +48,8 @@ public class TrollBrain : EnemyBrain
     private float recoveryTimer;
     private bool recoveryPending;
 
-    void Awake()
+    protected override void Init()
     {
-        entity = GetComponent<EnemyEntity>();
-        motor = GetComponent<EnemyMotor>();
-        steering = GetComponent<ContextSteering2D>();
-        effectController = GetComponent<StatusEffectController>();
-        enemyAudio = GetComponent<EnemyAudio>();
-        anim = GetComponent<Animator>();
         bodyCollider = GetComponent<Collider2D>();
         trollData = entity.GetData<TrollEnemyData>();
     }
@@ -108,9 +102,9 @@ public class TrollBrain : EnemyBrain
         {
             float step = trollData.chargeSpeed * Time.fixedDeltaTime;
             if (dashDistanceLeft <= 0) { EndCharge(); return; }
-            var hit = Physics2D.Raycast(transform.position, dashDir, step + 0.1f, obstacleMask);
+            var hit = Physics2D.Raycast(ColliderCenter, dashDir, step + 0.1f, obstacleMask);
             if (hit.collider != null) { EndCharge(); return; }
-            motor.MoveToward((Vector2)transform.position + dashDir * step, trollData.chargeSpeed);
+            motor.MoveWith(dashDir, trollData.chargeSpeed);
             dashDistanceLeft -= step;
         }
 
@@ -291,7 +285,7 @@ public class TrollBrain : EnemyBrain
                 break;
             case TrollAttack.Charge:
                 dashDir = target != null
-                    ? ((Vector2)(target.transform.position - transform.position)).normalized
+                    ? ((Vector2)(target.transform.position - (Vector3)ColliderCenter)).normalized
                     : transform.right;
                 dashDistanceLeft = trollData.chargeMaxDistance;
                 chargeHitbox?.Enable(trollData.chargeDamage, trollData.chargeEffects, true, trollData.chargeKnockbackForce, trollData.chargeKnockbackDuration);

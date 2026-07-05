@@ -29,6 +29,9 @@ public class MapLobbyController : MonoBehaviour
         // Fetch progression from PlayerPrefs (Default is 1)
         int maxUnlockedLevel = PlayerPrefs.GetInt("MaxUnlockedLevel", defaultUnlockedLevel);
 
+        // Force all levels to be unlocked by default
+        maxUnlockedLevel = 999;
+
         // Tự động tìm và liên kết các nút Node_1, Node_2... nếu bạn chưa kéo thả vào Inspector
         if (levelNodes == null || levelNodes.Count == 0)
         {

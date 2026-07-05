@@ -13,7 +13,7 @@ using UnityEngine.UI;
 public class MainMenuController : MonoBehaviour
 {
     [Header("Scene Names")]
-    [SerializeField] private string newGameSceneName = "Tutorial";
+    [SerializeField] private string newGameSceneName = "FTUE";
     [SerializeField] private string multiplayerSceneName = "MatchMaking";
 
     [Header("Cloud Buttons")]
