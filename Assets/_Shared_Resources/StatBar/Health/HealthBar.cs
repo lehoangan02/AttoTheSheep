@@ -33,6 +33,7 @@ public class HealthBar : MonoBehaviour
         if (entity != null && barFill != null && barBounds != null)
         {
             entity.currentHealth.OnValueChanged += OnHealthChanged;
+            UpdateFill(entity.currentHealth.Value, entity.BaseMaxHealth);
         }
     }
 

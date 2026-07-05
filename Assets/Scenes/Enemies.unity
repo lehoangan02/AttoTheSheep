@@ -740,58 +740,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: -7979202511421666267, guid: 5067e08349ce7b54d830d89cee772b3a, type: 3}
-      propertyPath: vfxEntries.Array.size
-      value: 6
-      objectReference: {fileID: 0}
-    - target: {fileID: -7979202511421666267, guid: 5067e08349ce7b54d830d89cee772b3a, type: 3}
-      propertyPath: vfxEntries.Array.data[1].kind
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: -7979202511421666267, guid: 5067e08349ce7b54d830d89cee772b3a, type: 3}
-      propertyPath: vfxEntries.Array.data[2].kind
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: -7979202511421666267, guid: 5067e08349ce7b54d830d89cee772b3a, type: 3}
-      propertyPath: vfxEntries.Array.data[3].kind
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: -7979202511421666267, guid: 5067e08349ce7b54d830d89cee772b3a, type: 3}
-      propertyPath: vfxEntries.Array.data[4].kind
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: -7979202511421666267, guid: 5067e08349ce7b54d830d89cee772b3a, type: 3}
-      propertyPath: vfxEntries.Array.data[5].kind
-      value: 7
-      objectReference: {fileID: 0}
-    - target: {fileID: -7979202511421666267, guid: 5067e08349ce7b54d830d89cee772b3a, type: 3}
-      propertyPath: vfxEntries.Array.data[0].prefab
-      value: 
-      objectReference: {fileID: 7648520399834041695, guid: cf25f414dee7e9b93ab4184da3cd8a7c, type: 3}
-    - target: {fileID: -7979202511421666267, guid: 5067e08349ce7b54d830d89cee772b3a, type: 3}
-      propertyPath: vfxEntries.Array.data[1].prefab
-      value: 
-      objectReference: {fileID: 3283786186218131887, guid: a225ce4e60e91cec99a5628437535806, type: 3}
-    - target: {fileID: -7979202511421666267, guid: 5067e08349ce7b54d830d89cee772b3a, type: 3}
-      propertyPath: vfxEntries.Array.data[2].prefab
-      value: 
-      objectReference: {fileID: 1022711246535324691, guid: e2ecf15e14ee0c36480d989dfb6b9f05, type: 3}
-    - target: {fileID: -7979202511421666267, guid: 5067e08349ce7b54d830d89cee772b3a, type: 3}
-      propertyPath: vfxEntries.Array.data[3].prefab
-      value: 
-      objectReference: {fileID: 5514854320820968321, guid: 1197a330ff874d942a86faa36f9268c3, type: 3}
-    - target: {fileID: -7979202511421666267, guid: 5067e08349ce7b54d830d89cee772b3a, type: 3}
-      propertyPath: vfxEntries.Array.data[4].prefab
-      value: 
-      objectReference: {fileID: 1022711246535324691, guid: e2ecf15e14ee0c36480d989dfb6b9f05, type: 3}
-    - target: {fileID: -7979202511421666267, guid: 5067e08349ce7b54d830d89cee772b3a, type: 3}
-      propertyPath: vfxEntries.Array.data[5].prefab
-      value: 
-      objectReference: {fileID: 2904711268780106769, guid: 9fdc1a1d3f3237e32a887444030e6e5b, type: 3}
-    - target: {fileID: 706738783152158243, guid: 5067e08349ce7b54d830d89cee772b3a, type: 3}
-      propertyPath: vfxAnchor
-      value: 
-      objectReference: {fileID: 1619872122}
     - target: {fileID: 2149695861835639596, guid: 5067e08349ce7b54d830d89cee772b3a, type: 3}
       propertyPath: m_Name
       value: Atto
@@ -842,10 +790,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: 5214352752191870431, guid: 5067e08349ce7b54d830d89cee772b3a, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1619872122}
+    m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5067e08349ce7b54d830d89cee772b3a, type: 3}
 --- !u!4 &1475184520 stripped
@@ -960,37 +905,6 @@ MonoBehaviour:
     OldPrefabList: []
   RunInBackground: 1
   LogLevel: 1
---- !u!1 &1619872121
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1619872122}
-  m_Layer: 7
-  m_Name: VfxAnchor
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1619872122
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1619872121}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.5, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1475184520}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1759220183
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1244,7 +1158,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2495840725773875051, guid: 858dd570ac8436d628b317a7988f8c17, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2696954149237419353, guid: 858dd570ac8436d628b317a7988f8c17, type: 3}
       propertyPath: m_Camera
@@ -1333,7 +1247,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2149372858635268260, guid: 3238abe42df3f7a7ca5c1fbf8d5eaab1, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3593555825154377661, guid: 3238abe42df3f7a7ca5c1fbf8d5eaab1, type: 3}
       propertyPath: m_Camera
@@ -1454,7 +1368,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8842079955634194191, guid: 5536ede37ecaceed594a3b21a9f9f46d, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1523,7 +1437,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8276238298806300973, guid: a206fc0f79892548b8cb16a8bf65c82f, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8804897818845142488, guid: a206fc0f79892548b8cb16a8bf65c82f, type: 3}
       propertyPath: GlobalObjectIdHash
@@ -1553,6 +1467,10 @@ PrefabInstance:
     - target: {fileID: 6844792111917231406, guid: e2fd2dd037a09f3f2b8accd71083296e, type: 3}
       propertyPath: m_Name
       value: 'FreezeVFX '
+      objectReference: {fileID: 0}
+    - target: {fileID: 6844792111917231406, guid: e2fd2dd037a09f3f2b8accd71083296e, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7934206561723731775, guid: e2fd2dd037a09f3f2b8accd71083296e, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1669,7 +1587,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8481652928192273667, guid: 433b1f558e92c9ddeb83ddc67800a11d, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1742,7 +1660,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5753693385531744272, guid: 45d7e47c9ee2e4202b70de24e0955c27, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7413690712713354143, guid: 45d7e47c9ee2e4202b70de24e0955c27, type: 3}
       propertyPath: m_Camera
@@ -1805,6 +1723,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 'BleedVFX '
       objectReference: {fileID: 0}
+    - target: {fileID: 7179515701393050396, guid: 2af9e1a6449f1e8a19b3d30a497e98b6, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1861,6 +1783,10 @@ PrefabInstance:
     - target: {fileID: 2904711268780106769, guid: 9fdc1a1d3f3237e32a887444030e6e5b, type: 3}
       propertyPath: m_Name
       value: 'CurseVFX '
+      objectReference: {fileID: 0}
+    - target: {fileID: 2904711268780106769, guid: 9fdc1a1d3f3237e32a887444030e6e5b, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1933,7 +1859,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8412613483446186031, guid: aed60d336d5c0c6e7a4e8abd65202c65, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8809559691720008370, guid: aed60d336d5c0c6e7a4e8abd65202c65, type: 3}
       propertyPath: transformCooldown
@@ -1996,6 +1922,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 'PoisonVFX '
       objectReference: {fileID: 0}
+    - target: {fileID: 7648520399834041695, guid: cf25f414dee7e9b93ab4184da3cd8a7c, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2055,11 +1985,11 @@ PrefabInstance:
       objectReference: {fileID: 35470466}
     - target: {fileID: 3991630347313862510, guid: 24782c5f264a30cd5b5a6e138bc3d25f, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4580063459017841068, guid: 24782c5f264a30cd5b5a6e138bc3d25f, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5747648402609233995, guid: 24782c5f264a30cd5b5a6e138bc3d25f, type: 3}
       propertyPath: m_Name
@@ -2067,7 +1997,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5747648402609233995, guid: 24782c5f264a30cd5b5a6e138bc3d25f, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6169221454852917242, guid: 24782c5f264a30cd5b5a6e138bc3d25f, type: 3}
       propertyPath: GlobalObjectIdHash
@@ -2076,14 +2006,6 @@ PrefabInstance:
     - target: {fileID: 6169221454852917242, guid: 24782c5f264a30cd5b5a6e138bc3d25f, type: 3}
       propertyPath: InScenePlacedSourceGlobalObjectIdHash
       value: 3122325986
-      objectReference: {fileID: 0}
-    - target: {fileID: 7837135803375008793, guid: 24782c5f264a30cd5b5a6e138bc3d25f, type: 3}
-      propertyPath: canDestroyBuildings
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7837135803375008793, guid: 24782c5f264a30cd5b5a6e138bc3d25f, type: 3}
-      propertyPath: buildingLayer.m_Bits
-      value: 256
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2142,6 +2064,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 'StunVFX '
       objectReference: {fileID: 0}
+    - target: {fileID: 5514854320820968321, guid: 1197a330ff874d942a86faa36f9268c3, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2158,6 +2084,10 @@ PrefabInstance:
     - target: {fileID: 3283786186218131887, guid: a225ce4e60e91cec99a5628437535806, type: 3}
       propertyPath: m_Name
       value: 'BurnVFX '
+      objectReference: {fileID: 0}
+    - target: {fileID: 3283786186218131887, guid: a225ce4e60e91cec99a5628437535806, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5177124349701818330, guid: a225ce4e60e91cec99a5628437535806, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2218,7 +2148,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 736431478501333566, guid: 3bb04c46540f936b8a90a4ea82e005ff, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2999674362594161210, guid: 3bb04c46540f936b8a90a4ea82e005ff, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2292,6 +2222,10 @@ PrefabInstance:
     - target: {fileID: 1022711246535324691, guid: e2ecf15e14ee0c36480d989dfb6b9f05, type: 3}
       propertyPath: m_Name
       value: SlowVFX
+      objectReference: {fileID: 0}
+    - target: {fileID: 1022711246535324691, guid: e2ecf15e14ee0c36480d989dfb6b9f05, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8062064964516989499, guid: e2ecf15e14ee0c36480d989dfb6b9f05, type: 3}
       propertyPath: m_LocalPosition.x

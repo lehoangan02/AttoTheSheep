@@ -21,7 +21,8 @@ MonoBehaviour:
   smashRange: 4
   smashCooldown: 3
   smashDamage: 20
-  smashEffects: []
+  smashEffects:
+  - {fileID: 11400000, guid: 2c306855809b745f0bb77edb8bad912e, type: 2}
   smashKnockbackForce: 8
   smashKnockbackDuration: 0.25
   smashWindupTime: 1
@@ -31,7 +32,8 @@ MonoBehaviour:
   chargeSpeed: 12
   chargeMaxDistance: 10
   chargeDamage: 35
-  chargeEffects: []
+  chargeEffects:
+  - {fileID: 11400000, guid: 2c306855809b745f0bb77edb8bad912e, type: 2}
   chargeKnockbackForce: 10
   chargeKnockbackDuration: 0.2
   chargeWindupTime: 1.5

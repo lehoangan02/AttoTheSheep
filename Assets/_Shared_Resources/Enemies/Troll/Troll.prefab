@@ -914,6 +914,10 @@ PrefabInstance:
       propertyPath: entity
       value: 
       objectReference: {fileID: 2609295763850550424}
+    - target: {fileID: 1250296350891605319, guid: 210d2ee4d4568bad19ef5f4056a248d3, type: 3}
+      propertyPath: maxHealthReference
+      value: 200
+      objectReference: {fileID: 0}
     - target: {fileID: 2423356332409346236, guid: 210d2ee4d4568bad19ef5f4056a248d3, type: 3}
       propertyPath: m_PresetInfoIsWorld
       value: 1

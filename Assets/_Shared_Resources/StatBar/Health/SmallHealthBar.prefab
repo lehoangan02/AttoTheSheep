@@ -418,8 +418,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb24218bb3befae4098c61749e21178f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HealthBar
-  barFill: {fileID: 7436662411109212953}
   barBounds: {fileID: 7971796957466656206}
+  barFill: {fileID: 7436662411109212953}
   scaleWidthWithMaxHealth: 1
-  maxHealthReference: 100
+  maxHealthReference: 200
   entity: {fileID: 0}

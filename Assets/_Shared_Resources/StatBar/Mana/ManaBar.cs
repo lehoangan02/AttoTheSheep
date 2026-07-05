@@ -33,6 +33,7 @@ public class ManaBar : MonoBehaviour
         if (entity != null && barFill != null && barBounds != null)
         {
             entity.currentMana.OnValueChanged += OnManaChanged;
+            UpdateFill(entity.currentMana.Value, entity.BaseMaxMana);
         }
     }
 

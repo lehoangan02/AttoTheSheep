@@ -5095,6 +5095,7 @@ Transform:
   - {fileID: 2371937422554456442}
   - {fileID: 1235488546585286335}
   - {fileID: 6208284458746283082}
+  - {fileID: 5052245939351895803}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!50 &3467612726841555971
@@ -5166,7 +5167,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 1855868505
+  GlobalObjectIdHash: 1192057837
   InScenePlacedSourceGlobalObjectIdHash: 1192057837
   DeferredDespawnTick: 0
   Ownership: 1
@@ -5278,7 +5279,7 @@ MonoBehaviour:
   baseAttackRange: 1
   baseAttackDamage: 10
   damageFont: {fileID: 11400000, guid: 2745a675487b843419622b8727c36f50, type: 2}
-  vfxAnchor: {fileID: 0}
+  vfxAnchor: {fileID: 5052245939351895803}
   effectController: {fileID: 0}
   currentMoveSpeed:
     UpdateTraits:
@@ -5441,7 +5442,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StatusEffectController
   ShowTopMostFoldoutHeaderGroup: 1
-  vfxEntries: []
+  vfxEntries:
+  - kind: 0
+    prefab: {fileID: 7648520399834041695, guid: cf25f414dee7e9b93ab4184da3cd8a7c, type: 3}
+  - kind: 1
+    prefab: {fileID: 3283786186218131887, guid: a225ce4e60e91cec99a5628437535806, type: 3}
+  - kind: 2
+    prefab: {fileID: 1022711246535324691, guid: e2ecf15e14ee0c36480d989dfb6b9f05, type: 3}
+  - kind: 3
+    prefab: {fileID: 5514854320820968321, guid: 1197a330ff874d942a86faa36f9268c3, type: 3}
+  - kind: 5
+    prefab: {fileID: 1022711246535324691, guid: e2ecf15e14ee0c36480d989dfb6b9f05, type: 3}
+  - kind: 7
+    prefab: {fileID: 2904711268780106769, guid: 9fdc1a1d3f3237e32a887444030e6e5b, type: 3}
 --- !u!114 &7287703922640957452
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10583,6 +10596,37 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!1 &3057188892651246649
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5052245939351895803}
+  m_Layer: 7
+  m_Name: VfxAnchor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5052245939351895803
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3057188892651246649}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.5, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5214352752191870431}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3115482559998634502
 GameObject:
   m_ObjectHideFlags: 0

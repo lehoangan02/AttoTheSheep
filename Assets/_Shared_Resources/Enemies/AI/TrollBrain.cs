@@ -104,7 +104,7 @@ public class TrollBrain : EnemyBrain
             if (dashDistanceLeft <= 0) { EndCharge(); return; }
             var hit = Physics2D.Raycast(ColliderCenter, dashDir, step + 0.1f, obstacleMask);
             if (hit.collider != null) { EndCharge(); return; }
-            motor.MoveToward(ColliderCenter + dashDir * step, trollData.chargeSpeed);
+            motor.MoveWith(dashDir, trollData.chargeSpeed);
             dashDistanceLeft -= step;
         }
 
@@ -333,7 +333,7 @@ public class TrollBrain : EnemyBrain
         
         if (trollData.spikePrefab != null && target != null)
         {
-            Vector2 dir = ((Vector2)(target.transform.position - (Vector3)ColliderCenter)).normalized;
+            Vector2 dir = ((Vector2)(target.transform.position - transform.position)).normalized;
             StartCoroutine(SpawnSpikesRoutine(dir));
         }
 
@@ -345,7 +345,7 @@ public class TrollBrain : EnemyBrain
     {
         for (int i = 1; i <= trollData.spikeCount; i++)
         {
-            Vector3 pos = (Vector3)ColliderCenter + (Vector3)(dir * (i * trollData.spikeSpacing));
+            Vector3 pos = transform.position + (Vector3)(dir * (i * trollData.spikeSpacing));
             GameObject spikeObj = Instantiate(trollData.spikePrefab, pos, Quaternion.identity);
             Vector3 spikeScale = spikeObj.transform.localScale;
             float travelFacingSign = dir.x >= 0 ? 1f : -1f;
