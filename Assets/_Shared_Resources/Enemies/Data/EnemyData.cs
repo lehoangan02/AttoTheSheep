@@ -9,9 +9,4 @@ public class EnemyData : ScriptableObject
     [Header("Movement")]
     public float moveSpeed = 5f;
 
-    [Header("Spawn / Death VFX")]
-    public GameObject spawnVFXPrefab;
-    public GameObject deathVFXPrefab;
-    public float spawnFadeDuration = 0.5f;
-    public float deathFadeDuration = 0.5f;
 }

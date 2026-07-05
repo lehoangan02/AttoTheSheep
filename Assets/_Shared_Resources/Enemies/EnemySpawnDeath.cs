@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using UnityEngine.VFX;
 
 [RequireComponent(typeof(EnemyEntity))]
 public class EnemySpawnDeath : NetworkBehaviour
@@ -9,6 +10,12 @@ public class EnemySpawnDeath : NetworkBehaviour
     [Header("Damage Flash")]
     [SerializeField] private Color damageFlashColor = Color.white;
     [SerializeField] private float damageFlashDuration = 0.15f;
+
+    [Header("Spawn / Death VFX")]
+    [SerializeField] private VisualEffect spawnVFX;
+    [SerializeField] private VisualEffect deathVFX;
+    [SerializeField] private float spawnFadeDuration = 0.5f;
+    [SerializeField] private float deathFadeDuration = 0.5f;
 
     private EnemyEntity entity;
     private EnemyBrain brain;
@@ -48,15 +55,10 @@ public class EnemySpawnDeath : NetworkBehaviour
         if (IsServer)
             entity.isInvulnerable.Value = true;
 
-        if (IsServer && entity.Data != null && entity.Data.spawnVFXPrefab != null)
-        {
-            GameObject vfx = Instantiate(entity.Data.spawnVFXPrefab, transform.position, Quaternion.identity);
-            NetworkObject vfxNetObj = vfx.GetComponent<NetworkObject>();
-            if (vfxNetObj != null) vfxNetObj.Spawn();
-        }
+        if (IsServer && spawnVFX != null)
+            spawnVFX.Play();
 
-        float fadeDur = entity.Data != null ? entity.Data.spawnFadeDuration : 0.5f;
-        StartCoroutine(SpawnFadeRoutine(fadeDur));
+        StartCoroutine(SpawnFadeRoutine(spawnFadeDuration));
     }
 
     private IEnumerator SpawnFadeRoutine(float duration)
@@ -132,17 +134,12 @@ public class EnemySpawnDeath : NetworkBehaviour
             hitbox.Disable();
         }
 
-        if (IsServer && entity.Data != null && entity.Data.deathVFXPrefab != null)
-        {
-            GameObject vfx = Instantiate(entity.Data.deathVFXPrefab, transform.position, Quaternion.identity);
-            NetworkObject vfxNetObj = vfx.GetComponent<NetworkObject>();
-            if (vfxNetObj != null) vfxNetObj.Spawn();
-        }
+        if (IsServer && deathVFX != null)
+            deathVFX.Play();
 
-        float fadeDur = entity.Data != null ? entity.Data.deathFadeDuration : 0.5f;
-        PlayDeathFxClientRpc(fadeDur);
+        PlayDeathFxClientRpc(deathFadeDuration);
 
-        StartCoroutine(DeathFadeThenDespawn(fadeDur));
+        StartCoroutine(DeathFadeThenDespawn(deathFadeDuration));
     }
 
     [ClientRpc]
