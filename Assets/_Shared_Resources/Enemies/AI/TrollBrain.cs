@@ -1,6 +1,7 @@
 using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.VFX;
+using System.Collections;
 
 public class TrollBrain : EnemyBrain
 {
@@ -37,6 +38,10 @@ public class TrollBrain : EnemyBrain
     // Recovery
     [Header("Troll - Recovery")]
     [SerializeField] private bool logRecoveryState = false;
+
+    // Death
+    public override bool HandlesOwnDeath => true;
+    private const float DEATH_ANIMATION_DURATION = 1f;
 
     // Runtime state
     private TrollAttack currentAttack;
@@ -206,6 +211,8 @@ public class TrollBrain : EnemyBrain
             case EnemyState.Dead:
                 recoveryPending = false;
                 ForceEndAttack();
+                anim.SetTrigger("Dead");
+                StartCoroutine(DeathSequenceAfterAnimation());
                 break;
             case EnemyState.Recovery:
                 motor.Stop();
@@ -378,5 +385,11 @@ public class TrollBrain : EnemyBrain
         CleanupTornado();
         anim.SetBool("IsAttacking", false);
         EndAttackTransition();
+    }
+
+    private IEnumerator DeathSequenceAfterAnimation()
+    {
+        yield return new WaitForSeconds(DEATH_ANIMATION_DURATION);
+        GetComponent<EnemySpawnDeath>()?.PlayDeathSequence();
     }
 }

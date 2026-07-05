@@ -86,6 +86,9 @@ public class EnemyEntity : NetworkEntity
     {
         InvokeOnDied();
 
+        if (brain != null && brain.HandlesOwnDeath)
+            return;
+
         var fx = GetComponent<EnemySpawnDeath>();
         if (fx != null && IsServer)
         {

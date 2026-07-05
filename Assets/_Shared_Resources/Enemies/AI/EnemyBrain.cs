@@ -57,6 +57,7 @@ public abstract class EnemyBrain : NetworkBehaviour
     protected virtual void OnStateExit(EnemyState state) { }
 
     public virtual bool ShouldBlockDamage() => false;
+    public virtual bool HandlesOwnDeath => false;
 
     protected float DistanceTo(NetworkEntity t) => Vector2.Distance(ColliderCenter, t.transform.position);
 
