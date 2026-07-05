@@ -17,11 +17,21 @@ public class PlayerHeadbuttSkill : BaseSkillComponent
     [SerializeField] private ParticleSystem impactParticle; 
 
     private HeadbuttSkillData currentHeadbuttData;
+    
+    // THÊM: Các biến lưu thời điểm được phép đánh đòn tiếp theo
+    private float nextAttackTimeServer = 0f;
+    private float nextAttackTimeClient = 0f;
 
     public override void ServerExecute(SkillData data, NetworkEntity caster, PlayerController controller = null)
     {
+        // 1. NGĂN SPAM TRÊN SERVER: Chỉ cho phép chạy logic khi đã qua thời gian hồi của đòn trước
+        if (Time.time < nextAttackTimeServer) return;
+
         if (data is HeadbuttSkillData headbuttData && controller != null)
         {
+            // Tính toán tổng thời gian của 1 đòn đánh (delay + recovery) để khóa
+            nextAttackTimeServer = Time.time + headbuttData.attackDelay + headbuttData.recoveryTime;
+
             currentHeadbuttData = headbuttData;
             StartCoroutine(HeadbuttRoutine(headbuttData, controller));
         }
@@ -29,7 +39,15 @@ public class PlayerHeadbuttSkill : BaseSkillComponent
 
     public override void ClientPlayVisual(SkillData data)
     {
+        // 2. NGĂN SPAM TRIGGER TRÊN CLIENT: Tránh kẹt Animator ở frame 1
+        if (data is HeadbuttSkillData headbuttData)
+        {
+            if (Time.time < nextAttackTimeClient) return;
+            nextAttackTimeClient = Time.time + headbuttData.attackDelay + headbuttData.recoveryTime;
+        }
+
         base.ClientPlayVisual(data); // Gọi code của class cha để tự động phát SFX nếu có
+        
         Animator anim = animator;
         if (anim == null) anim = GetComponentInParent<Animator>();
         if (anim == null) anim = GetComponentInChildren<Animator>();
@@ -93,7 +111,6 @@ public class PlayerHeadbuttSkill : BaseSkillComponent
                     impactParticle.transform.position = impactPos;
 
                     // XOAY PARTICLE THEO HƯỚNG NHÂN VẬT
-                    // Nếu nhân vật quay trái (facingDir.x < 0), xoay Particle 180 độ trục Y. Nếu quay phải thì giữ nguyên 0 độ.
                     float yRotation = facingDir.x < 0 ? 180f : 0f;
                     impactParticle.transform.rotation = Quaternion.Euler(0f, yRotation, 0f);
 
