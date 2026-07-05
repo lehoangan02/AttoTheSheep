@@ -3,12 +3,12 @@ using UnityEngine;
 
 public class EnemyProjectile : NetworkBehaviour
 {
-    [SerializeField] protected float speed = 8f;
     [SerializeField] protected float maxDistance = 15f;
-    [SerializeField] protected int damage = 100;
-    [SerializeField] protected StatusEffectData[] onHitEffects;
     [SerializeField] protected LayerMask targetLayers = ~0;
 
+    protected float speed = 8f;
+    protected int damage = 100;
+    protected StatusEffectData[] onHitEffects;
     protected Rigidbody2D rb;
     protected Vector2 direction;
     protected Vector3 startPosition;

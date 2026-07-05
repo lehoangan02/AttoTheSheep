@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 3314154720046995332}
   - component: {fileID: 4403698786592208883}
   m_Layer: 0
-  m_Name: ExplosionBallProjectile
+  m_Name: ExplosionBall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -222,8 +222,7 @@ MonoBehaviour:
   speed: 8
   maxDistance: 15
   damage: 100
-  onHitEffects:
-  - {fileID: 11400000, guid: 7b4e3ac689b3406880e0ab3dde76dba5, type: 2}
+  onHitEffects: []
   targetLayers:
     serializedVersion: 2
     m_Bits: 128

@@ -8,7 +8,8 @@ public class WizardEnemyData : EnemyData
     public float throwCooldown = 1.5f;
     public int throwDamage = 40;
     public float ballSpeed = 7f;
-    public GameObject explosionBallPrefab;
+    public GameObject ballPrefab;
+    public StatusEffectData[] ballOnHitEffects;
 
     [Header("Transform")]
     public float transformRange = 3f;

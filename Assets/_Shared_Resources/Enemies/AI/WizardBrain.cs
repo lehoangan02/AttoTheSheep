@@ -146,17 +146,17 @@ public class WizardBrain : EnemyBrain
     public void OnThrowSpawnBall()
     {
         if (!IsServer) return;
-        if (wizData.explosionBallPrefab == null || throwSpawn == null) return;
+        if (wizData.ballPrefab == null || throwSpawn == null) return;
         if (target == null) return;
 
         Vector2 dir = (target.transform.position - throwSpawn.position).normalized;
-        GameObject ballObj = Instantiate(wizData.explosionBallPrefab, throwSpawn.position, Quaternion.identity);
+        GameObject ballObj = Instantiate(wizData.ballPrefab, throwSpawn.position, Quaternion.identity);
         NetworkObject netObj = ballObj.GetComponent<NetworkObject>();
         if (netObj != null) netObj.Spawn();
 
         ExplosionBallProjectile proj = ballObj.GetComponent<ExplosionBallProjectile>();
         if (proj != null)
-            proj.Initialize(dir, wizData.ballSpeed, wizData.throwDamage, null, entity);
+            proj.Initialize(dir, wizData.ballSpeed, wizData.throwDamage, wizData.ballOnHitEffects, entity);
     }
 
     public void OnThrowEnd()

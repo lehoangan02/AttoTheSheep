@@ -43,10 +43,12 @@ public class ExplosionBallProjectile : EnemyProjectile
             NetworkEntity target = hit.GetComponentInParent<NetworkEntity>();
             if (target == null || target == source || !target.IsAlive) continue;
             target.TakeDamage(damage, source);
+            Debug.Log($"ExplosionBallProjectile hit {target.name} for {damage} damage.");
 
             if (onHitEffects != null && onHitEffects.Length > 0)
             {
                 StatusEffectController effectController = target.GetComponent<StatusEffectController>();
+                Debug.Log($"Applying {onHitEffects.Length} effects to {target.name}");
                 if (effectController != null)
                 {
                     foreach (StatusEffectData effect in onHitEffects)
