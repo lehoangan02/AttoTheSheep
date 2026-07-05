@@ -187,11 +187,6 @@ public class PlayerCheats : NetworkBehaviour
 
     private void HandleCheatActivated(int cheatId)
     {
-        ActivateCheat(cheatId);
-    }
-
-    public void ActivateCheat(int cheatId)
-    {
         if (!IsOwner) return;
 
         CheatSlotConfig slot = FindSlot(cheatId);
@@ -435,5 +430,11 @@ public class PlayerCheats : NetworkBehaviour
         {
             ps.Stop(true, ParticleSystemStopBehavior.StopEmitting);
         }
+    }
+    public void ActivateCheat(int cheatId)
+    {
+        // Gọi thẳng vào hàm xử lý hiện tại của bạn để đảm bảo
+        // hiệu ứng mạng (ServerRpc) và các check IsOwner vẫn hoạt động bình thường
+        HandleCheatActivated(cheatId);
     }
 }
