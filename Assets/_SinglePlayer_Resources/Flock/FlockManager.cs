@@ -271,16 +271,16 @@ public class FlockManager : NetworkBehaviour
         UpdateFlockRadius();
     }
 
-    public void SpawnLamb(Vector2 centerPosition)
+    public LambAI SpawnLamb(Vector2 centerPosition)
     {
-        if (!IsServer) return;
+        if (!IsServer) return null;
 
-        if (activeLambs.Count >= GetCurrentLevelConfig().maxLambs) return;
+        if (activeLambs.Count >= GetCurrentLevelConfig().maxLambs) return null;
 
         if (!TryGetValidSpawnPosition(centerPosition, currentFlockRadius, out Vector2 spawnPos))
         {
             Debug.LogWarning("⚠️ [FlockManager] Không tìm được vị trí trống để spawn cừu!");
-            return; 
+            return null; 
         }
 
         GameObject lambObj = Instantiate(lambPrefab, spawnPos, Quaternion.identity);
@@ -296,6 +296,8 @@ public class FlockManager : NetworkBehaviour
             UpdateFlockRadius();
             OnFlockTierChanged?.Invoke(GetFlockTier());
         }
+
+        return lambAI;
     }
 
     private bool TryGetValidSpawnPosition(Vector2 center, float maxRadius, out Vector2 validPosition)

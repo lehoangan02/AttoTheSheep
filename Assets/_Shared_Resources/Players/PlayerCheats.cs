@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
@@ -46,6 +47,29 @@ public class PlayerCheats : NetworkBehaviour
     private PlayerMovement playerMovement;
     private FlockManager flockManager;
     private PlayerSkills playerSkills;
+    private PlayerEntity playerEntity;
+
+    [Header("Player Cheat Particle FX")]
+    [SerializeField] private ParticleSystem damageAuraParticles;
+    [SerializeField] private ParticleSystem speedWindParticles;
+
+    [Header("Activation FX (Glow & Shockwave)")]
+    [SerializeField] private ParticleSystem shockwaveParticles;
+    [Tooltip("Kéo Renderer của nhân vật vào đây (SpriteRenderer, MeshRenderer hoặc SkinnedMeshRenderer)")]
+    [SerializeField] private Renderer[] playerRenderers;
+    [Tooltip("Màu chớp sáng (Nên bật HDR để có hiệu ứng Glow/Bloom)")]
+    [ColorUsage(true, true)] [SerializeField] private Color flashColor = new Color(2f, 2f, 2f, 1f);
+    [SerializeField] private float flashDuration = 0.2f; // Tăng nhẹ một chút để thấy rõ nhịp đập
+
+    [Tooltip("Kéo Object chứa đồ họa/hình ảnh của nhân vật vào đây để phóng to thu nhỏ mà không lỗi vật lý.")]
+    [SerializeField] private Transform visualTransform;
+    [Tooltip("Độ phóng to tối đa khi kích hoạt (Ví dụ: 1.25 là phóng to thêm 25%)")]
+    [SerializeField] private float pulseScaleMultiplier = 1.25f;
+
+    // Lưu trữ Coroutine để tránh việc spam cheat làm tắt hạt sai thời điểm
+    private Coroutine damageAuraCoroutine;
+    private Coroutine speedWindCoroutine;
+    private Coroutine flashCoroutine;
 
     [Header("Cheat Slots")]
     [SerializeField] private List<CheatSlotConfig> cheatSlots = new List<CheatSlotConfig>
@@ -140,6 +164,10 @@ public class PlayerCheats : NetworkBehaviour
         playerSkills = GetComponent<PlayerSkills>();
         if (playerSkills == null) playerSkills = GetComponentInChildren<PlayerSkills>();
         if (playerSkills == null) playerSkills = GetComponentInParent<PlayerSkills>();
+
+        playerEntity = GetComponent<PlayerEntity>();
+        if (playerEntity == null) playerEntity = GetComponentInChildren<PlayerEntity>();
+        if (playerEntity == null) playerEntity = GetComponentInParent<PlayerEntity>();
     }
 
     private FlockManager GetFlockManager()
@@ -209,7 +237,7 @@ public class PlayerCheats : NetworkBehaviour
                 break;
 
             case CheatBuffType.SkillDamageMultiplier:
-                ApplySkillDamageMultiplier(buff.value);
+                ApplySkillDamageMultiplier(buff.value, buff.duration);
                 break;
 
             case CheatBuffType.SpeedBoostPlayerAndFlock:
@@ -221,11 +249,7 @@ public class PlayerCheats : NetworkBehaviour
     private void ApplyShieldAllLambs(float duration)
     {
         FlockManager fm = GetFlockManager();
-        if (fm == null)
-        {
-            Debug.LogWarning("[Cheats] No FlockManager found for shield buff.");
-            return;
-        }
+        if (fm == null) return;
 
         float finalDuration = Mathf.Max(0f, duration);
         foreach (LambAI lamb in fm.activeLambs)
@@ -235,41 +259,37 @@ public class PlayerCheats : NetworkBehaviour
                 lamb.SetShieldedState(true, finalDuration);
             }
         }
-
-        Debug.Log($"[Cheats] Applied shield to all lambs for {finalDuration:0.##}s.");
     }
 
     private void ApplySpawnMaxLambs()
     {
         FlockManager fm = GetFlockManager();
-        if (fm == null)
-        {
-            Debug.LogWarning("[Cheats] No FlockManager found for spawn buff.");
-            return;
-        }
+        if (fm == null) return;
 
         int maxLambs = fm.GetCurrentLevelConfig().maxLambs;
         int currentCount = fm.activeLambs.Count;
 
         for (int i = currentCount; i < maxLambs; i++)
         {
-            fm.SpawnLamb(fm.currentFlockCenter.Value);
+            LambAI spawnedLamb = fm.SpawnLamb(fm.currentFlockCenter.Value);
+            if (spawnedLamb != null)
+            {
+                spawnedLamb.PlayReviveSpawnFx();
+            }
         }
-
-        Debug.Log($"[Cheats] Spawn buff applied: {currentCount} -> {fm.activeLambs.Count} lambs.");
     }
 
-    private void ApplySkillDamageMultiplier(float multiplier)
+    private void ApplySkillDamageMultiplier(float multiplier, float duration)
     {
-        if (playerSkills == null)
-        {
-            Debug.LogWarning("[Cheats] PlayerSkills not found; cannot apply damage multiplier.");
-            return;
-        }
+        if (playerSkills == null) return;
 
         float finalMultiplier = Mathf.Max(0f, multiplier);
+        float finalDuration = Mathf.Max(0f, duration);
+        
         playerSkills.damageMultiplier.Value = finalMultiplier;
-        Debug.Log($"[Cheats] Damage multiplier set to {finalMultiplier:0.##}x.");
+
+        PlayDamageAuraClientRpc(finalDuration);
+        PlayActivationFXClientRpc(); 
     }
 
     private void ApplySpeedBoost(float multiplier, float duration, float accelerationDuration)
@@ -283,6 +303,9 @@ public class PlayerCheats : NetworkBehaviour
             playerMovement.ApplyTemporarySpeedMultiplier(finalMultiplier, finalDuration, finalAccelerationDuration);
         }
 
+        PlaySpeedWindClientRpc(finalDuration);
+        PlayActivationFXClientRpc(); 
+
         FlockManager fm = GetFlockManager();
         if (fm != null)
         {
@@ -294,7 +317,118 @@ public class PlayerCheats : NetworkBehaviour
                 }
             }
         }
+    }
 
-        Debug.Log($"[Cheats] Speed boost applied. Multiplier={finalMultiplier:0.##}, Duration={finalDuration:0.##}s.");
+    // =======================================================================
+    // CLIENT RPCs & EFFECTS
+    // =======================================================================
+
+    [ClientRpc]
+    private void PlayActivationFXClientRpc()
+    {
+        // 1. Phát hạt sóng xung kích
+        if (shockwaveParticles != null)
+        {
+            shockwaveParticles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            shockwaveParticles.Play(true);
+        }
+
+        // 2. Chớp nháy nhân vật kết hợp Co Giãn (Glow Up + Pulse Scale)
+        if (flashCoroutine != null) StopCoroutine(flashCoroutine);
+        flashCoroutine = StartCoroutine(FlashAndPulseRoutine());
+    }
+
+    [ClientRpc]
+    private void PlayDamageAuraClientRpc(float duration)
+    {
+        if (damageAuraParticles == null) return;
+
+        damageAuraParticles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+        damageAuraParticles.Play(true);
+
+        if (damageAuraCoroutine != null) StopCoroutine(damageAuraCoroutine);
+        if (duration > 0f)
+        {
+            damageAuraCoroutine = StartCoroutine(StopParticleAfterDelay(damageAuraParticles, duration));
+        }
+    }
+
+    [ClientRpc]
+    private void PlaySpeedWindClientRpc(float duration)
+    {
+        if (speedWindParticles == null) return;
+
+        var main = speedWindParticles.main;
+        main.duration = Mathf.Max(0.05f, duration);
+        speedWindParticles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+        speedWindParticles.Play(true);
+
+        if (speedWindCoroutine != null) StopCoroutine(speedWindCoroutine);
+        if (duration > 0f)
+        {
+            speedWindCoroutine = StartCoroutine(StopParticleAfterDelay(speedWindParticles, duration));
+        }
+    }
+
+    // =======================================================================
+    // COROUTINES
+    // =======================================================================
+
+    private IEnumerator FlashAndPulseRoutine()
+    {
+        MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
+        
+        // Xác định đối tượng cần Scale (Ưu tiên visualTransform, nếu trống thì dùng chính nó)
+        Transform targetTransform = visualTransform != null ? visualTransform : transform;
+        Vector3 originalScale = targetTransform.localScale;
+
+        float elapsed = 0f;
+
+        // Bắt đầu áp màu chớp sáng lên tất cả Renderer
+        foreach (var r in playerRenderers)
+        {
+            if (r == null) continue;
+            r.GetPropertyBlock(propBlock);
+            propBlock.SetColor("_Color", flashColor);
+            propBlock.SetColor("_BaseColor", flashColor);
+            propBlock.SetColor("_EmissionColor", flashColor); 
+            r.SetPropertyBlock(propBlock);
+        }
+
+        // Vòng lặp nội suy mượt mà hiệu ứng tim đập (Pulse Scale)
+        while (elapsed < flashDuration)
+        {
+            elapsed += Time.deltaTime;
+            float pct = elapsed / flashDuration;
+
+            // Sử dụng hàm Sin từ 0 -> PI để tạo đồ thị hình parabol (0 tăng lên 1 rồi hạ xuống 0)
+            float pulseCurve = Mathf.Sin(pct * Mathf.PI);
+
+            // Nội suy kích thước dựa trên nhịp đập hình Sin
+            targetTransform.localScale = originalScale * Mathf.Lerp(1f, pulseScaleMultiplier, pulseCurve);
+
+            yield return null;
+        }
+
+        // Đảm bảo trả kích thước về chuẩn xác ban đầu
+        targetTransform.localScale = originalScale;
+
+        // Khôi phục lại trạng thái vật liệu ban đầu (Xóa màu flash)
+        foreach (var r in playerRenderers)
+        {
+            if (r == null) continue;
+            r.GetPropertyBlock(propBlock);
+            propBlock.Clear(); 
+            r.SetPropertyBlock(propBlock);
+        }
+    }
+
+    private IEnumerator StopParticleAfterDelay(ParticleSystem ps, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        if (ps != null)
+        {
+            ps.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+        }
     }
 }

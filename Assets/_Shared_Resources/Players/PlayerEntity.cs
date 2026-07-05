@@ -89,7 +89,7 @@ public class PlayerEntity : NetworkEntity
         {
             if (spriteRenderer != null)
             {
-                StopAllCoroutines(); 
+                StopCoroutine(nameof(FlashRedRoutine));
                 StartCoroutine(FlashRedRoutine());
             }
 

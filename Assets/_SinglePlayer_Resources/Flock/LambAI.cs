@@ -9,10 +9,18 @@ public class LambAI : NetworkEntity
     public NetworkVariable<bool> isShielded = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
     [SerializeField] private Color shieldColor = new Color(0f, 0.7f, 1f, 0.5f);
     [SerializeField] private float shieldFadeDuration = 0.5f;
+    [SerializeField] private Color shieldAuraColor = new Color(0.2f, 0.85f, 1f, 0.22f);
+    [SerializeField] private float shieldAuraScale = 1.28f;
+    [SerializeField] private float shieldPulseScale = 1.08f;
+    [SerializeField] private float shieldPulseDuration = 0.18f;
 
     [Header("Speed Boost Settings")]
     private Coroutine shieldRoutine;
     private Coroutine speedBoostRoutine;
+    private Coroutine shieldAuraRoutine;
+    private GameObject shieldAuraObject;
+    private SpriteRenderer shieldAuraRenderer;
+    [SerializeField] private ParticleSystem reviveSpawnParticles;
 
     [Header("Movement Settings")]
     [SerializeField] private float stoppingDistance = 0.1f; 
@@ -78,11 +86,20 @@ public class LambAI : NetworkEntity
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponentInChildren<Animator>();
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+        if (reviveSpawnParticles == null) reviveSpawnParticles = GetComponentInChildren<ParticleSystem>();
 
         if (spriteRenderer != null)
         {
             originalColor = spriteRenderer.color;
+            EnsureShieldAura();
         }
+    }
+
+    public void PlayReviveSpawnFx()
+    {
+        if (reviveSpawnParticles == null) return;
+
+        reviveSpawnParticles.Play(true);
     }
 
     void Start()
@@ -435,12 +452,88 @@ public class LambAI : NetworkEntity
                 // Store original color and apply shield color
                 originalColor = spriteRenderer.color;
                 spriteRenderer.color = shieldColor;
+                EnsureShieldAura();
+                ShowShieldAura(true);
+                StartShieldAuraPulse();
             }
             else
             {
                 spriteRenderer.color = originalColor;
+                ShowShieldAura(false);
             }
         }
+    }
+
+    private void EnsureShieldAura()
+    {
+        if (spriteRenderer == null || shieldAuraObject != null) return;
+
+        shieldAuraObject = new GameObject("ShieldAura");
+        shieldAuraObject.transform.SetParent(spriteRenderer.transform, false);
+        shieldAuraObject.transform.localPosition = Vector3.zero;
+        shieldAuraObject.transform.localRotation = Quaternion.identity;
+        shieldAuraObject.transform.localScale = Vector3.one * shieldAuraScale;
+
+        shieldAuraRenderer = shieldAuraObject.AddComponent<SpriteRenderer>();
+        shieldAuraRenderer.sprite = spriteRenderer.sprite;
+        shieldAuraRenderer.flipX = spriteRenderer.flipX;
+        shieldAuraRenderer.sortingLayerID = spriteRenderer.sortingLayerID;
+        shieldAuraRenderer.sortingOrder = spriteRenderer.sortingOrder - 1;
+        shieldAuraRenderer.color = shieldAuraColor;
+        shieldAuraRenderer.enabled = false;
+    }
+
+    private void ShowShieldAura(bool show)
+    {
+        if (shieldAuraRenderer == null) return;
+        shieldAuraRenderer.enabled = show;
+    }
+
+    private void StartShieldAuraPulse()
+    {
+        if (shieldAuraRenderer == null) return;
+
+        if (shieldAuraRoutine != null)
+        {
+            StopCoroutine(shieldAuraRoutine);
+        }
+
+        shieldAuraRoutine = StartCoroutine(ShieldAuraPulseRoutine());
+    }
+
+    private IEnumerator ShieldAuraPulseRoutine()
+    {
+        if (shieldAuraObject == null)
+        {
+            shieldAuraRoutine = null;
+            yield break;
+        }
+
+        Vector3 baseScale = Vector3.one * shieldAuraScale;
+        Vector3 pulseScale = baseScale * shieldPulseScale;
+
+        float elapsed = 0f;
+        while (elapsed < shieldPulseDuration)
+        {
+            float t = elapsed / Mathf.Max(0.01f, shieldPulseDuration);
+            float pulseT = Mathf.PingPong(t * 2f, 1f);
+            shieldAuraObject.transform.localScale = Vector3.Lerp(baseScale, pulseScale, pulseT);
+            shieldAuraRenderer.color = Color.Lerp(shieldAuraColor, Color.white, pulseT * 0.5f);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        if (shieldAuraObject != null)
+        {
+            shieldAuraObject.transform.localScale = baseScale;
+        }
+
+        if (shieldAuraRenderer != null)
+        {
+            shieldAuraRenderer.color = shieldAuraColor;
+        }
+
+        shieldAuraRoutine = null;
     }
 
     public override void TakeDamage(int damage, NetworkEntity source)
