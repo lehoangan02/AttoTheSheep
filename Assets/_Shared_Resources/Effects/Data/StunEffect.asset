@@ -10,15 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f2037eb76bbacee1988b62b0af18594f, type: 3}
-  m_Name: SlowEffect
+  m_Name: StunEffect
   m_EditorClassIdentifier: Assembly-CSharp::StatusEffectData
-  kind: 5
-  duration: 3
+  kind: 3
+  duration: 1
   tickRate: 0
   damagePerTick: 0
   stopsMovement: 0
-  stopsAttack: 0
-  speedMultiplier: 0.5
+  stopsAttack: 1
+  speedMultiplier: 0.8
   knockbackForce: 0
   knockbackDuration: 0.2
   stacking: 0
