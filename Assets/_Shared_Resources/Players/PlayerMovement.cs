@@ -53,13 +53,13 @@ public class PlayerMovement : NetworkBehaviour
     {
         // Use local input for smoothness if Owner, others use network input
         Vector2 currentInput = IsOwner ? localMoveInput : netMoveInput.Value;
-        bool isMoving = currentInput.sqrMagnitude > 0.01f;
+        bool isMoving = currentInput.sqrMagnitude > 0.01f && !isMovementLocked;
         if (animator != null) animator.SetBool("IsMoving", isMoving);
         
         if (spriteRenderer != null)
         {
-            if (currentInput.x > 0) spriteRenderer.flipX = false;
-            else if (currentInput.x < 0) spriteRenderer.flipX = true;
+            if (currentInput.x > 0 && !isMovementLocked) spriteRenderer.flipX = false;
+            else if (currentInput.x < 0 && !isMovementLocked) spriteRenderer.flipX = true;
         }
 
         if (isMoving && !isMovementLocked && entity != null && entity.IsAlive

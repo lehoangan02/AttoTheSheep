@@ -54,7 +54,32 @@ public class PlayerHeadbuttSkill : BaseSkillComponent
 
         if (anim != null)
         {
-            anim.SetTrigger("Headbutt");
+            AnimatorStateInfo stateInfo = anim.GetCurrentAnimatorStateInfo(0);
+            if (!stateInfo.IsName("Headbutt"))
+            {
+                anim.SetTrigger("Headbutt");
+            }
+        }
+        
+        if (data is HeadbuttSkillData hbData)
+        {
+            StartCoroutine(ClientLockMovementRoutine(hbData));
+        }
+    }
+
+    private IEnumerator ClientLockMovementRoutine(HeadbuttSkillData data)
+    {
+        PlayerController controller = GetComponentInParent<PlayerController>();
+        if (controller == null) yield break;
+
+        PlayerMovement movement = controller.GetComponentInChildren<PlayerMovement>();
+        if (movement == null) movement = controller.GetComponentInParent<PlayerMovement>();
+        
+        if (movement != null)
+        {
+            movement.isMovementLocked = true;
+            yield return new WaitForSeconds(data.attackDelay + data.recoveryTime);
+            movement.isMovementLocked = false;
         }
     }
 
