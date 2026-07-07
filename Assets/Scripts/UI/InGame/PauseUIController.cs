@@ -40,10 +40,27 @@ namespace AttoTheSheep.UI.InGame
             if (mainMenuButton != null) mainMenuButton.onClick.AddListener(OnMainMenuClicked);
             if (pauseButton != null) pauseButton.onClick.AddListener(OnPauseClicked);
             if (toggleAutoButton != null) toggleAutoButton.onClick.AddListener(OnToggleAutoClicked);
+            
+            // Sync with FlockManager
+            var flockManager = Object.FindFirstObjectByType<FlockManager>();
+            if (flockManager != null)
+            {
+                _isAutoMode = flockManager.currentControlMode == FlockControlMode.Auto;
+                flockManager.OnControlModeChanged += HandleControlModeChanged;
+            }
             UpdateToggleAutoUI();
 
             // Mặc định ẩn giao diện Pause (Overlay) khi mới vào game
             if (pausePanel != null) pausePanel.SetActive(false);
+        }
+
+        private void OnDestroy()
+        {
+            var flockManager = Object.FindFirstObjectByType<FlockManager>();
+            if (flockManager != null)
+            {
+                flockManager.OnControlModeChanged -= HandleControlModeChanged;
+            }
         }
 
         private void Update()
@@ -108,18 +125,22 @@ namespace AttoTheSheep.UI.InGame
 
         private void OnToggleAutoClicked()
         {
-            _isAutoMode = !_isAutoMode;
-            UpdateToggleAutoUI();
-            
-            // TODO: Bổ sung code gọi hàm chuyển đổi Auto/Manual của teamate tại đây
-            if (_isAutoMode)
+            var flockManager = Object.FindFirstObjectByType<FlockManager>();
+            if (flockManager != null)
             {
-                Debug.Log("[PauseUI] Chuyển sang chế độ: AUTO (Tự động)");
+                flockManager.RequestToggleControlMode();
             }
             else
             {
-                Debug.Log("[PauseUI] Chuyển sang chế độ: MANUAL (Thủ công)");
+                _isAutoMode = !_isAutoMode;
+                UpdateToggleAutoUI();
             }
+        }
+
+        private void HandleControlModeChanged(FlockControlMode newMode)
+        {
+            _isAutoMode = newMode == FlockControlMode.Auto;
+            UpdateToggleAutoUI();
         }
 
         private void UpdateToggleAutoUI()
