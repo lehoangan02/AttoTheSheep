@@ -13,6 +13,9 @@ namespace AttoTheSheep.UI.InGame
         [Header("Scene Settings")]
         [SerializeField] private string mainMenuSceneName = "MainMenu";
 
+        [Header("Reward UI")]
+        [SerializeField] private TMPro.TextMeshProUGUI earnedGoldText;
+
         private void Start()
         {
             if (retryButton != null)
@@ -37,8 +40,12 @@ namespace AttoTheSheep.UI.InGame
             SceneManager.LoadScene(mainMenuSceneName);
         }
 
-        public void ShowBanner()
+        public void ShowBanner(int earnedGold = 0)
         {
+            if (earnedGoldText != null)
+            {
+                earnedGoldText.text = "+" + earnedGold.ToString();
+            }
             gameObject.SetActive(true);
         }
 

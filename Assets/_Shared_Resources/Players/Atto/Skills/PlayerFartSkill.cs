@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
+using Unity.Cinemachine; // THÊM THƯ VIỆN NÀY
 
 public class PlayerFartSkill : BaseSkillComponent
 {
@@ -11,9 +12,12 @@ public class PlayerFartSkill : BaseSkillComponent
     [SerializeField] private Rigidbody2D parentRb;
     [SerializeField] private SpriteRenderer playerSprite; 
 
+    [Header("Camera Shake Settings")]
+    [SerializeField] private CinemachineImpulseSource impulseSource; // THÊM BIẾN NÀY
+
     private FartSkillData currentFartData;
     private PlayerController fartController;
-    private bool isDashing = false; // Biến cờ để kiểm tra trạng thái đang lướt
+    private bool isDashing = false; 
     private List<Vector3> originalTrailLocalPositions;
 
     private void Start()
@@ -29,7 +33,7 @@ public class PlayerFartSkill : BaseSkillComponent
             if (trail != null)
             {
                 originalTrailLocalPositions.Add(trail.transform.localPosition);
-                trail.emitting = false; // Disable emitting by default
+                trail.emitting = false; 
             }
             else
             {
@@ -98,7 +102,6 @@ public class PlayerFartSkill : BaseSkillComponent
         PlayerMovement movement = controller.GetComponentInChildren<PlayerMovement>();
         if (movement == null) movement = controller.GetComponentInParent<PlayerMovement>();
 
-        // Get damage multiplier from PlayerSkills
         float damageMultiplier = 1f;
         PlayerSkills skills = controller.GetComponentInChildren<PlayerSkills>();
         if (skills == null) skills = controller.GetComponentInParent<PlayerSkills>();
@@ -112,40 +115,38 @@ public class PlayerFartSkill : BaseSkillComponent
 
         if (movement != null) movement.isMovementLocked = true;
 
-        // Đảm bảo không bật Trigger để không bị xuyên tường
         parentCollider.isTrigger = false;
 
         float elapsed = 0f;
         bool hasCollided = false;
 
-        // --- CHUẨN BỊ BỘ LỌC CHO HÀM CAST ---
         ContactFilter2D filter = new ContactFilter2D();
         filter.SetLayerMask(data.enemyLayer | LayerMask.GetMask("Ground", "Wall"));
         filter.useLayerMask = true;
 
-        // Mảng để chứa kết quả quét (chỉ cần lấy 1 vật cản đầu tiên)
         RaycastHit2D[] hits = new RaycastHit2D[1];
 
-        // Vòng lặp lướt
         while (elapsed < data.dashDuration && !hasCollided)
         {
-            // 1. Ép vận tốc đẩy tới
             parentRb.linearVelocity = dashDir * data.dashForce;
 
-            // 2. CHỦ ĐỘNG QUÉT BẰNG CHÍNH COLLIDER CỦA NHÂN VẬT
             float moveDistance = data.dashForce * Time.fixedDeltaTime;
 
-            // Dùng parentCollider.Cast quét tới trước một khoảng bằng moveDistance + 0.1f (cộng thêm 1 chút xíu để bù trừ sai số vật lý)
             int hitCount = parentCollider.Cast(dashDir, filter, hits, moveDistance + 0.1f);
 
             if (hitCount > 0)
             {
-                RaycastHit2D hit = hits[0]; // Lấy vật đầu tiên tông trúng
+                RaycastHit2D hit = hits[0]; 
                 Debug.Log($"🛑 [PHYSICS CAST] Tông trúng: {hit.collider.gameObject.name}. Dừng lướt!");
 
-                hasCollided = true; // Kích hoạt cờ dừng lướt
+                hasCollided = true; 
 
-                // Nếu vật trúng là Enemy thì xử lý sát thương
+                // RUNG CAMERA KHI TÔNG VÀO VẬT CẢN HOẶC ĐỊCH
+                if (impulseSource != null)
+                {
+                    impulseSource.GenerateImpulse();
+                }
+
                 if (((1 << hit.collider.gameObject.layer) & data.enemyLayer) != 0)
                 {
                     NetworkEntity enemyEntity = hit.collider.GetComponent<NetworkEntity>();
@@ -164,35 +165,35 @@ public class PlayerFartSkill : BaseSkillComponent
             yield return new WaitForFixedUpdate();
         }
 
-        // Kết thúc lướt
         parentRb.linearVelocity = Vector2.zero;
         if (movement != null) movement.isMovementLocked = false;
 
         currentFartData = null;
     }
     
-    // XỬ LÝ VA CHẠM VẬT LÝ THÔNG THƯỜNG TẠI ĐÂY
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        // Chỉ xử lý nếu nhân vật đang trong trạng thái lướt chiêu thức
         if (!isDashing || currentFartData == null || fartController == null) return;
 
         Debug.Log($"🛑 [PHYSICS] Tông trúng Collider: {collision.gameObject.name}. Dừng lướt ngay lập tức!");
         
-        // 1. ÉP PLAYER DỪNG LẠI NGAY LẬP TỨC khi chạm vào BẤT KỲ ĐỊA HÌNH HAY COLLIDER NÀO
         isDashing = false; 
         Rigidbody2D rb = fartController.GetComponent<Rigidbody2D>();
         if (rb != null) rb.linearVelocity = Vector2.zero;
 
-        // 2. KIỂM TRA NẾU VẬT CHẠM THUỘC LAYER ENEMY THÌ MỚI GÂY SÁT THƯƠNG & KNOCKBACK
         if (((1 << collision.gameObject.layer) & currentFartData.enemyLayer) != 0)
         {
             Debug.Log($"💥 [PHYSICS] Xác nhận mục tiêu là Enemy: {collision.gameObject.name}. Kích hoạt Knockback!");
             
+            // RUNG CAMERA KHI TÔNG VÀO ĐỊCH Ở FALLBACK VẬT LÝ
+            if (impulseSource != null)
+            {
+                impulseSource.GenerateImpulse();
+            }
+
             NetworkEntity enemyEntity = collision.gameObject.GetComponent<NetworkEntity>();
             if (enemyEntity != null)
             {
-                // Get damage multiplier from PlayerSkills
                 float damageMultiplier = 1f;
                 if (fartController != null)
                 {
@@ -201,20 +202,14 @@ public class PlayerFartSkill : BaseSkillComponent
                     if (skills != null) damageMultiplier = skills.damageMultiplier.Value;
                 }
                 int finalDamage = Mathf.RoundToInt(currentFartData.damage * damageMultiplier);
-                // Gây sát thương
                 enemyEntity.TakeDamage(finalDamage);
 
-                // Tính toán hướng hất văng AN TOÀN: Chỉ lấy hướng Trái hoặc Phải dựa trên trục X
                 float dirX = collision.transform.position.x > fartController.transform.position.x ? 1f : -1f;
-                
-                // Tạo vector hất văng (bạn có thể thay số 0 thành 0.2f nếu muốn quái hơi nảy lên nhẹ khi bị tông)
                 Vector2 knockbackDir = new Vector2(dirX, 0f).normalized; 
                 
-                // Áp dụng lực Knockback cho Enemy
                 enemyEntity.ApplyKnockback(knockbackDir * currentFartData.knockupForce, 0.3f);
             }
                     
-            // Phát hiệu ứng trúng đòn ngay tại điểm va chạm đầu tiên
             if (collision.contactCount > 0)
             {
                 ClientPlayHitEffect(currentFartData, collision.GetContact(0).point);
@@ -224,7 +219,6 @@ public class PlayerFartSkill : BaseSkillComponent
 
     private void OnDrawGizmosSelected()
     {
-        // Để tránh bị đánh lừa, bạn nên vẽ Gizmos bằng hitRadius thực tế, hoặc giữ nguyên để tham khảo
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, 1f); 
     }
