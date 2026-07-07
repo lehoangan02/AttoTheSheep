@@ -22,6 +22,9 @@ public class PlayerHeadbuttSkill : BaseSkillComponent
     private float nextAttackTimeServer = 0f;
     private float nextAttackTimeClient = 0f;
 
+    private Coroutine headbuttRoutine;
+    private Coroutine clientLockRoutine;
+
     public override void ServerExecute(SkillData data, NetworkEntity caster, PlayerController controller = null)
     {
         // 1. NGĂN SPAM TRÊN SERVER: Chỉ cho phép chạy logic khi đã qua thời gian hồi của đòn trước
@@ -33,7 +36,8 @@ public class PlayerHeadbuttSkill : BaseSkillComponent
             nextAttackTimeServer = Time.time + headbuttData.attackDelay + headbuttData.recoveryTime;
 
             currentHeadbuttData = headbuttData;
-            StartCoroutine(HeadbuttRoutine(headbuttData, controller));
+            if (headbuttRoutine != null) StopCoroutine(headbuttRoutine);
+            headbuttRoutine = StartCoroutine(HeadbuttRoutine(headbuttData, controller));
         }
     }
 
@@ -55,7 +59,7 @@ public class PlayerHeadbuttSkill : BaseSkillComponent
         if (anim != null)
         {
             AnimatorStateInfo stateInfo = anim.GetCurrentAnimatorStateInfo(0);
-            if (!stateInfo.IsName("Headbutt"))
+            if (!stateInfo.IsName("Headbut"))
             {
                 anim.SetTrigger("Headbutt");
             }
@@ -63,7 +67,8 @@ public class PlayerHeadbuttSkill : BaseSkillComponent
         
         if (data is HeadbuttSkillData hbData)
         {
-            StartCoroutine(ClientLockMovementRoutine(hbData));
+            if (clientLockRoutine != null) StopCoroutine(clientLockRoutine);
+            clientLockRoutine = StartCoroutine(ClientLockMovementRoutine(hbData));
         }
     }
 
