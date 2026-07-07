@@ -80766,6 +80766,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: WinBannerUI
       objectReference: {fileID: 0}
+    - target: {fileID: 3641483429108853665, guid: 2e6ad9e405a84e7429086772ead0ad2e, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4756181135441081955, guid: 2e6ad9e405a84e7429086772ead0ad2e, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4756181135441081955, guid: 2e6ad9e405a84e7429086772ead0ad2e, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5147712707513512227, guid: 2e6ad9e405a84e7429086772ead0ad2e, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -80779,6 +80791,22 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5147712707513512227, guid: 2e6ad9e405a84e7429086772ead0ad2e, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5186976687031547786, guid: 2e6ad9e405a84e7429086772ead0ad2e, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5186976687031547786, guid: 2e6ad9e405a84e7429086772ead0ad2e, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5186976687031547786, guid: 2e6ad9e405a84e7429086772ead0ad2e, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5186976687031547786, guid: 2e6ad9e405a84e7429086772ead0ad2e, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
@@ -80891,6 +80919,22 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6536774718640496838, guid: 2e6ad9e405a84e7429086772ead0ad2e, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7251119854832638247, guid: 2e6ad9e405a84e7429086772ead0ad2e, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7251119854832638247, guid: 2e6ad9e405a84e7429086772ead0ad2e, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7251119854832638247, guid: 2e6ad9e405a84e7429086772ead0ad2e, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7251119854832638247, guid: 2e6ad9e405a84e7429086772ead0ad2e, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
@@ -146533,7 +146577,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DialogueTrigger
   dialogueData: {fileID: 11400000, guid: 816a21ee7b0396c448e448655631824d, type: 2}
   requireProximity: 1
-  interactKey: 101
+  interactAction: {fileID: 0}
 --- !u!114 &2030140581
 MonoBehaviour:
   m_ObjectHideFlags: 0
