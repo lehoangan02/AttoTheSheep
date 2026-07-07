@@ -13,7 +13,15 @@ MonoBehaviour:
   m_Name: Turtle
   m_EditorClassIdentifier: Assembly-CSharp::DialogueData
   speakerName: Turtle
+  speakerNameVietnamese: 
   speakerAvatar: {fileID: 6240235003232040363, guid: 3c1b87789be867145a5c709c8cdd753a, type: 3}
   lines:
   - I was once a monster. Now, all that's left is to wait for a peaceful death.
   - Never forget, little boy. Protect those you love
+  vietnameseLines:
+  - "Ta t\u1EEBng l\xE0 m\u1ED9t con qu\xE1i v\u1EADt.\nGi\u1EDD \u0111\xE2y... \u0111i\u1EC1u
+    duy nh\u1EA5t c\xF2n l\u1EA1i l\xE0 ch\u1EDD \u0111\u1EE3i m\u1ED9t c\xE1i ch\u1EBFt
+    thanh th\u1EA3n."
+  - "H\xE3y kh\u1EAFc ghi \u0111i\u1EC1u n\xE0y, c\u1EADu b\xE9.\nD\xF9 c\xF3 ph\u1EA3i
+    tr\u1EA3 b\u1EA5t c\u1EE9 gi\xE1 n\xE0o... h\xE3y b\u1EA3o v\u1EC7 nh\u1EEFng
+    ng\u01B0\u1EDDi ng\u01B0\u01A1i y\xEAu th\u01B0\u01A1ng."

@@ -24,6 +24,7 @@ public class SkillData : ScriptableObject
     public int skillId;
     public string skillName;
     [TextArea(2, 5)] public string description;
+    public Sprite skillIcon;
 
     [Header("Base Stats (Edit in Unity)")]
     public float cooldown = 5f;
