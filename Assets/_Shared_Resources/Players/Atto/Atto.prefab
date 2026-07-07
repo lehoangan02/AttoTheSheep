@@ -14879,7 +14879,6 @@ GameObject:
   - component: {fileID: 3035379761739461309}
   - component: {fileID: 706738783152158243}
   - component: {fileID: 1343113486860999786}
-  - component: {fileID: 6551048971583672964}
   - component: {fileID: 1963130586316328227}
   - component: {fileID: 5768902246884596341}
   - component: {fileID: -7979202511421666267}
@@ -15140,52 +15139,6 @@ MonoBehaviour:
   UseRigidBodyForMotion: 0
   AutoUpdateKinematicState: 1
   AutoSetKinematicOnDespawn: 1
---- !u!114 &6551048971583672964
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2149695861835639596}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a40e4e61d1473344e8c0e76f68e452d4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerEntity
-  ShowTopMostFoldoutHeaderGroup: 1
-  baseMoveSpeed: 2
-  baseMaxHealth: 1000
-  baseMaxMana: 100
-  baseAttackRange: 1
-  baseAttackDamage: 10
-  damageFont: {fileID: 11400000, guid: 2745a675487b843419622b8727c36f50, type: 2}
-  vfxAnchor: {fileID: 0}
-  effectController: {fileID: 0}
-  currentMoveSpeed:
-    UpdateTraits:
-      MinSecondsBetweenUpdates: 0
-      MaxSecondsBetweenUpdates: 0
-    m_InternalValue: 0
-  currentHealth:
-    UpdateTraits:
-      MinSecondsBetweenUpdates: 0
-      MaxSecondsBetweenUpdates: 0
-    m_InternalValue: 0
-  currentMana:
-    UpdateTraits:
-      MinSecondsBetweenUpdates: 0
-      MaxSecondsBetweenUpdates: 0
-    m_InternalValue: 0
-  isInvulnerable:
-    UpdateTraits:
-      MinSecondsBetweenUpdates: 0
-      MaxSecondsBetweenUpdates: 0
-    m_InternalValue: 0
-  spriteRenderer: {fileID: 0}
-  damageColor: {r: 1, g: 0, b: 0, a: 1}
-  flashDuration: 0.2
-  knockbackForce: 5
-  knockbackDuration: 0.15
 --- !u!58 &1963130586316328227
 CircleCollider2D:
   m_ObjectHideFlags: 0
