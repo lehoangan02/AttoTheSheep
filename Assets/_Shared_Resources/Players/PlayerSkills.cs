@@ -74,8 +74,7 @@ public class PlayerSkills : NetworkBehaviour
         if (!IsBaseSkill(skillId) && !isInsideFlock.Value) return;
 
         // STEP 1: CHECK AUTO-UNLOCK CONDITION — Base skills always pass
-        if (!IsBaseSkill(skillId) && skillId > unlockedSkillTier.Value) return;
-
+        if (slot.data.lambsRequired > unlockedSkillTier.Value) return;
         // STEP 2: CHECK COOLDOWN (Attack speed)
         if (lastCastTimes.TryGetValue(skillId, out float lastTime))
         {
@@ -105,7 +104,7 @@ public class PlayerSkills : NetworkBehaviour
         if (!IsBaseSkill(skillId) && !isInsideFlock.Value) return;
 
         // Double check on Server to prevent Hack — Base skills bypass
-        if (!IsBaseSkill(skillId) && skillId > unlockedSkillTier.Value) return;
+        if (slot.data.lambsRequired > unlockedSkillTier.Value) return;
 
         // STEP 3: DEDUCT MANA (If skill has manaCost > 0)
         if (slot.data.manaCost > 0)

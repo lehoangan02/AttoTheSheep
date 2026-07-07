@@ -255,6 +255,40 @@ public class FlockManager : NetworkBehaviour
         }
     }
 
+    // Thêm Sự kiện để UI có thể đăng ký lắng nghe và thay đổi Text/Màu sắc nút
+    public event Action<FlockControlMode> OnControlModeChanged;
+
+    /// <summary>
+    /// Hàm dành cho UI Button gọi để yêu cầu đổi chế độ
+    /// </summary>
+    public void RequestToggleControlMode()
+    {
+        // Gửi yêu cầu lên Server
+        ToggleControlModeServerRpc();
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void ToggleControlModeServerRpc()
+    {
+        // Server tính toán chế độ tiếp theo
+        FlockControlMode nextMode = (currentControlMode == FlockControlMode.Auto) ? FlockControlMode.Manual : FlockControlMode.Auto;
+        
+        // Thực thi thay đổi trên Server
+        SetControlMode(nextMode);
+
+        // Phát lệnh đồng bộ trạng thái xuống toàn bộ Client
+        SyncControlModeClientRpc(nextMode);
+    }
+
+    [ClientRpc]
+    private void SyncControlModeClientRpc(FlockControlMode newMode)
+    {
+        currentControlMode = newMode;
+        
+        // Kích hoạt sự kiện để giao diện cập nhật theo thay đổi mới
+        OnControlModeChanged?.Invoke(newMode);
+    }
+
     public FlockLevelConfig GetCurrentLevelConfig()
     {
         int index = Mathf.Clamp(currentLevel.Value - 1, 0, levelConfigs.Length - 1);

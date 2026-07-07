@@ -22,6 +22,13 @@ namespace AttoTheSheep.UI.ShopAndInventory
 
         private void Start()
         {
+            // Update visual elements from data in case they changed after prefab creation
+            if (_currentItem != null)
+            {
+                if (iconImage != null) iconImage.sprite = _currentItem.icon;
+                if (priceText != null) priceText.text = _currentItem.price.ToString() + "$";
+            }
+
             // Re-hook listeners at runtime because non-persistent listeners from Editor are lost
             if (buyButton != null)
             {

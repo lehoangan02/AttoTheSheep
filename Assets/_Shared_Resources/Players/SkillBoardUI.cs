@@ -15,10 +15,11 @@ public class SkillBoardUI : MonoBehaviour
             SkillSlot playerSkill = localPlayerSkills.equippedSkills[i];
             
             // Kiểm tra xem UI Slot có đủ số lượng không và Data có tồn tại không
+            // Kiểm tra xem UI Slot có đủ số lượng không và Data có tồn tại không
             if (i < uiSlots.Count && playerSkill.data != null)
             {
-                // Truyền dữ liệu vào UI Slot
-                uiSlots[i].SetupSlot(playerSkill.data);
+                // THAY ĐỔI Ở ĐÂY: Truyền thêm biến localPlayerSkills
+                uiSlots[i].SetupSlot(playerSkill.data, localPlayerSkills);
             }
         }
     }

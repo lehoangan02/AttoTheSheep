@@ -6,5 +6,6 @@ public class ActionItem : ScriptableObject
     public string itemName;
     public string itemDescription;
     public Sprite icon;
-    public int price = 100;
+    public int price;
+    public string name;
 }
