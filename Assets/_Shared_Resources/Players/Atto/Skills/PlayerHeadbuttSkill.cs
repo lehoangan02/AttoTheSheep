@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
+using Unity.Cinemachine; // THÊM THƯ VIỆN NÀY
 
 public class PlayerHeadbuttSkill : BaseSkillComponent
 {
@@ -9,16 +10,16 @@ public class PlayerHeadbuttSkill : BaseSkillComponent
     [SerializeField] private Animator animator;          
     [SerializeField] private LayerMask enemyLayer;       
     
-    // THÊM BIẾN NÀY ĐỂ KÉO THẢ SPRITE CỦA PLAYER
     [SerializeField] private SpriteRenderer playerSprite; 
     
     [Header("Visual Effects")]
-    // Kéo object Particle System có sẵn trên nhân vật vào đây
     [SerializeField] private ParticleSystem impactParticle; 
+
+    [Header("Camera Shake Settings")]
+    [SerializeField] private CinemachineImpulseSource impulseSource; // THÊM BIẾN NÀY
 
     private HeadbuttSkillData currentHeadbuttData;
     
-    // THÊM: Các biến lưu thời điểm được phép đánh đòn tiếp theo
     private float nextAttackTimeServer = 0f;
     private float nextAttackTimeClient = 0f;
 
@@ -27,12 +28,10 @@ public class PlayerHeadbuttSkill : BaseSkillComponent
 
     public override void ServerExecute(SkillData data, NetworkEntity caster, PlayerController controller = null)
     {
-        // 1. NGĂN SPAM TRÊN SERVER: Chỉ cho phép chạy logic khi đã qua thời gian hồi của đòn trước
         if (Time.time < nextAttackTimeServer) return;
 
         if (data is HeadbuttSkillData headbuttData && controller != null)
         {
-            // Tính toán tổng thời gian của 1 đòn đánh (delay + recovery) để khóa
             nextAttackTimeServer = Time.time + headbuttData.attackDelay + headbuttData.recoveryTime;
 
             currentHeadbuttData = headbuttData;
@@ -43,14 +42,13 @@ public class PlayerHeadbuttSkill : BaseSkillComponent
 
     public override void ClientPlayVisual(SkillData data)
     {
-        // 2. NGĂN SPAM TRIGGER TRÊN CLIENT: Tránh kẹt Animator ở frame 1
         if (data is HeadbuttSkillData headbuttData)
         {
             if (Time.time < nextAttackTimeClient) return;
             nextAttackTimeClient = Time.time + headbuttData.attackDelay + headbuttData.recoveryTime;
         }
 
-        base.ClientPlayVisual(data); // Gọi code của class cha để tự động phát SFX nếu có
+        base.ClientPlayVisual(data); 
         
         Animator anim = animator;
         if (anim == null) anim = GetComponentInParent<Animator>();
@@ -94,7 +92,6 @@ public class PlayerHeadbuttSkill : BaseSkillComponent
         if (movement == null) movement = controller.GetComponentInParent<PlayerMovement>();
         if (movement != null) movement.isMovementLocked = true;
 
-        // Get damage multiplier from PlayerSkills
         float damageMultiplier = 1f;
         PlayerSkills skills = controller.GetComponentInChildren<PlayerSkills>();
         if (skills == null) skills = controller.GetComponentInParent<PlayerSkills>();
@@ -102,7 +99,6 @@ public class PlayerHeadbuttSkill : BaseSkillComponent
 
         yield return new WaitForSeconds(data.attackDelay);
 
-        // --- SỬ DỤNG BIẾN playerSprite ĐỂ XÁC ĐỊNH HƯỚNG ---
         Vector2 facingDir = Vector2.right;
         if (playerSprite != null && playerSprite.flipX) 
         {
@@ -115,7 +111,7 @@ public class PlayerHeadbuttSkill : BaseSkillComponent
         Collider2D[] hits = Physics2D.OverlapCircleAll(hitCenter, data.hitRadius, layer);
 
         HashSet<Collider2D> damagedEnemies = new HashSet<Collider2D>();
-        bool hasPlayedParticle = false; // Biến kiểm tra để chỉ nổ hạt 1 lần mỗi cú húc
+        bool hasPlayedParticle = false; 
 
         foreach (var hit in hits)
         {
@@ -126,28 +122,23 @@ public class PlayerHeadbuttSkill : BaseSkillComponent
                 {
                     int finalDamage = Mathf.RoundToInt(data.damage * damageMultiplier);
                     enemyEntity.TakeDamage(finalDamage);
-
-                    // Đẩy lùi
                     enemyEntity.ApplyKnockback(facingDir * data.knockbackForce, 0.2f);
                 }
 
-                // TẠO HIỆU ỨNG TÓE LỬA TỪ OBJECT CÓ SẴN
                 if (impactParticle != null && !hasPlayedParticle)
                 {
-                    // Lấy điểm tiếp xúc gần nhất
                     Vector3 impactPos = hit.ClosestPoint(hitCenter);
-
-                    // Dời object particle đến đúng vị trí chạm
                     impactParticle.transform.position = impactPos;
-
-                    // XOAY PARTICLE THEO HƯỚNG NHÂN VẬT
                     float yRotation = facingDir.x < 0 ? 180f : 0f;
                     impactParticle.transform.rotation = Quaternion.Euler(0f, yRotation, 0f);
-
-                    // Bật nổ tia lửa
                     impactParticle.Play();
 
-                    // Đánh dấu là đã nổ để không gọi lại Play() nếu trúng thêm quái khác cùng lúc
+                    // RUNG CAMERA KHI HÚC TRÚNG
+                    if (impulseSource != null)
+                    {
+                        impulseSource.GenerateImpulse();
+                    }
+
                     hasPlayedParticle = true;
                 }
                 
@@ -166,8 +157,6 @@ public class PlayerHeadbuttSkill : BaseSkillComponent
         if (currentHeadbuttData != null)
         {
             Gizmos.color = Color.red;
-            
-            // Gizmos cũng dùng biến playerSprite để vẽ hitbox cho chuẩn
             float facingX = 1f;
             if (playerSprite != null && playerSprite.flipX) facingX = -1f;
             
