@@ -11,6 +11,7 @@ public class ActionBarController : MonoBehaviour
     private LoadPlayerUseCase _loadPlayerUseCase;
     private IPlayerRepository _playerRepository;
     private PlayerProfile _currentPlayerProfile;
+    private System.Action<UnityEngine.InputSystem.InputAction.CallbackContext>[] _actionBarHandlers;
 
     private async void Start()
     {
@@ -59,7 +60,8 @@ public class ActionBarController : MonoBehaviour
             {
                 if (actionBarActions[i] != null)
                 {
-                    actionBarActions[i].action.performed -= _ => TriggerSlot(i);
+                    if (_actionBarHandlers != null && i < _actionBarHandlers.Length && _actionBarHandlers[i] != null)
+                        actionBarActions[i].action.performed -= _actionBarHandlers[i];
                     actionBarActions[i].action.Disable();
                 }
             }
@@ -98,12 +100,14 @@ public class ActionBarController : MonoBehaviour
             return;
         }
 
+        _actionBarHandlers = new System.Action<InputAction.CallbackContext>[actionBarActions.Length];
         for (int i = 0; i < actionBarActions.Length && i < 4; i++)
         {
             if (actionBarActions[i] != null)
             {
                 int index = i;
-                actionBarActions[i].action.performed += _ => TriggerSlot(index);
+                _actionBarHandlers[i] = _ => TriggerSlot(index);
+                actionBarActions[i].action.performed += _actionBarHandlers[i];
                 actionBarActions[i].action.Enable();
             }
         }

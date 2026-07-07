@@ -28,7 +28,7 @@ public class DialogueTrigger : MonoBehaviour
     {
         if (interactAction != null)
         {
-            interactAction.action.performed += _ => TryInteract();
+            interactAction.action.performed += HandleInteract;
             interactAction.action.Enable();
         }
     }
@@ -37,7 +37,7 @@ public class DialogueTrigger : MonoBehaviour
     {
         if (interactAction != null)
         {
-            interactAction.action.performed -= _ => TryInteract();
+            interactAction.action.performed -= HandleInteract;
             interactAction.action.Disable();
         }
     }
@@ -47,6 +47,8 @@ public class DialogueTrigger : MonoBehaviour
         if (requireProximity && !_playerInRange) return;
         TriggerDialogue();
     }
+
+    private void HandleInteract(InputAction.CallbackContext ctx) => TryInteract();
 
     // Called by collider trigger zone (requires 2D Collider set to "Is Trigger")
     private void OnTriggerEnter2D(Collider2D other)
