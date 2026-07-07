@@ -17,15 +17,6 @@ public class MobileContextButton : MonoBehaviour
     [SerializeField]
     private GameObject interactButton;
 
-    [SerializeField]
-    private Image icon;
-
-    [SerializeField]
-    private Sprite headbuttIcon;
-
-    [SerializeField]
-    private Sprite interactIcon;
-
     private void Awake()
     {
         if (headbuttButton == null && interactButton == null)
@@ -47,8 +38,5 @@ public class MobileContextButton : MonoBehaviour
     {
         if (headbuttButton != null) headbuttButton.SetActive(!anyInRange);
         if (interactButton != null) interactButton.SetActive(anyInRange);
-
-        if (icon != null)
-            icon.sprite = anyInRange ? interactIcon : headbuttIcon;
     }
 }

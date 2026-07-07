@@ -32,4 +32,13 @@ public class MobileControlsUI : MonoBehaviour
         if (mobileControlsCanvas != null)
             mobileControlsCanvas.SetActive(true);
     }
+
+    // Log if touchscreen is detected at runtime (for debugging purposes)
+    private void Start()
+    {
+        if (Touchscreen.current != null)
+            Debug.Log($"[{nameof(MobileControlsUI)}] Touchscreen detected at runtime: {Touchscreen.current.deviceId}");
+        else
+            Debug.Log($"[{nameof(MobileControlsUI)}] No touchscreen detected at runtime.");
+    }
 }
