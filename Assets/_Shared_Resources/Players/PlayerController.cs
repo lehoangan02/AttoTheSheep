@@ -12,48 +12,11 @@ public class PlayerController : NetworkBehaviour
     public event Action<int> OnCheatActivated; // Returns Cheat ID (1, 2, 3, 4)
     public event Action<Vector2> OnMapClicked; 
 
-    // ----------------------------------------------------
-    // RECEIVE MOVEMENT INPUT
-    // ----------------------------------------------------
-    private void Update()
-    {
-        if (!IsOwner || Keyboard.current == null) return;
-
-        if (Keyboard.current.jKey.wasPressedThisFrame)
-        {
-            OnSkillActivated?.Invoke(0);
-        }
-
-        if (Keyboard.current.uKey.wasPressedThisFrame)
-        {
-            OnSkillActivated?.Invoke(1);
-        }
-
-        if (Keyboard.current.iKey.wasPressedThisFrame)
-        {
-            OnSkillActivated?.Invoke(2);
-        }
-
-        if (Keyboard.current.oKey.wasPressedThisFrame)
-        {
-            OnSkillActivated?.Invoke(3);
-        }
-    }
-
     public void OnMove(InputValue value)
     {
         if (!IsOwner) return;
         Vector2 moveInput = value.Get<Vector2>();
         OnMoveInputChanged?.Invoke(moveInput);
-    }
-
-    // ----------------------------------------------------
-    // RECEIVE BASIC ATTACK INPUT (SKILL 0) - Matches action "Attack" in InputSystem_Actions
-    // ----------------------------------------------------
-    public void OnAttack(InputValue value)
-    {
-        if (!IsOwner || !value.isPressed) return;
-        OnSkillActivated?.Invoke(0); // Call SkillSlot 0
     }
 
     // ----------------------------------------------------
@@ -78,12 +41,12 @@ public class PlayerController : NetworkBehaviour
     }
 
     // ----------------------------------------------------
-    // RECEIVE HEADBUTT INPUT (SKILL 4) - Triggered by its dedicated input binding.
+    // RECEIVE BASIC ATTACK / HEADBUTT INPUT (SKILL 0)
     // ----------------------------------------------------
     public void OnHeadbutt(InputValue value)
     {
         if (!IsOwner || !value.isPressed) return;
-        OnSkillActivated?.Invoke(4); // Call SkillSlot with skillId=4 (Headbutt)
+        OnSkillActivated?.Invoke(0); // Call SkillSlot with skillId=0 (Headbutt)
     }
 
     // ----------------------------------------------------

@@ -2,7 +2,6 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Collections;
 using UnityEngine.SceneManagement;
-using UnityEngine.EventSystems;
 
 public class AudioManager : MonoBehaviour
 {
@@ -66,60 +65,6 @@ public class AudioManager : MonoBehaviour
         {
             // Nếu lỡ có 2 cái AudioManager sinh ra, hủy cái mới đi
             Destroy(gameObject);
-        }
-    }
-
-    private GameObject _lastHoveredButton = null;
-
-    private void Update()
-    {
-        if (EventSystem.current == null) return;
-
-        PointerEventData pointerData = new PointerEventData(EventSystem.current)
-        {
-            position = Input.mousePosition
-        };
-        List<RaycastResult> results = new List<RaycastResult>();
-        EventSystem.current.RaycastAll(pointerData, results);
-
-        // --- 1. XỬ LÝ CLICK ---
-        if (Input.GetMouseButtonDown(0) && defaultUIButtonClickSFX != null)
-        {
-            foreach (RaycastResult result in results)
-            {
-                if (result.gameObject.GetComponentInParent<UnityEngine.UI.Button>() != null)
-                {
-                    PlaySFX_2D(defaultUIButtonClickSFX);
-                    break;
-                }
-            }
-        }
-
-        // --- 2. XỬ LÝ HOVER ---
-        if (defaultUIButtonHoverSFX != null)
-        {
-            GameObject currentHoveredButton = null;
-            foreach (RaycastResult result in results)
-            {
-                UnityEngine.UI.Button btn = result.gameObject.GetComponentInParent<UnityEngine.UI.Button>();
-                if (btn != null && btn.interactable) // Thêm điều kiện nút phải bấm được thì mới kêu
-                {
-                    currentHoveredButton = btn.gameObject;
-                    break;
-                }
-            }
-
-            // Nếu con chuột vừa trỏ vào một cục Button MỚI (chưa phải cái cũ)
-            if (currentHoveredButton != _lastHoveredButton)
-            {
-                if (currentHoveredButton != null)
-                {
-                    // Phát tiếng Hover!
-                    PlaySFX_2D(defaultUIButtonHoverSFX);
-                }
-                // Cập nhật lại thằng đang bị trỏ
-                _lastHoveredButton = currentHoveredButton;
-            }
         }
     }
 

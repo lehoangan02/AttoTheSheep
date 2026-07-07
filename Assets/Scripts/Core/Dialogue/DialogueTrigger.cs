@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 /// <summary>
 /// Attach to any NPC or interactive object.
@@ -18,34 +19,52 @@ public class DialogueTrigger : MonoBehaviour
     [Tooltip("If true, the player must also be inside this object's collider to interact.")]
     public bool requireProximity = true;
 
-    [Tooltip("The keyboard key used to talk to the NPC (e.g. E or F).")]
-    public KeyCode interactKey = KeyCode.E;
+    [Tooltip("The Input System action that triggers dialogue.")]
+    [SerializeField] private InputActionReference interactAction;
 
     private bool _playerInRange = false;
 
-    private void Update()
+    private void OnEnable()
     {
-        // If proximity is required but player is not near, do nothing
-        if (requireProximity && !_playerInRange) return;
-
-        // Check if the assigned key is pressed
-        if (Input.GetKeyDown(interactKey))
+        if (interactAction != null)
         {
-            TriggerDialogue();
+            interactAction.action.performed += _ => TryInteract();
+            interactAction.action.Enable();
         }
+    }
+
+    private void OnDisable()
+    {
+        if (interactAction != null)
+        {
+            interactAction.action.performed -= _ => TryInteract();
+            interactAction.action.Disable();
+        }
+    }
+
+    private void TryInteract()
+    {
+        if (requireProximity && !_playerInRange) return;
+        TriggerDialogue();
     }
 
     // Called by collider trigger zone (requires 2D Collider set to "Is Trigger")
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Player"))
+        {
             _playerInRange = true;
+            InteractionContext.EnterRange();
+        }
     }
 
     private void OnTriggerExit2D(Collider2D other)
     {
         if (other.CompareTag("Player"))
+        {
             _playerInRange = false;
+            InteractionContext.ExitRange();
+        }
     }
 
     /// <summary>

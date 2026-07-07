@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
@@ -16,6 +17,9 @@ namespace AttoTheSheep.UI.InGame
         [Header("Scene Settings")]
         [SerializeField] private string mainMenuSceneName = "MainMenu";
 
+        [Header("Input")]
+        [SerializeField] private InputActionReference pauseAction;
+
         [Header("Pause Panel")]
         [Tooltip("Kéo Panel chứa nền đen mờ và giao diện Pause vào đây")]
         [SerializeField] private GameObject pausePanel; 
@@ -26,6 +30,24 @@ namespace AttoTheSheep.UI.InGame
             if (GetComponent<Stop>() == null && Stop.Instance == null)
             {
                 gameObject.AddComponent<Stop>();
+            }
+        }
+
+        private void OnEnable()
+        {
+            if (pauseAction != null)
+            {
+                pauseAction.action.performed += HandlePauseInput;
+                pauseAction.action.Enable();
+            }
+        }
+
+        private void OnDisable()
+        {
+            if (pauseAction != null)
+            {
+                pauseAction.action.performed -= HandlePauseInput;
+                pauseAction.action.Disable();
             }
         }
 
@@ -40,20 +62,16 @@ namespace AttoTheSheep.UI.InGame
             if (pausePanel != null) pausePanel.SetActive(false);
         }
 
-        private void Update()
+        private void HandlePauseInput(InputAction.CallbackContext ctx)
         {
-            // Lắng nghe phím ESC để tự động gọi hàm TogglePause của đồng đội
-            if (Input.GetKeyDown(KeyCode.Escape))
+            if (Stop.Instance != null)
             {
-                if (Stop.Instance != null)
-                {
-                    Stop.Instance.TogglePause();
-                    UpdateUIVisibility();
-                }
-                else
-                {
-                    Debug.LogWarning("[PauseUI] Không tìm thấy Stop.Instance! Hãy đảm bảo script Stop.cs đã được gắn vào 1 GameObject trong Scene.");
-                }
+                Stop.Instance.TogglePause();
+                UpdateUIVisibility();
+            }
+            else
+            {
+                Debug.LogWarning("[PauseUI] Không tìm thấy Stop.Instance! Hãy đảm bảo script Stop.cs đã được gắn vào 1 GameObject trong Scene.");
             }
         }
 
