@@ -14968,7 +14968,7 @@ MonoBehaviour:
       m_Calls: []
   m_ActionEvents: []
   m_NeverAutoSwitchControlSchemes: 0
-  m_DefaultControlScheme: 
+  m_DefaultControlScheme: Keyboard&Mouse
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
@@ -14984,7 +14984,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 1855868505
+  GlobalObjectIdHash: 1192057837
   InScenePlacedSourceGlobalObjectIdHash: 1192057837
   DeferredDespawnTick: 0
   Ownership: 1
@@ -31474,6 +31474,9 @@ MonoBehaviour:
     m_InternalValue: 1
   equippedSkills:
   - slotName: 
+    data: {fileID: 11400000, guid: b8d300a8fbc750b47a61b1af106a3e6d, type: 2}
+    logicScript: {fileID: 6261496820048716688}
+  - slotName: 
     data: {fileID: 11400000, guid: 7ed33f3afac745e41ba8fd5e67a16fde, type: 2}
     logicScript: {fileID: 1956502594171290489}
   - slotName: 
@@ -31482,9 +31485,6 @@ MonoBehaviour:
   - slotName: 
     data: {fileID: 11400000, guid: 1a4a111ddeeef3e45aea618f792ae67a, type: 2}
     logicScript: {fileID: 7338613021342365268}
-  - slotName: 
-    data: {fileID: 11400000, guid: b8d300a8fbc750b47a61b1af106a3e6d, type: 2}
-    logicScript: {fileID: 6261496820048716688}
 --- !u!114 &5817904330219769839
 MonoBehaviour:
   m_ObjectHideFlags: 0
