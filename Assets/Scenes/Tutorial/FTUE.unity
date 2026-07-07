@@ -14081,7 +14081,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DialogueTrigger
   dialogueData: {fileID: 11400000, guid: bb73eb7ab9a2d314c84574be0ce42a1e, type: 2}
   requireProximity: 1
-  interactKey: 101
+  interactAction: {fileID: 0}
 --- !u!1001 &476312145
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -20592,7 +20592,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DialogueTrigger
   dialogueData: {fileID: 11400000, guid: 9b36b70b814e43b4ea2435b9975883e4, type: 2}
   requireProximity: 1
-  interactKey: 101
+  interactAction: {fileID: 0}
 --- !u!4 &940820019 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1074452526949956547, guid: 2f456e8c1905cff4688b9a08f81f0010, type: 3}
@@ -22940,7 +22940,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DialogueTrigger
   dialogueData: {fileID: 11400000, guid: 82f7ddf53c0b0604398095bd02cd1dfe, type: 2}
   requireProximity: 1
-  interactKey: 101
+  interactAction: {fileID: 0}
 --- !u!1001 &1293623649
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -24798,6 +24798,14 @@ PrefabInstance:
     - target: {fileID: 615435536352653401, guid: a651b6c6088600c4398ac15c37248e37, type: 3}
       propertyPath: m_fontSizeBase
       value: 24
+      objectReference: {fileID: 0}
+    - target: {fileID: 915358480183018193, guid: a651b6c6088600c4398ac15c37248e37, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 915358480183018193, guid: a651b6c6088600c4398ac15c37248e37, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1789497307515435191, guid: a651b6c6088600c4398ac15c37248e37, type: 3}
       propertyPath: m_Name
@@ -28986,7 +28994,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DialogueTrigger
   dialogueData: {fileID: 11400000, guid: ddffa8171f7cd264990a52f53368d07c, type: 2}
   requireProximity: 1
-  interactKey: 101
+  interactAction: {fileID: 0}
 --- !u!4 &1917337304 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1074452526949956547, guid: 2f456e8c1905cff4688b9a08f81f0010, type: 3}
@@ -29935,7 +29943,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DialogueTrigger
   dialogueData: {fileID: 11400000, guid: e06a3cd5fb2083844b12c9390336e275, type: 2}
   requireProximity: 1
-  interactKey: 101
+  interactAction: {fileID: 0}
 --- !u!1001 &1999852904
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -30742,7 +30750,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DialogueTrigger
   dialogueData: {fileID: 11400000, guid: a2c8ff2e1c1638a48b5a88e7c81749cb, type: 2}
   requireProximity: 1
-  interactKey: 101
+  interactAction: {fileID: -6580932956885760102, guid: b9dd86f78a71a2a45a9bb8d65e5bd9fc, type: 3}
 --- !u!1 &2134718799 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2867098298210721727, guid: 18a718106aa3c034fa927a6b37e28711, type: 3}
@@ -30762,7 +30770,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DialogueTrigger
   dialogueData: {fileID: 11400000, guid: 1076e64a20762c545b841c02b3a87686, type: 2}
   requireProximity: 1
-  interactKey: 101
+  interactAction: {fileID: 0}
 --- !u!4 &2140672372 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8662774093680456647, guid: 18a718106aa3c034fa927a6b37e28711, type: 3}
@@ -30908,7 +30916,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DialogueTrigger
   dialogueData: {fileID: 11400000, guid: 351795ff19ae81345a1eb175e7d52909, type: 2}
   requireProximity: 1
-  interactKey: 101
+  interactAction: {fileID: 0}
 --- !u!1001 &1163692746360120642
 PrefabInstance:
   m_ObjectHideFlags: 0
