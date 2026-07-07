@@ -18,10 +18,10 @@ MonoBehaviour:
     m\u0169i theo h\xECnh qu\u1EA1t v\u1EC1 ph\xEDa tr\u01B0\u1EDBc. M\u1ED7i tia
     g\xE2y 150 DMG v\xE0 cho\xE1ng 1.5s."
   skillIcon: {fileID: -3681904862023827580, guid: 473188d9507f64599a776617a45dcf3f, type: 3}
-  cooldown: 0
+  cooldown: 15
   damage: 150
-  manaCost: 0
-  lambsRequired: 0
+  manaCost: 100
+  lambsRequired: 5
   vfxPrefab: {fileID: 0}
   castSFX:
     clip: {fileID: 0}

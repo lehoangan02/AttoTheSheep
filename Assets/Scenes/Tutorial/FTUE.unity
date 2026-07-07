@@ -30112,6 +30112,30 @@ PrefabInstance:
       propertyPath: m_Name
       value: FlockManager
       objectReference: {fileID: 0}
+    - target: {fileID: 2778889839697966883, guid: f5b69f2371f8d4651b46dbc3a00fb3f2, type: 3}
+      propertyPath: levelConfigs.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2778889839697966883, guid: f5b69f2371f8d4651b46dbc3a00fb3f2, type: 3}
+      propertyPath: levelConfigs.Array.data[0].maxLambs
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2778889839697966883, guid: f5b69f2371f8d4651b46dbc3a00fb3f2, type: 3}
+      propertyPath: levelConfigs.Array.data[1].maxLambs
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2778889839697966883, guid: f5b69f2371f8d4651b46dbc3a00fb3f2, type: 3}
+      propertyPath: levelConfigs.Array.data[2].maxLambs
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2778889839697966883, guid: f5b69f2371f8d4651b46dbc3a00fb3f2, type: 3}
+      propertyPath: levelConfigs.Array.data[1].baseRadius
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2778889839697966883, guid: f5b69f2371f8d4651b46dbc3a00fb3f2, type: 3}
+      propertyPath: levelConfigs.Array.data[2].baseRadius
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4503758536222958945, guid: f5b69f2371f8d4651b46dbc3a00fb3f2, type: 3}
       propertyPath: GlobalObjectIdHash
       value: 3713127235
