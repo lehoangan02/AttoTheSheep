@@ -362,6 +362,7 @@ GameObject:
   - component: {fileID: 6287018842916475915}
   - component: {fileID: 8272205665685566892}
   - component: {fileID: 4390138929414892162}
+  - component: {fileID: 2344874813465266510}
   m_Layer: 0
   m_Name: Title
   m_TagString: Untagged
@@ -488,6 +489,19 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &2344874813465266510
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2972625781948688243}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6aedfa3279ed09e4a8bc8590a12f02f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AttoTheSheep.UI.Shared.LocalizedText
+  textID: ui_paused
 --- !u!1 &3721878872004712444
 GameObject:
   m_ObjectHideFlags: 0
