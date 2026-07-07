@@ -124,7 +124,8 @@ public class NetworkEntity : NetworkBehaviour, IStatusTarget
         currentHealth.Value = Mathf.Max(0, currentHealth.Value - damage);
         int actualDamage = previousHealth - currentHealth.Value;
 
-        Debug.Log($"[TakeDamage] {name} nhận {actualDamage} sát thương (gốc: {damage}) from {source?.name}. Máu: {previousHealth} → {currentHealth.Value}");
+        string sourceName = (source != null) ? source.name : "Unknown";
+        Debug.Log($"[TakeDamage] {name} nhận {actualDamage} sát thương (gốc: {damage}) from {sourceName}. Máu: {previousHealth} → {currentHealth.Value}");
 
         if (currentHealth.Value <= 0)
             Die();

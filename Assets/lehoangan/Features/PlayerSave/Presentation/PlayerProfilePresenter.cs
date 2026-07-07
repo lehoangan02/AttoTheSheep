@@ -20,8 +20,7 @@ public class PlayerProfilePresenter : MonoBehaviour
 
     private async void Start()
     {
-        // 1. Initialize Unity Services & Authenticate (Required for Cloud Save)
-        await InitializeServicesAsync();
+        // Initialization is now safely handled by UnityCloudSaveRepository
 
         // 2. Setup Dependencies (In a real project, you might use Zenject or VContainer for this)
         _playerRepository = new UnityCloudSaveRepository();
@@ -33,23 +32,6 @@ public class PlayerProfilePresenter : MonoBehaviour
 
         // 4. Load Initial Data
         await LoadPlayerData();
-    }
-
-    private async Task InitializeServicesAsync()
-    {
-        try
-        {
-            await UnityServices.InitializeAsync();
-            if (!AuthenticationService.Instance.IsSignedIn)
-            {
-                // Anonymous sign-in for testing Cloud Save
-                await AuthenticationService.Instance.SignInAnonymouslyAsync(); 
-            }
-        }
-        catch (System.Exception e)
-        {
-            Debug.LogError($"Failed to initialize Unity Services: {e.Message}");
-        }
     }
 
     private async Task LoadPlayerData()

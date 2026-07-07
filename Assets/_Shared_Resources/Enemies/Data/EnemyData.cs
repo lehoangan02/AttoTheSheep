@@ -9,4 +9,6 @@ public class EnemyData : ScriptableObject
     [Header("Movement")]
     public float moveSpeed = 5f;
 
+    [Header("PrizeCoin")]
+    public int prizeCoin;
 }

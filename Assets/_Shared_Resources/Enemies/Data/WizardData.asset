@@ -14,10 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WizardEnemyData
   maxHealth: 150
   moveSpeed: 3
-  spawnVFXPrefab: {fileID: 7154831219701261189, guid: 214d884724b865c1eab63ad02347873a, type: 3}
-  deathVFXPrefab: {fileID: 7154831219701261189, guid: 7698cce7c2fa4d2e694b2dec1e4c3095, type: 3}
-  spawnFadeDuration: 0.5
-  deathFadeDuration: 0.5
+  prizeCoin: 50
   throwRange: 8
   throwCooldown: 1.5
   throwDamage: 40

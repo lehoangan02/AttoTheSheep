@@ -86,6 +86,15 @@ public class EnemyEntity : NetworkEntity
     {
         InvokeOnDied();
 
+        // Add coins to the player's cloud save if the enemy has a prize
+        if (data != null && data.prizeCoin > 0)
+        {
+            if (PlayerSaveManager.Instance != null)
+            {
+                _ = PlayerSaveManager.Instance.AddMoney(data.prizeCoin);
+            }
+        }
+
         if (brain != null && brain.HandlesOwnDeath)
             return;
 

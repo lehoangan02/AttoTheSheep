@@ -22,8 +22,18 @@ public class UnityCloudSaveRepository : IPlayerRepository
     private const string KEY_SPEED_BOOST_COUNT = "speed_boost_count";
 
     private static PlayerProfile _cachedProfile;
+    private static Task _initializationTask;
 
     private async Task EnsureInitializedAsync()
+    {
+        if (_initializationTask == null)
+        {
+            _initializationTask = InitializeServicesInternalAsync();
+        }
+        await _initializationTask;
+    }
+
+    private async Task InitializeServicesInternalAsync()
     {
         try
         {
@@ -39,6 +49,8 @@ public class UnityCloudSaveRepository : IPlayerRepository
         catch (System.Exception e)
         {
             Debug.LogError($"Failed to initialize Unity Services in Repository: {e.Message}");
+            // Reset task so it can be retried if it failed completely
+            _initializationTask = null; 
         }
     }
 

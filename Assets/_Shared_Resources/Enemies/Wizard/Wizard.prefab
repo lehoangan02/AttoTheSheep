@@ -248,7 +248,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 483368551
+  GlobalObjectIdHash: 1719275420
   InScenePlacedSourceGlobalObjectIdHash: 923683677
   DeferredDespawnTick: 0
   Ownership: 1
@@ -447,6 +447,7 @@ MonoBehaviour:
       MaxSecondsBetweenUpdates: 0
     m_InternalValue: 0
   data: {fileID: 11400000, guid: eb29ee3a868624454ab1b7b8b62606e4, type: 2}
+  CoinPrize: 50
 --- !u!114 &8809559691720008370
 MonoBehaviour:
   m_ObjectHideFlags: 0
