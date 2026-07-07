@@ -65,9 +65,11 @@ public class PlayerSaveManager : MonoBehaviour
         // Add coins to local profile
         _currentPlayerProfile.AddCoins(amount);
         
-        // Play coin sound effect
+        // Play coin sound effect (playing it multiple times simultaneously to boost the volume)
         if (coinSFX != null && AudioManager.Instance != null)
         {
+            AudioManager.Instance.PlaySFX_2D(coinSFX);
+            AudioManager.Instance.PlaySFX_2D(coinSFX);
             AudioManager.Instance.PlaySFX_2D(coinSFX);
         }
         
