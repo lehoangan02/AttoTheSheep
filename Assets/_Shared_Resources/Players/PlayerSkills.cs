@@ -1,6 +1,7 @@
 using UnityEngine;
 using Unity.Netcode;
 using System.Collections.Generic;
+using System;
 
 [System.Serializable]
 public class SkillSlot
@@ -12,6 +13,7 @@ public class SkillSlot
 
 public class PlayerSkills : NetworkBehaviour
 {
+    public static event Action<int, float> OnSkillCooldownStarted;
     private PlayerController controller;
     private NetworkEntity entity;
 
@@ -39,7 +41,17 @@ public class PlayerSkills : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        if (IsOwner && controller != null) controller.OnSkillActivated += TryCastSkill;
+        if (IsOwner)
+        {
+            if (controller != null) controller.OnSkillActivated += TryCastSkill;
+
+            // Tìm SkillBoardUI trên Scene và nạp dữ liệu 4 skills vào
+            SkillBoardUI boardUI = FindObjectOfType<SkillBoardUI>();
+            if (boardUI != null)
+            {
+                boardUI.InitializeSkillBoard(this);
+            }
+        }
     }
 
     private SkillSlot GetSkillSlot(int skillId)
@@ -70,7 +82,16 @@ public class PlayerSkills : NetworkBehaviour
             if (Time.time < lastTime + slot.data.cooldown) return; 
         }
 
+        // Cập nhật thời gian thi triển
         lastCastTimes[skillId] = Time.time;
+
+        // CHỈ BẮN EVENT NẾU LÀ LOCAL PLAYER
+        if (IsOwner)
+        {
+            OnSkillCooldownStarted?.Invoke(skillId, slot.data.cooldown);
+        }
+
+        // Gọi logic lên Server
         CastSkillServerRpc(skillId);
     }
 
