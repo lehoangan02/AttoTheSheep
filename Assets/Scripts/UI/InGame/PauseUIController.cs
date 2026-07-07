@@ -13,6 +13,10 @@ namespace AttoTheSheep.UI.InGame
         [SerializeField] private Button mainMenuButton;
 
         [SerializeField] private Button pauseButton;
+        [SerializeField] private Button toggleAutoButton;
+        [SerializeField] private TMPro.TextMeshProUGUI toggleAutoText;
+        
+        private bool _isAutoMode = false;
 
         [Header("Scene Settings")]
         [SerializeField] private string mainMenuSceneName = "MainMenu";
@@ -57,6 +61,8 @@ namespace AttoTheSheep.UI.InGame
             if (optionsButton != null) optionsButton.onClick.AddListener(OnOptionsClicked);
             if (mainMenuButton != null) mainMenuButton.onClick.AddListener(OnMainMenuClicked);
             if (pauseButton != null) pauseButton.onClick.AddListener(OnPauseClicked);
+            if (toggleAutoButton != null) toggleAutoButton.onClick.AddListener(OnToggleAutoClicked);
+            UpdateToggleAutoUI();
 
             // Mặc định ẩn giao diện Pause (Overlay) khi mới vào game
             if (pausePanel != null) pausePanel.SetActive(false);
@@ -116,6 +122,31 @@ namespace AttoTheSheep.UI.InGame
             if (Stop.Instance != null) Stop.Instance.ResumeGame(); 
             
             SceneManager.LoadScene(mainMenuSceneName);
+        }
+
+        private void OnToggleAutoClicked()
+        {
+            _isAutoMode = !_isAutoMode;
+            UpdateToggleAutoUI();
+            
+            // TODO: Bổ sung code gọi hàm chuyển đổi Auto/Manual của teamate tại đây
+            if (_isAutoMode)
+            {
+                Debug.Log("[PauseUI] Chuyển sang chế độ: AUTO (Tự động)");
+            }
+            else
+            {
+                Debug.Log("[PauseUI] Chuyển sang chế độ: MANUAL (Thủ công)");
+            }
+        }
+
+        private void UpdateToggleAutoUI()
+        {
+            if (toggleAutoText != null)
+            {
+                // Lúc Auto thì hiện chữ A, lúc Thủ công thì hiện chữ M
+                toggleAutoText.text = _isAutoMode ? "A" : "M";
+            }
         }
     }
 }
