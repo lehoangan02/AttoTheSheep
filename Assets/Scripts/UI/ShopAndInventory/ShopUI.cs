@@ -41,7 +41,7 @@ namespace AttoTheSheep.UI.ShopAndInventory
                 detailIcon.gameObject.SetActive(true);
             }
             
-            string name = string.IsNullOrEmpty(item.itemName) ? "Unknown Item" : item.itemName;
+            string name = string.IsNullOrEmpty(item.name) ? "Unknown Item" : item.name;
             string desc = string.IsNullOrEmpty(item.itemDescription) ? "Mysterious Item" : item.itemDescription;
             
             if (detailName != null) detailName.text = name;
