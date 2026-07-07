@@ -9,7 +9,10 @@ public class HostInit : MonoBehaviour
         #if UNITY_EDITOR
             if (!ClonesManager.IsClone())
             {
-                NetworkManager.Singleton.StartHost();
+                if (NetworkManager.Singleton != null && !NetworkManager.Singleton.IsListening)
+                {
+                    NetworkManager.Singleton.StartHost();
+                }
             }
         #endif
     }

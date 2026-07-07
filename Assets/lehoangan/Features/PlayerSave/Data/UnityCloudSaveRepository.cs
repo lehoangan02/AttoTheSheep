@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Unity.Services.CloudSave;
+using Unity.Services.Core;
+using Unity.Services.Authentication;
+using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class UnityCloudSaveRepository : IPlayerRepository
@@ -20,8 +23,29 @@ public class UnityCloudSaveRepository : IPlayerRepository
 
     private static PlayerProfile _cachedProfile;
 
+    private async Task EnsureInitializedAsync()
+    {
+        try
+        {
+            if (UnityServices.State == ServicesInitializationState.Uninitialized)
+            {
+                await UnityServices.InitializeAsync();
+            }
+            if (!AuthenticationService.Instance.IsSignedIn)
+            {
+                await AuthenticationService.Instance.SignInAnonymouslyAsync();
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"Failed to initialize Unity Services in Repository: {e.Message}");
+        }
+    }
+
     public async Task SaveAsync(PlayerProfile profile)
     {
+        await EnsureInitializedAsync();
+
         // Update local cache immediately to guarantee correctness
         _cachedProfile = profile;
 
@@ -46,6 +70,8 @@ public class UnityCloudSaveRepository : IPlayerRepository
 
     public async Task<PlayerProfile> LoadAsync()
     {
+        await EnsureInitializedAsync();
+
         // Return cached profile if it exists to prevent unnecessary network requests
         if (_cachedProfile != null)
         {

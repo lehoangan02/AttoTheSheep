@@ -21,11 +21,23 @@ public class PlayerProfile
     {
         if (amount < 0) return;
         Exp += amount;
+        OnProfileUpdated?.Invoke();
+    }
+
+    public void AddCoins(int amount)
+    {
+        if (amount < 0) return;
+        Coins += amount;
+        OnProfileUpdated?.Invoke();
     }
 
     public void SpendCoins(int amount)
     {
-        if (Coins >= amount) Coins -= amount;
+        if (Coins >= amount) 
+        {
+            Coins -= amount;
+            OnProfileUpdated?.Invoke();
+        }
     }
 
     public void RestoreState(int coins, int exp, int unlockedStage, 
