@@ -73,6 +73,46 @@ public class DialogueManager : MonoBehaviour
             Debug.LogWarning("[DialogueManager] skipButton is NULL in Start.");
     }
 
+    private void Update()
+    {
+        if (panelRoot != null && panelRoot.activeInHierarchy)
+        {
+            // Bấm phím Space để Next
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                OnNextClicked();
+                return;
+            }
+
+            // Click chuột trái / Tap màn hình để Next
+            if (Input.GetMouseButtonDown(0))
+            {
+                // Tránh double-click nếu người dùng bấm thẳng vào 2 cái nút UI
+                if (IsPointerOverRectTransform(skipButton)) return;
+                if (IsPointerOverRectTransform(nextButton)) return;
+
+                OnNextClicked();
+            }
+        }
+    }
+
+    private bool IsPointerOverRectTransform(Button btn)
+    {
+        if (btn == null || !btn.gameObject.activeInHierarchy) return false;
+        RectTransform rt = btn.GetComponent<RectTransform>();
+        if (rt == null) return false;
+        
+        // Hỗ trợ UI Canvas dạng Overlay (Camera = null)
+        Camera cam = null;
+        Canvas canvas = btn.GetComponentInParent<Canvas>();
+        if (canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay)
+        {
+            cam = canvas.worldCamera;
+        }
+
+        return RectTransformUtility.RectangleContainsScreenPoint(rt, Input.mousePosition, cam);
+    }
+
     // ── Public API ────────────────────────────────────────────────────────────
     public void StartDialogue(DialogueData data)
     {
@@ -105,6 +145,12 @@ public class DialogueManager : MonoBehaviour
 
         ShowPanel(true);
         StreamLine(_lineIndex);
+
+        // Pause game khi hội thoại bắt đầu
+        if (Stop.Instance != null)
+        {
+            Stop.Instance.PauseGame();
+        }
     }
 
     // ── Button handlers ───────────────────────────────────────────────────────
@@ -204,6 +250,12 @@ public class DialogueManager : MonoBehaviour
         _skipStreaming = false;
         _data         = null;
         ShowPanel(false);
+
+        // Resume game khi hội thoại kết thúc
+        if (Stop.Instance != null)
+        {
+            Stop.Instance.ResumeGame();
+        }
     }
 
     private void ShowPanel(bool visible)

@@ -23,6 +23,8 @@ namespace AttoTheSheep.UI.InGame
         [Header("Pause Panel")]
         [Tooltip("Kéo Panel chứa nền đen mờ và giao diện Pause vào đây")]
         [SerializeField] private GameObject pausePanel; 
+        
+        private bool _isPauseMenuOpen = false;
 
         private void Awake()
         {
@@ -65,48 +67,46 @@ namespace AttoTheSheep.UI.InGame
 
         private void Update()
         {
-            // Lắng nghe phím ESC để tự động gọi hàm TogglePause của đồng đội
+            // Lắng nghe phím ESC để bật/tắt bảng Pause
             if (Input.GetKeyDown(KeyCode.Escape))
             {
-                if (Stop.Instance != null)
-                {
-                    Stop.Instance.TogglePause();
-                    UpdateUIVisibility();
-                }
-                else
-                {
-                    Debug.LogWarning("[PauseUI] Không tìm thấy Stop.Instance! Hãy đảm bảo script Stop.cs đã được gắn vào 1 GameObject trong Scene.");
-                }
+                TogglePauseMenu();
             }
         }
 
-        /// <summary>
-        /// Đồng bộ giao diện UI dựa trên trạng thái Pause của Game (từ Stop.cs)
-        /// </summary>
-        private void UpdateUIVisibility()
+        private void TogglePauseMenu()
         {
-            if (Stop.Instance == null || pausePanel == null) return;
+            _isPauseMenuOpen = !_isPauseMenuOpen;
             
-            // Hiện panel nếu game đang pause, ẩn panel nếu game đang resume
-            pausePanel.SetActive(Stop.Instance.IsPaused);
+            if (pausePanel != null) 
+                pausePanel.SetActive(_isPauseMenuOpen);
+
+            if (_isPauseMenuOpen)
+            {
+                // Khi bật Pause Menu, luôn ép game dừng lại
+                if (Stop.Instance != null) Stop.Instance.PauseGame();
+            }
+            else
+            {
+                // Khi tắt Pause Menu, kiểm tra xem DLG có đang mở không
+                bool isDialogueActive = (DialogueManager.Instance != null && DialogueManager.Instance.panelRoot != null && DialogueManager.Instance.panelRoot.activeInHierarchy);
+                
+                // CHỈ Resume game nếu không vướng hội thoại
+                if (!isDialogueActive)
+                {
+                    if (Stop.Instance != null) Stop.Instance.ResumeGame();
+                }
+            }
         }
 
         private void OnPauseClicked()
         {
-            if (Stop.Instance != null)
-            {
-                Stop.Instance.TogglePause();
-                UpdateUIVisibility();
-            }
+            if (!_isPauseMenuOpen) TogglePauseMenu();
         }
 
         private void OnResumeClicked()
         {
-            if (Stop.Instance != null)
-            {
-                Stop.Instance.ResumeGame();
-                UpdateUIVisibility();
-            }
+            if (_isPauseMenuOpen) TogglePauseMenu();
         }
 
         private void OnOptionsClicked()
