@@ -99,8 +99,15 @@ namespace AttoTheSheep.UI.ShopAndInventory
                 detailIcon.sprite = item.icon;
                 detailIcon.gameObject.SetActive(true);
             }
-            if (detailName != null) detailName.text = item.itemName;
-            if (detailDesc != null) detailDesc.text = item.itemDescription;
+            string nameKey = string.IsNullOrEmpty(item.itemName) ? item.name : item.itemName;
+            if (string.IsNullOrEmpty(nameKey)) nameKey = "Unknown Item";
+            string descKey = string.IsNullOrEmpty(item.itemDescription) ? "Mysterious Item" : item.itemDescription;
+            
+            string translatedName = AttoTheSheep.Core.LocalizationManager.Instance != null ? AttoTheSheep.Core.LocalizationManager.Instance.GetText(nameKey) : nameKey;
+            string translatedDesc = AttoTheSheep.Core.LocalizationManager.Instance != null ? AttoTheSheep.Core.LocalizationManager.Instance.GetText(descKey) : descKey;
+
+            if (detailName != null) detailName.text = translatedName;
+            if (detailDesc != null) detailDesc.text = translatedDesc;
         }
 
         public void HideDetails()

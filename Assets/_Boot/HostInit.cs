@@ -1,6 +1,8 @@
 using UnityEngine;
 using Unity.Netcode;
+#if UNITY_EDITOR
 using ParrelSync;
+#endif
 
 public class HostInit : MonoBehaviour
 {

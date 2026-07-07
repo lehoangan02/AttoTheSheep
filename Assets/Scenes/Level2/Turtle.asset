@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 71538442a108cf245bf5b66c9780c8da, type: 3}
+  m_Name: Turtle
+  m_EditorClassIdentifier: Assembly-CSharp::DialogueData
+  speakerName: Unknown
+  speakerNameVietnamese: 
+  speakerAvatar: {fileID: 0}
+  lines:
+  - 'I am still waiting for my elder brother to return.
+
+    Tell me... have you
+    seen an old tortoise on your journey?'
+  - 'The humans took him away.
+
+    Those wretched mortals...'
+  - 'Stay away from humans, little one.
+
+    And from the monsters as well.'
+  - 'Especially the Orcs...
+
+    They will tear apart and devour anything that still
+    draws breath.
+
+    Stay vigilant.'
+  vietnameseLines:
+  - "Ta v\u1EABn \u0111ang ch\u1EDD ng\u01B0\u1EDDi anh trai c\u1EE7a ta tr\u1EDF
+    v\u1EC1.\nNg\u01B0\u01A1i... \u0111\xE3 t\u1EEBng nh\xECn th\u1EA5y m\u1ED9t
+    con r\xF9a gi\xE0 n\xE0o tr\xEAn h\xE0nh tr\xECnh c\u1EE7a m\xECnh ch\u01B0a?"
+  - "Lo\xE0i ng\u01B0\u1EDDi \u0111\xE3 b\u1EAFt huynh \u1EA5y \u0111i.\nL\u0169
+    ph\xE0m nh\xE2n kh\u1ED1n ki\u1EBFp..."
+  - "H\xE3y tr\xE1nh xa lo\xE0i ng\u01B0\u1EDDi, c\u1EADu b\xE9.\nV\xE0 c\u1EA3 l\u0169
+    qu\xE1i v\u1EADt n\u1EEFa.\n\u0110\u1EB7c bi\u1EC7t l\xE0 b\u1ECDn Orc...\nCh\xFAng
+    s\u1EBD x\xE9 x\xE1c v\xE0 nu\u1ED1t ch\u1EEDng b\u1EA5t c\u1EE9 th\u1EE9 g\xEC
+    c\xF2n bi\u1EBFt c\u1EED \u0111\u1ED9ng.\nH\xE3y lu\xF4n c\u1EA9n th\u1EADn."

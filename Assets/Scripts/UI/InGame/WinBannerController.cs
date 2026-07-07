@@ -14,6 +14,9 @@ namespace AttoTheSheep.UI.InGame
         [SerializeField] private string mainMenuSceneName = "MainMenu";
         [SerializeField] private string nextLevelSceneName = "Level2"; // Thay đổi tên scene màn tiếp theo nếu cần
 
+        [Header("Reward UI")]
+        [SerializeField] private TMPro.TextMeshProUGUI earnedGoldText;
+
         private void Start()
         {
             if (nextLevelButton != null)
@@ -40,8 +43,16 @@ namespace AttoTheSheep.UI.InGame
             SceneManager.LoadScene(mainMenuSceneName);
         }
 
-        public void ShowBanner()
+        public void ShowBanner(int earnedGold = 0)
         {
+            if (earnedGoldText != null)
+            {
+                earnedGoldText.text = $"Coin:\n<color=green>+{earnedGold}</color>";
+                
+                // Nếu muốn Banner này TỰ ĐỘNG cộng tiền luôn, mở comment dòng dưới:
+                // if (AttoTheSheep.UI.ShopAndInventory.InventoryManager.Instance != null)
+                //     AttoTheSheep.UI.ShopAndInventory.InventoryManager.Instance.AddGold(earnedGold);
+            }
             gameObject.SetActive(true);
         }
 

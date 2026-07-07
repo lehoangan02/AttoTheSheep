@@ -41,11 +41,15 @@ namespace AttoTheSheep.UI.ShopAndInventory
                 detailIcon.gameObject.SetActive(true);
             }
             
-            string name = string.IsNullOrEmpty(item.name) ? "Unknown Item" : item.name;
-            string desc = string.IsNullOrEmpty(item.itemDescription) ? "Mysterious Item" : item.itemDescription;
+            string nameKey = string.IsNullOrEmpty(item.itemName) ? item.name : item.itemName;
+            if (string.IsNullOrEmpty(nameKey)) nameKey = "Unknown Item";
+            string descKey = string.IsNullOrEmpty(item.itemDescription) ? "Mysterious Item" : item.itemDescription;
             
-            if (detailName != null) detailName.text = name;
-            if (detailDesc != null) detailDesc.text = desc;
+            string translatedName = AttoTheSheep.Core.LocalizationManager.Instance != null ? AttoTheSheep.Core.LocalizationManager.Instance.GetText(nameKey) : nameKey;
+            string translatedDesc = AttoTheSheep.Core.LocalizationManager.Instance != null ? AttoTheSheep.Core.LocalizationManager.Instance.GetText(descKey) : descKey;
+
+            if (detailName != null) detailName.text = translatedName;
+            if (detailDesc != null) detailDesc.text = translatedDesc;
             if (detailPrice != null) detailPrice.text = "Price: " + item.price + "$";
 
             if (buyButton != null) buyButton.gameObject.SetActive(true);
