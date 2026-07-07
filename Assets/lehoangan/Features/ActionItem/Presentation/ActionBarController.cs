@@ -1,14 +1,17 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 using System.Threading.Tasks;
 
 public class ActionBarController : MonoBehaviour
 {
     [Header("Assign your 4 slots here in order")]
     public ActionSlot[] actionSlots; // Array size should be 4 in the inspector
+    [SerializeField] private InputActionReference[] actionBarActions;
 
     private LoadPlayerUseCase _loadPlayerUseCase;
     private IPlayerRepository _playerRepository;
     private PlayerProfile _currentPlayerProfile;
+    private System.Action<UnityEngine.InputSystem.InputAction.CallbackContext>[] _actionBarHandlers;
 
     private async void Start()
     {
@@ -34,6 +37,8 @@ public class ActionBarController : MonoBehaviour
         _currentPlayerProfile.OnProfileUpdated += HandleProfileUpdated;
 
         InitializeSlots(_currentPlayerProfile);
+
+        HookActionBarInput();
     }
 
     private void HandleProfileUpdated()
@@ -47,6 +52,19 @@ public class ActionBarController : MonoBehaviour
         if (_currentPlayerProfile != null)
         {
             _currentPlayerProfile.OnProfileUpdated -= HandleProfileUpdated;
+        }
+
+        if (actionBarActions != null)
+        {
+            for (int i = 0; i < actionBarActions.Length; i++)
+            {
+                if (actionBarActions[i] != null)
+                {
+                    if (_actionBarHandlers != null && i < _actionBarHandlers.Length && _actionBarHandlers[i] != null)
+                        actionBarActions[i].action.performed -= _actionBarHandlers[i];
+                    actionBarActions[i].action.Disable();
+                }
+            }
         }
     }
 
@@ -74,20 +92,25 @@ public class ActionBarController : MonoBehaviour
         }
     }
 
-    void Update()
+    private void HookActionBarInput()
     {
-        // Listen for standard keyboard numbers
-        if (Input.GetKeyDown(KeyCode.Alpha1)) 
-            TriggerSlot(0);
-        
-        if (Input.GetKeyDown(KeyCode.Alpha2)) 
-            TriggerSlot(1);
-        
-        if (Input.GetKeyDown(KeyCode.Alpha3)) 
-            TriggerSlot(2);
-        
-        if (Input.GetKeyDown(KeyCode.Alpha4)) 
-            TriggerSlot(3);
+        if (actionBarActions == null || actionBarActions.Length == 0)
+        {
+            Debug.LogWarning("[ActionBarController] No actionBarActions assigned in Inspector!");
+            return;
+        }
+
+        _actionBarHandlers = new System.Action<InputAction.CallbackContext>[actionBarActions.Length];
+        for (int i = 0; i < actionBarActions.Length && i < 4; i++)
+        {
+            if (actionBarActions[i] != null)
+            {
+                int index = i;
+                _actionBarHandlers[i] = _ => TriggerSlot(index);
+                actionBarActions[i].action.performed += _actionBarHandlers[i];
+                actionBarActions[i].action.Enable();
+            }
+        }
     }
 
     private void TriggerSlot(int index)

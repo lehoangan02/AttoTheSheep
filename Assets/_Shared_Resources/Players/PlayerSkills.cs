@@ -59,10 +59,10 @@ public class PlayerSkills : NetworkBehaviour
         return equippedSkills.Find(slot => slot.data != null && slot.data.skillId == skillId);
     }
 
-    // Base skills (always available: 0 = Basic Attack, 4 = Headbutt)
+    // Base skill (always available: 0 = Headbutt)
     private bool IsBaseSkill(int skillId)
     {
-        return skillId == 0 || skillId == 4;
+        return skillId == 0;
     }
 
     private void TryCastSkill(int skillId)

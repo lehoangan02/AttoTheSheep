@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
@@ -20,6 +21,9 @@ namespace AttoTheSheep.UI.InGame
         [Header("Scene Settings")]
         [SerializeField] private string mainMenuSceneName = "MainMenu";
 
+        [Header("Input")]
+        [SerializeField] private InputActionReference pauseAction;
+
         [Header("Pause Panel")]
         [Tooltip("Kéo Panel chứa nền đen mờ và giao diện Pause vào đây")]
         [SerializeField] private GameObject pausePanel; 
@@ -32,6 +36,24 @@ namespace AttoTheSheep.UI.InGame
             if (GetComponent<Stop>() == null && Stop.Instance == null)
             {
                 gameObject.AddComponent<Stop>();
+            }
+        }
+
+        private void OnEnable()
+        {
+            if (pauseAction != null)
+            {
+                pauseAction.action.performed += HandlePauseInput;
+                pauseAction.action.Enable();
+            }
+        }
+
+        private void OnDisable()
+        {
+            if (pauseAction != null)
+            {
+                pauseAction.action.performed -= HandlePauseInput;
+                pauseAction.action.Disable();
             }
         }
 
@@ -65,13 +87,10 @@ namespace AttoTheSheep.UI.InGame
             }
         }
 
-        private void Update()
+        private void HandlePauseInput(InputAction.CallbackContext ctx)
         {
-            // Lắng nghe phím ESC để bật/tắt bảng Pause
-            if (Input.GetKeyDown(KeyCode.Escape))
-            {
-                TogglePauseMenu();
-            }
+            // Lắng nghe Input Action để bật/tắt bảng Pause
+            TogglePauseMenu();
         }
 
         private void TogglePauseMenu()

@@ -11,35 +11,26 @@ public class TestBubble : MonoBehaviour
     [TextArea(10, 5)]
     public string textToTest = "Hello! This is a dynamically resizing speech bubble. It should clamp the ratio properly and type out smoothly.";
 
-    void Update()
+    [ContextMenu("Show Bubble")]
+    public void ShowBubble()
     {
-        // Press F to Activate and Show Text
-        if (Input.GetKeyDown(KeyCode.F))
+        if (bubbleDialog == null)
         {
-            if (bubbleDialog == null)
-            {
-                Debug.LogError("TestBubble: bubbleDialog reference is MISSING! Please drag the BubbleDialog into the Inspector.");
-                return;
-            }
-            
-            Debug.Log("TestBubble: 'F' pressed. Activating bubble...");
-            
-            // Activate the bubble FIRST so TextMeshPro is awake and can calculate sizes
-            bubbleDialog.SetBubbleActive(true);
-            
-            // Then set the text (it will resize perfectly since scale is 0 at the start of the animation)
-            // We pass this object's transform.position so the bubble's center-left edge aligns to this test object
-            bubbleDialog.SetText(textToTest, transform.position);
+            Debug.LogError("TestBubble: bubbleDialog reference is MISSING! Please drag the BubbleDialog into the Inspector.");
+            return;
         }
+        Debug.Log("TestBubble: 'Show Bubble' context menu activated.");
+        bubbleDialog.SetBubbleActive(true);
+        bubbleDialog.SetText(textToTest, transform.position);
+    }
 
-        // Press J to Deactivate
-        if (Input.GetKeyDown(KeyCode.J))
+    [ContextMenu("Hide Bubble")]
+    public void HideBubble()
+    {
+        if (bubbleDialog != null)
         {
-            if (bubbleDialog != null)
-            {
-                Debug.Log("TestBubble: 'J' pressed. Deactivating bubble...");
-                bubbleDialog.SetBubbleActive(false);
-            }
+            Debug.Log("TestBubble: 'Hide Bubble' context menu activated.");
+            bubbleDialog.SetBubbleActive(false);
         }
     }
 }
