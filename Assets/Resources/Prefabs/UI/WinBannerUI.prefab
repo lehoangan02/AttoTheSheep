@@ -647,9 +647,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'SCORE
+  m_text: 'Coin:
 
-    <color=green>1000</color>'
+    <color=green>+1000</color>'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8e90ddc3446c8a8469758e4146d538ac, type: 2}
   m_sharedMaterial: {fileID: -1333254729127453999, guid: 8e90ddc3446c8a8469758e4146d538ac, type: 2}
@@ -919,6 +919,7 @@ MonoBehaviour:
   mainMenuButton: {fileID: 4825408603010738385}
   mainMenuSceneName: MainMenu
   nextLevelSceneName: Level2
+  earnedGoldText: {fileID: 6245112802612815737}
 --- !u!1 &3835217401102574630
 GameObject:
   m_ObjectHideFlags: 0
