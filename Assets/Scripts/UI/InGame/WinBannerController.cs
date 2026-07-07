@@ -47,7 +47,11 @@ namespace AttoTheSheep.UI.InGame
         {
             if (earnedGoldText != null)
             {
-                earnedGoldText.text = "+" + earnedGold.ToString();
+                earnedGoldText.text = $"Coin:\n<color=green>+{earnedGold}</color>";
+                
+                // Nếu muốn Banner này TỰ ĐỘNG cộng tiền luôn, mở comment dòng dưới:
+                // if (AttoTheSheep.UI.ShopAndInventory.InventoryManager.Instance != null)
+                //     AttoTheSheep.UI.ShopAndInventory.InventoryManager.Instance.AddGold(earnedGold);
             }
             gameObject.SetActive(true);
         }
