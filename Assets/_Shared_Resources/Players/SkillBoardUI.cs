@@ -19,7 +19,7 @@ public class SkillBoardUI : MonoBehaviour
             if (i < uiSlots.Count && playerSkill.data != null)
             {
                 // THAY ĐỔI Ở ĐÂY: Truyền thêm biến localPlayerSkills
-                uiSlots[i].SetupSlot(playerSkill.data, localPlayerSkills);
+                uiSlots[i]?.SetupSlot(playerSkill.data, localPlayerSkills);
             }
         }
     }

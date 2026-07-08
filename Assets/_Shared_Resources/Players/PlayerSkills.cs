@@ -46,7 +46,7 @@ public class PlayerSkills : NetworkBehaviour
             if (controller != null) controller.OnSkillActivated += TryCastSkill;
 
             // Tìm SkillBoardUI trên Scene và nạp dữ liệu 4 skills vào
-            SkillBoardUI boardUI = FindObjectOfType<SkillBoardUI>();
+            SkillBoardUI boardUI = FindFirstObjectByType<SkillBoardUI>();
             if (boardUI != null)
             {
                 boardUI.InitializeSkillBoard(this);
