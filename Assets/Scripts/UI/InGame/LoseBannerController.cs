@@ -29,6 +29,12 @@ namespace AttoTheSheep.UI.InGame
         {
             Debug.Log("[LoseBanner] Đang chơi lại Level hiện tại...");
             Time.timeScale = 1f; // Bỏ trạng thái pause trước khi load lại
+            
+            if (Unity.Netcode.NetworkManager.Singleton != null)
+            {
+                Unity.Netcode.NetworkManager.Singleton.Shutdown();
+            }
+
             // Load lại chính scene hiện tại
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
@@ -37,6 +43,12 @@ namespace AttoTheSheep.UI.InGame
         {
             Debug.Log("[LoseBanner] Về Main Menu...");
             Time.timeScale = 1f;
+
+            if (Unity.Netcode.NetworkManager.Singleton != null)
+            {
+                Unity.Netcode.NetworkManager.Singleton.Shutdown();
+            }
+
             SceneManager.LoadScene(mainMenuSceneName);
         }
 
