@@ -18,10 +18,13 @@ public class DialogueManager : MonoBehaviour
     public GameObject panelRoot;
 
     [Header("Speaker")]
-    public Image    avatarImage;
     public TMP_Text speakerNameText;
+    public Image avatarImage;
 
-    [Header("Dialogue")]
+    [Header("Input System (New)")]
+    [SerializeField] private UnityEngine.InputSystem.InputActionReference nextAction;
+
+    [Header("Dialogue Config")]
     public TMP_Text dialogueText;
 
     [Header("Buttons")]
@@ -73,21 +76,50 @@ public class DialogueManager : MonoBehaviour
             Debug.LogWarning("[DialogueManager] skipButton is NULL in Start.");
     }
 
+    private void OnEnable()
+    {
+        if (nextAction != null)
+        {
+            nextAction.action.performed += OnNextActionTriggered;
+            nextAction.action.Enable();
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (nextAction != null)
+        {
+            nextAction.action.performed -= OnNextActionTriggered;
+            nextAction.action.Disable();
+        }
+    }
+
+    private void OnNextActionTriggered(UnityEngine.InputSystem.InputAction.CallbackContext context)
+    {
+        if (panelRoot != null && panelRoot.activeInHierarchy)
+        {
+            OnNextClicked();
+        }
+    }
+
     private void Update()
     {
         if (panelRoot != null && panelRoot.activeInHierarchy)
         {
-            // Bấm phím Space để Next
-            if (Input.GetKeyDown(KeyCode.Space))
+            bool fallbackNextPressed = false;
+
+            if (nextAction == null && UnityEngine.InputSystem.Keyboard.current != null && UnityEngine.InputSystem.Keyboard.current.spaceKey.wasPressedThisFrame)
             {
-                OnNextClicked();
-                return;
+                fallbackNextPressed = true;
             }
 
-            // Click chuột trái / Tap màn hình để Next
-            if (Input.GetMouseButtonDown(0))
+            if (UnityEngine.InputSystem.Pointer.current != null && UnityEngine.InputSystem.Pointer.current.press.wasPressedThisFrame)
             {
-                // Tránh double-click nếu người dùng bấm thẳng vào 2 cái nút UI
+                fallbackNextPressed = true;
+            }
+
+            if (fallbackNextPressed)
+            {
                 if (IsPointerOverRectTransform(skipButton)) return;
                 if (IsPointerOverRectTransform(nextButton)) return;
 
@@ -110,7 +142,13 @@ public class DialogueManager : MonoBehaviour
             cam = canvas.worldCamera;
         }
 
-        return RectTransformUtility.RectangleContainsScreenPoint(rt, Input.mousePosition, cam);
+        Vector2 pointerPos = Vector2.zero;
+        if (UnityEngine.InputSystem.Pointer.current != null)
+        {
+            pointerPos = UnityEngine.InputSystem.Pointer.current.position.ReadValue();
+        }
+
+        return RectTransformUtility.RectangleContainsScreenPoint(rt, pointerPos, cam);
     }
 
     // ── Public API ────────────────────────────────────────────────────────────

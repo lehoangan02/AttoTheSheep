@@ -57,21 +57,17 @@ public class GameBootstrapper : MonoBehaviour
 #endif
             await UnityServices.InitializeAsync(options);
 
-            // 2. Authenticate Player (Cloud Save requires a signed-in player)
             if (!AuthenticationService.Instance.IsSignedIn)
             {
                 await AuthenticationService.Instance.SignInAnonymouslyAsync();
                 Debug.Log($"[Bootstrapper] Signed in anonymously. Player ID: {AuthenticationService.Instance.PlayerId}");
             }
 
-            // 3. Setup Dependencies
             PlayerRepository = new UnityCloudSaveRepository();
 
-            // 4. Load the player's profile data
             CurrentProfile = await PlayerRepository.LoadAsync();
             Debug.Log("[Bootstrapper] Player Profile successfully loaded from Cloud Save.");
 
-            // 5. Ensure every item count is at least 1
             bool itemCountsModified = false;
             int flockShieldCount = CurrentProfile.FlockShieldCount;
             int spawnMaxLambsCount = CurrentProfile.SpawnMaxLambsCount;
