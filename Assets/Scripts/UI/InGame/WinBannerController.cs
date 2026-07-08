@@ -33,6 +33,12 @@ namespace AttoTheSheep.UI.InGame
         {
             Debug.Log("[WinBanner] Chuyển sang màn tiếp theo...");
             Time.timeScale = 1f; // Đảm bảo game không bị khựng khi sang màn mới
+            
+            if (Unity.Netcode.NetworkManager.Singleton != null)
+            {
+                Unity.Netcode.NetworkManager.Singleton.Shutdown();
+            }
+
             SceneManager.LoadScene(nextLevelSceneName);
         }
 
@@ -40,6 +46,12 @@ namespace AttoTheSheep.UI.InGame
         {
             Debug.Log("[WinBanner] Về Main Menu...");
             Time.timeScale = 1f;
+            
+            if (Unity.Netcode.NetworkManager.Singleton != null)
+            {
+                Unity.Netcode.NetworkManager.Singleton.Shutdown();
+            }
+
             SceneManager.LoadScene(mainMenuSceneName);
         }
 

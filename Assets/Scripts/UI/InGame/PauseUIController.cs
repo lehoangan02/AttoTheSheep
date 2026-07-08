@@ -139,6 +139,11 @@ namespace AttoTheSheep.UI.InGame
             // Nhớ Resume Game để Time.timeScale quay lại 1, tránh lỗi khựng hình ở Main Menu
             if (Stop.Instance != null) Stop.Instance.ResumeGame(); 
             
+            if (Unity.Netcode.NetworkManager.Singleton != null)
+            {
+                Unity.Netcode.NetworkManager.Singleton.Shutdown();
+            }
+            
             SceneManager.LoadScene(mainMenuSceneName);
         }
 

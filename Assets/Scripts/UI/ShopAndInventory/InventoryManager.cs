@@ -8,7 +8,16 @@ namespace AttoTheSheep.UI.ShopAndInventory
     {
         public static InventoryManager Instance { get; private set; }
 
-        public int Gold { get; private set; } = 1000; // Khởi tạo 1000 vàng để test
+        public int Gold 
+        { 
+            get 
+            {
+                if (GameBootstrapper.Instance != null && GameBootstrapper.Instance.CurrentProfile != null)
+                    return GameBootstrapper.Instance.CurrentProfile.Coins;
+                return _localGoldFallback;
+            }
+        }
+        private int _localGoldFallback = 0;
 
         // Dữ liệu item và số lượng đang có
         private Dictionary<ActionItem, int> _inventory = new Dictionary<ActionItem, int>();
@@ -22,6 +31,14 @@ namespace AttoTheSheep.UI.ShopAndInventory
             else Destroy(gameObject);
         }
 
+        private void Start()
+        {
+            if (GameBootstrapper.Instance != null && GameBootstrapper.Instance.CurrentProfile != null)
+            {
+                FetchInventoryFromCloud();
+            }
+        }
+
         public void AddItem(ActionItem item, int amount)
         {
             if (_inventory.ContainsKey(item))
@@ -30,6 +47,7 @@ namespace AttoTheSheep.UI.ShopAndInventory
                 _inventory[item] = amount;
                 
             onInventoryUpdated?.Invoke();
+            UploadInventoryToCloud();
         }
 
         public void RemoveItem(ActionItem item, int amount)
@@ -39,6 +57,7 @@ namespace AttoTheSheep.UI.ShopAndInventory
                 _inventory[item] -= amount;
                 if (_inventory[item] <= 0) _inventory.Remove(item);
                 onInventoryUpdated?.Invoke();
+                UploadInventoryToCloud();
             }
         }
 
@@ -56,15 +75,33 @@ namespace AttoTheSheep.UI.ShopAndInventory
 
         public void AddGold(int amount)
         {
-            Gold += amount;
+            if (GameBootstrapper.Instance != null && GameBootstrapper.Instance.CurrentProfile != null)
+            {
+                GameBootstrapper.Instance.CurrentProfile.AddCoins(amount);
+                UploadInventoryToCloud();
+            }
+            else
+            {
+                _localGoldFallback += amount;
+            }
             onInventoryUpdated?.Invoke();
         }
 
         public bool SpendGold(int amount)
         {
-            if (Gold >= amount)
+            if (GameBootstrapper.Instance != null && GameBootstrapper.Instance.CurrentProfile != null)
             {
-                Gold -= amount;
+                if (GameBootstrapper.Instance.CurrentProfile.Coins >= amount)
+                {
+                    GameBootstrapper.Instance.CurrentProfile.SpendCoins(amount);
+                    UploadInventoryToCloud();
+                    onInventoryUpdated?.Invoke();
+                    return true;
+                }
+            }
+            else if (_localGoldFallback >= amount)
+            {
+                _localGoldFallback -= amount;
                 onInventoryUpdated?.Invoke();
                 return true;
             }
@@ -76,16 +113,60 @@ namespace AttoTheSheep.UI.ShopAndInventory
         // =========================================
         public void FetchInventoryFromCloud()
         {
-            Debug.Log("[InventoryManager] Đang Fetch dữ liệu từ Cloud...");
-            // TODO: Team gắn API Fetch ở đây
-            // Giả lập load xong
+            if (GameBootstrapper.Instance == null || GameBootstrapper.Instance.CurrentProfile == null) return;
+            
+            Debug.Log("[InventoryManager] Fetching data from Cloud Save profile...");
+            var profile = GameBootstrapper.Instance.CurrentProfile;
+            
+            if (ShopManager.Instance != null)
+            {
+                _inventory.Clear();
+                foreach (var item in ShopManager.Instance.shopItems)
+                {
+                    int count = 0;
+                    if (item.itemName == "Shield" || item.name == "Shield") count = profile.FlockShieldCount;
+                    else if (item.itemName == "DeathTotem" || item.name == "DeathTotem") count = profile.SpawnMaxLambsCount;
+                    else if (item.itemName == "Meat" || item.name == "Meat") count = profile.SkillDamageBoostCount;
+                    else if (item.itemName == "MushShroom" || item.name == "MushShroom") count = profile.SpeedBoostCount;
+                    
+                    if (count > 0)
+                    {
+                        _inventory[item] = count;
+                    }
+                }
+            }
             onInventoryUpdated?.Invoke();
         }
 
         public void UploadInventoryToCloud()
         {
-            Debug.Log("[InventoryManager] Đang Upload dữ liệu lên Cloud...");
-            // TODO: Team gắn API Upload ở đây
+            if (GameBootstrapper.Instance == null || GameBootstrapper.Instance.CurrentProfile == null) return;
+
+            Debug.Log("[InventoryManager] Syncing to Cloud Save...");
+            var profile = GameBootstrapper.Instance.CurrentProfile;
+            
+            int shieldCount = 0;
+            int deathTotemCount = 0;
+            int meatCount = 0;
+            int mushShroomCount = 0;
+
+            foreach (var kvp in _inventory)
+            {
+                string name = !string.IsNullOrEmpty(kvp.Key.itemName) ? kvp.Key.itemName : kvp.Key.name;
+                if (name == "Shield") shieldCount = kvp.Value;
+                else if (name == "DeathTotem") deathTotemCount = kvp.Value;
+                else if (name == "Meat") meatCount = kvp.Value;
+                else if (name == "MushShroom") mushShroomCount = kvp.Value;
+            }
+
+            profile.RestoreState(
+                profile.Coins, profile.Exp, profile.UnlockedStage,
+                profile.DamageLevel, profile.HpLevel, profile.HerdHpLevel,
+                profile.HasArmor, profile.HasHorn,
+                shieldCount, deathTotemCount, meatCount, mushShroomCount
+            );
+
+            _ = GameBootstrapper.Instance.PlayerRepository.SaveAsync(profile);
         }
     }
 }
