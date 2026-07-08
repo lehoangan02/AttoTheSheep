@@ -71,8 +71,7 @@ public class PlayerMovement : NetworkBehaviour
 
     void FixedUpdate()
     {
-        // Change IsServer to IsOwner to match Authority Mode: Owner on NetworkTransform
-        if (!IsOwner || isMovementLocked || rb == null) return;
+        if (isMovementLocked || rb == null) return;
 
         // Status effect movement lock (e.g. freeze, stun) — synced via NetworkVariables
         if (entity != null && entity.effectController != null && entity.effectController.IsMovementLocked())
@@ -82,7 +81,14 @@ public class PlayerMovement : NetworkBehaviour
         float effectMult = (entity != null && entity.effectController != null) ? entity.effectController.GetSpeedMultiplier() : 1f;
         float currentSpeed = (entity != null) ? entity.currentMoveSpeed.Value * effectMult : 5f;
         
-        rb.linearVelocity = localMoveInput * currentSpeed;
+        if (IsOwner)
+        {
+            rb.linearVelocity = localMoveInput * currentSpeed;
+        }
+        else if (IsServer)
+        {
+            rb.linearVelocity = netMoveInput.Value * currentSpeed;
+        }
     }
 
     private void SendInputToServer(Vector2 moveInput)
