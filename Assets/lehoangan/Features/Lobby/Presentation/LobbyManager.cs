@@ -240,13 +240,12 @@ public class LobbyManager : MonoBehaviour
 
         if (NetworkManager.Singleton.IsServer)
         {
-            Debug.Log("[Host] Scene load completed for all clients. Terminating Lobby cloud session...");
-            await Presenter.LeaveLobby(); 
+            Debug.Log("[Host] Scene load completed for all clients. We will not terminate the Lobby immediately to allow clients to join.");
+            // We just let the lobby expire naturally or keep it for late joiners
         }
         else
         {
-            Debug.Log("[Client] Scene load completed. Disconnecting from Lobby state...");
-            await Presenter.LeaveLobby();
+            Debug.Log("[Client] Scene load completed. We are in the game.");
         }
     }
 

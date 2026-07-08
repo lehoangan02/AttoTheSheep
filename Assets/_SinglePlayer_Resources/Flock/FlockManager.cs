@@ -103,7 +103,23 @@ public class FlockManager : NetworkBehaviour
     {
         if (currentPlayer == null)
         {
-            currentPlayer = FindFirstObjectByType<PlayerController>();
+            var players = FindObjectsByType<PlayerController>(FindObjectsSortMode.None);
+            if (players.Length == 1)
+            {
+                currentPlayer = players[0];
+            }
+            else
+            {
+                foreach (var p in players)
+                {
+                    if (p.OwnerClientId == OwnerClientId)
+                    {
+                        currentPlayer = p;
+                        break;
+                    }
+                }
+            }
+
             if (currentPlayer != null)
             {
                 currentPlayer.OnMapClicked += HandleMapClicked;

@@ -72,6 +72,31 @@ public class PlayerSpawnManager : NetworkBehaviour
 
         netObj.SpawnAsPlayerObject(clientId, destroyWithScene: true);
         Debug.Log($"[PlayerSpawnManager] Spawned player for clientId={clientId} at {pos}");
+
+        // Spawn a FlockManager for this player!
+        GameObject flockPrefab = GetFlockManagerPrefab();
+        if (flockPrefab != null)
+        {
+            GameObject fmInstance = Instantiate(flockPrefab, pos, Quaternion.identity);
+            NetworkObject fmNetObj = fmInstance.GetComponent<NetworkObject>();
+            if (fmNetObj != null)
+            {
+                fmNetObj.SpawnWithOwnership(clientId, destroyWithScene: true);
+                Debug.Log($"[PlayerSpawnManager] Spawned FlockManager for clientId={clientId}");
+            }
+        }
+    }
+
+    private GameObject GetFlockManagerPrefab()
+    {
+        foreach (var prefabInfo in NetworkManager.Singleton.NetworkConfig.Prefabs.Prefabs)
+        {
+            if (prefabInfo.Prefab != null && prefabInfo.Prefab.GetComponent<FlockManager>() != null)
+            {
+                return prefabInfo.Prefab;
+            }
+        }
+        return null;
     }
 
     private bool GetValidSpawnPosition(out Vector3 position)

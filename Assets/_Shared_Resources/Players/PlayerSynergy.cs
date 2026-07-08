@@ -20,7 +20,16 @@ public class PlayerFlockBuffs : NetworkBehaviour
     {
         if (IsOwner)
         {
-            myFlock = FindFirstObjectByType<FlockManager>();
+            // We find the correct FlockManager for this player
+            var flocks = FindObjectsByType<FlockManager>(FindObjectsSortMode.None);
+            foreach (var fm in flocks)
+            {
+                if (fm.OwnerClientId == OwnerClientId || flocks.Length == 1)
+                {
+                    myFlock = fm;
+                    break;
+                }
+            }
 
             if (myFlock != null)
             {
@@ -29,15 +38,33 @@ public class PlayerFlockBuffs : NetworkBehaviour
             }
             else
             {
-                // [CHẾ ĐỘ KHÔNG CÓ CỪU] Mở khóa toàn bộ skill bằng cách gán số lượng cừu ảo cực lớn (Ví dụ: 999 con)
-                UpdateSkillLambsServerRpc(999);
+                // If it's null on spawn, we will try to find it in the first CheckFlockBuffs call
+                InvokeRepeating(nameof(CheckFlockBuffs), buffCheckInterval, buffCheckInterval);
             }
         }
     }
 
     private void CheckFlockBuffs()
     {
-        if (myFlock == null) return;
+        if (myFlock == null)
+        {
+            var flocks = FindObjectsByType<FlockManager>(FindObjectsSortMode.None);
+            foreach (var fm in flocks)
+            {
+                if (fm.OwnerClientId == OwnerClientId || flocks.Length == 1)
+                {
+                    myFlock = fm;
+                    break;
+                }
+            }
+
+            if (myFlock == null)
+            {
+                // [CHẾ ĐỘ KHÔNG CÓ CỪU] Nếu sau khi tìm vẫn không có cừu, thì unlock skill (Fallback)
+                UpdateSkillLambsServerRpc(999);
+                return;
+            }
+        }
         
         // Chỉ cần kiểm tra Heal Zone để hồi máu (Skill Zone đã được FlockManager tự động lo)
         Vector3 parentPos = transform.parent != null ? transform.parent.position : transform.position;
