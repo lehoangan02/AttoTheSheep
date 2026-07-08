@@ -45,9 +45,9 @@ public class PlayerSkills : NetworkBehaviour
         {
             if (controller != null) controller.OnSkillActivated += TryCastSkill;
 
-            // Tìm SkillBoardUI trên Scene và nạp dữ liệu 4 skills vào
-            SkillBoardUI boardUI = FindObjectOfType<SkillBoardUI>();
-            if (boardUI != null)
+            // Tìm tất cả SkillBoardUI trên Scene và nạp dữ liệu 4 skills vào
+            SkillBoardUI[] boardUIs = FindObjectsByType<SkillBoardUI>(FindObjectsSortMode.None);
+            foreach (SkillBoardUI boardUI in boardUIs)
             {
                 boardUI.InitializeSkillBoard(this);
             }
