@@ -505,7 +505,6 @@ MonoBehaviour:
       MaxSecondsBetweenUpdates: 0
     m_InternalValue: 0
   data: {fileID: 11400000, guid: 03a2a913927902ec987b7e312059b99b, type: 2}
-  CoinPrize: 10
 --- !u!114 &8047783568262049259
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -720,7 +719,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7202489359740745673, guid: e3f5b70ec364596dcb9dcaa71ba9a38b, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 1.2
+      value: 1.25
       objectReference: {fileID: 0}
     - target: {fileID: 7202489359740745673, guid: e3f5b70ec364596dcb9dcaa71ba9a38b, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
