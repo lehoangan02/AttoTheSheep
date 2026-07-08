@@ -22,21 +22,20 @@ public class FlockRadiusVisualizer : MonoBehaviour
     void Awake()
     {
         runeLineRenderer = GetComponent<LineRenderer>();
-        runeLineRenderer.positionCount = segments; // Đã sửa: bỏ "+ 1"
+        runeLineRenderer.positionCount = segments;
         runeLineRenderer.useWorldSpace = true;
-        runeLineRenderer.loop = true; // Đã thêm: Bật vòng lặp khép kín xóa vết gợn
+        runeLineRenderer.loop = true; 
         
         if (runeLineRenderer.material != null)
         {
             runtimeMaterial = runeLineRenderer.material;
         }
 
-        // Tự động cấu hình cho Line nền nếu có
         if (backgroundLineRenderer != null)
         {
-            backgroundLineRenderer.positionCount = segments; // Đã sửa: bỏ "+ 1"
+            backgroundLineRenderer.positionCount = segments; 
             backgroundLineRenderer.useWorldSpace = true;
-            backgroundLineRenderer.loop = true; // Đã thêm: Bật vòng lặp khép kín
+            backgroundLineRenderer.loop = true; 
         }
     }
 
@@ -44,7 +43,10 @@ public class FlockRadiusVisualizer : MonoBehaviour
     {
         if (flockManager == null) return;
 
-        bool hasSkill = flockManager.GetFlockTier() > 0;
+        // THAY ĐỔI TẠI ĐÂY: Hiển thị vòng kỹ năng nếu có ít nhất 1 con cừu 
+        // (Hoặc bạn có thể đổi thành > 2 nếu muốn có từ 3 con cừu trở lên mới hiện vòng)
+        bool hasSkill = flockManager.activeLambs != null && flockManager.activeLambs.Count > 0;
+        
         runeLineRenderer.enabled = hasSkill;
         if (backgroundLineRenderer != null) backgroundLineRenderer.enabled = hasSkill;
         
@@ -53,10 +55,8 @@ public class FlockRadiusVisualizer : MonoBehaviour
         Vector2 center = flockManager.currentFlockCenter.Value;
         float targetRadius = flockManager.currentSkillZoneRadius;
 
-        // Vẽ cả 2 vòng cùng lúc để đồng bộ tuyệt đối
         DrawCircle(center, targetRadius);
 
-        // Cuộn Texture để xoay cổ tự
         if (runtimeMaterial != null)
         {
             currentOffsetX -= Time.deltaTime * runeRotationSpeed;
@@ -70,8 +70,6 @@ public class FlockRadiusVisualizer : MonoBehaviour
         float deltaTheta = (2f * Mathf.PI) / segments;
         float theta = 0f;
 
-        // HIỆU CHỈNH ĐỘ DÀY: Trừ đi một nửa chiều rộng (startWidth) của LineRenderer
-        // Giúp mép ngoài cùng co lại, nằm ĐÚNG vào bán kính Logic
         float adjustedRuneRadius = radius - (runeLineRenderer.startWidth / 2f);
         
         float adjustedBgRadius = radius;
@@ -80,15 +78,13 @@ public class FlockRadiusVisualizer : MonoBehaviour
             adjustedBgRadius = radius - (backgroundLineRenderer.startWidth / 2f);
         }
 
-        for (int i = 0; i < segments; i++) // Đã sửa: chạy đến < segments
+        for (int i = 0; i < segments; i++) 
         {
-            // 1. Tính toán cho Vòng chữ cổ tự
             float xRune = adjustedRuneRadius * Mathf.Cos(theta);
             float yRune = adjustedRuneRadius * Mathf.Sin(theta);
             Vector3 runePos = new Vector3(xRune, yRune, 0.1f) + (Vector3)center; 
             runeLineRenderer.SetPosition(i, runePos);
 
-            // 2. Tính toán cho Vòng nền (nếu có)
             if (backgroundLineRenderer != null)
             {
                 float xBg = adjustedBgRadius * Mathf.Cos(theta);

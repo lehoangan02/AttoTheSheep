@@ -39,11 +39,6 @@ public class FlockManager : NetworkBehaviour
     [Header("Skill Zone (Radius 2 - Lớn hơn)")]
     [SerializeField] private float skillZoneRadiusMultiplier = 1.5f; 
 
-    [Header("Skill Unlock Milestones")]
-    [SerializeField] private int lambsForSkill1 = 3;
-    [SerializeField] private int lambsForSkill2 = 6;
-    [SerializeField] private int lambsForSkill3 = 10;
-
     [Header("Auto Spawn Settings")]
     [SerializeField] private bool enableAutoSpawn = true;
     [SerializeField] private float autoSpawnInterval = 10f;
@@ -54,9 +49,6 @@ public class FlockManager : NetworkBehaviour
     [SerializeField] private float spawnCheckRadius = 0.4f;
     [SerializeField] private int maxSpawnAttempts = 10;
 
-    // ==========================================
-    // TÍNH NĂNG MỚI: CẤU HÌNH CHIẾN ĐẤU & BỊ ĐẨY
-    // ==========================================
     [Header("Combat & Push Settings")]
     [Tooltip("Thời gian cừu chạy loạn xạ khi bị tấn công")]
     [SerializeField] private float panicDuration = 3f;
@@ -72,7 +64,7 @@ public class FlockManager : NetworkBehaviour
     public List<LambAI> activeLambs { get; private set; } = new List<LambAI>();
     
     public NetworkVariable<Vector2> currentFlockCenter = new NetworkVariable<Vector2>(Vector2.zero, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server); 
-    
+        
     public float currentFlockRadius { get; private set; } 
     public float currentSkillZoneRadius { get; private set; } 
 
@@ -82,11 +74,10 @@ public class FlockManager : NetworkBehaviour
     public float HealScale => healScale;
     public float ManaScale => manaScale;
 
-    public event Action<int> OnFlockTierChanged;
-
     private PlayerController currentPlayer; 
     private Vector2 lastPlayerAnchorPos; 
     private Vector2 flockDestination;
+    private PlayerSkills currentPlayerSkills; 
 
     public override void OnNetworkSpawn()
     {
@@ -117,6 +108,10 @@ public class FlockManager : NetworkBehaviour
             {
                 currentPlayer.OnMapClicked += HandleMapClicked;
                 lastPlayerAnchorPos = currentPlayer.transform.position;
+                
+                currentPlayerSkills = currentPlayer.GetComponent<PlayerSkills>();
+                if (currentPlayerSkills == null) 
+                    currentPlayerSkills = currentPlayer.GetComponentInChildren<PlayerSkills>();
             }
         }
 
@@ -129,7 +124,22 @@ public class FlockManager : NetworkBehaviour
 
             UpdateActualFlockCenter();
 
-            // TÍNH NĂNG MỚI: Quét định kỳ kiểm tra xem có con cừu nào bị đẩy ra rìa không
+            // THAY ĐỔI: Đồng bộ số lượng cừu thực tế sang Player Kỹ năng
+            if (currentPlayerSkills != null)
+            {
+                int totalLambs = activeLambs.Count;
+                if (currentPlayerSkills.currentLambCount.Value != totalLambs)
+                {
+                    currentPlayerSkills.currentLambCount.Value = totalLambs;
+                }
+
+                bool isInside = IsPositionInsideSkillZone(currentPlayer.transform.position);
+                if (currentPlayerSkills.isInsideFlock.Value != isInside)
+                {
+                    currentPlayerSkills.isInsideFlock.Value = isInside;
+                }
+            }
+
             oobCheckTimer += Time.deltaTime;
             if (oobCheckTimer >= oobCheckInterval)
             {
@@ -179,43 +189,28 @@ public class FlockManager : NetworkBehaviour
         }
     }
 
-    // ==========================================
-    // LOGIC 1: PHÁT HIỆN CỪU BỊ ĐẨY KHỎI BÁN KÍNH
-    // ==========================================
     private void CheckLambsOutOfBounds()
     {
         Vector2 center = flockDestination;
-
         foreach (var lamb in activeLambs)
         {
             if (lamb != null && lamb.gameObject.activeInHierarchy)
             {
                 float dist = Vector2.Distance(lamb.transform.position, center);
-                
-                // Nếu khoảng cách lớn hơn bán kính bầy hiện tại
                 if (dist > currentFlockRadius)
                 {
-                    // Phát lệnh ép buộc cừu quay trở về bầy lập tức
                     lamb.NotifyOutOfBounds(center);
                 }
             }
         }
     }
 
-    // ==========================================
-    // LOGIC 2: KÍCH HOẠT KHI BẦY CỪU BỊ TẤN CÔNG
-    // ==========================================
-    /// <summary>
-    /// Hàm này được gọi từ script nhận sát thương của con cừu (ví dụ: LambHealth hoặc chính LambAI)
-    /// </summary>
     public void ReportLambAttacked(LambAI attackedLamb)
     {
         if (!IsServer) return;
 
-        // 1. Cho con cừu bị dính đòn hoảng loạn trước
         attackedLamb.TriggerPanic(panicDuration);
 
-        // 2. Hiệu ứng đám đông: Lan truyền sự sợ hãi sang các con cừu lân cận
         foreach (var lamb in activeLambs)
         {
             if (lamb != null && lamb != attackedLamb && lamb.gameObject.activeInHierarchy)
@@ -223,7 +218,6 @@ public class FlockManager : NetworkBehaviour
                 float dist = Vector2.Distance(attackedLamb.transform.position, lamb.transform.position);
                 if (dist <= panicAlertRadius)
                 {
-                    // Cừu xung quanh hoảng loạn ngắn hơn một chút (70% thời gian gốc)
                     lamb.TriggerPanic(panicDuration * 0.7f); 
                 }
             }
@@ -255,28 +249,18 @@ public class FlockManager : NetworkBehaviour
         }
     }
 
-    // Thêm Sự kiện để UI có thể đăng ký lắng nghe và thay đổi Text/Màu sắc nút
     public event Action<FlockControlMode> OnControlModeChanged;
 
-    /// <summary>
-    /// Hàm dành cho UI Button gọi để yêu cầu đổi chế độ
-    /// </summary>
     public void RequestToggleControlMode()
     {
-        // Gửi yêu cầu lên Server
         ToggleControlModeServerRpc();
     }
 
     [ServerRpc(RequireOwnership = false)]
     private void ToggleControlModeServerRpc()
     {
-        // Server tính toán chế độ tiếp theo
         FlockControlMode nextMode = (currentControlMode == FlockControlMode.Auto) ? FlockControlMode.Manual : FlockControlMode.Auto;
-        
-        // Thực thi thay đổi trên Server
         SetControlMode(nextMode);
-
-        // Phát lệnh đồng bộ trạng thái xuống toàn bộ Client
         SyncControlModeClientRpc(nextMode);
     }
 
@@ -284,8 +268,6 @@ public class FlockManager : NetworkBehaviour
     private void SyncControlModeClientRpc(FlockControlMode newMode)
     {
         currentControlMode = newMode;
-        
-        // Kích hoạt sự kiện để giao diện cập nhật theo thay đổi mới
         OnControlModeChanged?.Invoke(newMode);
     }
 
@@ -328,7 +310,6 @@ public class FlockManager : NetworkBehaviour
             lambAI.Initialize(this, obstacleLayer);
             activeLambs.Add(lambAI);
             UpdateFlockRadius();
-            OnFlockTierChanged?.Invoke(GetFlockTier());
         }
 
         return lambAI;
@@ -358,7 +339,6 @@ public class FlockManager : NetworkBehaviour
         {
             activeLambs.Remove(lamb);
             UpdateFlockRadius();
-            OnFlockTierChanged?.Invoke(GetFlockTier());
         }
     }
 
@@ -367,7 +347,6 @@ public class FlockManager : NetworkBehaviour
         float dynamicBaseRadius = GetCurrentLevelConfig().baseRadius;
         currentFlockRadius = dynamicBaseRadius + (radiusMultiplier * Mathf.Sqrt(activeLambs.Count));
         currentSkillZoneRadius = currentFlockRadius * skillZoneRadiusMultiplier;
-        
         CommandFlock(flockDestination);
     }
 
@@ -385,7 +364,6 @@ public class FlockManager : NetworkBehaviour
     private void HandleMapClicked(Vector2 targetPos)
     {
         CommandFlock(targetPos);
-
         if (currentControlMode == FlockControlMode.Auto && currentPlayer != null)
         {
             lastPlayerAnchorPos = currentPlayer.transform.position;
@@ -395,7 +373,6 @@ public class FlockManager : NetworkBehaviour
     private void CommandFlock(Vector2 targetPos)
     {
         flockDestination = targetPos;
-
         foreach (var lamb in activeLambs)
         {
             if (lamb != null && lamb.gameObject.activeInHierarchy)
@@ -403,14 +380,6 @@ public class FlockManager : NetworkBehaviour
                 lamb.SetFlockData(flockDestination, currentFlockRadius);
             }
         }
-    }
-
-    public int GetFlockTier()
-    {
-        if (activeLambs.Count >= lambsForSkill3) return 3;
-        if (activeLambs.Count >= lambsForSkill2) return 2;
-        if (activeLambs.Count >= lambsForSkill1) return 1;
-        return 0; 
     }
 
     private void OnDrawGizmos()

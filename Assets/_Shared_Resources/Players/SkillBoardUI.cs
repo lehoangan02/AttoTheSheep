@@ -9,17 +9,29 @@ public class SkillBoardUI : MonoBehaviour
     // Hàm này sẽ được gọi khi Local Player spawn thành công
     public void InitializeSkillBoard(PlayerSkills localPlayerSkills)
     {
-        // Lặp qua danh sách skill đang trang bị của Player
-        for (int i = 0; i < localPlayerSkills.equippedSkills.Count; i++)
+        // ĐẢO NGƯỢC LOGIC: Duyệt qua từng ô UI đang hiện thị trên màn hình của bạn
+        foreach (SkillUIManager slotUI in uiSlots)
         {
-            SkillSlot playerSkill = localPlayerSkills.equippedSkills[i];
-            
-            // Kiểm tra xem UI Slot có đủ số lượng không và Data có tồn tại không
-            // Kiểm tra xem UI Slot có đủ số lượng không và Data có tồn tại không
-            if (i < uiSlots.Count && playerSkill.data != null)
+            if (slotUI == null) continue;
+
+            // Đọc ID mà ô UI này yêu cầu (Ví dụ: Bạn cài đặt ô này chuyên nhận chiêu có ID = 1)
+            int targetSkillId = slotUI.boundSkillId;
+
+            // Tìm kiếm trong danh sách của Player xem có Skill nào trùng ID này không
+            SkillSlot matchedSkill = localPlayerSkills.equippedSkills.Find(
+                slot => slot.data != null && slot.data.skillId == targetSkillId
+            );
+
+            if (matchedSkill != null)
             {
-                // THAY ĐỔI Ở ĐÂY: Truyền thêm biến localPlayerSkills
-                uiSlots[i]?.SetupSlot(playerSkill.data, localPlayerSkills);
+                // Nếu tìm thấy: Kích hoạt hiển thị ô UI và nạp dữ liệu chiêu thức vào
+                slotUI.gameObject.SetActive(true);
+                slotUI.SetupSlot(matchedSkill.data, localPlayerSkills);
+            }
+            else
+            {
+                // Nếu không tìm thấy chiêu thức này trong người Player: Ẩn ô UI này đi
+                slotUI.gameObject.SetActive(false);
             }
         }
     }

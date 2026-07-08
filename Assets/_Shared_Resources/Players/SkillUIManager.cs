@@ -1,16 +1,15 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
- using TMPro;
-// Nếu bạn dùng TextMeshPro, hãy đổi Text thành TextMeshProUGUI và thêm: using TMPro;
+using TMPro;
 
 public class SkillUIManager : MonoBehaviour
 {
     [Header("UI References")]
     public Image iconImage;
     public Image cooldownOverlay;
-    public GameObject lockedOverlay; // Lớp phủ đen khi chưa đủ cừu
-    public TextMeshProUGUI lambsReqText;        // Text hiển thị số cừu cần thiết
+    public GameObject lockedOverlay; 
+    public TextMeshProUGUI lambsReqText;        
     
     [Header("Skill Binding")]
     public int boundSkillId;
@@ -18,7 +17,6 @@ public class SkillUIManager : MonoBehaviour
     private PlayerSkills playerSkills;
     private SkillData skillData;
 
-    // THAY ĐỔI: Nhận thêm biến PlayerSkills để đọc dữ liệu NetworkVariable
     public void SetupSlot(SkillData data, PlayerSkills pSkills)
     {
         skillData = data;
@@ -26,13 +24,12 @@ public class SkillUIManager : MonoBehaviour
         iconImage.sprite = data.skillIcon;
         cooldownOverlay.fillAmount = 0f;
 
-        // Quản lý đăng ký sự kiện NetworkVariable an toàn
-        if (playerSkills != null) playerSkills.unlockedSkillTier.OnValueChanged -= OnTierChanged;
+        // THAY ĐỔI: Đăng ký lắng nghe biến số lượng cừu mới
+        if (playerSkills != null) playerSkills.currentLambCount.OnValueChanged -= OnLambCountChanged;
         playerSkills = pSkills;
-        if (playerSkills != null) playerSkills.unlockedSkillTier.OnValueChanged += OnTierChanged;
+        if (playerSkills != null) playerSkills.currentLambCount.OnValueChanged += OnLambCountChanged;
 
-        // Cập nhật Text số lượng cừu
-        if (skillData.lambsRequired > 0)
+        if (skillData.lambsRequired >= 0)
         {
             lambsReqText.gameObject.SetActive(true);
             lambsReqText.text = skillData.lambsRequired.ToString();
@@ -42,8 +39,8 @@ public class SkillUIManager : MonoBehaviour
             lambsReqText.gameObject.SetActive(false);
         }
 
-        // Kiểm tra trạng thái Khóa/Mở ngay khi load UI
-        CheckLockState(playerSkills.unlockedSkillTier.Value);
+        // Kiểm tra trạng thái Khóa/Mở ngay lập tức bằng số cừu thực tế
+        CheckLockState(playerSkills.currentLambCount.Value);
     }
 
     private void OnEnable()
@@ -54,12 +51,12 @@ public class SkillUIManager : MonoBehaviour
     private void OnDisable()
     {
         PlayerSkills.OnSkillCooldownStarted -= HandleSkillCooldown;
-        // Gỡ lắng nghe khi UI bị tắt để tránh lỗi Memory Leak
-        if (playerSkills != null) playerSkills.unlockedSkillTier.OnValueChanged -= OnTierChanged;
+        // THAY ĐỔI: Hủy đăng ký an toàn bằng biến đếm cừu mới
+        if (playerSkills != null) playerSkills.currentLambCount.OnValueChanged -= OnLambCountChanged;
     }
 
-    // Hàm này tự động chạy mỗi khi biến unlockedSkillTier trên Server/Client thay đổi
-    private void OnTierChanged(int previousValue, int newValue)
+    // THAY ĐỔI: Hàm tự động chạy khi số cừu của Player thay đổi trên Server
+    private void OnLambCountChanged(int previousValue, int newValue)
     {
         CheckLockState(newValue);
     }
@@ -68,7 +65,7 @@ public class SkillUIManager : MonoBehaviour
     {
         if (skillData == null) return;
         
-        // CÁCH MỚI: Bị khóa nếu "Số cừu yêu cầu" lớn hơn "Số cừu/Cấp độ hiện tại"
+        // Bị khóa nếu "Số cừu yêu cầu" lớn hơn "Số cừu hiện tại đang có"
         bool isLocked = skillData.lambsRequired > currentSheepValue;
         
         lockedOverlay.SetActive(isLocked);
