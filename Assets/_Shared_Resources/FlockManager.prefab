@@ -98,7 +98,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 877008340
+  GlobalObjectIdHash: 2132296346
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -132,17 +132,18 @@ MonoBehaviour:
   levelConfigs:
   - maxLambs: 5
     baseRadius: 1
+  - maxLambs: 7
+    baseRadius: 1.5
+  - maxLambs: 10
+    baseRadius: 2
   currentControlMode: 1
   playerDeadzoneRadius: 3
   randomOffsetRadius: 2
   lambPrefab: {fileID: 4784860766754900265, guid: 628ff7b0f60023e47884e19d86cef4fc, type: 3}
   radiusMultiplier: 0.5
   skillZoneRadiusMultiplier: 2
-  lambsForSkill1: 1
-  lambsForSkill2: 1
-  lambsForSkill3: 1
   enableAutoSpawn: 1
-  autoSpawnInterval: 10
+  autoSpawnInterval: 100
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 0
