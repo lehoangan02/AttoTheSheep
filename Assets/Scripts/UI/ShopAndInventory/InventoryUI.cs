@@ -13,6 +13,8 @@ namespace AttoTheSheep.UI.ShopAndInventory
         [SerializeField] private GameObject slotPrefab;
         [SerializeField] private TextMeshProUGUI goldText;
 
+        private bool _subscribed = false;
+
         [Header("Detail Panel References")]
         [SerializeField] private GameObject placeholderView;
         [SerializeField] private GameObject detailView;
@@ -31,28 +33,43 @@ namespace AttoTheSheep.UI.ShopAndInventory
 
         private void OnEnable()
         {
-            if (InventoryManager.Instance != null)
-            {
-                InventoryManager.Instance.onInventoryUpdated += RefreshUI;
-                RefreshUI();
-            }
+            TrySubscribe();
+            RefreshUI();
 
             if (uploadButton != null) uploadButton.onClick.AddListener(() => InventoryManager.Instance?.UploadInventoryToCloud());
             if (fetchButton != null) fetchButton.onClick.AddListener(() => InventoryManager.Instance?.FetchInventoryFromCloud());
-            
+
             if (useButton != null) useButton.onClick.AddListener(OnUseClicked);
             if (dropButton != null) dropButton.onClick.AddListener(OnDropClicked);
-            
+
             HideDetails();
+        }
+
+        private void Start()
+        {
+            // Retry: InventoryManager có thể chưa Awake kịp lúc OnEnable chạy
+            if (!_subscribed)
+            {
+                TrySubscribe();
+                RefreshUI();
+            }
+        }
+
+        private void TrySubscribe()
+        {
+            if (_subscribed || InventoryManager.Instance == null) return;
+            InventoryManager.Instance.onInventoryUpdated += RefreshUI;
+            _subscribed = true;
         }
 
         private void OnDisable()
         {
-            if (InventoryManager.Instance != null)
+            if (_subscribed && InventoryManager.Instance != null)
             {
                 InventoryManager.Instance.onInventoryUpdated -= RefreshUI;
+                _subscribed = false;
             }
-            
+
             if (uploadButton != null) uploadButton.onClick.RemoveAllListeners();
             if (fetchButton != null) fetchButton.onClick.RemoveAllListeners();
             if (useButton != null) useButton.onClick.RemoveAllListeners();

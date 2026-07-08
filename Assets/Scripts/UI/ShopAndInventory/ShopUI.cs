@@ -13,23 +13,53 @@ namespace AttoTheSheep.UI.ShopAndInventory
         [SerializeField] private TextMeshProUGUI detailName;
         [SerializeField] private TextMeshProUGUI detailDesc;
         [SerializeField] private TextMeshProUGUI detailPrice;
-        
+
+        [Header("Gold Display")]
+        [Tooltip("Text hiển thị số vàng hiện có của player trong Shop")]
+        [SerializeField] private TextMeshProUGUI goldText;
+
         [Header("Buy Button")]
         [SerializeField] private Button buyButton;
 
         private ActionItem _selectedItem;
+        private bool _subscribed = false;
 
         private void OnEnable()
         {
             if (buyButton != null) buyButton.onClick.AddListener(OnBuyClicked);
             if (closeButton != null) closeButton.onClick.AddListener(HideDetails);
+            TrySubscribe();
+            RefreshGold();
             HideDetails();
+        }
+
+        private void Start()
+        {
+            if (!_subscribed) { TrySubscribe(); RefreshGold(); }
+        }
+
+        private void TrySubscribe()
+        {
+            if (_subscribed || InventoryManager.Instance == null) return;
+            InventoryManager.Instance.onInventoryUpdated += RefreshGold;
+            _subscribed = true;
         }
 
         private void OnDisable()
         {
             if (buyButton != null) buyButton.onClick.RemoveAllListeners();
             if (closeButton != null) closeButton.onClick.RemoveAllListeners();
+            if (_subscribed && InventoryManager.Instance != null)
+            {
+                InventoryManager.Instance.onInventoryUpdated -= RefreshGold;
+                _subscribed = false;
+            }
+        }
+
+        private void RefreshGold()
+        {
+            if (goldText == null || InventoryManager.Instance == null) return;
+            goldText.text = InventoryManager.Instance.Gold.ToString("N0");
         }
 
         public void ShowItemDetails(ActionItem item)

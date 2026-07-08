@@ -8,36 +8,37 @@ namespace AttoTheSheep.UI.ShopAndInventory
         public GameObject shopPanel;
         public GameObject inventoryPanel;
 
+        [Header("Button References (kéo trực tiếp từ Inspector)")]
+        [SerializeField] private Button bagButton;
+        [SerializeField] private Button shopButton;
+
         private void Start()
         {
-            GameObject bagGo = GameObject.Find("BagButton");
-            if (bagGo != null)
+            // Ưu tiên SerializedField, fallback về Find() nếu chưa kéo tay
+            if (bagButton == null)
             {
-                Button bagBtn = bagGo.GetComponent<Button>();
-                if (bagBtn != null) 
-                {
-                    bagBtn.onClick.RemoveAllListeners();
-                    bagBtn.onClick.AddListener(() => inventoryPanel.SetActive(true));
-                }
-            }
-            else
-            {
-                Debug.LogWarning("[ShopInventoryRoot] Không tìm thấy GameObject nào tên 'BagButton' trên Scene để móc sự kiện!");
+                var go = GameObject.Find("BagButton");
+                if (go != null) bagButton = go.GetComponent<Button>();
+                else Debug.LogWarning("[ShopInventoryRoot] Không tìm thấy 'BagButton'. Hãy kéo vào Inspector!");
             }
 
-            GameObject shopGo = GameObject.Find("ShopButton");
-            if (shopGo != null)
+            if (shopButton == null)
             {
-                Button shopBtn = shopGo.GetComponent<Button>();
-                if (shopBtn != null) 
-                {
-                    shopBtn.onClick.RemoveAllListeners();
-                    shopBtn.onClick.AddListener(() => shopPanel.SetActive(true));
-                }
+                var go = GameObject.Find("ShopButton");
+                if (go != null) shopButton = go.GetComponent<Button>();
+                else Debug.LogWarning("[ShopInventoryRoot] Không tìm thấy 'ShopButton'. Hãy kéo vào Inspector!");
             }
-            else
+
+            if (bagButton != null)
             {
-                Debug.LogWarning("[ShopInventoryRoot] Không tìm thấy GameObject nào tên 'ShopButton' trên Scene để móc sự kiện!");
+                bagButton.onClick.RemoveAllListeners();
+                bagButton.onClick.AddListener(() => inventoryPanel.SetActive(true));
+            }
+
+            if (shopButton != null)
+            {
+                shopButton.onClick.RemoveAllListeners();
+                shopButton.onClick.AddListener(() => shopPanel.SetActive(true));
             }
 
             // Gắn sự kiện cho các nút CloseBtn bên trong Panel

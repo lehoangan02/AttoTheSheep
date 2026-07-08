@@ -33,10 +33,29 @@ namespace AttoTheSheep.UI.ShopAndInventory
 
         private void Start()
         {
-            if (GameBootstrapper.Instance != null && GameBootstrapper.Instance.CurrentProfile != null)
+            if (GameBootstrapper.Instance == null)
             {
+                // Không có Bootstrapper (chạy test scene trực tiếp) → dùng local fallback
+                return;
+            }
+
+            if (GameBootstrapper.Instance.CurrentProfile != null)
+            {
+                // Cloud đã load xong trước khi Start() chạy → fetch ngay
                 FetchInventoryFromCloud();
             }
+            else
+            {
+                // Cloud chưa xong → đăng ký chờ event OnBootstrapped
+                GameBootstrapper.Instance.OnBootstrapped += FetchInventoryFromCloud;
+            }
+        }
+
+        private void OnDestroy()
+        {
+            // Cleanup event để tránh memory leak
+            if (GameBootstrapper.Instance != null)
+                GameBootstrapper.Instance.OnBootstrapped -= FetchInventoryFromCloud;
         }
 
         public void AddItem(ActionItem item, int amount)

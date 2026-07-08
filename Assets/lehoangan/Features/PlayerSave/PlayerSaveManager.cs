@@ -1,89 +1,86 @@
 using UnityEngine;
 using System.Threading.Tasks;
-using Unity.Services.Core;
-using Unity.Services.Authentication;
+using AttoTheSheep.UI.ShopAndInventory;
 
+/// <summary>
+/// Cầu nối cho gameplay gọi AddMoney khi kẻ địch chết.
+/// Ưu tiên dùng InventoryManager nếu có (lobby scene).
+/// Fallback về GameBootstrapper.CurrentProfile nếu đang ở level scene.
+/// Trong mọi trường hợp chỉ ghi vào 1 profile duy nhất (GameBootstrapper.CurrentProfile).
+/// </summary>
 public class PlayerSaveManager : MonoBehaviour
 {
     public static PlayerSaveManager Instance { get; private set; }
 
-    private IPlayerRepository _playerRepository;
-    private LoadPlayerUseCase _loadPlayerUseCase;
-    private PlayerProfile _currentPlayerProfile;
-
     [Header("Audio Settings")]
     public AudioClip coinSFX;
 
-    public bool IsReady { get; private set; }
+    public bool IsReady => GameBootstrapper.Instance != null;
 
 #if UNITY_EDITOR
     private void OnValidate()
     {
-        if (coinSFX == null) 
-        {
+        if (coinSFX == null)
             coinSFX = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/_Shared_Resources/Audio/AudidResources/coin.mp3");
-        }
     }
 #endif
 
     private void Awake()
     {
-        // Singleton pattern
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
-        DontDestroyOnLoad(gameObject); // Keeps this object alive across scenes
-    }
-
-    private async void Start()
-    {
-        
-        _playerRepository = new UnityCloudSaveRepository();
-        _loadPlayerUseCase = new LoadPlayerUseCase(_playerRepository);
-
-        _currentPlayerProfile = await _loadPlayerUseCase.ExecuteAsync();
-        IsReady = true;
-        
-        Debug.Log("PlayerSaveManager is ready. Profile loaded.");
+        DontDestroyOnLoad(gameObject);
     }
 
     /// <summary>
-    /// Adds money (coins) to the player's profile and instantly saves it to the cloud.
-    /// Can be called from any other script using: PlayerSaveManager.Instance.AddMoney(amount);
+    /// Thêm vàng cho player khi giết kẻ địch.
+    /// Gọi bằng: PlayerSaveManager.Instance.AddMoney(amount)
     /// </summary>
-    public async Task AddMoney(int amount)
+    public Task AddMoney(int amount)
     {
-        if (!IsReady || _currentPlayerProfile == null)
+        // --- Ưu tiên 1: InventoryManager có mặt (MapLobby) ---
+        // AddGold() tự lo: cộng vào CurrentProfile + sync cloud + fire onInventoryUpdated
+        if (InventoryManager.Instance != null)
         {
-            Debug.LogWarning("PlayerSaveManager is not ready yet! Cannot add money.");
-            return;
+            InventoryManager.Instance.AddGold(amount);
+            PlayCoinSFX();
+            Debug.Log($"[PlayerSaveManager] +{amount} vàng (qua InventoryManager). Tổng: {InventoryManager.Instance.Gold}");
+            return Task.CompletedTask;
         }
 
-        // Add coins to local profile
-        _currentPlayerProfile.AddCoins(amount);
-        
-        // Play coin sound effect (playing it multiple times simultaneously to boost the volume)
+        // --- Fallback: Level scene (không có InventoryManager) ---
+        // Ghi thẳng vào GameBootstrapper.CurrentProfile — vẫn là 1 nguồn sự thật
+        if (GameBootstrapper.Instance?.CurrentProfile != null)
+        {
+            var profile = GameBootstrapper.Instance.CurrentProfile;
+            profile.AddCoins(amount);
+            // Save cloud ngay (fire-and-forget)
+            _ = GameBootstrapper.Instance.PlayerRepository.SaveAsync(profile);
+            PlayCoinSFX();
+            Debug.Log($"[PlayerSaveManager] +{amount} vàng (qua GameBootstrapper). Tổng: {profile.Coins}");
+            return Task.CompletedTask;
+        }
+
+        // --- Không có gì cả (hiếm gặp, ví dụ test scene) ---
+        Debug.LogWarning("[PlayerSaveManager] Không tìm thấy nguồn lưu gold! Bỏ qua AddMoney.");
+        return Task.CompletedTask;
+    }
+
+    private void PlayCoinSFX()
+    {
         if (coinSFX != null && AudioManager.Instance != null)
         {
             AudioManager.Instance.PlaySFX_2D(coinSFX);
             AudioManager.Instance.PlaySFX_2D(coinSFX);
             AudioManager.Instance.PlaySFX_2D(coinSFX);
         }
-        
-        // Save to cloud
-        await _playerRepository.SaveAsync(_currentPlayerProfile);
-        
-        Debug.Log($"Successfully added {amount} coins to Cloud Save. New total: {_currentPlayerProfile.Coins}");
     }
-    
+
     /// <summary>
-    /// Retrieves the current loaded player profile.
+    /// Trả về profile hiện tại từ GameBootstrapper (nguồn sự thật duy nhất).
     /// </summary>
     public PlayerProfile GetProfile()
     {
-        return _currentPlayerProfile;
+        return GameBootstrapper.Instance?.CurrentProfile;
     }
 }
