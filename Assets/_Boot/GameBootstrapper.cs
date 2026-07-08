@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Threading.Tasks;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
@@ -95,11 +96,30 @@ public class GameBootstrapper : MonoBehaviour
             }
             
             OnBootstrapped?.Invoke();
+            
+            // Start the 30-minute auto-sync timer
+            StartCoroutine(AutoSyncRoutine());
         }
         catch (Exception ex)
         {
             Debug.LogError($"[Bootstrapper] Failed to initialize game services: {ex.Message}");
             throw; // Re-throw to be caught in Awake and set exception on Task
+        }
+    }
+
+    private IEnumerator AutoSyncRoutine()
+    {
+        while (true)
+        {
+            // Đợi 30 phút (1800 giây)
+            yield return new WaitForSecondsRealtime(1800f);
+
+            if (CurrentProfile != null && PlayerRepository != null)
+            {
+                Debug.Log("[Bootstrapper] Định kỳ 30 phút: Đang Auto-sync dữ liệu lên Cloud Save...");
+                // Gọi hàm lưu mà không chặn luồng chính
+                _ = PlayerRepository.SaveAsync(CurrentProfile);
+            }
         }
     }
 }

@@ -6,6 +6,7 @@ using Unity.Services.Authentication;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using System.IO;
+using System;
 public class UnityCloudSaveRepository : IPlayerRepository
 {
     private const string KEY_COIN = "coin_amount";
@@ -20,6 +21,7 @@ public class UnityCloudSaveRepository : IPlayerRepository
     private const string KEY_SPAWN_MAX_LAMBS_COUNT = "spawn_max_lambs_count";
     private const string KEY_SKILL_DAMAGE_BOOST_COUNT = "skill_damage_boost_count";
     private const string KEY_SPEED_BOOST_COUNT = "speed_boost_count";
+    private const string KEY_LAST_UPDATED = "last_updated_time";
 
     private static PlayerProfile _cachedProfile;
     private static Task _initializationTask;
@@ -40,6 +42,7 @@ public class UnityCloudSaveRepository : IPlayerRepository
         public int SpawnMaxLambsCount;
         public int SkillDamageBoostCount;
         public int SpeedBoostCount;
+        public long LastUpdated;
     }
 
     private async Task EnsureInitializedAsync()
@@ -92,7 +95,8 @@ public class UnityCloudSaveRepository : IPlayerRepository
             { KEY_FLOCK_SHIELD_COUNT, profile.FlockShieldCount },
             { KEY_SPAWN_MAX_LAMBS_COUNT, profile.SpawnMaxLambsCount },
             { KEY_SKILL_DAMAGE_BOOST_COUNT, profile.SkillDamageBoostCount },
-            { KEY_SPEED_BOOST_COUNT, profile.SpeedBoostCount }
+            { KEY_SPEED_BOOST_COUNT, profile.SpeedBoostCount },
+            { KEY_LAST_UPDATED, DateTimeOffset.UtcNow.ToUnixTimeSeconds() }
         };
 
         try
@@ -110,7 +114,8 @@ public class UnityCloudSaveRepository : IPlayerRepository
                 FlockShieldCount = profile.FlockShieldCount,
                 SpawnMaxLambsCount = profile.SpawnMaxLambsCount,
                 SkillDamageBoostCount = profile.SkillDamageBoostCount,
-                SpeedBoostCount = profile.SpeedBoostCount
+                SpeedBoostCount = profile.SpeedBoostCount,
+                LastUpdated = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
             };
             File.WriteAllText(LocalSavePath, JsonUtility.ToJson(localSave));
         }
@@ -180,6 +185,31 @@ public class UnityCloudSaveRepository : IPlayerRepository
             return _cachedProfile;
         }
 
+        long cloudTimestamp = loadedData.TryGetValue(KEY_LAST_UPDATED, out var t) ? t.Value.GetAs<long>() : 0;
+        
+        LocalSaveData existingLocalSave = null;
+        if (File.Exists(LocalSavePath))
+        {
+            try { existingLocalSave = JsonUtility.FromJson<LocalSaveData>(File.ReadAllText(LocalSavePath)); } catch { }
+        }
+
+        if (existingLocalSave != null && existingLocalSave.LastUpdated > cloudTimestamp)
+        {
+            Debug.Log("[CloudSave] Local cache is newer than Cloud Save. Preferring local data and syncing to Cloud.");
+            var localProfile = new PlayerProfile();
+            localProfile.RestoreState(
+                existingLocalSave.Coins, existingLocalSave.Exp, existingLocalSave.UnlockedStage, 
+                existingLocalSave.DamageLevel, existingLocalSave.HpLevel, existingLocalSave.HerdHpLevel, 
+                existingLocalSave.HasArmor, existingLocalSave.HasHorn, existingLocalSave.FlockShieldCount, 
+                existingLocalSave.SpawnMaxLambsCount, existingLocalSave.SkillDamageBoostCount, existingLocalSave.SpeedBoostCount
+            );
+            _cachedProfile = localProfile;
+            
+            // Upload to cloud asynchronously
+            _ = SaveAsync(localProfile);
+            return localProfile;
+        }
+
         int coins = loadedData.TryGetValue(KEY_COIN, out var c) ? c.Value.GetAs<int>() : 0;
         int exp = loadedData.TryGetValue(KEY_EXP, out var e) ? e.Value.GetAs<int>() : 0;
         int unlockedStage = loadedData.TryGetValue(KEY_UNLOCKED_STAGE, out var us) ? us.Value.GetAs<int>() : 0;
@@ -206,7 +236,8 @@ public class UnityCloudSaveRepository : IPlayerRepository
                 DamageLevel = damageLevel, HpLevel = hpLevel, HerdHpLevel = herdHpLevel,
                 HasArmor = hasArmor, HasHorn = hasHorn, FlockShieldCount = flockShieldCount,
                 SpawnMaxLambsCount = spawnMaxLambsCount, SkillDamageBoostCount = skillDamageBoostCount,
-                SpeedBoostCount = speedBoostCount
+                SpeedBoostCount = speedBoostCount,
+                LastUpdated = cloudTimestamp
             };
             File.WriteAllText(LocalSavePath, JsonUtility.ToJson(localSave));
         }
