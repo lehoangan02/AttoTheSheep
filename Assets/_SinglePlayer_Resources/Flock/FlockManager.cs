@@ -6,9 +6,7 @@ using Unity.Netcode;
 [System.Serializable]
 public struct FlockLevelConfig
 {
-    [Tooltip("Số lượng cừu tối đa ở Level này")]
     public int maxLambs;
-    [Tooltip("Bán kính cơ bản (Base Radius) ở Level này")]
     public float baseRadius;
 }
 
@@ -20,10 +18,15 @@ public enum FlockControlMode
 
 public class FlockManager : NetworkBehaviour
 {
-    [Header("Level Settings")]
-    public NetworkVariable<int> currentLevel = new NetworkVariable<int>(1, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    [Header("=== HARDCODED SETTINGS (CHỈNH SỬA TẠI ĐÂY) ===")]
+    [Tooltip("SỬA SỐ NÀY TRONG CODE ĐỂ ĐỔI LEVEL KHỞI ĐẦU KHI RUN: 1, 2 hoặc 3")]
+    private const int HARDCODED_STARTING_LEVEL = 3; 
     
-    [SerializeField] private FlockLevelConfig[] levelConfigs;
+    // Hardcode các mốc kích hoạt Kỹ năng (Skill Milestones)
+    private const int lambsForSkill1 = 3;
+    private const int lambsForSkill2 = 6;
+    private const int lambsForSkill3 = 10;
+    private const int MAX_LEVEL = 3;
 
     [Header("Control Settings")]
     public FlockControlMode currentControlMode = FlockControlMode.Auto;
@@ -61,6 +64,10 @@ public class FlockManager : NetworkBehaviour
     [Header("Debug Settings")]
     [SerializeField] private bool showDebugRadius = true;
 
+    // Các biến đồng bộ Network và dữ liệu Runtime
+    [HideInInspector]
+    public NetworkVariable<int> currentLevel = new NetworkVariable<int>(1, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    
     public List<LambAI> activeLambs { get; private set; } = new List<LambAI>();
     
     public NetworkVariable<Vector2> currentFlockCenter = new NetworkVariable<Vector2>(Vector2.zero, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server); 
@@ -74,24 +81,35 @@ public class FlockManager : NetworkBehaviour
     public float HealScale => healScale;
     public float ManaScale => manaScale;
 
+    public event Action<int> OnFlockTierChanged;
+
     private PlayerController currentPlayer; 
     private Vector2 lastPlayerAnchorPos; 
     private Vector2 flockDestination;
     private PlayerSkills currentPlayerSkills; 
 
+    // ==========================================
+    // LOGIC HARDCODE CẤU HÌNH LEVEL
+    // ==========================================
+    public FlockLevelConfig GetCurrentLevelConfig()
+    {
+        switch (currentLevel.Value)
+        {
+            case 1:
+                return new FlockLevelConfig { maxLambs = 3, baseRadius = 1.0f };
+            case 2:
+                return new FlockLevelConfig { maxLambs = 6, baseRadius = 1.5f };
+            case 3:
+            default:
+                return new FlockLevelConfig { maxLambs = 10, baseRadius = 2.0f };
+        }
+    }
+
     public override void OnNetworkSpawn()
     {
         if (IsServer)
         {
-            if (levelConfigs == null || levelConfigs.Length == 0)
-            {
-                levelConfigs = new FlockLevelConfig[]
-                {
-                    new FlockLevelConfig { maxLambs = 3, baseRadius = 1.0f },
-                    new FlockLevelConfig { maxLambs = 6, baseRadius = 1.5f },
-                    new FlockLevelConfig { maxLambs = 10, baseRadius = 2.0f }
-                };
-            }
+            currentLevel.Value = HARDCODED_STARTING_LEVEL;
 
             flockDestination = transform.position;
             currentFlockCenter.Value = transform.position;
@@ -140,13 +158,13 @@ public class FlockManager : NetworkBehaviour
 
             UpdateActualFlockCenter();
 
-            // THAY ĐỔI: Đồng bộ số lượng cừu thực tế sang Player Kỹ năng
+            // CHỖ THAY ĐỔI: Đồng bộ số lượng cừu thực tế sang PlayerSkills mới
             if (currentPlayerSkills != null)
             {
-                int totalLambs = activeLambs.Count;
-                if (currentPlayerSkills.currentLambCount.Value != totalLambs)
+                int currentLambsCount = activeLambs.Count; // Lấy tổng số cừu thực tế hiện tại
+                if (currentPlayerSkills.currentLambCount.Value != currentLambsCount)
                 {
-                    currentPlayerSkills.currentLambCount.Value = totalLambs;
+                    currentPlayerSkills.currentLambCount.Value = currentLambsCount; // Gán vào biến mới
                 }
 
                 bool isInside = IsPositionInsideSkillZone(currentPlayer.transform.position);
@@ -208,6 +226,7 @@ public class FlockManager : NetworkBehaviour
     private void CheckLambsOutOfBounds()
     {
         Vector2 center = flockDestination;
+
         foreach (var lamb in activeLambs)
         {
             if (lamb != null && lamb.gameObject.activeInHierarchy)
@@ -287,12 +306,6 @@ public class FlockManager : NetworkBehaviour
         OnControlModeChanged?.Invoke(newMode);
     }
 
-    public FlockLevelConfig GetCurrentLevelConfig()
-    {
-        int index = Mathf.Clamp(currentLevel.Value - 1, 0, levelConfigs.Length - 1);
-        return levelConfigs[index];
-    }
-
     private void SpawnInitialFlock()
     {
         int startingLambs = GetCurrentLevelConfig().maxLambs;
@@ -326,6 +339,7 @@ public class FlockManager : NetworkBehaviour
             lambAI.Initialize(this, obstacleLayer);
             activeLambs.Add(lambAI);
             UpdateFlockRadius();
+            OnFlockTierChanged?.Invoke(GetFlockTier());
         }
 
         return lambAI;
@@ -355,6 +369,7 @@ public class FlockManager : NetworkBehaviour
         {
             activeLambs.Remove(lamb);
             UpdateFlockRadius();
+            OnFlockTierChanged?.Invoke(GetFlockTier());
         }
     }
 
@@ -363,6 +378,7 @@ public class FlockManager : NetworkBehaviour
         float dynamicBaseRadius = GetCurrentLevelConfig().baseRadius;
         currentFlockRadius = dynamicBaseRadius + (radiusMultiplier * Mathf.Sqrt(activeLambs.Count));
         currentSkillZoneRadius = currentFlockRadius * skillZoneRadiusMultiplier;
+        
         CommandFlock(flockDestination);
     }
 
@@ -370,7 +386,7 @@ public class FlockManager : NetworkBehaviour
     {
         if (!IsServer) return;
 
-        if (currentLevel.Value < levelConfigs.Length)
+        if (currentLevel.Value < MAX_LEVEL)
         {
             currentLevel.Value++;
             UpdateFlockRadius();
@@ -380,6 +396,7 @@ public class FlockManager : NetworkBehaviour
     private void HandleMapClicked(Vector2 targetPos)
     {
         CommandFlock(targetPos);
+
         if (currentControlMode == FlockControlMode.Auto && currentPlayer != null)
         {
             lastPlayerAnchorPos = currentPlayer.transform.position;
@@ -389,6 +406,7 @@ public class FlockManager : NetworkBehaviour
     private void CommandFlock(Vector2 targetPos)
     {
         flockDestination = targetPos;
+
         foreach (var lamb in activeLambs)
         {
             if (lamb != null && lamb.gameObject.activeInHierarchy)
@@ -396,6 +414,14 @@ public class FlockManager : NetworkBehaviour
                 lamb.SetFlockData(flockDestination, currentFlockRadius);
             }
         }
+    }
+
+    public int GetFlockTier()
+    {
+        if (activeLambs.Count >= lambsForSkill3) return 3;
+        if (activeLambs.Count >= lambsForSkill2) return 2;
+        if (activeLambs.Count >= lambsForSkill1) return 1;
+        return 0; 
     }
 
     private void OnDrawGizmos()
