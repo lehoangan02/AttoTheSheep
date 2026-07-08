@@ -17,8 +17,8 @@ public class PlayerSkills : NetworkBehaviour
     private PlayerController controller;
     private NetworkEntity entity;
 
-    // Flock tier (0: No flock, 1: 3 lambs, 2: 6 lambs, 3: 10 lambs)
-    public NetworkVariable<int> unlockedSkillTier = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    // THAY ĐỔI: Lưu trực tiếp số lượng cừu thực tế đang có trên mạng thay vì lưu Tier
+    public NetworkVariable<int> currentLambCount = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
     // Is the player standing within the flock's radius
     public NetworkVariable<bool> isInsideFlock = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
@@ -45,7 +45,7 @@ public class PlayerSkills : NetworkBehaviour
         {
             if (controller != null) controller.OnSkillActivated += TryCastSkill;
 
-            // Tìm tất cả SkillBoardUI trên Scene và nạp dữ liệu 4 skills vào
+            // Tìm tất cả SkillBoardUI trên Scene và nạp dữ liệu
             SkillBoardUI[] boardUIs = FindObjectsByType<SkillBoardUI>(FindObjectsSortMode.None);
             foreach (SkillBoardUI boardUI in boardUIs)
             {
@@ -73,8 +73,9 @@ public class PlayerSkills : NetworkBehaviour
         // STEP 0: CHECK FLOCK RANGE — Base skills don't need flock
         if (!IsBaseSkill(skillId) && !isInsideFlock.Value) return;
 
-        // STEP 1: CHECK AUTO-UNLOCK CONDITION — Base skills always pass
-        if (slot.data.lambsRequired > unlockedSkillTier.Value) return;
+        // THAY ĐỔI: So sánh trực tiếp số cừu yêu cầu với số cừu thực tế đang sở hữu
+        if (slot.data.lambsRequired > currentLambCount.Value) return;
+
         // STEP 2: CHECK COOLDOWN (Attack speed)
         if (lastCastTimes.TryGetValue(skillId, out float lastTime))
         {
@@ -103,8 +104,8 @@ public class PlayerSkills : NetworkBehaviour
         // Check flock range on Server (Anti-hack) — Base skills bypass
         if (!IsBaseSkill(skillId) && !isInsideFlock.Value) return;
 
-        // Double check on Server to prevent Hack — Base skills bypass
-        if (slot.data.lambsRequired > unlockedSkillTier.Value) return;
+        // THAY ĐỔI: Kiểm tra chống hack trên Server bằng số cừu thực tế
+        if (slot.data.lambsRequired > currentLambCount.Value) return;
 
         // STEP 3: DEDUCT MANA (If skill has manaCost > 0)
         if (slot.data.manaCost > 0)

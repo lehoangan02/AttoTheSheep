@@ -31,13 +31,14 @@ public class HealWaveVisualizer : MonoBehaviour
 
     void Start()
     {
-        // Khóa scale của object cha này về chuẩn 1, 1, 1 để không làm lệch các sóng con
         transform.localScale = Vector3.one;
     }
 
     void Update()
     {
-        if (flockManager == null || waveSprite == null) return;
+        // THAY ĐỔI TẠI ĐÂY: Nếu không có flockManager, không có hình, hoặc KHÔNG CÓ CỪU NÀO thì không làm gì cả
+        if (flockManager == null || waveSprite == null || flockManager.activeLambs == null || flockManager.activeLambs.Count == 0) 
+            return;
 
         // Luôn bám theo tâm bầy cừu
         transform.position = flockManager.currentFlockCenter.Value;
@@ -53,35 +54,25 @@ public class HealWaveVisualizer : MonoBehaviour
 
     private void SpawnWave()
     {
-        // Tạo 1 Game Object mới chứa gợn sóng
         GameObject waveObj = new GameObject("RippleWave");
         waveObj.transform.position = transform.position;
-        waveObj.transform.SetParent(transform); // Nhét vào trong object cha cho gọn
+        waveObj.transform.SetParent(transform); 
 
-        // Gắn Sprite và set màu
         SpriteRenderer sr = waveObj.AddComponent<SpriteRenderer>();
         sr.sprite = waveSprite;
         sr.color = waveColor;
         sr.sortingOrder = sortingOrder;
 
-        // --- THUẬT TOÁN TỰ ĐỘNG CHUẨN HÓA KÍCH THƯỚC ẢNH ---
-        // Lấy kích thước thật của Sprite trong không gian Unity (đơn vị Unit)
         float spriteUnitWidth = waveSprite.bounds.size.x;
-        // Hệ số chuẩn hóa: Biến mọi bức ảnh (dù to hay nhỏ) về đúng chuẩn kích thước 1 ô vuông Unity
         float normalizationFactor = (spriteUnitWidth > 0) ? (1f / spriteUnitWidth) : 1f;
 
-        // Gắn script phụ để điều khiển hiệu ứng lan tỏa
         WaveBehavior waveAnim = waveObj.AddComponent<WaveBehavior>();
         
-        // Đường kính đích = Bán kính bầy cừu * 2 * Hệ số chuẩn hóa ảnh * Hệ số tinh chỉnh tay
         waveAnim.targetScale = (flockManager.currentFlockRadius * 2f) * normalizationFactor * sizeMultiplier; 
         waveAnim.duration = waveDuration;
     }
 }
 
-// ==========================================
-// CLASS PHỤ: Xử lý hoạt ảnh của từng gợn sóng
-// ==========================================
 public class WaveBehavior : MonoBehaviour
 {
     public float targetScale;
@@ -95,7 +86,7 @@ public class WaveBehavior : MonoBehaviour
     {
         sr = GetComponent<SpriteRenderer>();
         startColor = sr.color;
-        transform.localScale = Vector3.zero; // Bắt đầu lan ra từ tâm (scale = 0)
+        transform.localScale = Vector3.zero; 
     }
 
     void Update()
@@ -105,16 +96,14 @@ public class WaveBehavior : MonoBehaviour
 
         if (progress >= 1f)
         {
-            Destroy(gameObject); // Sóng tan biến hết thì tự hủy cho nhẹ máy
+            Destroy(gameObject); 
             return;
         }
 
-        // Hiệu ứng phình to: Phình nhanh lúc đầu, chậm dần về cuối (Ease Out)
         float easeOutProgress = 1f - Mathf.Pow(1f - progress, 3f); 
         float currentScale = Mathf.Lerp(0f, targetScale, easeOutProgress);
         transform.localScale = new Vector3(currentScale, currentScale, 1f);
 
-        // Hiệu ứng mờ dần: Alpha giảm từ từ về 0
         Color c = startColor;
         c.a = Mathf.Lerp(startColor.a, 0f, progress);
         sr.color = c;

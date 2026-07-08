@@ -12,10 +12,7 @@ public class PlayerFlockBuffs : NetworkBehaviour
 
     void Awake()
     {
-        // Find the stat core for healing
         entity = GetComponentInParent<NetworkEntity>();
-        
-        // Find the Skill list on the same Object to unlock skills
         skills = GetComponent<PlayerSkills>(); 
     }
 
@@ -23,17 +20,17 @@ public class PlayerFlockBuffs : NetworkBehaviour
     {
         if (IsOwner)
         {
-                myFlock = FindFirstObjectByType<FlockManager>();
+            myFlock = FindFirstObjectByType<FlockManager>();
 
             if (myFlock != null)
             {
-                // Start the flock checking loop (Defaults to once per second)
+                // Vẫn giữ chu kỳ kiểm tra buff (Mặc định 1 giây/lần)
                 InvokeRepeating(nameof(CheckFlockBuffs), buffCheckInterval, buffCheckInterval);
             }
             else
             {
-                // [MULTIPLAYER MODE] If there are no lambs on the map, automatically unlock all skills (Tier 10)
-                UpdateSkillTierServerRpc(10);
+                // [CHẾ ĐỘ KHÔNG CÓ CỪU] Mở khóa toàn bộ skill bằng cách gán số lượng cừu ảo cực lớn (Ví dụ: 999 con)
+                UpdateSkillLambsServerRpc(999);
             }
         }
     }
@@ -42,37 +39,29 @@ public class PlayerFlockBuffs : NetworkBehaviour
     {
         if (myFlock == null) return;
         
-        // Check if the player is standing inside any flock zone
+        // Chỉ cần kiểm tra Heal Zone để hồi máu (Skill Zone đã được FlockManager tự động lo)
         Vector3 parentPos = transform.parent != null ? transform.parent.position : transform.position;
         bool isInsideHealZone = myFlock.IsPositionInsideHealZone(parentPos);
-        bool isInsideSkillZone = myFlock.IsPositionInsideSkillZone(parentPos);
         
-        // Send information to the Server
-        UpdateBuffsServerRpc(myFlock.activeLambs.Count, myFlock.GetFlockTier(), isInsideHealZone, isInsideSkillZone, myFlock.HealScale, myFlock.ManaScale);
+        // Gửi thông tin hồi máu lên Server
+        UpdateBuffsServerRpc(myFlock.activeLambs.Count, isInsideHealZone, myFlock.HealScale, myFlock.ManaScale);
     }
 
     [ServerRpc]
-    private void UpdateBuffsServerRpc(int clientFlockSize, int flockTier, bool isInsideHealZone, bool isInsideSkillZone, float healScale, float manaScale)
+    private void UpdateBuffsServerRpc(int clientFlockSize, bool isInsideHealZone, float healScale, float manaScale)
     {
-        if (skills == null) return;
+        // LƯU Ý: Đã xóa phần đồng bộ isInsideFlock và unlockedSkillTier ở đây 
+        // vì FlockManager.cs đã làm việc đó liên tục và chính xác trên Server rồi!
 
-        // 0. UPDATE "is inside skill zone" status for PlayerSkills
-        skills.isInsideFlock.Value = isInsideSkillZone;
-
-        // 1. UNLOCK SKILLS
-        skills.unlockedSkillTier.Value = flockTier;
-
-        // 2. RESTORE: Only heal when standing inside the flock's heal zone
+        // CHỈ XỬ LÝ HỒI MÁU VÀ NĂNG LƯỢNG
         if (isInsideHealZone && clientFlockSize > 0 && entity != null)
         {
-            // Heal if not full
             if (entity.currentHealth.Value < entity.BaseMaxHealth)
             {
                 int healAmount = Mathf.RoundToInt(healScale * clientFlockSize);
                 entity.Heal(Mathf.Max(1, healAmount));
             }
 
-            // Restore mana if not full
             if (entity.currentMana.Value < entity.BaseMaxMana)
             {
                 int manaAmount = Mathf.RoundToInt(manaScale * clientFlockSize);
@@ -81,13 +70,14 @@ public class PlayerFlockBuffs : NetworkBehaviour
         }
     }
 
-    // Helper function for no-flock mode
+    // Hàm hỗ trợ cho chế độ chơi không có bầy cừu
     [ServerRpc]
-    private void UpdateSkillTierServerRpc(int tier)
+    private void UpdateSkillLambsServerRpc(int simulatedLambCount)
     {
         if (skills != null)
         {
-            skills.unlockedSkillTier.Value = tier;
+            // Gán số lượng cừu khổng lồ để pass mọi điều kiện unlock
+            skills.currentLambCount.Value = simulatedLambCount;
             skills.isInsideFlock.Value = true;
         }
     }
