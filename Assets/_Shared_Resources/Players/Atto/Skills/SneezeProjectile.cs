@@ -51,6 +51,38 @@ public class SneezeProjectile : NetworkBehaviour
             localScale.x = Mathf.Abs(localScale.x);
         }
         transform.localScale = localScale;
+        
+        if (IsServer)
+        {
+            InitializeVisualsClientRpc(direction, speed, flipX);
+        }
+    }
+
+    [ClientRpc]
+    private void InitializeVisualsClientRpc(Vector2 direction, float speed, bool flipX)
+    {
+        if (IsServer) return; // Server already sets this in Initialize
+
+        if (rb != null)
+        {
+            rb.linearVelocity = direction * speed;
+        }
+
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        transform.rotation = Quaternion.Euler(0, 0, angle);
+
+        Vector3 localScale = transform.localScale;
+        if (direction.x < 0)
+        {
+            localScale.y = -Mathf.Abs(localScale.y);
+            localScale.x = Mathf.Abs(localScale.x);
+        }
+        else
+        {
+            localScale.y = Mathf.Abs(localScale.y);
+            localScale.x = Mathf.Abs(localScale.x);
+        }
+        transform.localScale = localScale;
     }
 
     private void OnTriggerEnter2D(Collider2D other)

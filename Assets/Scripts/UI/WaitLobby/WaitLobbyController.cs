@@ -33,6 +33,7 @@ public class WaitLobbyController : MonoBehaviour
     [SerializeField] private Sprite[] mockAvatars;
 
     private List<AttoTheSheep.Core.PlayerData> _players = new List<AttoTheSheep.Core.PlayerData>();
+    private bool _isTransitioning;
 
     private void Start()
     {
@@ -191,6 +192,9 @@ public class WaitLobbyController : MonoBehaviour
 
     private void OnConfirmYesClicked()
     {
+        if (_isTransitioning) return;
+        _isTransitioning = true;
+
         Debug.Log("[WaitLobby] Leaving lobby...");
         if (OnRequestLeaveLobby != null)
         {
@@ -210,6 +214,9 @@ public class WaitLobbyController : MonoBehaviour
 
     private void OnReadyClicked()
     {
+        if (_isTransitioning) return;
+        _isTransitioning = true;
+
         Debug.Log("[WaitLobby] Ready clicked! Proceeding to Game...");
         AttoTheSheep.Core.LoadingManager.Instance?.Show("msg_loading_game");
         

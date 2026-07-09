@@ -242,6 +242,14 @@ public class LobbyManager : MonoBehaviour
         {
             Debug.Log("[Host] Scene load completed for all clients. We will not terminate the Lobby immediately to allow clients to join.");
             // We just let the lobby expire naturally or keep it for late joiners
+
+            // Ensure PlayerSpawnManager exists in MultiplayerLevel
+            if (UnityEngine.Object.FindFirstObjectByType<PlayerSpawnManager>() == null)
+            {
+                Debug.Log("[LobbyManager] PlayerSpawnManager missing in scene! Spawning one dynamically.");
+                var smGo = new GameObject("PlayerSpawnManager");
+                smGo.AddComponent<PlayerSpawnManager>();
+            }
         }
         else
         {

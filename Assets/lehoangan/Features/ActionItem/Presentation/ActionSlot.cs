@@ -66,13 +66,15 @@ public class ActionSlot : MonoBehaviour
             return false; 
         }
 
-        if (_playerProfile == null)
+        bool isMultiplayer = Unity.Netcode.NetworkManager.Singleton != null && Unity.Netcode.NetworkManager.Singleton.IsListening;
+
+        if (!isMultiplayer && _playerProfile == null)
         {
             Debug.LogWarning("PlayerProfile not loaded yet!");
             return false;
         }
 
-        if (_playerProfile.ConsumeItem(itemData.itemName))
+        if (isMultiplayer || _playerProfile.ConsumeItem(itemData.itemName))
         {
             // Update the visual UI directly from the new profile state
             UpdateUI();
@@ -80,7 +82,7 @@ public class ActionSlot : MonoBehaviour
             Debug.Log($"Used {itemData.itemName}! Remaining: {GetCurrentAmount()}");
 
             // Save the updated profile to the cloud
-            if (_playerRepository != null)
+            if (!isMultiplayer && _playerRepository != null)
             {
                 _playerRepository.SaveAsync(_playerProfile);
             }
@@ -96,6 +98,9 @@ public class ActionSlot : MonoBehaviour
 
     private int GetCurrentAmount()
     {
+        bool isMultiplayer = Unity.Netcode.NetworkManager.Singleton != null && Unity.Netcode.NetworkManager.Singleton.IsListening;
+        if (isMultiplayer) return 99;
+
         if (_playerProfile == null || itemData == null) return 0;
         
         switch (itemData.itemName)

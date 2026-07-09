@@ -113,9 +113,33 @@ public class PlayerController : NetworkBehaviour
         NetworkVariableWritePermission.Server
     );
 
+    private void Start()
+    {
+        // On clients, pre-placed scene objects that were despawned by the server 
+        // will not have OnNetworkSpawn called and will remain unspawned.
+        // We must destroy them to prevent them from becoming "extra" phantom players that steal input.
+        if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
+        {
+            if (!NetworkObject.IsSpawned)
+            {
+                Debug.Log($"[PlayerController] Destroying unspawned pre-placed player object: {gameObject.name}");
+                Destroy(gameObject);
+            }
+        }
+    }
+
     public override void OnNetworkSpawn()
     {
         Debug.Log($"[PlayerController] OnNetworkSpawn is running on: {gameObject.name}. IsOwner: {IsOwner}");
+        
+        // Destroy pre-placed player objects in scenes to prevent duplicates when using PlayerSpawnManager
+        if (IsServer && !NetworkObject.IsPlayerObject)
+        {
+            Debug.Log("[PlayerController] Destroying pre-placed non-player object in scene.");
+            GetComponent<NetworkObject>().Despawn(true);
+            return;
+        }
+
         if (IsOwner)
         {
             // Automatically assign a random name upon spawning into the game

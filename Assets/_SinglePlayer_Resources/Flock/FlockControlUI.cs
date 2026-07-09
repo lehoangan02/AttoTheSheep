@@ -32,7 +32,8 @@ public class FlockControlUI : MonoBehaviour
         }
         else
         {
-            Debug.LogError("[FlockControlUI] Không tìm thấy FlockManager trong Scene!");
+            Debug.Log("[FlockControlUI] Không tìm thấy FlockManager trong Scene. Đang vô hiệu hóa giao diện.");
+            gameObject.SetActive(false);
         }
     }
 

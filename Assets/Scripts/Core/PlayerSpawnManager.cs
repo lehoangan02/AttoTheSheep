@@ -2,7 +2,7 @@ using UnityEngine;
 using Unity.Netcode;
 using System.Collections.Generic;
 
-public class PlayerSpawnManager : NetworkBehaviour
+public class PlayerSpawnManager : MonoBehaviour
 {
     [Header("Spawn Settings")]
     [SerializeField] private GameObject playerPrefab;
@@ -12,20 +12,20 @@ public class PlayerSpawnManager : NetworkBehaviour
 
     private readonly HashSet<ulong> _spawnedClientIds = new HashSet<ulong>();
 
-    public override void OnNetworkSpawn()
+    private void Start()
     {
-        if (!IsServer) return;
+        if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsServer) return;
 
         NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
 
         // Host is the only client connected at the moment SampleScene loads on the host.
         // StartHost() fires OnClientConnectedCallback for the host BEFORE this scene's
-        // OnNetworkSpawn runs, so we must spawn the host explicitly here.
+        // Start runs, so we must spawn the host explicitly here.
         SpawnPlayer(NetworkManager.ServerClientId);
         _spawnedClientIds.Add(NetworkManager.ServerClientId);
 
         // Defensive sweep: any client that connected between scene-load-start and this
-        // OnNetworkSpawn would otherwise be missed. Iterate the read-only list and
+        // Start would otherwise be missed. Iterate the read-only list and
         // spawn anyone we have not already spawned.
         var connectedIds = NetworkManager.Singleton.ConnectedClientsIds;
         for (int i = 0; i < connectedIds.Count; i++)
@@ -37,7 +37,7 @@ public class PlayerSpawnManager : NetworkBehaviour
         }
     }
 
-    public override void OnNetworkDespawn()
+    private void OnDestroy()
     {
         if (NetworkManager.Singleton != null)
         {
@@ -47,7 +47,7 @@ public class PlayerSpawnManager : NetworkBehaviour
 
     private void OnClientConnected(ulong clientId)
     {
-        if (!IsServer) return;
+        if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsServer) return;
         if (_spawnedClientIds.Contains(clientId)) return;
         SpawnPlayer(clientId);
         _spawnedClientIds.Add(clientId);
@@ -55,7 +55,25 @@ public class PlayerSpawnManager : NetworkBehaviour
 
     private void SpawnPlayer(ulong clientId)
     {
-        if (!IsServer) return;
+        if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsServer) return;
+
+        if (playerPrefab == null)
+        {
+            foreach (var prefabInfo in NetworkManager.Singleton.NetworkConfig.Prefabs.Prefabs)
+            {
+                if (prefabInfo.Prefab != null && prefabInfo.Prefab.GetComponent<PlayerController>() != null)
+                {
+                    playerPrefab = prefabInfo.Prefab;
+                    break;
+                }
+            }
+        }
+
+        if (playerPrefab == null)
+        {
+            Debug.LogError("[PlayerSpawnManager] playerPrefab is null and could not be found in NetworkConfig!");
+            return;
+        }
 
         if (!GetValidSpawnPosition(out Vector3 pos))
         {
@@ -72,36 +90,11 @@ public class PlayerSpawnManager : NetworkBehaviour
 
         netObj.SpawnAsPlayerObject(clientId, destroyWithScene: true);
         Debug.Log($"[PlayerSpawnManager] Spawned player for clientId={clientId} at {pos}");
-
-        // Spawn a FlockManager for this player!
-        GameObject flockPrefab = GetFlockManagerPrefab();
-        if (flockPrefab != null)
-        {
-            GameObject fmInstance = Instantiate(flockPrefab, pos, Quaternion.identity);
-            NetworkObject fmNetObj = fmInstance.GetComponent<NetworkObject>();
-            if (fmNetObj != null)
-            {
-                fmNetObj.SpawnWithOwnership(clientId, destroyWithScene: true);
-                Debug.Log($"[PlayerSpawnManager] Spawned FlockManager for clientId={clientId}");
-            }
-        }
-    }
-
-    private GameObject GetFlockManagerPrefab()
-    {
-        foreach (var prefabInfo in NetworkManager.Singleton.NetworkConfig.Prefabs.Prefabs)
-        {
-            if (prefabInfo.Prefab != null && prefabInfo.Prefab.GetComponent<FlockManager>() != null)
-            {
-                return prefabInfo.Prefab;
-            }
-        }
-        return null;
     }
 
     private bool GetValidSpawnPosition(out Vector3 position)
     {
-        if (!IsServer)
+        if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsServer)
         {
             position = Vector3.zero;
             return false;

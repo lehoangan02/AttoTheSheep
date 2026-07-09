@@ -71,15 +71,16 @@ public class PlayerSkills : NetworkBehaviour
         if (slot == null || slot.data == null || slot.logicScript == null) return;
 
         // STEP 0: CHECK FLOCK RANGE — Base skills don't need flock
-        if (!IsBaseSkill(skillId) && !isInsideFlock.Value) return;
+        // if (!IsBaseSkill(skillId) && !isInsideFlock.Value) return;
 
         // THAY ĐỔI: So sánh trực tiếp số cừu yêu cầu với số cừu thực tế đang sở hữu
-        if (slot.data.lambsRequired > currentLambCount.Value) return;
+        // if (slot.data.lambsRequired > currentLambCount.Value) return;
 
         // STEP 2: CHECK COOLDOWN (Attack speed)
+        // Dùng cooldown nhỏ (0.5s) để tránh lỗi gọi đè nhiều Coroutine cùng lúc
         if (lastCastTimes.TryGetValue(skillId, out float lastTime))
         {
-            if (Time.time < lastTime + slot.data.cooldown) return; 
+            if (Time.time < lastTime + 0.5f) return; 
         }
 
         // Cập nhật thời gian thi triển
@@ -88,7 +89,7 @@ public class PlayerSkills : NetworkBehaviour
         // CHỈ BẮN EVENT NẾU LÀ LOCAL PLAYER
         if (IsOwner)
         {
-            OnSkillCooldownStarted?.Invoke(skillId, slot.data.cooldown);
+            OnSkillCooldownStarted?.Invoke(skillId, 0f); // 0f để UI không hiện cooldown
         }
 
         // Gọi logic lên Server
@@ -102,16 +103,17 @@ public class PlayerSkills : NetworkBehaviour
         if (slot == null || slot.data == null || slot.logicScript == null) return;
 
         // Check flock range on Server (Anti-hack) — Base skills bypass
-        if (!IsBaseSkill(skillId) && !isInsideFlock.Value) return;
+        // if (!IsBaseSkill(skillId) && !isInsideFlock.Value) return;
 
         // THAY ĐỔI: Kiểm tra chống hack trên Server bằng số cừu thực tế
-        if (slot.data.lambsRequired > currentLambCount.Value) return;
+        // if (slot.data.lambsRequired > currentLambCount.Value) return;
 
         // STEP 3: DEDUCT MANA (If skill has manaCost > 0)
-        if (slot.data.manaCost > 0)
-        {
-            if (entity != null && !entity.ConsumeMana((int)slot.data.manaCost)) return;
-        }
+        // COMMENTED OUT MANA COST SO YOU CAN TEST FREELY
+        // if (slot.data.manaCost > 0)
+        // {
+        //     if (entity != null && !entity.ConsumeMana((int)slot.data.manaCost)) return;
+        // }
 
         // STEP 4: TRIGGER SERVER LOGIC (Basic Attack, Headbutt, Fart, Dash, etc.)
         slot.logicScript.ServerExecute(slot.data, entity, controller);
@@ -127,6 +129,16 @@ public class PlayerSkills : NetworkBehaviour
         if (slot != null && slot.logicScript != null)
         {
             slot.logicScript.ClientPlayVisual(slot.data);
+        }
+    }
+
+    [ClientRpc]
+    public void PlaySkillHitVisualClientRpc(int skillId, Vector2 hitPosition)
+    {
+        SkillSlot slot = GetSkillSlot(skillId);
+        if (slot != null && slot.logicScript != null)
+        {
+            slot.logicScript.ClientPlayHitEffect(slot.data, hitPosition);
         }
     }
 

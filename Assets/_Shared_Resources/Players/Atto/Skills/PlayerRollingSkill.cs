@@ -42,20 +42,55 @@ public class PlayerRollingSkill : BaseSkillComponent
 
     public override void ClientPlayVisual(SkillData data)
     {
-        // 1. GỌI CODE CỦA CLASS CHA ĐỂ TỰ ĐỘNG PHÁT SFX VÀ LOG
         base.ClientPlayVisual(data);
+        if (data is RollingSkillData rollData)
+        {
+            StartCoroutine(ClientRollingVisualRoutine(rollData));
+        }
+    }
+
+    private IEnumerator ClientRollingVisualRoutine(RollingSkillData data)
+    {
+        if (normalVisual != null) normalVisual.SetActive(false);
+        if (dustVisual != null) dustVisual.SetActive(true);
+        if (rollingDust != null) rollingDust.Play();
+
+        float elapsed = 0f;
+        float currentMultiplier = 1f;
+
+        while (elapsed < data.duration)
+        {
+            float deltaTime = Time.deltaTime;
+            if (currentMultiplier < data.maxSpeedMultiplier)
+            {
+                currentMultiplier += data.acceleration * deltaTime;
+                currentMultiplier = Mathf.Min(currentMultiplier, data.maxSpeedMultiplier);
+            }
+
+            if (spinMesh != null)
+            {
+                float currentRotationSpeed = data.baseRotationSpeed * currentMultiplier;
+                spinMesh.Rotate(0, 0, -currentRotationSpeed * deltaTime);
+            }
+
+            elapsed += deltaTime;
+            yield return null;
+        }
+
+        if (rollingDust != null) rollingDust.Stop();
+        if (dustVisual != null) dustVisual.SetActive(false);
+        if (normalVisual != null) normalVisual.SetActive(true);
+        if (spinMesh != null) spinMesh.localRotation = Quaternion.identity;
+
+        if (impulseSource != null)
+        {
+            impulseSource.GenerateImpulse(); 
+        }
     }
 
     private IEnumerator RollingRoutine(RollingSkillData data, PlayerController controller)
     {
         Debug.Log("🌀 [ROLL] Bắt đầu cuộn tròn! Đang lấy đà...");
-        
-        // --- 1. SETUP VISUAL & TRẠNG THÁI ---
-        if (normalVisual != null) normalVisual.SetActive(false);
-        if (dustVisual != null) dustVisual.SetActive(true);
-        
-        // Bật Particle bụi
-        if (rollingDust != null) rollingDust.Play();
 
         PlayerMovement pMovement = controller.GetComponentInChildren<PlayerMovement>();
         if (pMovement == null) pMovement = controller.GetComponentInParent<PlayerMovement>();
@@ -73,13 +108,6 @@ public class PlayerRollingSkill : BaseSkillComponent
             {
                 currentMultiplier += data.acceleration * deltaTime;
                 currentMultiplier = Mathf.Min(currentMultiplier, data.maxSpeedMultiplier);
-            }
-
-            // Xoay mesh cục bông dựa trên tốc độ hiện tại
-            if (spinMesh != null)
-            {
-                float currentRotationSpeed = data.baseRotationSpeed * currentMultiplier;
-                spinMesh.Rotate(0, 0, -currentRotationSpeed * deltaTime);
             }
 
             // MECHANIC: HÚT VÀ NUỐT ĐỊCH
@@ -158,22 +186,8 @@ public class PlayerRollingSkill : BaseSkillComponent
             }
         }
 
-        // Tắt Particle bụi
-        if (rollingDust != null) rollingDust.Stop();
-
         // Nhả những con địch còn sống ra xung quanh bằng Animation
         SpitOutEnemies(data);
-
-        // GỌI RUNG CAMERA BẰNG CINEMACHINE TẠI ĐÂY
-        if (impulseSource != null)
-        {
-            impulseSource.GenerateImpulse(); 
-        }
-
-        // Trả lại Visual cừu bình thường
-        if (dustVisual != null) dustVisual.SetActive(false);
-        if (normalVisual != null) normalVisual.SetActive(true);
-        if (spinMesh != null) spinMesh.localRotation = Quaternion.identity; 
     }
 
     private void SwallowEnemy(GameObject enemyObj)
@@ -236,6 +250,12 @@ public class PlayerRollingSkill : BaseSkillComponent
         if (enemy.Obj != null)
         {
             foreach (var sr in enemy.Renderers) if (sr != null) sr.enabled = false;
+            
+            if (enemy.Entity != null && enemy.Entity.NetworkObject != null)
+            {
+                SetEnemyVisibilityClientRpc(enemy.Entity.NetworkObject.NetworkObjectId, false);
+            }
+
             // Trả lại kích thước gốc để chuẩn bị cho lúc nhả ra
             enemy.Obj.transform.localScale = enemy.OriginalScale; 
         }
@@ -279,7 +299,13 @@ public class PlayerRollingSkill : BaseSkillComponent
             // Đặt quái ở chính giữa bụng và hiện hình lên ngay
             enemy.Obj.transform.position = centerPos;
             if (enemy.Renderers != null) 
+            {
                 foreach (var sr in enemy.Renderers) if (sr != null) sr.enabled = true;
+            }
+            if (enemy.Entity != null && enemy.Entity.NetworkObject != null)
+            {
+                SetEnemyVisibilityClientRpc(enemy.Entity.NetworkObject.NetworkObjectId, true);
+            }
         }
 
         // --- 2. CHẠY HOẠT ẢNH BẮN VĂNG RA ---
@@ -327,6 +353,20 @@ public class PlayerRollingSkill : BaseSkillComponent
             if (enemy.Motor != null) enemy.Motor.IsFrozen = false;
             if (enemy.Colliders != null) 
                 foreach (var col in enemy.Colliders) if (col != null) col.enabled = true;
+        }
+    }
+
+    [ClientRpc]
+    private void SetEnemyVisibilityClientRpc(ulong enemyNetId, bool isVisible)
+    {
+        if (NetworkManager.Singleton != null && NetworkManager.Singleton.SpawnManager != null && 
+            NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(enemyNetId, out var netObj))
+        {
+            var renderers = netObj.GetComponentsInChildren<SpriteRenderer>();
+            foreach (var r in renderers) 
+            {
+                if (r != null) r.enabled = isVisible; 
+            }
         }
     }
 }

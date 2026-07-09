@@ -125,24 +125,15 @@ public class PlayerHeadbuttSkill : BaseSkillComponent
                     enemyEntity.ApplyKnockback(facingDir * data.knockbackForce, 0.2f);
                 }
 
-                if (impactParticle != null && !hasPlayedParticle)
+                if (!hasPlayedParticle)
                 {
                     Vector3 impactPos = hit.ClosestPoint(hitCenter);
-                    impactParticle.transform.position = impactPos;
-                    float yRotation = facingDir.x < 0 ? 180f : 0f;
-                    impactParticle.transform.rotation = Quaternion.Euler(0f, yRotation, 0f);
-                    impactParticle.Play();
-
-                    // RUNG CAMERA KHI HÚC TRÚNG
-                    if (impulseSource != null)
+                    if (skills != null)
                     {
-                        impulseSource.GenerateImpulse();
+                        skills.PlaySkillHitVisualClientRpc(data.skillId, impactPos);
                     }
-
                     hasPlayedParticle = true;
                 }
-                
-                ClientPlayHitEffect(data, hit.transform.position);
             }
         }
 
@@ -162,6 +153,24 @@ public class PlayerHeadbuttSkill : BaseSkillComponent
             
             Vector2 hitCenter = (Vector2)transform.position + new Vector2(currentHeadbuttData.hitboxOffset.x * facingX, currentHeadbuttData.hitboxOffset.y);
             Gizmos.DrawWireSphere(hitCenter, currentHeadbuttData.hitRadius);
+        }
+    }
+
+    public override void ClientPlayHitEffect(SkillData data, Vector2 hitPosition)
+    {
+        base.ClientPlayHitEffect(data, hitPosition);
+
+        if (impactParticle != null)
+        {
+            impactParticle.transform.position = hitPosition;
+            float yRotation = (playerSprite != null && playerSprite.flipX) ? 180f : 0f;
+            impactParticle.transform.rotation = Quaternion.Euler(0f, yRotation, 0f);
+            impactParticle.Play();
+        }
+
+        if (impulseSource != null)
+        {
+            impulseSource.GenerateImpulse();
         }
     }
 }

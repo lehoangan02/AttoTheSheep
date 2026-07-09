@@ -58,7 +58,67 @@ public class PlayerFartSkill : BaseSkillComponent
         if (data is FartSkillData fartData)
         {
             StartCoroutine(PlayTrailRoutine(fartData.dashDuration));
+            StartCoroutine(LockMovementOnClientRoutine(fartData.dashDuration));
+
+            if (IsOwner)
+            {
+                StartCoroutine(OwnerDashMovementRoutine(fartData));
+            }
         }
+    }
+
+    private IEnumerator OwnerDashMovementRoutine(FartSkillData data)
+    {
+        Rigidbody2D parentRb = transform.root.GetComponent<Rigidbody2D>();
+        Collider2D parentCollider = transform.root.GetComponent<Collider2D>();
+
+        if (parentRb == null || parentCollider == null) yield break;
+
+        Vector2 dashDir = transform.root.GetComponentInChildren<SpriteRenderer>().flipX ? Vector2.left : Vector2.right;
+        
+        if (parentRb.linearVelocity.magnitude > 0.1f)
+        {
+            dashDir = parentRb.linearVelocity.normalized;
+        }
+
+        parentRb.linearVelocity = dashDir * data.dashForce;
+
+        float elapsed = 0f;
+        bool hasCollided = false;
+
+        ContactFilter2D filter = new ContactFilter2D();
+        filter.SetLayerMask(data.enemyLayer | LayerMask.GetMask("Ground", "Wall"));
+        filter.useLayerMask = true;
+
+        RaycastHit2D[] hits = new RaycastHit2D[1];
+
+        while (elapsed < data.dashDuration && !hasCollided)
+        {
+            parentRb.linearVelocity = dashDir * data.dashForce;
+
+            float moveDistance = data.dashForce * Time.fixedDeltaTime;
+            int hitCount = parentCollider.Cast(dashDir, filter, hits, moveDistance + 0.1f);
+
+            if (hitCount > 0)
+            {
+                hasCollided = true; 
+            }
+
+            elapsed += Time.fixedDeltaTime;
+            yield return new WaitForFixedUpdate();
+        }
+
+        parentRb.linearVelocity = Vector2.zero;
+    }
+
+    private IEnumerator LockMovementOnClientRoutine(float duration)
+    {
+        PlayerMovement movement = transform.root.GetComponentInChildren<PlayerMovement>();
+        if (movement != null) movement.isMovementLocked = true;
+        
+        yield return new WaitForSeconds(duration);
+        
+        if (movement != null) movement.isMovementLocked = false;
     }
 
     private IEnumerator PlayTrailRoutine(float duration)
@@ -141,10 +201,9 @@ public class PlayerFartSkill : BaseSkillComponent
 
                 hasCollided = true; 
 
-                // RUNG CAMERA KHI TÔNG VÀO VẬT CẢN HOẶC ĐỊCH
-                if (impulseSource != null)
+                if (skills != null)
                 {
-                    impulseSource.GenerateImpulse();
+                    skills.PlaySkillHitVisualClientRpc(data.skillId, hit.point);
                 }
 
                 if (((1 << hit.collider.gameObject.layer) & data.enemyLayer) != 0)
@@ -157,7 +216,6 @@ public class PlayerFartSkill : BaseSkillComponent
                         Vector2 knockbackDir = ((Vector2)hit.collider.transform.position - (Vector2)parentCollider.bounds.center).normalized;
                         enemyEntity.ApplyKnockback(knockbackDir * data.knockupForce, 0.3f);
                     }
-                    ClientPlayHitEffect(data, hit.point);
                 }
             }
 
@@ -185,12 +243,6 @@ public class PlayerFartSkill : BaseSkillComponent
         {
             Debug.Log($"💥 [PHYSICS] Xác nhận mục tiêu là Enemy: {collision.gameObject.name}. Kích hoạt Knockback!");
             
-            // RUNG CAMERA KHI TÔNG VÀO ĐỊCH Ở FALLBACK VẬT LÝ
-            if (impulseSource != null)
-            {
-                impulseSource.GenerateImpulse();
-            }
-
             NetworkEntity enemyEntity = collision.gameObject.GetComponent<NetworkEntity>();
             if (enemyEntity != null)
             {
@@ -200,6 +252,11 @@ public class PlayerFartSkill : BaseSkillComponent
                     PlayerSkills skills = fartController.GetComponentInChildren<PlayerSkills>();
                     if (skills == null) skills = fartController.GetComponentInParent<PlayerSkills>();
                     if (skills != null) damageMultiplier = skills.damageMultiplier.Value;
+                    
+                    if (skills != null && collision.contactCount > 0)
+                    {
+                        skills.PlaySkillHitVisualClientRpc(currentFartData.skillId, collision.GetContact(0).point);
+                    }
                 }
                 int finalDamage = Mathf.RoundToInt(currentFartData.damage * damageMultiplier);
                 enemyEntity.TakeDamage(finalDamage);
@@ -209,11 +266,6 @@ public class PlayerFartSkill : BaseSkillComponent
                 
                 enemyEntity.ApplyKnockback(knockbackDir * currentFartData.knockupForce, 0.3f);
             }
-                    
-            if (collision.contactCount > 0)
-            {
-                ClientPlayHitEffect(currentFartData, collision.GetContact(0).point);
-            }
         }
     }
 
@@ -221,5 +273,14 @@ public class PlayerFartSkill : BaseSkillComponent
     {
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, 1f); 
+    }
+
+    public override void ClientPlayHitEffect(SkillData data, Vector2 hitPosition)
+    {
+        base.ClientPlayHitEffect(data, hitPosition);
+        if (impulseSource != null)
+        {
+            impulseSource.GenerateImpulse();
+        }
     }
 }

@@ -196,6 +196,7 @@ public class MatchMakingController : MonoBehaviour
 
     private void OnCreateLobbyClicked()
     {
+        if (_isTransitioning) return;
         CloseAllModals();
         if (modalOverlay != null) modalOverlay.SetActive(true);
         if (createLobbyModal != null)
@@ -212,6 +213,7 @@ public class MatchMakingController : MonoBehaviour
 
     private void OnJoinPrivateClicked()
     {
+        if (_isTransitioning) return;
         CloseAllModals();
         if (modalOverlay != null) modalOverlay.SetActive(true);
         if (joinPrivateModal != null)
@@ -228,6 +230,7 @@ public class MatchMakingController : MonoBehaviour
 
     private void OnLobbyRowClicked(AttoTheSheep.Core.LobbyData data)
     {
+        if (_isTransitioning) return;
         _selectedLobbyId = data.LobbyId;
         _selectedLobbyDisplayName = data.LobbyName;
         CloseAllModals();
@@ -252,8 +255,10 @@ public class MatchMakingController : MonoBehaviour
 
     private async void OnCreateOkClicked()
     {
+        if (_isTransitioning) return;
         if (createNameInput != null && !string.IsNullOrEmpty(createNameInput.text))
         {
+            _isTransitioning = true;
             Debug.Log($"[MatchMaking] Creating lobby: {createNameInput.text}");
             CloseAllModals();
 
@@ -274,6 +279,7 @@ public class MatchMakingController : MonoBehaviour
                 }
                 catch (System.Exception e)
                 {
+                    _isTransitioning = false;
                     AttoTheSheep.Core.LoadingManager.Instance?.Hide();
                     Debug.LogError($"[MatchMaking] Failed to create lobby: {e}");
                 }
@@ -295,8 +301,10 @@ public class MatchMakingController : MonoBehaviour
 
     private async void OnJoinOkClicked()
     {
+        if (_isTransitioning) return;
         if (joinCodeInput != null && !string.IsNullOrEmpty(joinCodeInput.text))
         {
+            _isTransitioning = true;
             Debug.Log($"[MatchMaking] Joining private lobby code: {joinCodeInput.text}");
             CloseAllModals();
 
@@ -317,6 +325,7 @@ public class MatchMakingController : MonoBehaviour
                 }
                 catch (System.Exception e)
                 {
+                    _isTransitioning = false;
                     AttoTheSheep.Core.LoadingManager.Instance?.Hide();
                     Debug.LogError($"[MatchMaking] Failed to join private lobby: {e}");
                 }
@@ -338,6 +347,9 @@ public class MatchMakingController : MonoBehaviour
 
     private async void OnConfirmOkClicked()
     {
+        if (_isTransitioning) return;
+        _isTransitioning = true;
+        
         Debug.Log($"[MatchMaking] Joining public lobby ID: {_selectedLobbyId}");
         CloseAllModals();
 
@@ -358,6 +370,7 @@ public class MatchMakingController : MonoBehaviour
             }
             catch (System.Exception e)
             {
+                _isTransitioning = false;
                 AttoTheSheep.Core.LoadingManager.Instance?.Hide();
                 Debug.LogError($"[MatchMaking] Failed to join public lobby: {e}");
             }
