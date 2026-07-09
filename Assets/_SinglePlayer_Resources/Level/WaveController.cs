@@ -85,13 +85,6 @@ public class WaveController : MonoBehaviour
     {
         while (_spawnedCount < waveData.TotalEnemyCount)
         {
-            // Respect max-alive cap.
-            if (waveData.MaxAliveAtOnce > 0 && _aliveCount >= waveData.MaxAliveAtOnce)
-            {
-                yield return null;
-                continue;
-            }
-
             SpawnOneEnemy();
             yield return new WaitForSeconds(waveData.SpawnInterval);
         }
