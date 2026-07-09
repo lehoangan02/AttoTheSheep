@@ -125,6 +125,16 @@ public class WaveController : MonoBehaviour
         NetworkEntity entity = instance.GetComponent<NetworkEntity>();
         if (entity != null)
         {
+            if (entity is EnemyEntity enemyEntity && enemyEntity.Data != null)
+            {
+                enemyEntity.Configure(enemyEntity.Data);
+                // Force initialization since IsServer on NetworkBehaviour is false before Spawn
+                if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsServer)
+                {
+                    entity.currentHealth.Value = enemyEntity.Data.maxHealth;
+                    entity.currentMoveSpeed.Value = enemyEntity.Data.moveSpeed;
+                }
+            }
             entity.OnDied += OnEnemyDied;
         }
 
