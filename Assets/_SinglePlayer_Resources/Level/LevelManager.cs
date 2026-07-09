@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -27,6 +28,9 @@ public class LevelManager : MonoBehaviour
     [Header("Infinite Mode")]
     [Tooltip("When enabled, waves must be completed in the listed order. After all waves are cleared, the cycle repeats indefinitely.")]
     [SerializeField] private bool infiniteMode;
+
+    [Tooltip("Seconds to wait before auto-starting the next wave in infinite mode.")]
+    [SerializeField] private float infiniteModeWaveDelay = 3f;
 
     [Header("Debug")]
     [SerializeField] private bool logStateChanges;
@@ -169,10 +173,12 @@ public class LevelManager : MonoBehaviour
                 _clearedWaves.Clear();
                 _currentWaveIndex = 0;
                 SetState(LevelState.Idle);
+                StartCoroutine(AutoStartNextWaveAfterDelay());
             }
             else
             {
                 SetState(LevelState.Idle);
+                StartCoroutine(AutoStartNextWaveAfterDelay());
             }
         }
         else
@@ -190,6 +196,17 @@ public class LevelManager : MonoBehaviour
             {
                 SetState(LevelState.Idle);
             }
+        }
+    }
+
+    private IEnumerator AutoStartNextWaveAfterDelay()
+    {
+        yield return new WaitForSeconds(infiniteModeWaveDelay);
+
+        int nextIndex = _currentWaveIndex % allWaves.Count;
+        if (nextIndex < allWaves.Count)
+        {
+            TryStartWave(allWaves[nextIndex]);
         }
     }
 
