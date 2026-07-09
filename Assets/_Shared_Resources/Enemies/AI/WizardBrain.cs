@@ -101,19 +101,19 @@ public class WizardBrain : EnemyBrain
         switch (state)
         {
             case EnemyState.Chase:
-                anim.SetBool("IsChasing", true);
+                SyncSetBool("IsChasing", true);
                 if (target != null)
                     motor.MoveToward(target.transform.position, entity.Data.moveSpeed * speedMult);
                 break;
             case EnemyState.Attack:
-                anim.SetTrigger("Attack");
+                SyncSetTrigger("Attack");
                 motor.Stop();
                 lastThrowTime = Time.time;
                 enemyAudio.Play("ThrowStart");
                 break;
             case EnemyState.Cast:
                 Debug.Log("[WizardBrain] Transforming lamb: " + target.name);
-                anim.SetTrigger("Transform");
+                SyncSetTrigger("Transform");
                 motor.Stop();
                 lastTransformTime = Time.time;
                 currentTransformTarget = target as LambAI;
@@ -131,7 +131,7 @@ public class WizardBrain : EnemyBrain
         {
             case EnemyState.Chase:
                 motor.Stop();
-                anim.SetBool("IsChasing", false);
+                SyncSetBool("IsChasing", false);
                 break;
             case EnemyState.Attack:
                 break;

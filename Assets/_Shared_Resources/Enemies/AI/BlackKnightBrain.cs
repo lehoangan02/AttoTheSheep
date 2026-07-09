@@ -48,19 +48,19 @@ public class BlackKnightBrain : EnemyBrain
         switch (state)
         {
             case EnemyState.Chase:
-                anim.SetBool("IsChasing", true);
+                SyncSetBool("IsChasing", true);
                 motor.MoveToward(target.transform.position, entity.Data.moveSpeed * speedMult);
                 break;
             case EnemyState.Attack:
                 bool useLeftAttack = isLeftAttack;
                 enemyAudio.Play(useLeftAttack ? "LeftStart" : "RightStart");
-                anim.SetTrigger(useLeftAttack ? "AttackLeft" : "AttackRight");
+                SyncSetTrigger(useLeftAttack ? "AttackLeft" : "AttackRight");
                 isLeftAttack = !isLeftAttack;
                 motor.Stop();
                 lastAttackTime = Time.time;
                 break;
             case EnemyState.Guard:
-                anim.SetTrigger("Guard");
+                SyncSetTrigger("Guard");
                 motor.Stop();
                 lastAttackTime = Time.time;
                 break;
@@ -76,7 +76,7 @@ public class BlackKnightBrain : EnemyBrain
         {
             case EnemyState.Chase:
                 motor.Stop();
-                anim.SetBool("IsChasing", false);
+                SyncSetBool("IsChasing", false);
                 break;
             case EnemyState.Attack:
                 leftHitbox?.Disable();

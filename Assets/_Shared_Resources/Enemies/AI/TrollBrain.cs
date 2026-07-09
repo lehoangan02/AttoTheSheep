@@ -178,13 +178,13 @@ public class TrollBrain : EnemyBrain
         switch (state)
         {
             case EnemyState.Chase:
-                anim.SetBool("IsChasing", true);
+                SyncSetBool("IsChasing", true);
                 if (target != null)
                     motor.MoveToward(target.transform.position, entity.Data.moveSpeed * (effectController?.GetSpeedMultiplier() ?? 1f));
                 break;
             case EnemyState.Attack:
                 windupComplete = false;
-                anim.SetBool("IsAttacking", true);
+                SyncSetBool("IsAttacking", true);
                 motor.Stop();
                 switch (currentAttack)
                 {
@@ -192,11 +192,11 @@ public class TrollBrain : EnemyBrain
                     case TrollAttack.Charge: lastChargeTime = Time.time; break;
                     case TrollAttack.Tornado: lastTornadoTime = Time.time; break;
                 }
-                anim.SetTrigger("Windup" + currentAttack);
+                SyncSetTrigger("Windup" + currentAttack);
                 break;
             case EnemyState.Idle:
                 motor.Stop();
-                anim.SetBool("IsAttacking", false);
+                SyncSetBool("IsAttacking", false);
                 smashHitbox?.Disable();
                 chargeHitbox?.Disable();
                 CleanupTornado();
@@ -211,12 +211,12 @@ public class TrollBrain : EnemyBrain
             case EnemyState.Dead:
                 recoveryPending = false;
                 ForceEndAttack();
-                anim.SetTrigger("Dead");
+                SyncSetTrigger("Dead");
                 StartCoroutine(DeathSequenceAfterAnimation());
                 break;
             case EnemyState.Recovery:
                 motor.Stop();
-                anim.SetBool("IsRecovering", true);
+                SyncSetBool("IsRecovering", true);
                 recoveryTimer = 0f;
                 recoveryPending = false;
                 if (logRecoveryState) Debug.Log($"[TrollRecovery] Recovery (timer={trollData.recoveryInterval:F1})");
@@ -230,14 +230,14 @@ public class TrollBrain : EnemyBrain
         {
             case EnemyState.Chase:
                 motor.Stop();
-                anim.SetBool("IsChasing", false);
+                SyncSetBool("IsChasing", false);
                 break;
             case EnemyState.Attack:
                 smashHitbox?.Disable();
-                anim.SetBool("IsAttacking", false);
+                SyncSetBool("IsAttacking", false);
                 break;
             case EnemyState.Recovery:
-                anim.SetBool("IsRecovering", false);
+                SyncSetBool("IsRecovering", false);
                 break;
         }
     }
@@ -307,7 +307,7 @@ public class TrollBrain : EnemyBrain
                     tornadoVfx.Play();
                 break;
         }
-        anim.SetTrigger("Attack" + currentAttack);
+        SyncSetTrigger("Attack" + currentAttack);
         enemyAudio.Play(currentAttack.ToString() + "Start");
     }
 
@@ -345,7 +345,7 @@ public class TrollBrain : EnemyBrain
         }
 
         smashHitbox?.Disable();
-        anim.SetBool("IsAttacking", false);
+        SyncSetBool("IsAttacking", false);
         EndAttackTransition();
     }
     private System.Collections.IEnumerator SpawnSpikesRoutine(Vector2 dir)
@@ -368,7 +368,7 @@ public class TrollBrain : EnemyBrain
         }
     }
 
-    private void EndCharge() { chargeHitbox?.Disable(); anim.SetBool("IsAttacking", false); EndAttackTransition(); }
+    private void EndCharge() { chargeHitbox?.Disable(); SyncSetBool("IsAttacking", false); EndAttackTransition(); }
     private void CleanupTornado()
     {
         tornadoHitbox?.Disable();
@@ -383,7 +383,7 @@ public class TrollBrain : EnemyBrain
     private void EndTornado()
     {
         CleanupTornado();
-        anim.SetBool("IsAttacking", false);
+        SyncSetBool("IsAttacking", false);
         EndAttackTransition();
     }
 

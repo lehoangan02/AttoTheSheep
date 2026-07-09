@@ -43,14 +43,14 @@ public class GoblinBrain : EnemyBrain
         switch (state)
         {
             case EnemyState.Chase:
-                anim.SetBool("IsChasing", true);
+                SyncSetBool("IsChasing", true);
                 motor.MoveToward(target.transform.position, entity.Data.moveSpeed * speedMult);
                 break;
             case EnemyState.Attack:
                 bool useFastAttack = isFastAttack;
                 string trigger = useFastAttack ? "AttackFast" : "AttackStrong";
                 enemyAudio.Play(useFastAttack ? "FastStart" : "StrongStart");
-                anim.SetTrigger(trigger);
+                SyncSetTrigger(trigger);
                 isFastAttack = !isFastAttack;
                 lastAttackTime = Time.time;
                 motor.Stop();
@@ -67,7 +67,7 @@ public class GoblinBrain : EnemyBrain
         {
             case EnemyState.Chase:
                 motor.Stop();
-                anim.SetBool("IsChasing", false);
+                SyncSetBool("IsChasing", false);
                 break;
             case EnemyState.Attack:
                 fastHitbox?.Disable();

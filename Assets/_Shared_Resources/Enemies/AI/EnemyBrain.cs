@@ -137,4 +137,30 @@ public abstract class EnemyBrain : NetworkBehaviour
                 break;
         }
     }
+
+    [ClientRpc]
+    protected void TriggerAnimClientRpc(int hash)
+    {
+        if (IsServer) return; // Server already sets it locally
+        if (anim != null) anim.SetTrigger(hash);
+    }
+
+    [ClientRpc]
+    protected void SetAnimBoolClientRpc(int hash, bool value)
+    {
+        if (IsServer) return;
+        if (anim != null) anim.SetBool(hash, value);
+    }
+    
+    protected void SyncSetTrigger(string triggerName)
+    {
+        if (anim != null) anim.SetTrigger(triggerName);
+        if (IsServer) TriggerAnimClientRpc(Animator.StringToHash(triggerName));
+    }
+    
+    protected void SyncSetBool(string boolName, bool value)
+    {
+        if (anim != null) anim.SetBool(boolName, value);
+        if (IsServer) SetAnimBoolClientRpc(Animator.StringToHash(boolName), value);
+    }
 }

@@ -45,6 +45,14 @@ public class NetworkEntity : NetworkBehaviour, IStatusTarget
         false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server
     );
 
+    // Sync position and scale for multiplayer
+    public NetworkVariable<Vector2> syncPosition = new NetworkVariable<Vector2>(
+        default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server
+    );
+    public NetworkVariable<float> syncScaleX = new NetworkVariable<float>(
+        1f, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server
+    );
+
     public event Action OnDied;
 
     protected void InvokeOnDied() => OnDied?.Invoke();
@@ -67,6 +75,16 @@ public class NetworkEntity : NetworkBehaviour, IStatusTarget
             currentMoveSpeed.Value = baseMoveSpeed;
             currentHealth.Value = baseMaxHealth;
             currentMana.Value = baseMaxMana;
+        }
+        else if (!IsOwner)
+        {
+            // Set Rigidbody to Kinematic on the client for non-owned objects so it doesn't fight transform sync
+            Rigidbody2D rb = GetComponent<Rigidbody2D>();
+            if (rb != null)
+            {
+                rb.bodyType = RigidbodyType2D.Kinematic;
+                rb.linearVelocity = Vector2.zero;
+            }
         }
 
         currentHealth.OnValueChanged += OnHealthChangedBase;
@@ -209,6 +227,25 @@ public class NetworkEntity : NetworkBehaviour, IStatusTarget
         if (NetworkObject.IsSpawned)
         {
             NetworkObject.Despawn(true);
+        }
+    }
+
+    protected virtual void Update()
+    {
+        if (IsServer)
+        {
+            syncPosition.Value = transform.position;
+            syncScaleX.Value = transform.localScale.x;
+        }
+        else if (IsClient && !IsOwner)
+        {
+            if (Vector2.Distance(transform.position, syncPosition.Value) > 0.001f)
+            {
+                transform.position = Vector2.Lerp(transform.position, syncPosition.Value, Time.deltaTime * 15f);
+            }
+            Vector3 scale = transform.localScale;
+            scale.x = syncScaleX.Value;
+            transform.localScale = scale;
         }
     }
 }
