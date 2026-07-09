@@ -46,10 +46,44 @@ public class PlayerSkills : NetworkBehaviour
             if (controller != null) controller.OnSkillActivated += TryCastSkill;
 
             // Tìm tất cả SkillBoardUI trên Scene và nạp dữ liệu
-            SkillBoardUI[] boardUIs = FindObjectsByType<SkillBoardUI>(FindObjectsSortMode.None);
+            SkillBoardUI[] boardUIs = FindObjectsByType<SkillBoardUI>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            Debug.Log($"[PlayerSkills DEBUG] OnNetworkSpawn. IsOwner: {IsOwner}, IsServer: {IsServer}. Found {boardUIs.Length} SkillBoardUIs in scene.");
+            
             foreach (SkillBoardUI boardUI in boardUIs)
             {
+                // Bỏ qua SkillBoardUI của các Player khác (nếu nó được gắn trên Prefab của Player)
+                Unity.Netcode.NetworkObject parentNetObj = boardUI.GetComponentInParent<Unity.Netcode.NetworkObject>();
+                
+                Debug.Log($"[PlayerSkills DEBUG] Checking {boardUI.gameObject.name}. Parent NetObj: {(parentNetObj != null ? parentNetObj.name + " ID:" + parentNetObj.NetworkObjectId : "None")}. My ID: {this.NetworkObject.NetworkObjectId}");
+                
+                if (parentNetObj != null && parentNetObj != this.NetworkObject)
+                {
+                    Debug.Log($"[PlayerSkills DEBUG] Skipping {boardUI.gameObject.name} because it belongs to another player (ID: {parentNetObj.NetworkObjectId})");
+                    continue; 
+                }
+
+                Debug.Log($"[PlayerSkills DEBUG] Calling InitializeSkillBoard on {boardUI.gameObject.name}");
                 boardUI.InitializeSkillBoard(this);
+            }
+        }
+        else
+        {
+            // Tắt UI màn hình của các người chơi khác (Remote Players) để không bị đè lên màn hình của Host/Local Player
+            SkillBoardUI[] myBoardUIs = this.NetworkObject.GetComponentsInChildren<SkillBoardUI>(true);
+            Debug.Log($"[PlayerSkills DEBUG] Non-owner player spawned. Found {myBoardUIs.Length} SkillBoardUIs in children.");
+            foreach (SkillBoardUI ui in myBoardUIs)
+            {
+                Canvas parentCanvas = ui.GetComponentInParent<Canvas>();
+                if (parentCanvas != null && parentCanvas.renderMode != RenderMode.WorldSpace)
+                {
+                    Debug.Log($"[PlayerSkills DEBUG] Disabling remote player Canvas: {parentCanvas.gameObject.name}");
+                    parentCanvas.gameObject.SetActive(false);
+                }
+                else
+                {
+                    Debug.Log($"[PlayerSkills DEBUG] Disabling remote player SkillBoardUI object directly: {ui.gameObject.name}");
+                    ui.gameObject.SetActive(false);
+                }
             }
         }
     }

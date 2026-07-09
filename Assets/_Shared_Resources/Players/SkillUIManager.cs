@@ -22,7 +22,11 @@ public class SkillUIManager : MonoBehaviour
         skillData = data;
         boundSkillId = data.skillId;
         iconImage.sprite = data.skillIcon;
+        Debug.Log($"[SkillUIManager DEBUG] SetupSlot for skill {data.skillId} '{data.skillName}'. Icon is null? {data.skillIcon == null}. Setting onto {gameObject.name}");
         cooldownOverlay.fillAmount = 0f;
+        
+        // Cố tình ép màu trắng và alpha = 1 để tránh bị đen
+        iconImage.color = Color.white;
 
         // THAY ĐỔI: Đăng ký lắng nghe biến số lượng cừu mới
         if (playerSkills != null) playerSkills.currentLambCount.OnValueChanged -= OnLambCountChanged;
@@ -65,10 +69,18 @@ public class SkillUIManager : MonoBehaviour
     {
         if (skillData == null) return;
         
-        // Bị khóa nếu "Số cừu yêu cầu" lớn hơn "Số cừu hiện tại đang có"
-        bool isLocked = skillData.lambsRequired > currentSheepValue;
+        // Force unlock cho Multiplayer
+        bool isLocked = false; 
         
-        lockedOverlay.SetActive(isLocked);
+        if (lockedOverlay != null) 
+        {
+            lockedOverlay.SetActive(isLocked);
+            Debug.Log($"[SkillUIManager DEBUG] CheckLockState: {skillData.skillName} | isLocked = {isLocked} | lockedOverlay active self: {lockedOverlay.activeSelf}");
+        }
+        else
+        {
+            Debug.Log($"[SkillUIManager DEBUG] CheckLockState: {skillData.skillName} | lockedOverlay is NULL!");
+        }
     }
 
     private void HandleSkillCooldown(int skillId, float cooldownDuration)

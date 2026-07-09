@@ -21,6 +21,8 @@ public class SkillBoardUI : MonoBehaviour
             SkillSlot matchedSkill = localPlayerSkills.equippedSkills.Find(
                 slot => slot.data != null && slot.data.skillId == targetSkillId
             );
+            
+            Debug.Log($"[SkillBoardUI DEBUG] Slot checking for targetSkillId: {targetSkillId}. equippedSkills Count: {localPlayerSkills.equippedSkills.Count}. Found match: {matchedSkill != null}");
 
             if (matchedSkill != null)
             {
@@ -31,6 +33,7 @@ public class SkillBoardUI : MonoBehaviour
             else
             {
                 // Nếu không tìm thấy chiêu thức này trong người Player: Ẩn ô UI này đi
+                Debug.Log($"[SkillBoardUI DEBUG] Matched skill was NULL for targetSkillId {targetSkillId}. Disabling slot UI GameObject {slotUI.gameObject.name}");
                 slotUI.gameObject.SetActive(false);
             }
         }
