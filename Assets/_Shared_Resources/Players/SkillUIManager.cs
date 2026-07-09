@@ -84,6 +84,19 @@ public class SkillUIManager : MonoBehaviour
             lockedOverlay.SetActive(isLocked);
             Debug.Log($"[SkillUIManager DEBUG] CheckLockState: {skillData.skillName} | isLocked = {isLocked} | lockedOverlay active self: {lockedOverlay.activeSelf}");
         }
+
+        // Add greyed-out visual effect using the cooldown overlay
+        if (cooldownOverlay != null)
+        {
+            if (isLocked)
+            {
+                cooldownOverlay.fillAmount = 1f;
+            }
+            else if (cooldownOverlay.fillAmount >= 1f) // Only reset if it was locked, let normal cooldown routines handle themselves
+            {
+                cooldownOverlay.fillAmount = 0f;
+            }
+        }
         else
         {
             Debug.Log($"[SkillUIManager DEBUG] CheckLockState: {skillData.skillName} | lockedOverlay is NULL!");
