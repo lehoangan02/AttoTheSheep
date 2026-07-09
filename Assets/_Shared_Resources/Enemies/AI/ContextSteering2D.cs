@@ -3,21 +3,20 @@ using UnityEngine;
 /// <summary>
 /// Context-Based Steering for 2D enemy AI (server-side FixedUpdate).
 ///
-/// 16-way compass: Interest map (dot against target), Danger map
-/// (CircleCast per direction against obstacle layer + OverlapCircle
-/// for ally separation), Final = max(0, Interest - Danger), blend
-/// top angular neighbors, then smooth across frames.
+/// 16-way compass. Interest map (dot against target + wall-slide bias),
+/// Danger map (CircleCast per direction against obstacle layer with
+/// angular-neighbor propagation + OverlapCircle for ally separation),
+/// Final = max(0, Interest - Danger), blend top angular neighbors,
+/// then smooth across frames.
 ///
 /// Wall avoidance uses CircleCast (body-radius-aware) with danger
-/// propagated to angular neighbors, so walls become "thick" in
-/// danger space — wall-following emerges and corners stop sticking.
-///
-/// Ally separation writes continuous anti-direction danger with the
-/// same neighbor propagation for smooth separation without clumping.
+/// propagated to angular neighbors.  Additionally, each wall hit
+/// boosts interest along the wall surface (tangent) toward the side
+/// that matches the current heading so the enemy commits to one
+/// wall-following direction instead of oscillating.
 ///
 /// Strafe is a blended bias (not a full interest replacement) that
-/// picks the more-open perpendicular side dynamically with hysteresis,
-/// and still passes through the full danger mask.
+/// picks the more-open perpendicular side dynamically with hysteresis.
 ///
 /// Fallback when fully blocked: picks the least-danger direction
 /// instead of freezing, so the enemy slides along walls.
@@ -37,6 +36,11 @@ public class ContextSteering2D : MonoBehaviour
     [Header("Danger Propagation")]
     [SerializeField] private float[] dangerFalloff = { 1f, 0.5f, 0.2f };
 
+    [Header("Wall Slide")]
+    [Range(0f, 1f)]
+    [SerializeField] private float wallSlideStrength = 0.45f;
+    [SerializeField] private float[] wallSlideFalloff = { 1f, 0.5f, 0.2f };
+
     [Header("Layer Masks (defaults set in Awake)")]
     [SerializeField] private LayerMask obstacleMask;
     [SerializeField] private LayerMask allyMask;
@@ -44,6 +48,11 @@ public class ContextSteering2D : MonoBehaviour
     [Header("Shaping - Distance")]
     [SerializeField] private float approachRange = 5f;
     [SerializeField] private float approachRangePause = 1.5f;
+
+    [Header("Momentum")]
+    [Range(0f, 0.5f)]
+    [SerializeField] private float momentumWeight = 0.25f;
+    [SerializeField] private float[] momentumFalloff = { 1f, 0.5f, 0.2f };
 
     [Header("Shaping - Strafe")]
     [SerializeField] private bool enableStrafe = true;
@@ -75,6 +84,7 @@ public class ContextSteering2D : MonoBehaviour
     int strafeSign = 1;
     float lastStrafeFlipTime;
 
+    Vector2 _currentTargetDir;
     Vector2 lastOutputDir;
     Vector2 lastBlendedDir;
     Vector2 lastStrafeDir;
@@ -119,6 +129,7 @@ public class ContextSteering2D : MonoBehaviour
 
     public Vector2 ComputeDirection(Vector2 toTargetDir, float distanceToTarget, bool allowStrafe = true)
     {
+        _currentTargetDir = toTargetDir;
         Vector2 origin = SteeringOrigin;
 
         // 1. Seek interest
@@ -132,12 +143,14 @@ public class ContextSteering2D : MonoBehaviour
         float speed = rb != null ? rb.linearVelocity.magnitude : 0f;
         lastSensorLength = Mathf.Clamp(baseSensorLength + speed * speedSensorFactor, baseSensorLength, maxSensorLength);
 
-        // 4. Zero danger, then compute obstacle + ally danger
+        // 4. Zero danger, then obstacle danger + wall-slide interest
         System.Array.Clear(danger, 0, danger.Length);
-        ComputeObstacleDanger(origin);
+        ComputeObstacleMap(origin);
+
+        // 5. Ally separation danger
         ComputeAllyDanger(origin);
 
-        // 5. Strafe blend
+        // 6. Strafe blend
         if (enableStrafe && allowStrafe && distanceToTarget <= strafeRange && distanceToTarget > 0.01f)
         {
             PickStrafeSide(toTargetDir);
@@ -155,30 +168,40 @@ public class ContextSteering2D : MonoBehaviour
             lastStrafeDir = Vector2.zero;
         }
 
-        // 6. Final = max(0, Interest - Danger)
+        // 7. Momentum bias toward current heading
+        if (momentumWeight > 0f && lastOutputDir.sqrMagnitude > 0.0001f)
+        {
+            int mSlot = SteeringMath.GetNearestSlot(lastOutputDir, rayCount);
+            SteeringMath.ApplyDangerFalloff(interest, mSlot, momentumWeight, momentumFalloff, rayCount);
+        }
+
+        // 8. Final = max(0, Interest - Danger)
         for (int i = 0; i < rayCount; i++)
             finalScores[i] = Mathf.Max(0f, interest[i] - danger[i]);
 
-        // 7. Blend top angular neighbors (or fallback if all zero)
+        // 9. Blend top angular neighbors (or fallback if all zero)
         Vector2 blended = SteeringMath.Blend(finalScores, dirs, blendAngleThreshold);
         if (blended == Vector2.zero)
             blended = SteeringMath.LeastDangerDirection(danger, dirs);
 
         lastBlendedDir = blended;
 
-        // 8. Smooth across frames (skip on sharp turns)
+        // 10. Smooth across frames (skip on sharp turns)
         blended = SteeringMath.SmoothDirection(blended, lastOutputDir, directionSmoothing, 0.5f);
         lastOutputDir = blended;
 
         return blended;
     }
 
-    void ComputeObstacleDanger(Vector2 origin)
+    void ComputeObstacleMap(Vector2 origin)
     {
         int count = rayCount;
         float len = lastSensorLength;
         LayerMask mask = obstacleMask;
         float radius = bodyRadius;
+        float slideStr = wallSlideStrength;
+        Vector2 targetDir = _currentTargetDir;
+        Vector2 heading = lastOutputDir;
 
         for (int i = 0; i < count; i++)
         {
@@ -188,7 +211,30 @@ public class ContextSteering2D : MonoBehaviour
             float weight = 1f - (hit.distance / len);
             if (weight <= 0f) continue;
 
+            // Danger — avoid the wall
             SteeringMath.ApplyDangerFalloff(danger, i, weight, dangerFalloff, count);
+
+            // Wall-slide interest — follow the wall tangent
+            if (slideStr <= 0f) continue;
+
+            Vector2 normal = hit.normal;
+            Vector2 tanA = new Vector2(normal.y, -normal.x);
+            Vector2 tanB = new Vector2(-normal.y, normal.x);
+
+            float dotA = heading.sqrMagnitude > 0.0001f
+                ? Vector2.Dot(tanA, heading) : Vector2.Dot(tanA, targetDir);
+            float dotB = heading.sqrMagnitude > 0.0001f
+                ? Vector2.Dot(tanB, heading) : Vector2.Dot(tanB, targetDir);
+
+            Vector2 slideDir = dotA >= dotB ? tanA : tanB;
+
+            // Only add slide interest if it actually moves us somewhat toward target
+            if (Vector2.Dot(slideDir, targetDir) > -0.2f)
+            {
+                float slideWeight = weight * slideStr;
+                int slideSlot = SteeringMath.GetNearestSlot(slideDir, count);
+                SteeringMath.ApplyDangerFalloff(interest, slideSlot, slideWeight, wallSlideFalloff, count);
+            }
         }
     }
 
@@ -267,13 +313,11 @@ public class ContextSteering2D : MonoBehaviour
         Vector3 pos = SteeringOrigin;
         float gizmoLen = lastSensorLength > 0.01f ? lastSensorLength : baseSensorLength;
 
-        // Range circles
         Gizmos.color = new Color(1f, 1f, 1f, 0.15f);
         Gizmos.DrawWireSphere(pos, approachRange);
         Gizmos.color = new Color(0f, 1f, 1f, 0.15f);
         Gizmos.DrawWireSphere(pos, strafeRange);
 
-        // Per-slot rays — green = interest, red = danger, white sphere = final
         for (int i = 0; i < dirs.Length; i++)
         {
             Vector3 dir = (Vector3)dirs[i];
@@ -298,7 +342,6 @@ public class ContextSteering2D : MonoBehaviour
             }
         }
 
-        // Yellow arrow — final blended direction
         if (lastBlendedDir != Vector2.zero)
         {
             Gizmos.color = Color.yellow;
@@ -310,7 +353,6 @@ public class ContextSteering2D : MonoBehaviour
             Gizmos.DrawRay(end, l);
         }
 
-        // Red arrow — smoothed output direction (actual movement)
         if (lastOutputDir != Vector2.zero)
         {
             Gizmos.color = new Color(1f, 1f, 0.5f, 0.8f);
@@ -318,7 +360,6 @@ public class ContextSteering2D : MonoBehaviour
             Gizmos.DrawRay(offset, (Vector3)lastOutputDir * gizmoLen * 0.5f);
         }
 
-        // Cyan ray — strafe perpendicular direction
         if (lastStrafeDir != Vector2.zero)
         {
             Gizmos.color = Color.cyan;
