@@ -115,6 +115,13 @@ public class ActionBarController : MonoBehaviour
 
     private void TriggerSlot(int index)
     {
+        bool isMultiplayer = Unity.Netcode.NetworkManager.Singleton != null && Unity.Netcode.NetworkManager.Singleton.IsListening;
+        if (isMultiplayer)
+        {
+            Debug.Log("[ActionBarController] Item usage (keys 1, 2, 3, 4) is disabled in multiplayer.");
+            return;
+        }
+
         // Safety check to ensure the array is set up properly
         if (index >= 0 && index < actionSlots.Length && actionSlots[index] != null)
         {
