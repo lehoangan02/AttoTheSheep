@@ -74,12 +74,13 @@ public class ActionSlot : MonoBehaviour
             return false;
         }
 
-        if (isMultiplayer || _playerProfile.ConsumeItem(itemData.itemName))
+        string assetName = ((UnityEngine.Object)itemData).name;
+        if (isMultiplayer || _playerProfile.ConsumeItem(assetName))
         {
             // Update the visual UI directly from the new profile state
             UpdateUI();
             
-            Debug.Log($"Used {itemData.itemName}! Remaining: {GetCurrentAmount()}");
+            Debug.Log($"Used {assetName}! Remaining: {GetCurrentAmount()}");
 
             // Save the updated profile to the cloud
             if (!isMultiplayer && _playerRepository != null)
@@ -108,14 +109,20 @@ public class ActionSlot : MonoBehaviour
 
         if (_playerProfile == null || itemData == null) return 0;
         
-        switch (itemData.itemName)
+        string assetName = ((UnityEngine.Object)itemData).name;
+        
+        int amount = 0;
+        switch (assetName)
         {
-            case "Shield": return _playerProfile.FlockShieldCount;
-            case "DeathTotem": return _playerProfile.SpawnMaxLambsCount;
-            case "Meat": return _playerProfile.SkillDamageBoostCount;
-            case "MushShroom": return _playerProfile.SpeedBoostCount;
-            default: return 0;
+            case "Shield": amount = _playerProfile.FlockShieldCount; break;
+            case "DeathTotem": amount = _playerProfile.SpawnMaxLambsCount; break;
+            case "Meat": amount = _playerProfile.SkillDamageBoostCount; break;
+            case "MushShroom": amount = _playerProfile.SpeedBoostCount; break;
+            default: amount = 0; break;
         }
+
+        Debug.Log($"[ActionSlot] itemData.name = {assetName}, returned amount = {amount}. Profile has: Shield={_playerProfile.FlockShieldCount}, Totem={_playerProfile.SpawnMaxLambsCount}, Meat={_playerProfile.SkillDamageBoostCount}, Shroom={_playerProfile.SpeedBoostCount}");
+        return amount;
     }
 
     private void UpdateUI()

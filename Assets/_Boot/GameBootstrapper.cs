@@ -67,7 +67,24 @@ public class GameBootstrapper : MonoBehaviour
 
             CurrentProfile = await PlayerRepository.LoadAsync();
             Debug.Log("[Bootstrapper] Player Profile successfully loaded from Cloud Save.");
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"[Bootstrapper] Failed to initialize game services (Online): {ex.Message}");
+            Debug.Log("[Bootstrapper] Falling back to OFFLINE mode.");
+            
+            CurrentProfile = new PlayerProfile();
+            CurrentProfile.RestoreState(
+                0, 0, 1, 
+                1, 1, 1, 
+                false, false, 
+                15, 15, 15, 15
+            );
+        }
 
+        // Validate items regardless of online or offline mode
+        try 
+        {
             bool itemCountsModified = false;
             int flockShieldCount = CurrentProfile.FlockShieldCount;
             int spawnMaxLambsCount = CurrentProfile.SpawnMaxLambsCount;
@@ -87,20 +104,23 @@ public class GameBootstrapper : MonoBehaviour
                     CurrentProfile.HasArmor, CurrentProfile.HasHorn,
                     flockShieldCount, spawnMaxLambsCount, skillDamageBoostCount, speedBoostCount
                 );
-                await PlayerRepository.SaveAsync(CurrentProfile);
-                Debug.Log("[Bootstrapper] Minimum item counts enforced and saved.");
+                
+                if (PlayerRepository != null) 
+                {
+                    await PlayerRepository.SaveAsync(CurrentProfile);
+                    Debug.Log("[Bootstrapper] Minimum item counts enforced and saved.");
+                }
             }
-            
-            OnBootstrapped?.Invoke();
-            
-            // Start the 30-minute auto-sync timer
-            StartCoroutine(AutoSyncRoutine());
         }
         catch (Exception ex)
         {
-            Debug.LogError($"[Bootstrapper] Failed to initialize game services: {ex.Message}");
-            throw; // Re-throw to be caught in Awake and set exception on Task
+            Debug.LogError($"[Bootstrapper] Error during profile validation: {ex.Message}");
         }
+
+        OnBootstrapped?.Invoke();
+        
+        // Start the 30-minute auto-sync timer
+        StartCoroutine(AutoSyncRoutine());
     }
 
     private IEnumerator AutoSyncRoutine()

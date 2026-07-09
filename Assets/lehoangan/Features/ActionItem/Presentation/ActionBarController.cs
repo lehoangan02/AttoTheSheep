@@ -24,19 +24,29 @@ public class ActionBarController : MonoBehaviour
             Debug.Log($"[ActionBarController] Auto-populated {actionSlots.Length} action slots.");
         }
 
-        // Setup Dependencies
-        _playerRepository = new UnityCloudSaveRepository();
-        _loadPlayerUseCase = new LoadPlayerUseCase(_playerRepository);
-
-        // Load the player data
-        _currentPlayerProfile = await _loadPlayerUseCase.ExecuteAsync();
+        if (GameBootstrapper.Instance != null)
+        {
+            // Wait for Bootstrapper to finish fetching and fixing the profile
+            await GameBootstrapper.Instance.InitializationTask;
+            _playerRepository = GameBootstrapper.Instance.PlayerRepository;
+            _currentPlayerProfile = GameBootstrapper.Instance.CurrentProfile;
+        }
+        else
+        {
+            // Fallback for test scenes without GameBootstrapper
+            _playerRepository = new UnityCloudSaveRepository();
+            _loadPlayerUseCase = new LoadPlayerUseCase(_playerRepository);
+            _currentPlayerProfile = await _loadPlayerUseCase.ExecuteAsync();
+        }
         
-        Debug.Log($"[ActionBarController] Profile loaded. FlockShield: {_currentPlayerProfile.FlockShieldCount}, SpeedBoost: {_currentPlayerProfile.SpeedBoostCount}");
+        Debug.Log($"[ActionBarController] Profile loaded. FlockShield: {_currentPlayerProfile?.FlockShieldCount}, SpeedBoost: {_currentPlayerProfile?.SpeedBoostCount}");
 
-        // Subscribe to profile changes
-        _currentPlayerProfile.OnProfileUpdated += HandleProfileUpdated;
-
-        InitializeSlots(_currentPlayerProfile);
+        if (_currentPlayerProfile != null)
+        {
+            // Subscribe to profile changes
+            _currentPlayerProfile.OnProfileUpdated += HandleProfileUpdated;
+            InitializeSlots(_currentPlayerProfile);
+        }
 
         HookActionBarInput();
     }
