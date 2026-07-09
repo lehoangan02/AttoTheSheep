@@ -39,7 +39,7 @@ public class ContextSteering2D : MonoBehaviour
     [SerializeField] private float sideSeekCoeff = 1.5f;
 
     [Tooltip("Degrees per second the agent rotates toward the committed wall side when a corner is met.")]
-    [SerializeField] private float cornerTurnRate = 90f;
+    [SerializeField] private float cornerTurnRate = 180f;
 
     [Header("Leave-Wall Conditions")]
     [Tooltip("Soft cap on how long the agent will stay in wall-follow before forcing a retry.")]
@@ -76,7 +76,6 @@ public class ContextSteering2D : MonoBehaviour
     // Bug2 state
     BugState state = BugState.Seek;
     int wallSide = 1;                // +1 = right-hand wall follow, -1 = left-hand
-    Vector2 hitPoint;                // Point where we first touched the obstacle
     float wallFollowTimer;
 
     const float STRAFE_STICK_TIME = 0.8f;
@@ -186,7 +185,6 @@ public class ContextSteering2D : MonoBehaviour
         {
             // Transition to wall-follow at the point of impact.
             state = BugState.WallFollow;
-            hitPoint = origin + toTargetDir * hit.distance;
             wallSide = PickWallSide(toTargetDir, hit.normal);
             wallFollowTimer = 0f;
 
@@ -205,46 +203,51 @@ public class ContextSteering2D : MonoBehaviour
     {
         wallFollowTimer += Time.fixedDeltaTime;
 
-        // Side whisker points into the committed wall side.
         Vector2 heading = lastOutputDir;
-        Vector2 sideDir = Rotate(heading, -wallSide * 90f);
-        float sideProbeRadius = bodyRadius * 0.5f;
-        RaycastHit2D sideHit = Physics2D.CircleCast(origin, sideProbeRadius, sideDir, sideSensorLength, obstacleMask);
 
         Vector2 desired;
 
-        if (sideHit.collider)
+        // Forward probe catches convex corners that protrude into our path.
+        float forwardProbeRadius = bodyRadius * 0.8f;
+        RaycastHit2D forwardHit = Physics2D.CircleCast(origin, forwardProbeRadius, heading, forwardSensorLength, obstacleMask);
+        if (forwardHit.collider)
         {
-            Vector2 n = sideHit.normal;                 // wall -> agent
-            Vector2 tangent = Perpendicular(n, wallSide).normalized;
-            float error = sideHit.distance - sideTargetOffset;
-            desired = (tangent - n * (error * sideSeekCoeff)).normalized;
-
-#if UNITY_EDITOR
-            _debugSideHit = true;
-            _debugSideDist = sideHit.distance;
-            _debugSideNormal = n;
-#endif
-        }
-        else
-        {
-            // Wall ended on this side (concave corner or wall turn-away); curve back toward it.
-            desired = Rotate(heading, -wallSide * cornerTurnRate * Time.fixedDeltaTime).normalized;
+            desired = Rotate(heading, wallSide * cornerTurnRate * Time.fixedDeltaTime).normalized;
 
 #if UNITY_EDITOR
             _debugSideHit = false;
             _debugSideDist = sideSensorLength;
-            _debugSideNormal = Vector2.zero;
 #endif
         }
-
-        // Forward probe catches convex corners that protrude into our path.
-        float forwardProbeRadius = bodyRadius * 0.8f;
-        float forwardProbeLength = bodyRadius * 2f;
-        RaycastHit2D forwardHit = Physics2D.CircleCast(origin, forwardProbeRadius, heading, forwardProbeLength, obstacleMask);
-        if (forwardHit.collider)
+        else
         {
-            desired = Rotate(desired, -wallSide * cornerTurnRate * Time.fixedDeltaTime).normalized;
+            // Side whisker points into the committed wall side.
+            Vector2 sideDir = Rotate(heading, -wallSide * 90f);
+            float sideProbeRadius = bodyRadius * 0.5f;
+            RaycastHit2D sideHit = Physics2D.CircleCast(origin, sideProbeRadius, sideDir, sideSensorLength, obstacleMask);
+
+            if (sideHit.collider)
+            {
+                Vector2 n = sideHit.normal;                 // wall -> agent
+                Vector2 tangent = Perpendicular(n, wallSide).normalized;
+                float error = sideHit.distance - sideTargetOffset;
+                desired = (tangent - n * (error * sideSeekCoeff)).normalized;
+
+#if UNITY_EDITOR
+                _debugSideHit = true;
+                _debugSideDist = sideHit.distance;
+#endif
+            }
+            else
+            {
+                // Wall ended on this side (concave); curve back toward it.
+                desired = Rotate(heading, -wallSide * cornerTurnRate * Time.fixedDeltaTime).normalized;
+
+#if UNITY_EDITOR
+                _debugSideHit = false;
+                _debugSideDist = sideSensorLength;
+#endif
+            }
         }
 
         if (losClear || wallFollowTimer > maxWallFollowTime)
@@ -384,7 +387,6 @@ public class ContextSteering2D : MonoBehaviour
     float _debugWallTimer;
     bool _debugSideHit;
     float _debugSideDist;
-    Vector2 _debugSideNormal;
     Vector2 _debugOutput;
 
     void OnDrawGizmosSelected()
@@ -418,11 +420,6 @@ public class ContextSteering2D : MonoBehaviour
             // Forward probe.
             Gizmos.color = new Color(1f, 0f, 0f, 0.6f);
             Gizmos.DrawRay(pos, (Vector3)(heading * bodyRadius * 2f));
-
-            // Recorded hit point.
-            Gizmos.color = new Color(1f, 1f, 0f, 0.5f);
-            Gizmos.DrawWireSphere((Vector3)hitPoint, 0.15f);
-            Gizmos.DrawLine(pos, (Vector3)hitPoint);
         }
 
         // Strafe range.
