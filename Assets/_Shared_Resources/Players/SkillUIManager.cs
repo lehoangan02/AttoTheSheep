@@ -65,12 +65,19 @@ public class SkillUIManager : MonoBehaviour
         CheckLockState(newValue);
     }
 
+    private bool IsMultiplayerScene()
+    {
+        string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+        return sceneName == "MultiplayerLevel" || sceneName == "SampleScene";
+    }
+
     private void CheckLockState(int currentSheepValue)
     {
         if (skillData == null) return;
         
-        // Force unlock cho Multiplayer
-        bool isLocked = false; 
+        // Force unlock cho Multiplayer, normal lock for Singleplayer
+        bool isMultiplayer = IsMultiplayerScene();
+        bool isLocked = !isMultiplayer && (currentSheepValue < skillData.lambsRequired); 
         
         if (lockedOverlay != null) 
         {

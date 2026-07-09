@@ -52,10 +52,12 @@ public class PlayerProfile
         HerdHpLevel = herdHpLevel;
         HasArmor = hasArmor;
         HasHorn = hasHorn;
-        FlockShieldCount = flockShieldCount;
-        SpawnMaxLambsCount = spawnMaxLambsCount;
-        SkillDamageBoostCount = skillDamageBoostCount;
-        SpeedBoostCount = speedBoostCount;
+        
+        // HOTFIX: Reset any bugged item counts of 99 back to 15
+        FlockShieldCount = flockShieldCount >= 99 ? 15 : flockShieldCount;
+        SpawnMaxLambsCount = spawnMaxLambsCount >= 99 ? 15 : spawnMaxLambsCount;
+        SkillDamageBoostCount = skillDamageBoostCount >= 99 ? 15 : skillDamageBoostCount;
+        SpeedBoostCount = speedBoostCount >= 99 ? 15 : speedBoostCount;
         
         OnProfileUpdated?.Invoke();
     }

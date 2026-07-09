@@ -66,7 +66,7 @@ public class ActionSlot : MonoBehaviour
             return false; 
         }
 
-        bool isMultiplayer = Unity.Netcode.NetworkManager.Singleton != null && Unity.Netcode.NetworkManager.Singleton.IsListening;
+        bool isMultiplayer = IsMultiplayerScene();
 
         if (!isMultiplayer && _playerProfile == null)
         {
@@ -96,10 +96,15 @@ public class ActionSlot : MonoBehaviour
         }
     }
 
+    private bool IsMultiplayerScene()
+    {
+        string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+        return sceneName == "MultiplayerLevel" || sceneName == "SampleScene";
+    }
+
     private int GetCurrentAmount()
     {
-        bool isMultiplayer = Unity.Netcode.NetworkManager.Singleton != null && Unity.Netcode.NetworkManager.Singleton.IsListening;
-        if (isMultiplayer) return 99;
+        if (IsMultiplayerScene()) return 99;
 
         if (_playerProfile == null || itemData == null) return 0;
         

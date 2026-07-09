@@ -99,22 +99,32 @@ public class PlayerSkills : NetworkBehaviour
         return skillId == 0;
     }
 
+    private bool IsMultiplayerScene()
+    {
+        string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+        return sceneName == "MultiplayerLevel" || sceneName == "SampleScene";
+    }
+
     private void TryCastSkill(int skillId)
     {
         SkillSlot slot = GetSkillSlot(skillId);
         if (slot == null || slot.data == null || slot.logicScript == null) return;
 
+        bool isMultiplayer = IsMultiplayerScene();
+
         // STEP 0: CHECK FLOCK RANGE — Base skills don't need flock
-        // if (!IsBaseSkill(skillId) && !isInsideFlock.Value) return;
+        if (!isMultiplayer && !IsBaseSkill(skillId) && !isInsideFlock.Value) return;
 
         // THAY ĐỔI: So sánh trực tiếp số cừu yêu cầu với số cừu thực tế đang sở hữu
-        // if (slot.data.lambsRequired > currentLambCount.Value) return;
+        if (!isMultiplayer && slot.data.lambsRequired > currentLambCount.Value) return;
 
         // STEP 2: CHECK COOLDOWN (Attack speed)
-        // Dùng cooldown nhỏ (0.5s) để tránh lỗi gọi đè nhiều Coroutine cùng lúc
+        // Trong Multiplayer, dùng cooldown nhỏ (0.5s) để spam. Singleplayer thì xài cooldown gốc.
+        float actualCooldown = isMultiplayer ? 0.5f : slot.data.cooldown;
+        
         if (lastCastTimes.TryGetValue(skillId, out float lastTime))
         {
-            if (Time.time < lastTime + 0.5f) return; 
+            if (Time.time < lastTime + actualCooldown) return; 
         }
 
         // Cập nhật thời gian thi triển
@@ -123,7 +133,8 @@ public class PlayerSkills : NetworkBehaviour
         // CHỈ BẮN EVENT NẾU LÀ LOCAL PLAYER
         if (IsOwner)
         {
-            OnSkillCooldownStarted?.Invoke(skillId, 0f); // 0f để UI không hiện cooldown
+            float visualCooldown = isMultiplayer ? 0f : slot.data.cooldown;
+            OnSkillCooldownStarted?.Invoke(skillId, visualCooldown); 
         }
 
         // Gọi logic lên Server
@@ -136,11 +147,13 @@ public class PlayerSkills : NetworkBehaviour
         SkillSlot slot = GetSkillSlot(skillId);
         if (slot == null || slot.data == null || slot.logicScript == null) return;
 
+        bool isMultiplayer = IsMultiplayerScene();
+
         // Check flock range on Server (Anti-hack) — Base skills bypass
-        // if (!IsBaseSkill(skillId) && !isInsideFlock.Value) return;
+        if (!isMultiplayer && !IsBaseSkill(skillId) && !isInsideFlock.Value) return;
 
         // THAY ĐỔI: Kiểm tra chống hack trên Server bằng số cừu thực tế
-        // if (slot.data.lambsRequired > currentLambCount.Value) return;
+        if (!isMultiplayer && slot.data.lambsRequired > currentLambCount.Value) return;
 
         // STEP 3: DEDUCT MANA (If skill has manaCost > 0)
         // COMMENTED OUT MANA COST SO YOU CAN TEST FREELY

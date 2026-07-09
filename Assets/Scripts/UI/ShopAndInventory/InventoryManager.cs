@@ -58,8 +58,16 @@ namespace AttoTheSheep.UI.ShopAndInventory
                 GameBootstrapper.Instance.OnBootstrapped -= FetchInventoryFromCloud;
         }
 
+        private bool IsMultiplayerScene()
+        {
+            string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+            return sceneName == "MultiplayerLevel" || sceneName == "SampleScene";
+        }
+
         public void AddItem(ActionItem item, int amount)
         {
+            if (IsMultiplayerScene()) return;
+
             if (_inventory.ContainsKey(item))
                 _inventory[item] += amount;
             else
@@ -71,6 +79,8 @@ namespace AttoTheSheep.UI.ShopAndInventory
 
         public void RemoveItem(ActionItem item, int amount)
         {
+            if (IsMultiplayerScene()) return;
+
             if (_inventory.ContainsKey(item))
             {
                 _inventory[item] -= amount;
@@ -94,6 +104,8 @@ namespace AttoTheSheep.UI.ShopAndInventory
 
         public void AddGold(int amount)
         {
+            if (IsMultiplayerScene()) return;
+
             if (GameBootstrapper.Instance != null && GameBootstrapper.Instance.CurrentProfile != null)
             {
                 GameBootstrapper.Instance.CurrentProfile.AddCoins(amount);
@@ -108,6 +120,8 @@ namespace AttoTheSheep.UI.ShopAndInventory
 
         public bool SpendGold(int amount)
         {
+            if (IsMultiplayerScene()) return false;
+
             if (GameBootstrapper.Instance != null && GameBootstrapper.Instance.CurrentProfile != null)
             {
                 if (GameBootstrapper.Instance.CurrentProfile.Coins >= amount)

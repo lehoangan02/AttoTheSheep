@@ -113,10 +113,15 @@ public class ActionBarController : MonoBehaviour
         }
     }
 
+    private bool IsMultiplayerScene()
+    {
+        string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+        return sceneName == "MultiplayerLevel" || sceneName == "SampleScene";
+    }
+
     private void TriggerSlot(int index)
     {
-        bool isMultiplayer = Unity.Netcode.NetworkManager.Singleton != null && Unity.Netcode.NetworkManager.Singleton.IsListening;
-        if (isMultiplayer)
+        if (IsMultiplayerScene())
         {
             Debug.Log("[ActionBarController] Item usage (keys 1, 2, 3, 4) is disabled in multiplayer.");
             return;

@@ -32,12 +32,19 @@ public class PlayerSaveManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
+    private bool IsMultiplayerScene()
+    {
+        string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+        return sceneName == "MultiplayerLevel" || sceneName == "SampleScene";
+    }
+
     /// <summary>
     /// Thêm vàng cho player khi giết kẻ địch.
     /// Gọi bằng: PlayerSaveManager.Instance.AddMoney(amount)
     /// </summary>
     public Task AddMoney(int amount)
     {
+        if (IsMultiplayerScene()) return Task.CompletedTask;
         // --- Ưu tiên 1: InventoryManager có mặt (MapLobby) ---
         // AddGold() tự lo: cộng vào CurrentProfile + sync cloud + fire onInventoryUpdated
         if (InventoryManager.Instance != null)
