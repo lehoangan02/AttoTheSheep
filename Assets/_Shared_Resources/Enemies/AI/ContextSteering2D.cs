@@ -42,13 +42,6 @@ public class ContextSteering2D : MonoBehaviour
     [SerializeField] private float cornerTurnRate = 90f;
 
     [Header("Leave-Wall Conditions")]
-    [Tooltip("Minimum dot(heading, toTarget) required before the agent will leave a wall.")]
-    [Range(-1f, 1f)]
-    [SerializeField] private float facingThreshold = 0.3f;
-
-    [Tooltip("How much closer to the goal the agent must be than its best recorded distance to leave the wall.")]
-    [SerializeField] private float leaveEpsilon = 0.2f;
-
     [Tooltip("Soft cap on how long the agent will stay in wall-follow before forcing a retry.")]
     [SerializeField] private float maxWallFollowTime = 6f;
 
@@ -84,11 +77,9 @@ public class ContextSteering2D : MonoBehaviour
     BugState state = BugState.Seek;
     int wallSide = 1;                // +1 = right-hand wall follow, -1 = left-hand
     Vector2 hitPoint;                // Point where we first touched the obstacle
-    float minGoalDist = float.MaxValue;
     float wallFollowTimer;
 
     const float STRAFE_STICK_TIME = 0.8f;
-    const float WALL_SIDE_PROBE_ANGLE = 70f;
 
     void Awake()
     {
@@ -170,7 +161,6 @@ public class ContextSteering2D : MonoBehaviour
         _debugWallSide = wallSide;
         _debugLOS = losClear;
         _debugWallTimer = wallFollowTimer;
-        _debugMinGoalDist = minGoalDist;
         // _debugSideHit/_debugSideDist/_debugSideNormal are written inside RunWallFollow.
         _debugOutput = output;
 #endif
@@ -197,12 +187,12 @@ public class ContextSteering2D : MonoBehaviour
             // Transition to wall-follow at the point of impact.
             state = BugState.WallFollow;
             hitPoint = origin + toTargetDir * hit.distance;
-            wallSide = PickWallSide(toTargetDir, origin);
-            minGoalDist = distanceToTarget;
+            wallSide = PickWallSide(toTargetDir, hit.normal);
             wallFollowTimer = 0f;
 
-            // Produce a first-frame wall-follow direction.
-            return RunWallFollow(toTargetDir, distanceToTarget, origin, false);
+            // Start by aligning with the wall tangent on the chosen side.
+            Vector2 initialTangent = Perpendicular(hit.normal, wallSide).normalized;
+            return initialTangent;
         }
 
         return dir;
@@ -226,7 +216,7 @@ public class ContextSteering2D : MonoBehaviour
         if (sideHit.collider)
         {
             Vector2 n = sideHit.normal;                 // wall -> agent
-            Vector2 tangent = Perpendicular(n, -wallSide).normalized;
+            Vector2 tangent = Perpendicular(n, wallSide).normalized;
             float error = sideHit.distance - sideTargetOffset;
             desired = (tangent - n * (error * sideSeekCoeff)).normalized;
 
@@ -257,14 +247,7 @@ public class ContextSteering2D : MonoBehaviour
             desired = Rotate(desired, -wallSide * cornerTurnRate * Time.fixedDeltaTime).normalized;
         }
 
-        // Update best distance seen while following the wall.
-        minGoalDist = Mathf.Min(minGoalDist, distanceToTarget);
-
-        // Leave-wall test.
-        bool closerThanBest = distanceToTarget < minGoalDist - leaveEpsilon;
-        bool facingGoal = Vector2.Dot(desired, toTargetDir) > facingThreshold;
-
-        if ((closerThanBest && facingGoal && losClear) || wallFollowTimer > maxWallFollowTime)
+        if (losClear || wallFollowTimer > maxWallFollowTime)
         {
             state = BugState.Seek;
             ResetWallState();
@@ -276,7 +259,6 @@ public class ContextSteering2D : MonoBehaviour
 
     void ResetWallState()
     {
-        minGoalDist = float.MaxValue;
         wallFollowTimer = 0f;
         state = BugState.Seek;
     }
@@ -338,16 +320,21 @@ public class ContextSteering2D : MonoBehaviour
         return hit.collider != null;
     }
 
-    int PickWallSide(Vector2 toGoalDir, Vector2 origin)
+    int PickWallSide(Vector2 toGoalDir, Vector2 hitNormal)
     {
-        float probeRadius = bodyRadius * 0.8f;
-        float clearR = CastClearDistance(origin, Rotate(toGoalDir, WALL_SIDE_PROBE_ANGLE), forwardSensorLength, probeRadius);
-        float clearL = CastClearDistance(origin, Rotate(toGoalDir, -WALL_SIDE_PROBE_ANGLE), forwardSensorLength, probeRadius);
+        // There are two valid wall-follow tangents. Choose the one that points more
+        // toward the goal so the agent goes around the obstacle toward the player.
+        // Perpendicular(n, +1) is the tangent for right-hand follow (wallSide = +1).
+        // Perpendicular(n, -1) is the tangent for left-hand follow  (wallSide = -1).
+        Vector2 rightTangent = Perpendicular(hitNormal, +1);
+        Vector2 leftTangent  = Perpendicular(hitNormal, -1);
 
-        // Prefer the side with more open space; tiebreak right (+1) for determinism.
-        if (clearR > clearL + 0.05f) return 1;
-        if (clearL > clearR + 0.05f) return -1;
-        return 1;
+        float dotR = Vector2.Dot(rightTangent, toGoalDir);
+        float dotL = Vector2.Dot(leftTangent,  toGoalDir);
+
+        if (dotR > dotL + 0.01f) return +1;
+        if (dotL > dotR + 0.01f) return -1;
+        return +1; // tiebreak right-hand follow
     }
 
     float CastDistance(Vector2 origin, Vector2 dir, float length)
@@ -395,7 +382,6 @@ public class ContextSteering2D : MonoBehaviour
     int _debugWallSide;
     bool _debugLOS;
     float _debugWallTimer;
-    float _debugMinGoalDist;
     bool _debugSideHit;
     float _debugSideDist;
     Vector2 _debugSideNormal;
@@ -444,8 +430,8 @@ public class ContextSteering2D : MonoBehaviour
         Gizmos.DrawWireSphere(pos, strafeRange);
 
         // State label.
-        Handles.Label(pos + Vector3.up * 0.5f,
-            $"State: {_debugState}\nSide: {_debugWallSide}\nLOS: {_debugLOS}\nWallT: {_debugWallTimer:F1}s\nMinD: {_debugMinGoalDist:F1}");
+        Handles.Label(pos + Vector3.up * 1.5f,
+            $"State: {_debugState}\nSide: {_debugWallSide}\nLOS: {_debugLOS}\nWallT: {_debugWallTimer:F1}s");
     }
 #endif
 }
