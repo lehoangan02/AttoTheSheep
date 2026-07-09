@@ -157,10 +157,11 @@ namespace AttoTheSheep.UI.ShopAndInventory
                 foreach (var item in ShopManager.Instance.shopItems)
                 {
                     int count = 0;
-                    if (item.itemName == "Shield" || item.name == "Shield") count = profile.FlockShieldCount;
-                    else if (item.itemName == "DeathTotem" || item.name == "DeathTotem") count = profile.SpawnMaxLambsCount;
-                    else if (item.itemName == "Meat" || item.name == "Meat") count = profile.SkillDamageBoostCount;
-                    else if (item.itemName == "MushShroom" || item.name == "MushShroom") count = profile.SpeedBoostCount;
+                    string assetName = ((UnityEngine.Object)item).name;
+                    if (assetName == "Shield") count = profile.FlockShieldCount;
+                    else if (assetName == "DeathTotem") count = profile.SpawnMaxLambsCount;
+                    else if (assetName == "Meat") count = profile.SkillDamageBoostCount;
+                    else if (assetName == "MushShroom") count = profile.SpeedBoostCount;
                     
                     if (count > 0)
                     {
@@ -185,7 +186,7 @@ namespace AttoTheSheep.UI.ShopAndInventory
 
             foreach (var kvp in _inventory)
             {
-                string name = !string.IsNullOrEmpty(kvp.Key.itemName) ? kvp.Key.itemName : kvp.Key.name;
+                string name = ((UnityEngine.Object)kvp.Key).name;
                 if (name == "Shield") shieldCount = kvp.Value;
                 else if (name == "DeathTotem") deathTotemCount = kvp.Value;
                 else if (name == "Meat") meatCount = kvp.Value;

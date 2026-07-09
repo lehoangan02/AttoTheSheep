@@ -92331,6 +92331,7 @@ MonoBehaviour:
   - {fileID: 1295816861}
   - {fileID: 1005134650}
   infiniteMode: 0
+  infiniteModeWaveDelay: 3
   logStateChanges: 1
 --- !u!1 &594066161
 GameObject:
@@ -92634,11 +92635,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4938033688450847453, guid: f5b69f2371f8d4651b46dbc3a00fb3f2, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.2
+      value: -76.4
       objectReference: {fileID: 0}
     - target: {fileID: 4938033688450847453, guid: f5b69f2371f8d4651b46dbc3a00fb3f2, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -1.4
+      value: 25.3
       objectReference: {fileID: 0}
     - target: {fileID: 4938033688450847453, guid: f5b69f2371f8d4651b46dbc3a00fb3f2, type: 3}
       propertyPath: m_LocalPosition.z
@@ -129385,11 +129386,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5214352752191870431, guid: 5067e08349ce7b54d830d89cee772b3a, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 5.6699
+      value: -79
       objectReference: {fileID: 0}
     - target: {fileID: 5214352752191870431, guid: 5067e08349ce7b54d830d89cee772b3a, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.72031
+      value: 26
       objectReference: {fileID: 0}
     - target: {fileID: 5214352752191870431, guid: 5067e08349ce7b54d830d89cee772b3a, type: 3}
       propertyPath: m_LocalPosition.z
