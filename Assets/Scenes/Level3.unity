@@ -110372,7 +110372,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3010464097422371370, guid: ecac4fdf50a503d4d914bdd1c5d1a1f6, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 23.48
+      value: 17.77
       objectReference: {fileID: 0}
     - target: {fileID: 3010464097422371370, guid: ecac4fdf50a503d4d914bdd1c5d1a1f6, type: 3}
       propertyPath: m_LocalPosition.y
@@ -110454,6 +110454,11 @@ MonoBehaviour:
   dialogueData: {fileID: 11400000, guid: 672a758850f19b34aaf1893d800ea2da, type: 2}
   requireProximity: 1
   interactAction: {fileID: 0}
+--- !u!4 &1000310005 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3010464097422371370, guid: ecac4fdf50a503d4d914bdd1c5d1a1f6, type: 3}
+  m_PrefabInstance: {fileID: 1000310001}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1005134649
 GameObject:
   m_ObjectHideFlags: 0
@@ -120748,6 +120753,52 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SpawnPoint
   gizmoColor: {r: 0, g: 0, b: 0, a: 0.7}
   gizmoRadius: 0.5
+--- !u!1 &1234949190
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1234949191}
+  - component: {fileID: 1234949192}
+  m_Layer: 0
+  m_Name: NPCWinnerSpawn
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1234949191
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1234949190}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 5.6699, y: -0.72031, z: 5.11452}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1234949192
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1234949190}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d31408ef6de9a847a1f45cecace2b60, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LevelCompletionNPCSpawner
+  npcPrefab: {fileID: 1000310002}
+  spawnPoint: {fileID: 1000310005}
 --- !u!1 &1235416612
 GameObject:
   m_ObjectHideFlags: 0
@@ -178029,3 +178080,4 @@ SceneRoots:
   - {fileID: 318563154}
   - {fileID: 1000310001}
   - {fileID: 2033188866}
+  - {fileID: 1234949191}

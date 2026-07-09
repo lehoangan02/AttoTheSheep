@@ -20,13 +20,13 @@ public class FlockManager : NetworkBehaviour
 {
     [Header("=== HARDCODED SETTINGS (CHỈNH SỬA TẠI ĐÂY) ===")]
     [Tooltip("SỬA SỐ NÀY TRONG CODE ĐỂ ĐỔI LEVEL KHỞI ĐẦU KHI RUN: 1, 2 hoặc 3")]
-    private const int HARDCODED_STARTING_LEVEL = 3; 
+    [SerializeField] private int HARDCODED_STARTING_LEVEL = 3; 
     
     // Hardcode các mốc kích hoạt Kỹ năng (Skill Milestones)
-    private const int lambsForSkill1 = 3;
-    private const int lambsForSkill2 = 6;
-    private const int lambsForSkill3 = 10;
-    private const int MAX_LEVEL = 3;
+    [SerializeField] private int lambsForSkill1 = 5;
+    [SerializeField] private int lambsForSkill2 = 7;
+    [SerializeField] private int lambsForSkill3 = 10;
+    [SerializeField] private int MAX_LEVEL = 3;
 
     [Header("Control Settings")]
     public FlockControlMode currentControlMode = FlockControlMode.Auto;
@@ -96,9 +96,9 @@ public class FlockManager : NetworkBehaviour
         switch (currentLevel.Value)
         {
             case 1:
-                return new FlockLevelConfig { maxLambs = 3, baseRadius = 1.0f };
+                return new FlockLevelConfig { maxLambs = 5, baseRadius = 1.0f };
             case 2:
-                return new FlockLevelConfig { maxLambs = 6, baseRadius = 1.5f };
+                return new FlockLevelConfig { maxLambs = 7, baseRadius = 1.5f };
             case 3:
             default:
                 return new FlockLevelConfig { maxLambs = 10, baseRadius = 2.0f };
@@ -121,23 +121,7 @@ public class FlockManager : NetworkBehaviour
     {
         if (currentPlayer == null)
         {
-            var players = FindObjectsByType<PlayerController>(FindObjectsSortMode.None);
-            if (players.Length == 1)
-            {
-                currentPlayer = players[0];
-            }
-            else
-            {
-                foreach (var p in players)
-                {
-                    if (p.OwnerClientId == OwnerClientId)
-                    {
-                        currentPlayer = p;
-                        break;
-                    }
-                }
-            }
-
+            currentPlayer = FindFirstObjectByType<PlayerController>();
             if (currentPlayer != null)
             {
                 currentPlayer.OnMapClicked += HandleMapClicked;
