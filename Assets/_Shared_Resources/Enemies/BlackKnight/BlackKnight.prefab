@@ -258,7 +258,6 @@ MonoBehaviour:
       MaxSecondsBetweenUpdates: 0
     m_InternalValue: 0
   data: {fileID: 11400000, guid: 03be99d8119eb862486f375ce5218e9f, type: 2}
-  CoinPrize: 10
 --- !u!114 &8059245908609101459
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -342,8 +341,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65e4600b56ca75106aa247bf05ac4847, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ContextSteering2D
-  rayCount: 8
-  sensorLength: 1.2
+  rayCount: 16
+  baseSensorLength: 1.2
+  speedSensorFactor: 0.25
+  maxSensorLength: 3
+  dangerFalloff:
+  - 1
+  - 0.5
+  - 0.2
   obstacleMask:
     serializedVersion: 2
     m_Bits: 1048832
@@ -354,10 +359,14 @@ MonoBehaviour:
   approachRangePause: 1.5
   enableStrafe: 1
   strafeRange: 2
+  strafeWeight: 0.7
+  strafeFlipMargin: 0.3
+  strafeStickTime: 1
   allyScanRadius: 2.5
   closeRepulsionRadius: 0.8
   closeRepulsionStrength: 1
   blendAngleThreshold: 45
+  directionSmoothing: 0.35
   drawGizmos: 1
 --- !u!114 &299880393720582323
 MonoBehaviour:
