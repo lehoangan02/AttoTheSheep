@@ -1,103 +1,70 @@
 using UnityEngine;
 
 /// <summary>
-/// Context-Based Steering for 2D enemy AI (server-side FixedUpdate).
+/// Simple Reynolds-style steering for 2D enemies.
 ///
-/// 16-way compass. Interest map (dot against target + wall-slide bias),
-/// Danger map (CircleCast per direction against obstacle layer with
-/// angular-neighbor propagation + OverlapCircle for ally separation),
-/// Final = max(0, Interest - Danger), blend top angular neighbors,
-/// then smooth across frames.
+/// Composes three vectors each FixedUpdate:
+///   - Seek (or full orbit/strafe when within range and attack is on cooldown)
+///   - Wall avoidance (body-radius-aware CircleCast whiskers ahead)
+///   - Ally separation (OverlapCircle of nearby enemies)
 ///
-/// Wall avoidance uses CircleCast (body-radius-aware) with danger
-/// propagated to angular neighbors.  Additionally, each wall hit
-/// boosts interest along the wall surface (tangent) toward the side
-/// that matches the current heading so the enemy commits to one
-/// wall-following direction instead of oscillating.
+/// The combined direction is normalized and smoothed across frames.
 ///
-/// Strafe is a blended bias (not a full interest replacement) that
-/// picks the more-open perpendicular side dynamically with hysteresis.
+/// Designed for top-down RPG combat in open spaces / scattered obstacle layouts.
+/// It is NOT a pathfinder: long fully-blocking walls with no opening may cause
+/// the enemy to slide along them, but it will round finite walls and pillars.
 ///
-/// Fallback when fully blocked: picks the least-danger direction
-/// instead of freezing, so the enemy slides along walls.
-///
-/// Driven from EnemyBrain.MoveChaseTarget() every FixedUpdate.
-/// Public API unchanged: ComputeDirection(toTargetDir, dist, canStrafe).
+/// Driven from EnemyBrain.MoveChaseTarget(). Public API unchanged:
+///   SteeringOrigin
+///   ComputeDirection(toTargetDir, distanceToTarget, allowStrafe)
 /// </summary>
 [RequireComponent(typeof(Rigidbody2D))]
 public class ContextSteering2D : MonoBehaviour
 {
-    [Header("Compass")]
-    [SerializeField] private int rayCount = 16;
-    [SerializeField] private float baseSensorLength = 1.2f;
-    [SerializeField] private float speedSensorFactor = 0.25f;
-    [SerializeField] private float maxSensorLength = 3.0f;
-
-    [Header("Danger Propagation")]
-    [SerializeField] private float[] dangerFalloff = { 1f, 0.5f, 0.2f };
-
-    [Header("Wall Slide")]
-    [Range(0f, 1f)]
-    [SerializeField] private float wallSlideStrength = 0.45f;
-    [SerializeField] private float[] wallSlideFalloff = { 1f, 0.5f, 0.2f };
-
-    [Header("Layer Masks (defaults set in Awake)")]
+    [Header("Layers")]
     [SerializeField] private LayerMask obstacleMask;
     [SerializeField] private LayerMask allyMask;
 
-    [Header("Shaping - Distance")]
-    [SerializeField] private float approachRange = 5f;
-    [SerializeField] private float approachRangePause = 1.5f;
+    [Header("Avoidance")]
+    [SerializeField] private float sensorLength = 1.2f;
+    [SerializeField] private float avoidWeight = 2f;
 
-    [Header("Momentum")]
-    [Range(0f, 0.5f)]
-    [SerializeField] private float momentumWeight = 0.25f;
-    [SerializeField] private float[] momentumFalloff = { 1f, 0.5f, 0.2f };
+    [Header("Ally Separation")]
+    [SerializeField] private float separationRadius = 1.5f;
+    [SerializeField] private float separationWeight = 1f;
 
-    [Header("Shaping - Strafe")]
-    [SerializeField] private bool enableStrafe = true;
+    [Header("Strafe")]
     [SerializeField] private float strafeRange = 2f;
+
+    [Header("Smoothing")]
     [Range(0f, 1f)]
-    [SerializeField] private float strafeWeight = 0.7f;
-    [SerializeField] private float strafeFlipMargin = 0.3f;
-    [SerializeField] private float strafeStickTime = 1.0f;
+    [SerializeField] private float directionSmoothing = 0.4f;
 
-    [Header("Separation")]
-    [SerializeField] private float allyScanRadius = 2.5f;
-    [SerializeField] private float closeRepulsionRadius = 0.8f;
-    [SerializeField] private float closeRepulsionStrength = 1f;
-
-    [Header("Synthesis")]
-    [SerializeField] private float blendAngleThreshold = 45f;
-    [Range(0f, 1f)]
-    [SerializeField] private float directionSmoothing = 0.35f;
-
+#if UNITY_EDITOR
     [Header("Debug")]
     [SerializeField] private bool drawGizmos = true;
 
-    Vector2[] dirs;
-    float[] interest;
-    float[] strafeInterest;
-    float[] danger;
-    float[] finalScores;
-
-    int strafeSign = 1;
-    float lastStrafeFlipTime;
-
-    Vector2 _currentTargetDir;
-    Vector2 lastOutputDir;
-    Vector2 lastBlendedDir;
-    Vector2 lastStrafeDir;
-    float lastSensorLength;
-
-    Collider2D selfCollider;
-    float bodyRadius;
-    Vector2 steeringOriginOffset;
-    Rigidbody2D rb;
+    Vector2 _debugSeek;
+    Vector2 _debugAvoid;
+    Vector2 _debugSep;
+    Vector2 _debugOutput;
+#endif
 
     public Vector2 SteeringOrigin => (Vector2)transform.position + steeringOriginOffset;
 
-    static readonly Collider2D[] s_allyHits = new Collider2D[32];
+    Vector2 steeringOriginOffset;
+    float bodyRadius;
+    Collider2D selfCollider;
+
+    Vector2 lastOutputDir;
+    int strafeSign = 1;
+    float lastStrafeFlipTime;
+
+    const float WHISKER_ANGLE = 35f;
+    const float STRAFE_STICK_TIME = 0.8f;
+    const float ARRIVAL_PAUSE = 1f;
+    const int MAX_ALLY_HITS = 32;
+    static readonly Collider2D[] s_allyHits = new Collider2D[MAX_ALLY_HITS];
 
     void Awake()
     {
@@ -106,17 +73,9 @@ public class ContextSteering2D : MonoBehaviour
         if (allyMask.value == 0)
             allyMask = LayerMask.GetMask("Enemy");
 
-        rb = GetComponent<Rigidbody2D>();
         selfCollider = GetComponent<Collider2D>();
         steeringOriginOffset = selfCollider != null ? selfCollider.offset : Vector2.zero;
-
         bodyRadius = GetBodyRadius();
-
-        dirs = SteeringMath.BuildDirections(rayCount);
-        interest = new float[rayCount];
-        strafeInterest = new float[rayCount];
-        danger = new float[rayCount];
-        finalScores = new float[rayCount];
     }
 
     float GetBodyRadius()
@@ -127,244 +86,179 @@ public class ContextSteering2D : MonoBehaviour
         return 0.3f;
     }
 
+    /// <summary>
+    /// Returns the desired normalized movement direction for this FixedUpdate.
+    /// </summary>
     public Vector2 ComputeDirection(Vector2 toTargetDir, float distanceToTarget, bool allowStrafe = true)
     {
-        _currentTargetDir = toTargetDir;
         Vector2 origin = SteeringOrigin;
 
-        // 1. Seek interest
-        SteeringMath.ComputeInterest(toTargetDir, dirs, interest);
-
-        // 2. Distance scaling (arrival throttle)
-        if (allowStrafe)
-            SteeringMath.ApplyDistanceScaling(interest, distanceToTarget, approachRange, approachRangePause);
-
-        // 3. Speed-scaled sensor length
-        float speed = rb != null ? rb.linearVelocity.magnitude : 0f;
-        lastSensorLength = Mathf.Clamp(baseSensorLength + speed * speedSensorFactor, baseSensorLength, maxSensorLength);
-
-        // 4. Zero danger, then obstacle danger + wall-slide interest
-        System.Array.Clear(danger, 0, danger.Length);
-        ComputeObstacleMap(origin);
-
-        // 5. Ally separation danger
-        ComputeAllyDanger(origin);
-
-        // 6. Strafe blend
-        if (enableStrafe && allowStrafe && distanceToTarget <= strafeRange && distanceToTarget > 0.01f)
+        // 1. Seek toward target, or orbit/strafe when in range.
+        Vector2 seek;
+        if (allowStrafe && distanceToTarget <= strafeRange && distanceToTarget > 0.01f)
         {
-            PickStrafeSide(toTargetDir);
-            Vector2 strafeDir = SteeringMath.Perpendicular(toTargetDir, strafeSign);
-            lastStrafeDir = strafeDir;
-
-            SteeringMath.ComputeInterest(strafeDir, dirs, strafeInterest);
-
-            float seekW = 1f - strafeWeight;
-            for (int i = 0; i < rayCount; i++)
-                interest[i] = seekW * interest[i] + strafeWeight * strafeInterest[i];
+            PickStrafeSide(toTargetDir, origin);
+            seek = Perpendicular(toTargetDir, strafeSign);
         }
         else
         {
-            lastStrafeDir = Vector2.zero;
+            float arrival = distanceToTarget < ARRIVAL_PAUSE
+                ? distanceToTarget / ARRIVAL_PAUSE
+                : 1f;
+            seek = toTargetDir * arrival;
         }
 
-        // 7. Momentum bias toward current heading
-        if (momentumWeight > 0f && lastOutputDir.sqrMagnitude > 0.0001f)
-        {
-            int mSlot = SteeringMath.GetNearestSlot(lastOutputDir, rayCount);
-            SteeringMath.ApplyDangerFalloff(interest, mSlot, momentumWeight, momentumFalloff, rayCount);
-        }
+        // 2. Avoid walls and obstacles.
+        Vector2 avoid = ComputeAvoidance(origin, seek);
 
-        // 8. Final = max(0, Interest - Danger)
-        for (int i = 0; i < rayCount; i++)
-            finalScores[i] = Mathf.Max(0f, interest[i] - danger[i]);
+        // 3. Push away from overlapping allies.
+        Vector2 separation = ComputeSeparation(origin);
 
-        // 9. Blend top angular neighbors (or fallback if all zero)
-        Vector2 blended = SteeringMath.Blend(finalScores, dirs, blendAngleThreshold);
-        if (blended == Vector2.zero)
-            blended = SteeringMath.LeastDangerDirection(danger, dirs);
+        // 4. Combine and normalize.
+        Vector2 desired = seek + avoid * avoidWeight + separation * separationWeight;
 
-        lastBlendedDir = blended;
+        if (desired.sqrMagnitude < 0.0001f)
+            desired = lastOutputDir.sqrMagnitude > 0.0001f ? lastOutputDir : Vector2.up;
 
-        // 10. Smooth across frames (skip on sharp turns)
-        blended = SteeringMath.SmoothDirection(blended, lastOutputDir, directionSmoothing, 0.5f);
-        lastOutputDir = blended;
+        Vector2 output = desired.normalized;
 
-        return blended;
+        // 5. Smooth across frames.
+        output = SmoothDirection(output, lastOutputDir, directionSmoothing, 0.5f);
+        lastOutputDir = output;
+
+#if UNITY_EDITOR
+        _debugSeek = seek;
+        _debugAvoid = avoid;
+        _debugSep = separation;
+        _debugOutput = output;
+#endif
+
+        return output;
     }
 
-    void ComputeObstacleMap(Vector2 origin)
+    Vector2 ComputeAvoidance(Vector2 origin, Vector2 referenceDir)
     {
-        int count = rayCount;
-        float len = lastSensorLength;
-        LayerMask mask = obstacleMask;
-        float radius = bodyRadius;
-        float slideStr = wallSlideStrength;
-        Vector2 targetDir = _currentTargetDir;
-        Vector2 heading = lastOutputDir;
+        Vector2 avoid = Vector2.zero;
+        if (referenceDir.sqrMagnitude < 0.0001f)
+            referenceDir = Vector2.up;
 
-        for (int i = 0; i < count; i++)
-        {
-            RaycastHit2D hit = Physics2D.CircleCast(origin, radius, dirs[i], len, mask);
-            if (!hit.collider) continue;
+        Probe(origin, referenceDir, sensorLength, ref avoid);
+        Probe(origin, Rotate(referenceDir, WHISKER_ANGLE), sensorLength, ref avoid);
+        Probe(origin, Rotate(referenceDir, -WHISKER_ANGLE), sensorLength, ref avoid);
 
-            float weight = 1f - (hit.distance / len);
-            if (weight <= 0f) continue;
-
-            // Danger — avoid the wall
-            SteeringMath.ApplyDangerFalloff(danger, i, weight, dangerFalloff, count);
-
-            // Wall-slide interest — follow the wall tangent
-            if (slideStr <= 0f) continue;
-
-            Vector2 normal = hit.normal;
-            Vector2 tanA = new Vector2(normal.y, -normal.x);
-            Vector2 tanB = new Vector2(-normal.y, normal.x);
-
-            float dotA = heading.sqrMagnitude > 0.0001f
-                ? Vector2.Dot(tanA, heading) : Vector2.Dot(tanA, targetDir);
-            float dotB = heading.sqrMagnitude > 0.0001f
-                ? Vector2.Dot(tanB, heading) : Vector2.Dot(tanB, targetDir);
-
-            Vector2 slideDir = dotA >= dotB ? tanA : tanB;
-
-            // Only add slide interest if it actually moves us somewhat toward target
-            if (Vector2.Dot(slideDir, targetDir) > -0.2f)
-            {
-                float slideWeight = weight * slideStr;
-                int slideSlot = SteeringMath.GetNearestSlot(slideDir, count);
-                SteeringMath.ApplyDangerFalloff(interest, slideSlot, slideWeight, wallSlideFalloff, count);
-            }
-        }
+        return avoid;
     }
 
-    void ComputeAllyDanger(Vector2 origin)
+    void Probe(Vector2 origin, Vector2 dir, float length, ref Vector2 accumulator)
     {
-        var filter = new ContactFilter2D { layerMask = allyMask };
-        int hitCount = Physics2D.OverlapCircle(origin, allyScanRadius, filter, s_allyHits);
-        if (hitCount <= 0) return;
+        RaycastHit2D hit = Physics2D.CircleCast(origin, bodyRadius, dir, length, obstacleMask);
+        if (!hit.collider) return;
 
-        int dirCount = rayCount;
-        float scanInv = 1f / allyScanRadius;
-        float closeInv = closeRepulsionRadius > 0.001f ? 1f / closeRepulsionRadius : 0f;
+        float strength = 1f - (hit.distance / length);
+        if (strength <= 0f) return;
 
-        for (int j = 0; j < hitCount; j++)
+        // Surface normal pushes us off/around the obstacle.
+        accumulator += hit.normal * strength;
+    }
+
+    Vector2 ComputeSeparation(Vector2 origin)
+    {
+        Vector2 separation = Vector2.zero;
+        var filter = new ContactFilter2D { layerMask = allyMask, useLayerMask = true };
+        int hitCount = Physics2D.OverlapCircle(origin, separationRadius, filter, s_allyHits);
+        if (hitCount <= 0) return separation;
+
+        for (int i = 0; i < hitCount; i++)
         {
-            Collider2D col = s_allyHits[j];
+            Collider2D col = s_allyHits[i];
             if (col == null || col == selfCollider) continue;
 
             Vector2 toAlly = (Vector2)col.transform.position - origin;
             float dist = toAlly.magnitude;
-            if (dist < 0.001f) continue;
+            if (dist < 0.001f || dist >= separationRadius) continue;
 
-            float weight = 1f - dist * scanInv;
-            if (weight <= 0f) continue;
+            float strength = 1f - (dist / separationRadius);
+            separation += (-toAlly / dist) * strength;
+        }
 
-            if (closeRepulsionRadius > 0.001f && dist < closeRepulsionRadius)
-            {
-                float closeWeight = closeRepulsionStrength * (1f - dist * closeInv);
-                if (closeWeight > weight) weight = closeWeight;
-            }
+        return separation;
+    }
 
-            int slot = SteeringMath.GetNearestSlot(toAlly / dist, dirCount);
-            SteeringMath.ApplyDangerFalloff(danger, slot, weight, dangerFalloff, dirCount);
+    void PickStrafeSide(Vector2 toTargetDir, Vector2 origin)
+    {
+        Vector2 perpR = Perpendicular(toTargetDir, 1);
+        Vector2 perpL = Perpendicular(toTargetDir, -1);
+
+        float clearR = CastDistance(origin, perpR);
+        float clearL = CastDistance(origin, perpL);
+
+        float timeSinceFlip = Time.time - lastStrafeFlipTime;
+        if (timeSinceFlip < STRAFE_STICK_TIME) return;
+
+        if (strafeSign > 0 && clearR < clearL)
+        {
+            strafeSign = -1;
+            lastStrafeFlipTime = Time.time;
+        }
+        else if (strafeSign < 0 && clearL < clearR)
+        {
+            strafeSign = 1;
+            lastStrafeFlipTime = Time.time;
         }
     }
 
-    void PickStrafeSide(Vector2 toTargetDir)
+    float CastDistance(Vector2 origin, Vector2 dir)
     {
-        Vector2 perpR = SteeringMath.Perpendicular(toTargetDir, 1);
-        Vector2 perpL = SteeringMath.Perpendicular(toTargetDir, -1);
+        RaycastHit2D hit = Physics2D.CircleCast(origin, bodyRadius, dir, sensorLength, obstacleMask);
+        return hit.collider ? hit.distance : sensorLength;
+    }
 
-        int dirCount = rayCount;
-        int slotR = SteeringMath.GetNearestSlot(perpR, dirCount);
-        int slotL = SteeringMath.GetNearestSlot(perpL, dirCount);
+    static Vector2 SmoothDirection(Vector2 current, Vector2 previous, float factor, float opposeThreshold)
+    {
+        if (previous.sqrMagnitude < 0.0001f) return current;
+        if (current.sqrMagnitude < 0.0001f) return Vector2.zero;
+        if (Vector2.Dot(current, previous) < -opposeThreshold) return current;
+        return Vector2.Lerp(current, previous, factor).normalized;
+    }
 
-        float dangerR = danger[slotR];
-        float dangerL = danger[slotL];
+    static Vector2 Perpendicular(Vector2 v, int sign)
+    {
+        return sign >= 0 ? new Vector2(v.y, -v.x) : new Vector2(-v.y, v.x);
+    }
 
-        float timeSinceFlip = Time.time - lastStrafeFlipTime;
-        float margin = strafeFlipMargin;
-
-        if (strafeSign == 1)
-        {
-            if (dangerR > dangerL + margin && timeSinceFlip >= strafeStickTime)
-            {
-                strafeSign = -1;
-                lastStrafeFlipTime = Time.time;
-            }
-        }
-        else
-        {
-            if (dangerL > dangerR + margin && timeSinceFlip >= strafeStickTime)
-            {
-                strafeSign = 1;
-                lastStrafeFlipTime = Time.time;
-            }
-        }
+    static Vector2 Rotate(Vector2 v, float degrees)
+    {
+        float rad = degrees * Mathf.Deg2Rad;
+        float c = Mathf.Cos(rad);
+        float s = Mathf.Sin(rad);
+        return new Vector2(v.x * c - v.y * s, v.x * s + v.y * c);
     }
 
 #if UNITY_EDITOR
     void OnDrawGizmosSelected()
     {
         if (!drawGizmos) return;
-        if (dirs == null || interest == null || danger == null || finalScores == null) return;
+        if (bodyRadius <= 0f) return;
 
         Vector3 pos = SteeringOrigin;
-        float gizmoLen = lastSensorLength > 0.01f ? lastSensorLength : baseSensorLength;
 
-        Gizmos.color = new Color(1f, 1f, 1f, 0.15f);
-        Gizmos.DrawWireSphere(pos, approachRange);
-        Gizmos.color = new Color(0f, 1f, 1f, 0.15f);
+        Gizmos.color = new Color(0f, 1f, 0f, 0.75f);
+        Gizmos.DrawRay(pos, (Vector3)_debugSeek.normalized * sensorLength);
+
+        Gizmos.color = new Color(1f, 0f, 0f, 0.75f);
+        Gizmos.DrawRay(pos, (Vector3)_debugAvoid.normalized * sensorLength);
+
+        Gizmos.color = new Color(1f, 0f, 1f, 0.75f);
+        Gizmos.DrawRay(pos, (Vector3)_debugSep.normalized * sensorLength);
+
+        Gizmos.color = new Color(1f, 1f, 0f, 0.9f);
+        Gizmos.DrawRay(pos, (Vector3)_debugOutput * sensorLength);
+
+        Gizmos.color = new Color(1f, 1f, 1f, 0.2f);
+        Gizmos.DrawWireSphere(pos, separationRadius);
+
+        Gizmos.color = new Color(0f, 1f, 1f, 0.2f);
         Gizmos.DrawWireSphere(pos, strafeRange);
-
-        for (int i = 0; i < dirs.Length; i++)
-        {
-            Vector3 dir = (Vector3)dirs[i];
-
-            if (interest[i] > 0.01f)
-            {
-                Gizmos.color = new Color(0f, 1f, 0f, 0.6f);
-                Gizmos.DrawRay(pos, dir * gizmoLen * interest[i]);
-            }
-
-            if (danger[i] > 0.01f)
-            {
-                Gizmos.color = new Color(1f, 0f, 0f, 0.6f);
-                Vector3 offset = pos + new Vector3(dir.y, -dir.x, 0f) * 0.05f;
-                Gizmos.DrawRay(offset, dir * gizmoLen * danger[i]);
-            }
-
-            if (finalScores[i] > 0.01f)
-            {
-                Gizmos.color = Color.white;
-                Gizmos.DrawSphere(pos + dir * gizmoLen * finalScores[i], 0.03f);
-            }
-        }
-
-        if (lastBlendedDir != Vector2.zero)
-        {
-            Gizmos.color = Color.yellow;
-            Vector3 end = pos + (Vector3)lastBlendedDir * gizmoLen;
-            Gizmos.DrawRay(pos, (Vector3)lastBlendedDir * gizmoLen);
-            Vector3 r = Quaternion.Euler(0f, 0f, 160f) * (Vector3)lastBlendedDir * 0.2f;
-            Vector3 l = Quaternion.Euler(0f, 0f, -160f) * (Vector3)lastBlendedDir * 0.2f;
-            Gizmos.DrawRay(end, r);
-            Gizmos.DrawRay(end, l);
-        }
-
-        if (lastOutputDir != Vector2.zero)
-        {
-            Gizmos.color = new Color(1f, 1f, 0.5f, 0.8f);
-            Vector3 offset = pos + new Vector3(0f, 0.1f, 0f);
-            Gizmos.DrawRay(offset, (Vector3)lastOutputDir * gizmoLen * 0.5f);
-        }
-
-        if (lastStrafeDir != Vector2.zero)
-        {
-            Gizmos.color = Color.cyan;
-            Gizmos.DrawRay(pos, (Vector3)lastStrafeDir * gizmoLen * 0.5f);
-        }
     }
 #endif
 }

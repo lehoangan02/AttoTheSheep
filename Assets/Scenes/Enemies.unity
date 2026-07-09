@@ -207,7 +207,7 @@ Transform:
   m_GameObject: {fileID: 35470464}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5.21, y: 2.21, z: -10}
+  m_LocalPosition: {x: 4.43, y: -11.16, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -687,11 +687,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5214352752191870431, guid: 5067e08349ce7b54d830d89cee772b3a, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 5.21
+      value: 4.43
       objectReference: {fileID: 0}
     - target: {fileID: 5214352752191870431, guid: 5067e08349ce7b54d830d89cee772b3a, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2.21
+      value: -11.16
       objectReference: {fileID: 0}
     - target: {fileID: 5214352752191870431, guid: 5067e08349ce7b54d830d89cee772b3a, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1139,7 +1139,7 @@ Transform:
   m_GameObject: {fileID: 1931734141}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5.21, y: 2.21, z: -10}
+  m_LocalPosition: {x: 4.43, y: -11.16, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1159,11 +1159,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4170642968498222792, guid: 858dd570ac8436d628b317a7988f8c17, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 2.05983
+      value: -4.92
       objectReference: {fileID: 0}
     - target: {fileID: 4170642968498222792, guid: 858dd570ac8436d628b317a7988f8c17, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2.59451
+      value: 0.74
       objectReference: {fileID: 0}
     - target: {fileID: 4170642968498222792, guid: 858dd570ac8436d628b317a7988f8c17, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1198,8 +1198,16 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4986655033410483987, guid: 858dd570ac8436d628b317a7988f8c17, type: 3}
-      propertyPath: momentumWeight
-      value: 0.5
+      propertyPath: allyMask.m_Bits
+      value: 64
+      objectReference: {fileID: 0}
+    - target: {fileID: 4986655033410483987, guid: 858dd570ac8436d628b317a7988f8c17, type: 3}
+      propertyPath: directionSmoothing
+      value: 0.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4986655033410483987, guid: 858dd570ac8436d628b317a7988f8c17, type: 3}
+      propertyPath: obstacleMask.m_Bits
+      value: 1048832
       objectReference: {fileID: 0}
     - target: {fileID: 8414926124882652261, guid: 858dd570ac8436d628b317a7988f8c17, type: 3}
       propertyPath: GlobalObjectIdHash
@@ -1285,7 +1293,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -1.8885875, y: 0}
+  m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -1295,7 +1303,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 7.032771, y: 1}
+  m_Size: {x: 10, y: 10}
   m_EdgeRadius: 0
 --- !u!50 &1996020516
 Rigidbody2D:
