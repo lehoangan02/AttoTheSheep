@@ -132,12 +132,15 @@ public class PlayerController : NetworkBehaviour
     {
         Debug.Log($"[PlayerController] OnNetworkSpawn is running on: {gameObject.name}. IsOwner: {IsOwner}");
         
-        // Destroy pre-placed player objects in scenes to prevent duplicates when using PlayerSpawnManager
+        // Destroy pre-placed player objects in scenes to prevent duplicates ONLY when using PlayerSpawnManager
         if (IsServer && !NetworkObject.IsPlayerObject)
         {
-            Debug.Log("[PlayerController] Destroying pre-placed non-player object in scene.");
-            GetComponent<NetworkObject>().Despawn(true);
-            return;
+            if (FindAnyObjectByType<PlayerSpawnManager>() != null)
+            {
+                Debug.Log("[PlayerController] Destroying pre-placed non-player object in scene because PlayerSpawnManager is present.");
+                GetComponent<NetworkObject>().Despawn(true);
+                return;
+            }
         }
 
         if (IsOwner)

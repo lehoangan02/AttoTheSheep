@@ -24,7 +24,8 @@ public class WaveTrigger : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (Unity.Netcode.NetworkManager.Singleton != null && !Unity.Netcode.NetworkManager.Singleton.IsServer) return;
+        var netMgr = Unity.Netcode.NetworkManager.Singleton;
+        if (netMgr != null && netMgr.IsListening && !netMgr.IsServer) return;
 
         if (!other.CompareTag("Player")) return;
         if (targetWave == null) return;
