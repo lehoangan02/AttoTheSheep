@@ -31,6 +31,14 @@ public class GameBootstrapper : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
+        // Ensure ScreenshotManager is always globally available in every scene
+        if (ScreenshotManager.Instance == null)
+        {
+            GameObject screenshotObj = new GameObject("ScreenshotManager");
+            screenshotObj.AddComponent<ScreenshotManager>();
+            // ScreenshotManager's own Awake will call DontDestroyOnLoad
+        }
+
         try
         {
             await InitializeGameAsync();
