@@ -49,6 +49,27 @@ public class PlayerEntity : NetworkEntity
         currentHealth.OnValueChanged += OnHealthChanged;
     }
 
+    private float _multiplayerRegenTimer = 0f;
+
+    private void Update()
+    {
+        if (IsServer && IsAlive)
+        {
+            if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "MultiplayerLevel")
+            {
+                _multiplayerRegenTimer += Time.deltaTime;
+                if (_multiplayerRegenTimer >= 2f) // Every 2 seconds
+                {
+                    _multiplayerRegenTimer -= 2f;
+                    if (currentHealth.Value < baseMaxHealth)
+                    {
+                        currentHealth.Value = Mathf.Min(baseMaxHealth, currentHealth.Value + 3); // Recover 3 HP
+                    }
+                }
+            }
+        }
+    }
+
     public override void OnNetworkDespawn()
     {
         base.OnNetworkDespawn();

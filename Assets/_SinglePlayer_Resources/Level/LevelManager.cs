@@ -154,7 +154,9 @@ public class LevelManager : MonoBehaviour
         SetState(LevelState.Idle);
     }
 
-    // --- Internal ---
+    private int _infiniteRoundCount = 0;
+    public int InfiniteRoundCount => _infiniteRoundCount;
+    private List<GameObject> _allEnemyPrefabsInLevel = new List<GameObject>();
 
     private void HandleWaveCleared(WaveController wave)
     {
@@ -169,12 +171,33 @@ public class LevelManager : MonoBehaviour
 
             if (_clearedWaves.Count >= allWaves.Count)
             {
-                Debug.Log("[LevelManager] Round complete! Restarting wave cycle.");
+                Debug.Log("[LevelManager] Round complete! Restarting wave cycle with higher difficulty.");
+                _infiniteRoundCount++;
+                
+                // Collect all enemies to inject into later rounds
+                if (_allEnemyPrefabsInLevel.Count == 0)
+                {
+                    HashSet<GameObject> uniqueEnemies = new HashSet<GameObject>();
+                    foreach (WaveController w in allWaves)
+                    {
+                        if (w != null && w.Data != null && w.Data.EnemyPrefabs != null)
+                        {
+                            foreach(var prefab in w.Data.EnemyPrefabs)
+                                uniqueEnemies.Add(prefab);
+                        }
+                    }
+                    _allEnemyPrefabsInLevel.AddRange(uniqueEnemies);
+                }
+                
                 foreach (WaveController w in allWaves)
                 {
                     if (w != null)
+                    {
+                        w.SetScaling(_infiniteRoundCount, _allEnemyPrefabsInLevel);
                         w.ResetWave();
+                    }
                 }
+                
                 _clearedWaves.Clear();
                 _currentWaveIndex = 0;
                 SetState(LevelState.Idle);

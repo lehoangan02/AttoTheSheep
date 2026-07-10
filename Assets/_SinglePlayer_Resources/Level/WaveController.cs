@@ -12,6 +12,7 @@ public class WaveController : MonoBehaviour
 {
     [Header("Config")]
     [SerializeField] private WaveData waveData;
+    public WaveData Data => waveData;
     [Tooltip("Scene Transforms where enemies spawn. ScriptableObjects can't hold scene refs.")]
     [SerializeField] private Transform[] spawnPoints;
 
@@ -79,14 +80,35 @@ public class WaveController : MonoBehaviour
         _isCleared = false;
     }
 
+    private int _difficultyMultiplier = 1;
+    private List<GameObject> _allEnemyTypes;
+
+    public void SetScaling(int roundCount, List<GameObject> allTypes)
+    {
+        _difficultyMultiplier = 1 + roundCount; // Round 0 = 1x, Round 1 = 2x, etc.
+        if (roundCount > 0 && allTypes != null && allTypes.Count > 0)
+        {
+            _allEnemyTypes = allTypes;
+        }
+        else
+        {
+            _allEnemyTypes = null;
+        }
+    }
+
     // --- Spawn Loop ---
 
     private IEnumerator SpawnRoutine()
     {
-        while (_spawnedCount < waveData.TotalEnemyCount)
+        int totalToSpawn = waveData.TotalEnemyCount * _difficultyMultiplier;
+        
+        while (_spawnedCount < totalToSpawn)
         {
             SpawnOneEnemy();
-            yield return new WaitForSeconds(waveData.SpawnInterval);
+            
+            // Speed up spawn interval as rounds increase so it doesn't take forever
+            float currentInterval = Mathf.Max(0.5f, waveData.SpawnInterval / (1f + (_difficultyMultiplier - 1) * 0.25f));
+            yield return new WaitForSeconds(currentInterval);
         }
 
         if (logEvents) Debug.Log($"[WaveController] {name}: all {_spawnedCount} enemies spawned.");
@@ -94,7 +116,16 @@ public class WaveController : MonoBehaviour
 
     private void SpawnOneEnemy()
     {
-        GameObject prefab = waveData.GetRandomEnemyPrefab();
+        GameObject prefab = null;
+        if (_allEnemyTypes != null && _allEnemyTypes.Count > 0)
+        {
+            prefab = _allEnemyTypes[UnityEngine.Random.Range(0, _allEnemyTypes.Count)];
+        }
+        else
+        {
+            prefab = waveData.GetRandomEnemyPrefab();
+        }
+
         Transform spawnPoint = GetRandomSpawnPoint();
 
         if (prefab == null)
@@ -124,7 +155,13 @@ public class WaveController : MonoBehaviour
                 // Force initialization since IsServer on NetworkBehaviour is false before Spawn
                 if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsServer)
                 {
-                    entity.currentHealth.Value = enemyEntity.Data.maxHealth;
+                    // Scale enemy health based on round multiplier (optional, but requested increasing difficulty)
+                    int scaledHealth = enemyEntity.Data.maxHealth;
+                    if (_difficultyMultiplier > 1) 
+                    {
+                        scaledHealth = Mathf.CeilToInt(scaledHealth * (1f + (_difficultyMultiplier - 1) * 0.5f));
+                    }
+                    entity.currentHealth.Value = scaledHealth;
                     entity.currentMoveSpeed.Value = enemyEntity.Data.moveSpeed;
                 }
             }
