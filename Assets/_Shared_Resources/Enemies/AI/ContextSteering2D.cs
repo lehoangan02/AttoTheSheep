@@ -1,315 +1,434 @@
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 /// <summary>
-/// Context-Based Steering for 2D enemy AI.
-/// 8-way compass: Interest map (dot product against target direction),
-/// Danger map (8 raycasts against obstacle layer + ally overlap sensor),
-/// Final = max(0, Interest - Danger), blend top angular neighbors.
+/// Bug2-based steering for 2D enemies.
 ///
-/// Driven from EnemyBrain.MoveChaseTarget() in FixedUpdate. Server-side only
-/// (per-enemy cost is 8 raycasts + 1 overlap per tick, but scratch buffers
-/// are static, so zero per-frame allocations).
+/// Reaches the player with a hybrid Bug2 boundary-following algorithm layered on top of a
+/// short-range reactive sensor. Long walls and concave pockets that defeated the previous
+/// Reynolds-style whiskers are now navigable; close-range strafing is preserved.
+///
+/// Public API (unchanged):
+///   SteeringOrigin
+///   ComputeDirection(toTargetDir, distanceToTarget, allowStrafe)
+///
+/// Driven from EnemyBrain.MoveChaseTarget().
 /// </summary>
 [RequireComponent(typeof(Rigidbody2D))]
 public class ContextSteering2D : MonoBehaviour
 {
-    [Header("Compass")]
-    [SerializeField] private int rayCount = 8;
-    [SerializeField] private float sensorLength = 1.2f;
+    [Header("Obstacles")]
+    [SerializeField] private LayerMask obstacleMask;
 
-    [Header("Layer Masks (defaults set in Awake)")]
-    [SerializeField] private LayerMask obstacleMask; // default = Building|Terrain
-    [SerializeField] private LayerMask allyMask;     // default = Enemy
-
-    [Header("Shaping - Distance")]
-    [SerializeField] private float approachRange = 5f;
-    [SerializeField] private float approachRangePause = 1.5f;
-
-    [Header("Shaping - Strafe")]
-    [SerializeField] private bool enableStrafe = true;
+    [Header("Strafe")]
     [SerializeField] private float strafeRange = 2f;
 
-    [Header("Separation")]
-    [SerializeField] private float allyScanRadius = 2.5f;
-    [SerializeField] private float closeRepulsionRadius = 0.8f;
-    [SerializeField] private float closeRepulsionStrength = 1f;
+    [Header("Bug2 Sensors")]
+    [Tooltip("Forward reach used to detect when the straight path to the target is blocked.")]
+    [SerializeField] private float forwardSensorLength = 1.2f;
 
-    [Header("Synthesis")]
-    [SerializeField] private float blendAngleThreshold = 45f;
+    [Tooltip("Side reach used while tracing an obstacle boundary.")]
+    [SerializeField] private float sideSensorLength = 0.8f;
 
+    [Tooltip("Desired distance from the steering origin to the wall surface while wall-following. Will be clamped to at least the agent's body radius.")]
+    [SerializeField] private float sideTargetOffset = 0.3f;
+
+    [Tooltip("Gain that converts wall-distance error into a lateral correction.")]
+    [SerializeField] private float sideSeekCoeff = 1.5f;
+
+    [Tooltip("Degrees per second the agent rotates toward the committed wall side when a corner is met.")]
+    [SerializeField] private float cornerTurnRate = 180f;
+
+    [Header("Leave-Wall Conditions")]
+    [Tooltip("Soft cap on how long the agent will stay in wall-follow before forcing a retry.")]
+    [SerializeField] private float maxWallFollowTime = 6f;
+
+    [Header("Smoothing")]
+    [Tooltip("Distance within which arrival slowdown is applied in Seek state.")]
+    [SerializeField] private float arrivalPause = 1f;
+
+    [Range(0f, 1f)]
+    [SerializeField] private float directionSmoothing = 0.4f;
+
+#if UNITY_EDITOR
     [Header("Debug")]
     [SerializeField] private bool drawGizmos = true;
+#endif
 
-    // Cached runtime fields (private, NOT SerializeField):
-    Vector2[] dirs8;
-    float[] interest;
-    float[] danger;
-    float[] finalScores;     // max(0, interest - danger) for blending and gizmos
-    int strafeSign = 1;
-    bool inStrafeMode;
-    Vector2 lastBlendedDir;  // for gizmos
-    Vector2 lastStrafeDir;   // for gizmos
-    Collider2D selfCollider;
-    Vector2 steeringOriginOffset;
     public Vector2 SteeringOrigin => (Vector2)transform.position + steeringOriginOffset;
 
-    // Static scratch buffers (shared, safe: single-threaded FixedUpdate).
-    // Safe ONLY because Unity's FixedUpdate is single-threaded.
-    // If Burst/Jobs are added later, move to instance buffers.d
-    // Sized for max 32 rays (rayCount is configurable)
-    static readonly RaycastHit2D[] s_wallHits = new RaycastHit2D[32];
-    static readonly Collider2D[] s_allyHits = new Collider2D[32];
-    static readonly ContactFilter2D s_allyFilter = ContactFilter2D.noFilter;
+    enum BugState { Seek, WallFollow }
+
+    // Cached self-data
+    Vector2 steeringOriginOffset;
+    float bodyRadius;
+    Collider2D selfCollider;
+
+    // Output smoothing
+    Vector2 lastOutputDir;
+
+    // Strafe state
+    int strafeSign = 1;
+    float lastStrafeFlipTime;
+
+    // Bug2 state
+    BugState state = BugState.Seek;
+    int wallSide = 1;                // +1 = right-hand wall follow, -1 = left-hand
+    float wallFollowTimer;
+
+    const float STRAFE_STICK_TIME = 0.8f;
 
     void Awake()
     {
         if (obstacleMask.value == 0)
             obstacleMask = LayerMask.GetMask("Building", "Terrain");
-        if (allyMask.value == 0)
-            allyMask = LayerMask.GetMask("Enemy");
 
         selfCollider = GetComponent<Collider2D>();
         steeringOriginOffset = selfCollider != null ? selfCollider.offset : Vector2.zero;
+        bodyRadius = GetBodyRadius();
 
-        // Build the compass directions (0°, 45°, 90°, 135°, 180°, 225°, 270°, 315°)
-        dirs8 = new Vector2[rayCount];
-        interest = new float[rayCount];
-        danger = new float[rayCount];
-        finalScores = new float[rayCount];
-        for (int i = 0; i < rayCount; i++)
-        {
-            float angle = i * 360f / rayCount * Mathf.Deg2Rad;
-            dirs8[i] = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
-        }
+        // Scale sensor geometry with body size so large enemies don't outgrow their whiskers
+        // and so the wall standoff is always achievable.
+        forwardSensorLength = Mathf.Max(forwardSensorLength, bodyRadius * 2f);
+        sideTargetOffset = Mathf.Max(sideTargetOffset, bodyRadius + 0.05f);
+        sideSensorLength = Mathf.Max(sideSensorLength, sideTargetOffset + 0.25f);
+
+        lastOutputDir = Vector2.up;
+    }
+
+    float GetBodyRadius()
+    {
+        if (selfCollider is CircleCollider2D c) return c.radius;
+        if (selfCollider is CapsuleCollider2D cap) return cap.size.x * 0.5f;
+        if (selfCollider is BoxCollider2D box) return Mathf.Min(box.size.x, box.size.y) * 0.5f;
+        return 0.3f;
+    }
+
+    void Reset()
+    {
+        obstacleMask = LayerMask.GetMask("Building", "Terrain");
     }
 
     /// <summary>
-    /// Compute the context-steered movement direction.
-    /// Called from EnemyBrain.MoveChaseTarget(). Runs server-side only.
+    /// Returns the desired normalized movement direction for this FixedUpdate.
     /// </summary>
-    /// <param name="toTargetDir">Normalized direction from self to target.</param>
-    /// <param name="distanceToTarget">Current distance to target.</param>
-    /// <returns>Normalized blended direction, or Vector2.zero if no viable path.</returns>
     public Vector2 ComputeDirection(Vector2 toTargetDir, float distanceToTarget, bool allowStrafe = true)
     {
-        // 1. Compute base interest (dot product of each compass dir vs target direction)
-        SteeringMath.ComputeInterest(toTargetDir, dirs8, interest);
+        if (toTargetDir.sqrMagnitude < 0.0001f)
+            toTargetDir = lastOutputDir.sqrMagnitude > 0.0001f ? lastOutputDir : Vector2.up;
 
-        // 2. Apply distance scaling: within approachRange, reduce toward-target interest
-        //    Skip when attack is ready (allowStrafe=false) so enemy beelines in
-        if (allowStrafe)
-            SteeringMath.ApplyDistanceScaling(interest, distanceToTarget, approachRange, approachRangePause);
+        Vector2 origin = SteeringOrigin;
+        Vector2 targetPos = origin + toTargetDir * distanceToTarget;
 
-        // 3. If strafe enabled and within strafeRange, replace interest with perpendicular direction
-        if (enableStrafe && allowStrafe && distanceToTarget <= strafeRange)
+        // Line-of-sight test used for both strafe gating and leave-wall decisions.
+        bool losClear = !HasObstacleBetween(origin, targetPos);
+
+        Vector2 desired;
+
+        // Close-range strafe pre-empts long-range navigation.
+        if (allowStrafe && distanceToTarget <= strafeRange && distanceToTarget > 0.01f && losClear)
         {
-            SteeringMath.ApplyStrafe(interest, dirs8, toTargetDir, transform, ref strafeSign, ref inStrafeMode, strafeRange);
-            lastStrafeDir = SteeringMath.Perpendicular(toTargetDir, strafeSign);
+            desired = RunStrafe(toTargetDir, origin);
+            ResetWallState();
         }
         else
         {
-            if (inStrafeMode && distanceToTarget > strafeRange * 1.1f)
-                inStrafeMode = false; // exit with hysteresis
-            lastStrafeDir = Vector2.zero;
+            switch (state)
+            {
+                case BugState.WallFollow:
+                    desired = RunWallFollow(toTargetDir, distanceToTarget, origin, losClear);
+                    break;
+                default:
+                case BugState.Seek:
+                    desired = RunSeek(toTargetDir, distanceToTarget, origin);
+                    break;
+            }
         }
 
-        // 4. Compute wall danger (8 raycasts against Building|Terrain)
-        SteeringMath.ComputeDangerRay(SteeringOrigin, dirs8, sensorLength, obstacleMask, s_wallHits, danger);
+        if (desired.sqrMagnitude < 0.0001f)
+            desired = lastOutputDir.sqrMagnitude > 0.0001f ? lastOutputDir : Vector2.up;
 
-        // 5. Add ally separation danger (OverlapCircle for nearby Enemy-layer entities)
-        SteeringMath.AddAllyDanger(SteeringOrigin, allyScanRadius, allyMask, selfCollider, s_allyHits, s_allyFilter, dirs8, danger, closeRepulsionRadius, closeRepulsionStrength);
-
-        // 6. Final = max(0, Interest - Danger) per slot
-        for (int i = 0; i < interest.Length; i++)
-            finalScores[i] = Mathf.Max(0f, interest[i] - danger[i]);
-
-        // 7. Blend top angular neighbors, store for gizmos
-        lastBlendedDir = SteeringMath.Blend(finalScores, dirs8, blendAngleThreshold);
-        return lastBlendedDir;
-    }
+        Vector2 output = SmoothDirection(desired.normalized, lastOutputDir, directionSmoothing, 0.5f);
+        lastOutputDir = output;
 
 #if UNITY_EDITOR
-    void OnDrawGizmosSelected()
-    {
-        if (!drawGizmos) return;
-        if (dirs8 == null) return;
-        Vector3 pos = SteeringOrigin;
-
-        // Draw range circles
-        Gizmos.color = new Color(1, 1, 1, 0.15f);
-        Gizmos.DrawWireSphere(pos, approachRange);
-        Gizmos.color = new Color(0, 1, 1, 0.15f);
-        Gizmos.DrawWireSphere(pos, strafeRange);
-
-        if (interest == null || danger == null || finalScores == null) return;
-
-        for (int i = 0; i < dirs8.Length; i++)
-        {
-            Vector3 dir = (Vector3)dirs8[i];
-
-            // Green ray: interest
-            if (interest[i] > 0.01f)
-            {
-                Gizmos.color = new Color(0, 1, 0, 0.6f);
-                Gizmos.DrawRay(pos, dir * sensorLength * interest[i]);
-            }
-
-            // Red ray: danger (offset slightly so red/green don't perfectly overlap)
-            if (danger[i] > 0.01f)
-            {
-                Gizmos.color = new Color(1, 0, 0, 0.6f);
-                Vector3 offset = pos + new Vector3(dir.y, -dir.x, 0) * 0.05f;
-                Gizmos.DrawRay(offset, dir * sensorLength * danger[i]);
-            }
-
-            // White sphere at tip: final score magnitude
-            float score = finalScores[i];
-            if (score > 0.01f)
-            {
-                Gizmos.color = Color.white;
-                Vector3 tip = pos + dir * sensorLength * score;
-                Gizmos.DrawSphere(tip, 0.03f);
-            }
-        }
-
-        // Yellow arrow: final blended direction
-        if (lastBlendedDir != Vector2.zero)
-        {
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawRay(pos, (Vector3)lastBlendedDir * sensorLength);
-            Vector3 end = pos + (Vector3)lastBlendedDir * sensorLength;
-            Vector3 right = Quaternion.Euler(0, 0, 160) * (Vector3)lastBlendedDir * 0.2f;
-            Vector3 left  = Quaternion.Euler(0, 0, -160) * (Vector3)lastBlendedDir * 0.2f;
-            Gizmos.DrawRay(end, right);
-            Gizmos.DrawRay(end, left);
-        }
-
-        // Cyan ray: strafe perpendicular basis when in strafe mode
-        if (inStrafeMode && lastStrafeDir != Vector2.zero)
-        {
-            Gizmos.color = Color.cyan;
-            Gizmos.DrawRay(pos, (Vector3)lastStrafeDir * sensorLength * 0.5f);
-        }
-    }
+        _debugOrigin = origin;
+        _debugTargetPos = targetPos;
+        _debugState = state;
+        _debugWallSide = wallSide;
+        _debugLOS = losClear;
+        _debugWallTimer = wallFollowTimer;
+        // _debugSideHit/_debugSideDist/_debugSideNormal are written inside RunWallFollow.
+        _debugOutput = output;
 #endif
-}
 
-/// <summary>
-/// Pure math helpers for context steering. No Time, no Physics2D calls, no
-/// static UnityEngine state — inputs are all values or scratch arrays, so
-/// these methods are deterministic and unit-testable.
-/// </summary>
-public static class SteeringMath
-{
-    /// <summary>Compute interest per compass slot: dot product of each dir vs target direction, clamped [0,1].</summary>
-    public static void ComputeInterest(Vector2 toTargetDir, Vector2[] dirs, float[] outInterest)
-    {
-        for (int i = 0; i < dirs.Length; i++)
-            outInterest[i] = Mathf.Clamp01(Vector2.Dot(dirs[i], toTargetDir));
+        return output;
     }
 
-    /// <summary>Scale interest toward 0 as distance goes from fullAt → zeroAt. Linear lerp.</summary>
-    public static void ApplyDistanceScaling(float[] interest, float dist, float fullAt, float zeroAt)
+    // ---------------------------------------------------------------
+    // Seek
+    // ---------------------------------------------------------------
+    Vector2 RunSeek(Vector2 toTargetDir, float distanceToTarget, Vector2 origin)
     {
-        if (dist >= fullAt) return;
-        float t = Mathf.Clamp01((dist - zeroAt) / (fullAt - zeroAt));
-        for (int i = 0; i < interest.Length; i++)
-            interest[i] *= t;
-    }
+        // Soft arrival slowdown.
+        float arrival = distanceToTarget < arrivalPause
+            ? distanceToTarget / arrivalPause
+            : 1f;
+        Vector2 dir = toTargetDir * Mathf.Max(arrival, 0.1f);
 
-    /// <summary>Blend strafe perpendicular into interest. Called when within strafeRange.
-    /// Sign selection: on entry, picks the sign that keeps current facing (dot with self.right). Cached with hysteresis.</summary>
-    public static void ApplyStrafe(float[] interest, Vector2[] dirs, Vector2 toTargetDir, Transform self, ref int strafeSign, ref bool inStrafeMode, float strafeRange)
-    {
-        if (!inStrafeMode)
+        // Is the straight path blocked before we reach the target?
+        float probeRadius = bodyRadius * 0.9f;
+        RaycastHit2D hit = Physics2D.CircleCast(origin, probeRadius, toTargetDir, forwardSensorLength, obstacleMask);
+        if (hit.collider && hit.distance < distanceToTarget - 0.05f)
         {
-            inStrafeMode = true;
-            Vector2 perpRight = Perpendicular(toTargetDir, 1);
-            float dot = Vector2.Dot(self.right, perpRight);
-            strafeSign = dot >= 0f ? 1 : -1;
-        }
-        Vector2 strafeDir = Perpendicular(toTargetDir, strafeSign);
-        ComputeInterest(strafeDir, dirs, interest);
-        // NOTE: distance scaling still applies from the caller (already applied before ApplyStrafe)
-    }
+            // Transition to wall-follow at the point of impact.
+            state = BugState.WallFollow;
+            wallSide = PickWallSide(toTargetDir, hit.normal);
+            wallFollowTimer = 0f;
 
-    /// <summary>8 raycasts. danger[i] = 1 - hit.distance/sensorLength if hit, else 0.</summary>
-    public static void ComputeDangerRay(Vector2 origin, Vector2[] dirs, float sensorLength, LayerMask obstacleMask, RaycastHit2D[] wallHits, float[] outDanger)
-    {
-        for (int i = 0; i < dirs.Length; i++)
-        {
-            RaycastHit2D hit = Physics2D.Raycast(origin, dirs[i], sensorLength, obstacleMask);
-            wallHits[i] = hit;
-            outDanger[i] = hit.collider ? 1f - (hit.distance / sensorLength) : 0f;
-        }
-    }
-
-    /// <summary>OverlapCircle for nearby Enemy-layer colliders. For each ally, weight (1-dist/radius)
-    /// into the NEAREST compass slot as repulsion danger.</summary>
-    public static void AddAllyDanger(Vector2 origin, float scanRadius, LayerMask allyMask, Collider2D self, Collider2D[] allyHits, ContactFilter2D allyFilter, Vector2[] dirs, float[] outDanger, float closeRepulsionRadius = 0f, float closeRepulsionStrength = 1f)
-    {
-        allyFilter.layerMask = allyMask;
-        int count = Physics2D.OverlapCircle(origin, scanRadius, allyFilter, allyHits);
-        if (count <= 0) return;
-        float anglePerSlot = 360f / dirs.Length;
-
-        for (int j = 0; j < count; j++)
-        {
-            Collider2D col = allyHits[j];
-            if (col == null || col == self) continue;
-            Vector2 toAlly = (Vector2)(col.bounds.center - (Vector3)origin);
-            float dist = toAlly.magnitude;
-            if (dist < 0.001f) continue;
-            float weight = 1f - (dist / scanRadius);
-            if (weight <= 0f) continue;
-
-            if (dist < closeRepulsionRadius)
-                weight = Mathf.Max(weight, closeRepulsionStrength * (1f - dist / closeRepulsionRadius));
-
-            float goalAngle = Mathf.Atan2(toAlly.y, toAlly.x) * Mathf.Rad2Deg;
-            int slot = Mathf.RoundToInt(goalAngle / anglePerSlot);
-            if (slot < 0) slot += dirs.Length;
-
-            outDanger[slot] = Mathf.Min(1f, outDanger[slot] + weight);
-        }
-    }
-
-    /// <summary>Blend best slot with its neighbors. Linear weight by angular proximity.
-    /// Returns zero if all final ≤ 0.</summary>
-    public static Vector2 Blend(float[] final, Vector2[] dirs, float neighborAngleThreshold)
-    {
-        int bestIdx = 0;
-        float bestVal = final[0];
-        for (int i = 1; i < final.Length; i++)
-        {
-            if (final[i] > bestVal) { bestVal = final[i]; bestIdx = i; }
-        }
-        if (bestVal <= 0f) return Vector2.zero;
-
-        Vector2 blended = dirs[bestIdx] * bestVal;
-        float totalWeight = bestVal;
-        float anglePerSlot = 360f / dirs.Length;
-
-        for (int i = 0; i < final.Length; i++)
-        {
-            if (i == bestIdx) continue;
-            if (final[i] <= 0f) continue;
-            int slotDiff = Mathf.Abs(i - bestIdx);
-            if (slotDiff > final.Length / 2) slotDiff = final.Length - slotDiff;
-            float angleDiff = slotDiff * anglePerSlot;
-            if (angleDiff > neighborAngleThreshold) continue;
-
-            float weight = final[i] * (1f - (angleDiff / neighborAngleThreshold));
-            blended += dirs[i] * weight;
-            totalWeight += weight;
+            // Start by aligning with the wall tangent on the chosen side.
+            Vector2 initialTangent = Perpendicular(hit.normal, wallSide).normalized;
+            return initialTangent;
         }
 
-        return totalWeight > 0.0001f ? blended.normalized : Vector2.zero;
+        return dir;
     }
 
-    /// <summary>Get perpendicular vector: sign≥0 → right, sign&lt;0 → left.</summary>
-    public static Vector2 Perpendicular(Vector2 v, int sign)
+    // ---------------------------------------------------------------
+    // Wall Follow (Bug2 boundary tracing)
+    // ---------------------------------------------------------------
+    Vector2 RunWallFollow(Vector2 toTargetDir, float distanceToTarget, Vector2 origin, bool losClear)
+    {
+        wallFollowTimer += Time.fixedDeltaTime;
+
+        Vector2 heading = lastOutputDir;
+
+        Vector2 desired;
+
+        // Forward probe catches convex corners that protrude into our path.
+        float forwardProbeRadius = bodyRadius * 0.8f;
+        RaycastHit2D forwardHit = Physics2D.CircleCast(origin, forwardProbeRadius, heading, forwardSensorLength, obstacleMask);
+        if (forwardHit.collider)
+        {
+            desired = Rotate(heading, wallSide * cornerTurnRate * Time.fixedDeltaTime).normalized;
+
+#if UNITY_EDITOR
+            _debugSideHit = false;
+            _debugSideDist = sideSensorLength;
+#endif
+        }
+        else
+        {
+            // Side whisker points into the committed wall side.
+            Vector2 sideDir = Rotate(heading, -wallSide * 90f);
+            float sideProbeRadius = bodyRadius * 0.5f;
+            RaycastHit2D sideHit = Physics2D.CircleCast(origin, sideProbeRadius, sideDir, sideSensorLength, obstacleMask);
+
+            if (sideHit.collider)
+            {
+                Vector2 n = sideHit.normal;                 // wall -> agent
+                Vector2 tangent = Perpendicular(n, wallSide).normalized;
+                float error = sideHit.distance - sideTargetOffset;
+                desired = (tangent - n * (error * sideSeekCoeff)).normalized;
+
+#if UNITY_EDITOR
+                _debugSideHit = true;
+                _debugSideDist = sideHit.distance;
+#endif
+            }
+            else
+            {
+                // Wall ended on this side (concave); curve back toward it.
+                desired = Rotate(heading, -wallSide * cornerTurnRate * Time.fixedDeltaTime).normalized;
+
+#if UNITY_EDITOR
+                _debugSideHit = false;
+                _debugSideDist = sideSensorLength;
+#endif
+            }
+        }
+
+        if (losClear || wallFollowTimer > maxWallFollowTime)
+        {
+            state = BugState.Seek;
+            ResetWallState();
+            return toTargetDir;
+        }
+
+        return desired;
+    }
+
+    void ResetWallState()
+    {
+        wallFollowTimer = 0f;
+        state = BugState.Seek;
+    }
+
+    // ---------------------------------------------------------------
+    // Strafe
+    // ---------------------------------------------------------------
+    Vector2 RunStrafe(Vector2 toTargetDir, Vector2 origin)
+    {
+        Vector2 perpR = Perpendicular(toTargetDir, 1);
+        Vector2 perpL = Perpendicular(toTargetDir, -1);
+
+        float clearR = CastDistance(origin, perpR, strafeRange);
+        float clearL = CastDistance(origin, perpL, strafeRange);
+
+        float timeSinceFlip = Time.time - lastStrafeFlipTime;
+        if (timeSinceFlip >= STRAFE_STICK_TIME)
+        {
+            float currentClear = strafeSign > 0 ? clearR : clearL;
+            float otherClear = strafeSign > 0 ? clearL : clearR;
+
+            if (otherClear > currentClear + 0.2f)
+            {
+                strafeSign = -strafeSign;
+                lastStrafeFlipTime = Time.time;
+            }
+        }
+
+        // Emergency flip if the current orbit direction runs into a wall soon.
+        // If both directions are blocked, fall back to moving toward the player instead of orbiting.
+        Vector2 currentOrbitDir = Perpendicular(toTargetDir, strafeSign);
+        float currentDirClear = CastDistance(origin, currentOrbitDir, strafeRange);
+        if (currentDirClear < strafeRange * 0.5f)
+        {
+            strafeSign = -strafeSign;
+            lastStrafeFlipTime = Time.time;
+
+            Vector2 otherOrbitDir = Perpendicular(toTargetDir, strafeSign);
+            float otherDirClear = CastDistance(origin, otherOrbitDir, strafeRange);
+            if (otherDirClear < strafeRange * 0.5f)
+                return toTargetDir;
+        }
+
+        return Perpendicular(toTargetDir, strafeSign);
+    }
+
+    // ---------------------------------------------------------------
+    // Sensing helpers
+    // ---------------------------------------------------------------
+    bool HasObstacleBetween(Vector2 from, Vector2 to)
+    {
+        Vector2 dir = to - from;
+        float dist = dir.magnitude;
+        if (dist < 0.001f) return false;
+        dir.Normalize();
+
+        float radius = bodyRadius * 0.7f;
+        RaycastHit2D hit = Physics2D.CircleCast(from, radius, dir, dist, obstacleMask);
+        return hit.collider != null;
+    }
+
+    int PickWallSide(Vector2 toGoalDir, Vector2 hitNormal)
+    {
+        // There are two valid wall-follow tangents. Choose the one that points more
+        // toward the goal so the agent goes around the obstacle toward the player.
+        // Perpendicular(n, +1) is the tangent for right-hand follow (wallSide = +1).
+        // Perpendicular(n, -1) is the tangent for left-hand follow  (wallSide = -1).
+        Vector2 rightTangent = Perpendicular(hitNormal, +1);
+        Vector2 leftTangent  = Perpendicular(hitNormal, -1);
+
+        float dotR = Vector2.Dot(rightTangent, toGoalDir);
+        float dotL = Vector2.Dot(leftTangent,  toGoalDir);
+
+        if (dotR > dotL + 0.01f) return +1;
+        if (dotL > dotR + 0.01f) return -1;
+        return +1; // tiebreak right-hand follow
+    }
+
+    float CastDistance(Vector2 origin, Vector2 dir, float length)
+    {
+        return CastClearDistance(origin, dir, length, bodyRadius * 0.8f);
+    }
+
+    float CastClearDistance(Vector2 origin, Vector2 dir, float length, float radius)
+    {
+        RaycastHit2D hit = Physics2D.CircleCast(origin, radius, dir, length, obstacleMask);
+        return hit.collider ? hit.distance : length;
+    }
+
+    // ---------------------------------------------------------------
+    // Math helpers
+    // ---------------------------------------------------------------
+    static Vector2 SmoothDirection(Vector2 current, Vector2 previous, float factor, float opposeThreshold)
+    {
+        if (previous.sqrMagnitude < 0.0001f) return current;
+        if (current.sqrMagnitude < 0.0001f) return Vector2.zero;
+        if (Vector2.Dot(current, previous) < -opposeThreshold) return current;
+        return Vector2.Lerp(current, previous, factor).normalized;
+    }
+
+    static Vector2 Perpendicular(Vector2 v, int sign)
     {
         return sign >= 0 ? new Vector2(v.y, -v.x) : new Vector2(-v.y, v.x);
     }
+
+    static Vector2 Rotate(Vector2 v, float degrees)
+    {
+        float rad = degrees * Mathf.Deg2Rad;
+        float c = Mathf.Cos(rad);
+        float s = Mathf.Sin(rad);
+        return new Vector2(v.x * c - v.y * s, v.x * s + v.y * c);
+    }
+
+    // ---------------------------------------------------------------
+    // Debug gizmos
+    // ---------------------------------------------------------------
+#if UNITY_EDITOR
+    Vector2 _debugOrigin;
+    Vector2 _debugTargetPos;
+    BugState _debugState;
+    int _debugWallSide;
+    bool _debugLOS;
+    float _debugWallTimer;
+    bool _debugSideHit;
+    float _debugSideDist;
+    Vector2 _debugOutput;
+
+    void OnDrawGizmosSelected()
+    {
+        if (!drawGizmos) return;
+
+        Vector3 pos = _debugOrigin;
+        Vector3 targetPos = _debugTargetPos;
+
+        // LOS ray.
+        Gizmos.color = _debugLOS ? new Color(1f, 1f, 1f, 0.75f) : new Color(1f, 0f, 0f, 0.75f);
+        Gizmos.DrawLine(pos, targetPos);
+
+        // Output direction.
+        Gizmos.color = new Color(1f, 1f, 0f, 0.9f);
+        Gizmos.DrawRay(pos, (Vector3)_debugOutput * forwardSensorLength);
+
+        if (_debugState == BugState.Seek)
+        {
+            Gizmos.color = new Color(0f, 1f, 0f, 0.75f);
+            Gizmos.DrawRay(pos, ((Vector3)targetPos - pos).normalized * forwardSensorLength);
+        }
+        else if (_debugState == BugState.WallFollow)
+        {
+            // Side whisker.
+            Vector2 heading = _debugOutput.sqrMagnitude > 0.0001f ? _debugOutput : Vector2.up;
+            Vector2 sideDir = Rotate(heading, -_debugWallSide * 90f);
+            Gizmos.color = _debugSideHit ? new Color(0f, 0.5f, 1f, 0.85f) : new Color(0f, 0.5f, 1f, 0.35f);
+            Gizmos.DrawRay(pos, (Vector3)(sideDir * _debugSideDist));
+
+            // Forward probe.
+            Gizmos.color = new Color(1f, 0f, 0f, 0.6f);
+            Gizmos.DrawRay(pos, (Vector3)(heading * bodyRadius * 2f));
+        }
+
+        // Strafe range.
+        Gizmos.color = new Color(0f, 1f, 1f, 0.15f);
+        Gizmos.DrawWireSphere(pos, strafeRange);
+
+        // State label.
+        Handles.Label(pos + Vector3.up * 1.5f,
+            $"State: {_debugState}\nSide: {_debugWallSide}\nLOS: {_debugLOS}\nWallT: {_debugWallTimer:F1}s");
+    }
+#endif
 }
