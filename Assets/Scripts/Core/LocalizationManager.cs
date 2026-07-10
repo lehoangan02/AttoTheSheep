@@ -57,7 +57,16 @@ namespace AttoTheSheep.Core
             {
                 try
                 {
-                    _localizedText = JsonConvert.DeserializeObject<Dictionary<string, string>>(textAsset.text);
+                    var rawDict = JsonConvert.DeserializeObject<Dictionary<string, string>>(textAsset.text);
+                    _localizedText = new Dictionary<string, string>();
+                    if (rawDict != null)
+                    {
+                        foreach (var kvp in rawDict)
+                        {
+                            string normalizedKey = kvp.Key.Replace("\r\n", "\n");
+                            _localizedText[normalizedKey] = kvp.Value;
+                        }
+                    }
                     Debug.Log($"[Localization] Loaded {fileName}.json with {_localizedText.Count} entries.");
                 }
                 catch (Exception e)
@@ -76,8 +85,10 @@ namespace AttoTheSheep.Core
         public string GetText(string key)
         {
             if (string.IsNullOrEmpty(key)) return "";
+            
+            string normalizedKey = key.Replace("\r\n", "\n");
 
-            if (_localizedText != null && _localizedText.TryGetValue(key, out string translated))
+            if (_localizedText != null && _localizedText.TryGetValue(normalizedKey, out string translated))
             {
                 return translated;
             }
