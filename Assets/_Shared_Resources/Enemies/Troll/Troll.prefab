@@ -799,9 +799,8 @@ MonoBehaviour:
   sideTargetOffset: 0.3
   sideSeekCoeff: 1.5
   cornerTurnRate: 180
-  maxWallFollowTime: 6
+  maxWallFollowTime: 12
   arrivalPause: 1
-  directionSmoothing: 0.4
   drawGizmos: 1
 --- !u!114 &409582896825743840
 MonoBehaviour:

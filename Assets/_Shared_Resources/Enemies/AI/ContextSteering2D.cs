@@ -45,12 +45,9 @@ public class ContextSteering2D : MonoBehaviour
     [Tooltip("Soft cap on how long the agent will stay in wall-follow before forcing a retry.")]
     [SerializeField] private float maxWallFollowTime = 6f;
 
-    [Header("Smoothing")]
+    [Header("Seek")]
     [Tooltip("Distance within which arrival slowdown is applied in Seek state.")]
     [SerializeField] private float arrivalPause = 1f;
-
-    [Range(0f, 1f)]
-    [SerializeField] private float directionSmoothing = 0.4f;
 
 #if UNITY_EDITOR
     [Header("Debug")]
@@ -66,7 +63,6 @@ public class ContextSteering2D : MonoBehaviour
     float bodyRadius;
     Collider2D selfCollider;
 
-    // Output smoothing
     Vector2 lastOutputDir;
 
     // Strafe state
@@ -150,7 +146,7 @@ public class ContextSteering2D : MonoBehaviour
         if (desired.sqrMagnitude < 0.0001f)
             desired = lastOutputDir.sqrMagnitude > 0.0001f ? lastOutputDir : Vector2.up;
 
-        Vector2 output = SmoothDirection(desired.normalized, lastOutputDir, directionSmoothing, 0.5f);
+        Vector2 output = desired.normalized;
         lastOutputDir = output;
 
 #if UNITY_EDITOR
@@ -354,14 +350,6 @@ public class ContextSteering2D : MonoBehaviour
     // ---------------------------------------------------------------
     // Math helpers
     // ---------------------------------------------------------------
-    static Vector2 SmoothDirection(Vector2 current, Vector2 previous, float factor, float opposeThreshold)
-    {
-        if (previous.sqrMagnitude < 0.0001f) return current;
-        if (current.sqrMagnitude < 0.0001f) return Vector2.zero;
-        if (Vector2.Dot(current, previous) < -opposeThreshold) return current;
-        return Vector2.Lerp(current, previous, factor).normalized;
-    }
-
     static Vector2 Perpendicular(Vector2 v, int sign)
     {
         return sign >= 0 ? new Vector2(v.y, -v.x) : new Vector2(-v.y, v.x);
