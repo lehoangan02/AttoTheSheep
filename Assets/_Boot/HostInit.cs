@@ -8,14 +8,17 @@ public class HostInit : MonoBehaviour
 {
     void Start()
     {
-        #if UNITY_EDITOR
-            if (!ClonesManager.IsClone())
+        bool isClone = false;
+#if UNITY_EDITOR
+        isClone = ClonesManager.IsClone();
+#endif
+
+        if (!isClone)
+        {
+            if (NetworkManager.Singleton != null && !NetworkManager.Singleton.IsListening)
             {
-                if (NetworkManager.Singleton != null && !NetworkManager.Singleton.IsListening)
-                {
-                    NetworkManager.Singleton.StartHost();
-                }
+                NetworkManager.Singleton.StartHost();
             }
-        #endif
+        }
     }
 }

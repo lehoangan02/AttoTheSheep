@@ -152,7 +152,8 @@ public class PlayerController : NetworkBehaviour
             TestSetRandomName();
         }
 
-        if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name != "FTUE")
+        string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+        if (sceneName == "MultiplayerLevel" || sceneName == "SampleScene")
         {
             CreateNameTag();
             netPlayerPublicData.OnValueChanged += OnPlayerNameChanged;

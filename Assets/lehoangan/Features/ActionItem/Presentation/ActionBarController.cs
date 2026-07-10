@@ -56,7 +56,6 @@ public class ActionBarController : MonoBehaviour
         Debug.Log("[ActionBarController] HandleProfileUpdated triggered by event!");
         InitializeSlots(_currentPlayerProfile);
     }
-
     private void OnDestroy()
     {
         if (_currentPlayerProfile != null)
@@ -104,6 +103,8 @@ public class ActionBarController : MonoBehaviour
 
     private void HookActionBarInput()
     {
+        if (Application.isMobilePlatform) return; // Disabled on mobile
+
         if (actionBarActions == null || actionBarActions.Length == 0)
         {
             Debug.LogWarning("[ActionBarController] No actionBarActions assigned in Inspector!");
@@ -131,6 +132,12 @@ public class ActionBarController : MonoBehaviour
 
     private void TriggerSlot(int index)
     {
+        if (Application.isMobilePlatform)
+        {
+            Debug.Log("[ActionBarController] Item usage via this script is disabled on mobile (handled by another component).");
+            return;
+        }
+
         if (IsMultiplayerScene())
         {
             Debug.Log("[ActionBarController] Item usage (keys 1, 2, 3, 4) is disabled in multiplayer.");

@@ -8,7 +8,8 @@ public class SkillBoardUI : MonoBehaviour
 
     private void Start()
     {
-        if (Application.isMobilePlatform)
+        // Only disable the PC SkillBoard. Mobile skill buttons might also use this script!
+        if (Application.isMobilePlatform && gameObject.name == "SkillBoard")
         {
             gameObject.SetActive(false);
         }
