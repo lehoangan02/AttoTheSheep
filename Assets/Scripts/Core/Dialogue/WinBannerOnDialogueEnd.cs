@@ -20,7 +20,12 @@ public class WinBannerOnDialogueEnd : MonoBehaviour
         if (winBannerController != null)
         {
             Debug.Log("[WinBannerOnDialogueEnd] Mở Win Banner...");
-            winBannerController.ShowBanner();
+            int earnedCoins = 0;
+            if (PlayerSaveManager.Instance != null)
+            {
+                earnedCoins = PlayerSaveManager.Instance.CoinsEarnedThisSession;
+            }
+            winBannerController.ShowBanner(earnedCoins);
         }
         else
         {

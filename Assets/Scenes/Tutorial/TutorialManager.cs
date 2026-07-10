@@ -57,6 +57,12 @@ public class TutorialManager : MonoBehaviour
 
     private IEnumerator Start()
     {
+        // QUAN TRỌNG: FTUE là màn chơi đơn (offline tutorial), cần tự động khởi chạy Host để spawn Player!
+        if (Unity.Netcode.NetworkManager.Singleton != null && !Unity.Netcode.NetworkManager.Singleton.IsListening)
+        {
+            Unity.Netcode.NetworkManager.Singleton.StartHost();
+        }
+
         if (instructionBubble != null) instructionBubble.SetBubbleActive(false);
 
         yield return null;

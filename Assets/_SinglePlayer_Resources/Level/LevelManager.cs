@@ -59,6 +59,11 @@ public class LevelManager : MonoBehaviour
 
     void Start()
     {
+        if (PlayerSaveManager.Instance != null)
+        {
+            PlayerSaveManager.Instance.ResetSessionCoins();
+        }
+
         foreach (WaveController wave in allWaves)
         {
             if (wave != null)

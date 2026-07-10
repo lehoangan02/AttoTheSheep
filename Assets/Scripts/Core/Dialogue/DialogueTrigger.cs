@@ -87,9 +87,19 @@ public class DialogueTrigger : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            _playerInRange = true;
-            InteractionContext.EnterRange();
-            onPlayerEnterRange?.Invoke();
+            var pc = other.GetComponent<PlayerController>() ?? other.GetComponentInParent<PlayerController>();
+            if (pc != null)
+            {
+                bool isLocal = true;
+                if (pc.NetworkObject != null && pc.NetworkObject.IsSpawned) isLocal = pc.IsOwner;
+                
+                if (isLocal)
+                {
+                    _playerInRange = true;
+                    InteractionContext.EnterRange();
+                    onPlayerEnterRange?.Invoke();
+                }
+            }
         }
     }
 
@@ -97,9 +107,19 @@ public class DialogueTrigger : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            _playerInRange = false;
-            InteractionContext.ExitRange();
-            onPlayerExitRange?.Invoke();
+            var pc = other.GetComponent<PlayerController>() ?? other.GetComponentInParent<PlayerController>();
+            if (pc != null)
+            {
+                bool isLocal = true;
+                if (pc.NetworkObject != null && pc.NetworkObject.IsSpawned) isLocal = pc.IsOwner;
+                
+                if (isLocal)
+                {
+                    _playerInRange = false;
+                    InteractionContext.ExitRange();
+                    onPlayerExitRange?.Invoke();
+                }
+            }
         }
     }
 

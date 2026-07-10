@@ -37,8 +37,11 @@ public class AudioManager : MonoBehaviour
     public AudioClip defaultUIButtonHoverSFX;
 
     [Header("BGM Volume")]
-    [Range(0f, 1f)] public float bgmVolume = 0.5f;
+    [Range(0f, 1f)] public float bgmVolume = 0.8f;
     private AudioSource bgmSource;
+
+    [Header("SFX Volume")]
+    [Range(0f, 1f)] public float sfxVolume = 0.4f;
 
 #if UNITY_EDITOR
     private void OnValidate()
@@ -53,6 +56,10 @@ public class AudioManager : MonoBehaviour
 
     private void Awake()
     {
+        // Force the volume up just in case the scene had it saved at 0.1
+        if (bgmVolume < 0.8f) bgmVolume = 0.8f;
+        if (sfxVolume == 0f) sfxVolume = 0.4f;
+
         // Setup Singleton và giữ cho nó sống xuyên suốt các Scene
         if (Instance == null) 
         {
@@ -127,6 +134,7 @@ public class AudioManager : MonoBehaviour
             
             AudioSource source = speakerObj.AddComponent<AudioSource>();
             source.playOnAwake = false;
+            source.volume = sfxVolume;
             
             // Cài đặt âm thanh 3D giả lập cho Game 2D
             source.spatialBlend = 1f;

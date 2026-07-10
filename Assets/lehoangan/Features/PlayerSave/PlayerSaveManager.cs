@@ -38,6 +38,13 @@ public class PlayerSaveManager : MonoBehaviour
         return sceneName == "MultiplayerLevel" || sceneName == "SampleScene";
     }
 
+    public int CoinsEarnedThisSession { get; private set; }
+
+    /// <summary>
+    /// Reset session coins. Can be called at the start of a level.
+    /// </summary>
+    public void ResetSessionCoins() => CoinsEarnedThisSession = 0;
+
     /// <summary>
     /// Thêm vàng cho player khi giết kẻ địch.
     /// Gọi bằng: PlayerSaveManager.Instance.AddMoney(amount)
@@ -45,6 +52,9 @@ public class PlayerSaveManager : MonoBehaviour
     public Task AddMoney(int amount)
     {
         if (IsMultiplayerScene()) return Task.CompletedTask;
+        
+        CoinsEarnedThisSession += amount;
+
         // --- Ưu tiên 1: InventoryManager có mặt (MapLobby) ---
         // AddGold() tự lo: cộng vào CurrentProfile + sync cloud + fire onInventoryUpdated
         if (InventoryManager.Instance != null)
