@@ -132,8 +132,17 @@ public class PlayerController : NetworkBehaviour
     {
         Debug.Log($"[PlayerController] OnNetworkSpawn is running on: {gameObject.name}. IsOwner: {IsOwner}");
         
-        // Removed the code that destroys pre-placed non-player objects, because the FTUE scene 
-        // actually relies on the manually placed 'Atto' object to serve as the player.
+        // Fix: In multiplayer scenes (not FTUE), we must destroy any manually pre-placed Atto objects
+        // otherwise they become a 3rd uncontrollable player that steals input or causes Game Over when killed.
+        if (IsServer && !NetworkObject.IsPlayerObject)
+        {
+            if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name != "FTUE")
+            {
+                Debug.Log($"[PlayerController] Destroying redundant pre-placed Atto in multiplayer scene: {gameObject.name}");
+                NetworkObject.Despawn(true);
+                return;
+            }
+        }
 
         if (IsOwner)
         {
