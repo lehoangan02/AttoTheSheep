@@ -142,7 +142,8 @@ public class ActionBarController : MonoBehaviour
         {
             if (actionSlots[index].UseItem())
             {
-                InvokeAttoSkill(actionSlots[index].itemData.itemName);
+                string assetName = ((UnityEngine.Object)actionSlots[index].itemData).name;
+                InvokeAttoSkill(assetName);
             }
         }
     }
