@@ -118,12 +118,17 @@ public class PlayerController : NetworkBehaviour
         // On clients, pre-placed scene objects that were despawned by the server 
         // will not have OnNetworkSpawn called and will remain unspawned.
         // We must destroy them to prevent them from becoming "extra" phantom players that steal input.
-        if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
+        // FIX: Only do this in Multiplayer levels. In single-player, the pre-placed Atto is REQUIRED.
+        string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+        if (sceneName == "MultiplayerLevel" || sceneName == "SampleScene")
         {
-            if (!NetworkObject.IsSpawned)
+            if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
             {
-                Debug.Log($"[PlayerController] Destroying unspawned pre-placed player object: {gameObject.name}");
-                Destroy(gameObject);
+                if (!NetworkObject.IsSpawned)
+                {
+                    Debug.Log($"[PlayerController] Destroying unspawned pre-placed player object: {gameObject.name}");
+                    Destroy(gameObject);
+                }
             }
         }
     }
