@@ -32,7 +32,12 @@ public class LevelCompletionNPCSpawner : MonoBehaviour
         if (npcPrefab != null && spawnPoint != null)
         {
             Debug.Log("[LevelCompletionNPCSpawner] Tất cả wave đã xong. Spawn NPC!");
-            Instantiate(npcPrefab, spawnPoint.position, spawnPoint.rotation);
+            GameObject npc = Instantiate(npcPrefab, spawnPoint.position, spawnPoint.rotation);
+            
+            if (npc.TryGetComponent(out Unity.Netcode.NetworkObject netObj))
+            {
+                netObj.Spawn();
+            }
         }
         else
         {

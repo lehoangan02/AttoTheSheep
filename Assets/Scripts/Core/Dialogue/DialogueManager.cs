@@ -41,6 +41,7 @@ public class DialogueManager : MonoBehaviour
     private bool         _isStreaming;
     private bool         _skipStreaming;
     private Coroutine    _streamCoroutine;
+    private System.Action _currentOnDialogueEnd;
 
     // ─────────────────────────────────────────────────────────────────────────
     private void Awake()
@@ -152,7 +153,7 @@ public class DialogueManager : MonoBehaviour
     }
 
     // ── Public API ────────────────────────────────────────────────────────────
-    public void StartDialogue(DialogueData data)
+    public void StartDialogue(DialogueData data, System.Action onDialogueEnd = null)
     {
             Debug.Log($"[DialogueManager] StartDialogue called. data={(data != null ? data.speakerName : "NULL")}");
 
@@ -164,6 +165,7 @@ public class DialogueManager : MonoBehaviour
 
         _data      = data;
         _lineIndex = 0;
+        _currentOnDialogueEnd = onDialogueEnd;
 
         if (speakerNameText != null) 
         {
@@ -293,6 +295,13 @@ public class DialogueManager : MonoBehaviour
         if (Stop.Instance != null)
         {
             Stop.Instance.ResumeGame();
+        }
+
+        if (_currentOnDialogueEnd != null)
+        {
+            var callback = _currentOnDialogueEnd;
+            _currentOnDialogueEnd = null;
+            callback.Invoke();
         }
     }
 

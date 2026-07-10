@@ -12,6 +12,11 @@ public class WinBannerOnDialogueEnd : MonoBehaviour
     /// </summary>
     public void ShowWinBanner()
     {
+        if (winBannerController == null)
+        {
+            winBannerController = Object.FindFirstObjectByType<WinBannerController>(FindObjectsInactive.Include);
+        }
+
         if (winBannerController != null)
         {
             Debug.Log("[WinBannerOnDialogueEnd] Mở Win Banner...");
@@ -19,7 +24,7 @@ public class WinBannerOnDialogueEnd : MonoBehaviour
         }
         else
         {
-            Debug.LogError("[WinBannerOnDialogueEnd] Chưa gán WinBannerController!");
+            Debug.LogError("[WinBannerOnDialogueEnd] Chưa tìm thấy WinBannerController trong Scene!");
         }
     }
 }
