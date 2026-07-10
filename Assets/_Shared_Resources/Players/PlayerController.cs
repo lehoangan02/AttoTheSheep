@@ -134,11 +134,11 @@ public class PlayerController : NetworkBehaviour
     {
         Debug.Log($"[PlayerController] OnNetworkSpawn is running on: {gameObject.name}. IsOwner: {IsOwner}");
         
-        // Fix: In multiplayer scenes (not FTUE), we must destroy any manually pre-placed Atto objects
+        // Fix: In multiplayer scenes (MultiplayerLevel), we must destroy any manually pre-placed Atto objects
         // otherwise they become a 3rd uncontrollable player that steals input or causes Game Over when killed.
         if (IsServer && !NetworkObject.IsPlayerObject)
         {
-            if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name != "FTUE")
+            if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "MultiplayerLevel")
             {
                 Debug.Log($"[PlayerController] Destroying redundant pre-placed Atto in multiplayer scene: {gameObject.name}");
                 NetworkObject.Despawn(true);
