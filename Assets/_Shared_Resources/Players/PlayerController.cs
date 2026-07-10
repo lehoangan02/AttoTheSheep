@@ -132,13 +132,8 @@ public class PlayerController : NetworkBehaviour
     {
         Debug.Log($"[PlayerController] OnNetworkSpawn is running on: {gameObject.name}. IsOwner: {IsOwner}");
         
-        // Destroy pre-placed player objects in scenes to prevent duplicates ALWAYS.
-        if (IsServer && !NetworkObject.IsPlayerObject)
-        {
-            Debug.Log("[PlayerController] Destroying pre-placed non-player object in scene to prevent duplicates.");
-            GetComponent<NetworkObject>().Despawn(true);
-            return;
-        }
+        // Removed the code that destroys pre-placed non-player objects, because the FTUE scene 
+        // actually relies on the manually placed 'Atto' object to serve as the player.
 
         if (IsOwner)
         {

@@ -56,9 +56,9 @@ public class AudioManager : MonoBehaviour
 
     private void Awake()
     {
-        // Force the volume up just in case the scene had it saved at 0.1
-        if (bgmVolume < 0.8f) bgmVolume = 0.8f;
-        if (sfxVolume == 0f) sfxVolume = 0.4f;
+        // Force the volumes to be balanced based on feedback
+        bgmVolume = 1.0f;
+        sfxVolume = 0.2f;
 
         // Setup Singleton và giữ cho nó sống xuyên suốt các Scene
         if (Instance == null) 

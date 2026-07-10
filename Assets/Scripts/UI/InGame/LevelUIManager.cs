@@ -82,6 +82,22 @@ namespace AttoTheSheep.UI.InGame
             // Đảm bảo Banner được active
             _activeBanner.SetActive(true);
 
+            // Pass the earned coins to the banner controller if it exists
+            var winBanner = _activeBanner.GetComponent<WinBannerController>();
+            if (winBanner != null)
+            {
+                int earnedCoins = PlayerSaveManager.Instance != null ? PlayerSaveManager.Instance.CoinsEarnedThisSession : 0;
+                winBanner.ShowBanner(earnedCoins);
+            }
+            else
+            {
+                var loseBanner = _activeBanner.GetComponent<LoseBannerController>();
+                if (loseBanner != null)
+                {
+                    loseBanner.ShowBanner(0); // Lose usually gets 0, or logic can be added here
+                }
+            }
+
             // Tạm dừng game hoàn toàn khi hiện bảng Win/Lose
             Time.timeScale = 0f;
         }
