@@ -77,5 +77,5 @@ public class SpiderBrain : EnemyBrain
         hitbox?.Enable(caveData.attackDamage, caveData.onHitEffects);
     }
     public void OnAttackHitEnd() => hitbox?.Disable();
-    public void OnAttackEnd() => SetState(EnemyState.Chase);
+    public void OnAttackEnd() => DecideNextState();
 }

@@ -99,6 +99,8 @@ public class StatusEffectController : NetworkBehaviour
 
         for (int i = activeEffects.Count - 1; i >= 0; i--)
         {
+            if (i >= activeEffects.Count) continue;
+
             StatusEffect effect = activeEffects[i];
 
             // Indefinite effects don't expire by timer — only via RemoveEffect.
@@ -107,10 +109,11 @@ public class StatusEffectController : NetworkBehaviour
                 effect.RemainingDuration -= dt;
                 if (effect.RemainingDuration <= 0f)
                 {
-                    effect.OnExpire(target, this);
-                    RemoveVfxForKind(effect.Data.kind);
                     activeEffects.RemoveAt(i);
                     changed = true;
+
+                    effect.OnExpire(target, this);
+                    RemoveVfxForKind(effect.Data.kind);
                     continue;
                 }
             }
@@ -122,6 +125,9 @@ public class StatusEffectController : NetworkBehaviour
                 {
                     effect.TickTimer -= effect.Data.tickRate;
                     effect.OnTick(target, this);
+                    
+                    if (i >= activeEffects.Count || activeEffects[i] != effect)
+                        break;
                 }
             }
         }
@@ -146,23 +152,24 @@ public class StatusEffectController : NetworkBehaviour
         // Handle stacking with existing effect of the same kind.
         for (int i = activeEffects.Count - 1; i >= 0; i--)
         {
-            if (activeEffects[i].Data.kind != data.kind) continue;
+            StatusEffect existingEffect = activeEffects[i];
+            if (existingEffect.Data.kind != data.kind) continue;
 
             if (data.stacking == EffectStacking.RefreshDuration)
             {
                 // Reset timer + damage on existing effect — no new instance, no OnApply/OnExpire.
-                activeEffects[i].RemainingDuration = duration > 0f ? duration
+                existingEffect.RemainingDuration = duration > 0f ? duration
                     : (data.duration > 0f ? data.duration : float.MaxValue);
                 if (damagePerTickOverride > 0)
-                    activeEffects[i].DamagePerTick = damagePerTickOverride;
+                    existingEffect.DamagePerTick = damagePerTickOverride;
                 RefreshAggregatedState();
                 return;
             }
 
             // Replace: expire old effect first.
-            activeEffects[i].OnExpire(target, this);
-            RemoveVfxForKind(data.kind);
             activeEffects.RemoveAt(i);
+            existingEffect.OnExpire(target, this);
+            RemoveVfxForKind(data.kind);
             break;
         }
 
@@ -184,10 +191,12 @@ public class StatusEffectController : NetworkBehaviour
 
         for (int i = activeEffects.Count - 1; i >= 0; i--)
         {
-            if (activeEffects[i].Data.kind != kind) continue;
-            activeEffects[i].OnExpire(target, this);
-            RemoveVfxForKind(kind);
+            StatusEffect existingEffect = activeEffects[i];
+            if (existingEffect.Data.kind != kind) continue;
+            
             activeEffects.RemoveAt(i);
+            existingEffect.OnExpire(target, this);
+            RemoveVfxForKind(kind);
             RefreshAggregatedState();
             return;
         }
@@ -212,12 +221,14 @@ public class StatusEffectController : NetworkBehaviour
     public void ClearAllEffects()
     {
         if (!IsServer) return;
-        foreach (var e in activeEffects)
+        var effectsCopy = activeEffects.ToArray();
+        activeEffects.Clear();
+
+        foreach (var e in effectsCopy)
         {
             e.OnExpire(target, this);
             RemoveVfxForKind(e.Data.kind);
         }
-        activeEffects.Clear();
         RefreshAggregatedState();
     }
 

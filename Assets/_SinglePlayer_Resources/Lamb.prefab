@@ -205,8 +205,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LambAI
   ShowTopMostFoldoutHeaderGroup: 1
   baseMoveSpeed: 5
-  baseMaxHealth: 100
-  baseMaxMana: 100
+  baseMaxHealth: 300
+  baseMaxMana: 200
   baseAttackRange: 1
   baseAttackDamage: 10
   damageFont: {fileID: 11400000, guid: 2745a675487b843419622b8727c36f50, type: 2}
@@ -232,6 +232,16 @@ MonoBehaviour:
       MinSecondsBetweenUpdates: 0
       MaxSecondsBetweenUpdates: 0
     m_InternalValue: 0
+  syncPosition:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: {x: 0, y: 0}
+  syncScaleX:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 1
   isShielded:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
@@ -323,6 +333,16 @@ MonoBehaviour:
       MinSecondsBetweenUpdates: 0
       MaxSecondsBetweenUpdates: 0
     m_InternalValue: 0
+  syncPosition:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: {x: 0, y: 0}
+  syncScaleX:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 1
 --- !u!114 &4742138789793845509
 MonoBehaviour:
   m_ObjectHideFlags: 0

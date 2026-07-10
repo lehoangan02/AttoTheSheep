@@ -91,6 +91,6 @@ public class BlueKnightBrain : EnemyBrain
         hitbox?.Enable(knightData.attackDamage);
     }
     public void OnAttackHitEnd() => hitbox?.Disable();
-    public void OnAttackEnd() => SetState(EnemyState.Chase);
-    public void OnGuardEnd() => SetState(EnemyState.Chase);
+    public void OnAttackEnd() => DecideNextState();
+    public void OnGuardEnd() => DecideNextState();
 }

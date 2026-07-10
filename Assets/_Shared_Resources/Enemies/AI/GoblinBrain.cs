@@ -89,5 +89,5 @@ public class GoblinBrain : EnemyBrain
         strongHitbox.Enable(meleeData.attackDamage * 2);
     }
     public void OnStrongAttackHitEnd() => strongHitbox?.Disable();
-    public void OnAttackEnd() => SetState(EnemyState.Chase);
+    public void OnAttackEnd() => DecideNextState();
 }

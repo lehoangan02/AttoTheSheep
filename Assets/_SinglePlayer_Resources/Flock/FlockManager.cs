@@ -96,12 +96,12 @@ public class FlockManager : NetworkBehaviour
         switch (currentLevel.Value)
         {
             case 1:
-                return new FlockLevelConfig { maxLambs = 5, baseRadius = 1.0f };
+                return new FlockLevelConfig { maxLambs = 10, baseRadius = 1.0f };
             case 2:
-                return new FlockLevelConfig { maxLambs = 7, baseRadius = 1.5f };
+                return new FlockLevelConfig { maxLambs = 20, baseRadius = 1.5f };
             case 3:
             default:
-                return new FlockLevelConfig { maxLambs = 10, baseRadius = 2.0f };
+                return new FlockLevelConfig { maxLambs = 30, baseRadius = 2.0f };
         }
     }
 

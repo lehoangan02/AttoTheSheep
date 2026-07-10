@@ -102,6 +102,6 @@ public class BlackKnightBrain : EnemyBrain
         rightHitbox.Enable(knightData.attackDamage);
     }
     public void OnRightAttackHitEnd() => rightHitbox?.Disable();
-    public void OnAttackEnd() => SetState(EnemyState.Chase);
-    public void OnGuardEnd() => SetState(EnemyState.Chase);
+    public void OnAttackEnd() => DecideNextState();
+    public void OnGuardEnd() => DecideNextState();
 }

@@ -77,5 +77,5 @@ public class PawnBrain : EnemyBrain
         hitbox?.Enable(meleeData.attackDamage);
     }
     public void OnAttackHitEnd() => hitbox?.Disable();
-    public void OnAttackEnd() => SetState(EnemyState.Chase);
+    public void OnAttackEnd() => DecideNextState();
 }
