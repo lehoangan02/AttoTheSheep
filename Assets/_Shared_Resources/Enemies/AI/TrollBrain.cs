@@ -300,8 +300,7 @@ public class TrollBrain : EnemyBrain
             case TrollAttack.Tornado:
                 if (NetworkObject.IsSpawned)
                     entity.isInvulnerable.Value = true;
-                if (bodyCollider != null)
-                    bodyCollider.enabled = false;
+                // Removed bodyCollider.enabled = false to prevent overlap explosion when re-enabled
                 tornadoHitbox?.Enable(trollData.tornadoDamagePerTick, null, false, 0f, 0f, trollData.tornadoTickInterval);
                 if (tornadoVfx != null)
                     tornadoVfx.Play();
@@ -374,8 +373,7 @@ public class TrollBrain : EnemyBrain
         tornadoHitbox?.Disable();
         if (NetworkObject.IsSpawned)
             entity.isInvulnerable.Value = false;
-        if (bodyCollider != null)
-            bodyCollider.enabled = true;
+        // Removed bodyCollider.enabled = true
         if (tornadoVfx != null)
             tornadoVfx.Stop();
         tornadoTimer = 0f;

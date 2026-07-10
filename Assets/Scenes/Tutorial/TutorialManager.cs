@@ -99,7 +99,12 @@ public class TutorialManager : MonoBehaviour
 
         instructionBubble.SetBubbleActive(false);
         instructionBubble.SetBubbleActive(true);
-        instructionBubble.SetText(message, showPosition);
+        
+        string localizedMessage = AttoTheSheep.Core.LocalizationManager.Instance != null 
+            ? AttoTheSheep.Core.LocalizationManager.Instance.GetText(message) 
+            : message;
+
+        instructionBubble.SetText(localizedMessage, showPosition);
     }
 
     private IEnumerator TutorialRoutine()

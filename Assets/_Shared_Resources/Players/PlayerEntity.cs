@@ -62,6 +62,18 @@ public class PlayerEntity : NetworkEntity
         if (vCam != null)
         {
             vCam.Follow = this.transform; 
+            
+            // Fix: Disable camera Lookahead to prevent violent camera warping during dashes.
+            var composer = vCam.GetComponent<Unity.Cinemachine.CinemachinePositionComposer>();
+            if (composer != null)
+            {
+                // When dash applies high velocity, Lookahead extrapolates it and jerks the camera.
+                composer.Lookahead.Enabled = false;
+                
+                // Tighten damping slightly to keep the camera focused on the player without sluggishness
+                composer.Damping = new Vector3(1f, 1f, 1f);
+            }
+
             Debug.Log("🎥 [Camera] Đã setup Cinemachine focus vào Local Player!");
         }
         else

@@ -58,7 +58,7 @@ public class AudioManager : MonoBehaviour
     {
         // Force the volumes to be balanced based on feedback
         bgmVolume = 1.0f;
-        sfxVolume = 0.2f;
+        sfxVolume = 0.7f;
 
         // Setup Singleton và giữ cho nó sống xuyên suốt các Scene
         if (Instance == null) 
