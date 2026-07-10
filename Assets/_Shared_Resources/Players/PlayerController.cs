@@ -128,6 +128,8 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
+    private TMPro.TextMeshPro _nameTag;
+
     public override void OnNetworkSpawn()
     {
         Debug.Log($"[PlayerController] OnNetworkSpawn is running on: {gameObject.name}. IsOwner: {IsOwner}");
@@ -148,6 +150,46 @@ public class PlayerController : NetworkBehaviour
         {
             // Automatically assign a random name upon spawning into the game
             TestSetRandomName();
+        }
+
+        if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name != "FTUE")
+        {
+            CreateNameTag();
+            netPlayerPublicData.OnValueChanged += OnPlayerNameChanged;
+        }
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        netPlayerPublicData.OnValueChanged -= OnPlayerNameChanged;
+    }
+
+    private void CreateNameTag()
+    {
+        GameObject tagObj = new GameObject("PlayerNameTag");
+        tagObj.transform.SetParent(transform);
+        tagObj.transform.localPosition = new Vector3(0, 0.7f, 0); // Position reduced in half (0.7f)
+
+        _nameTag = tagObj.AddComponent<TMPro.TextMeshPro>();
+        _nameTag.alignment = TMPro.TextAlignmentOptions.Center;
+        _nameTag.fontSize = 2.5f;
+        _nameTag.color = IsOwner ? Color.yellow : Color.white;
+        _nameTag.sortingOrder = 100;
+        
+        UpdateNameTagText(netPlayerPublicData.Value.playerName.ToString());
+    }
+
+    private void OnPlayerNameChanged(PlayerPublicData prev, PlayerPublicData next)
+    {
+        UpdateNameTagText(next.playerName.ToString());
+    }
+
+    private void UpdateNameTagText(string newName)
+    {
+        if (_nameTag != null)
+        {
+            // Fully opaque black background (#000000) for maximum contrast
+            _nameTag.text = $"<mark=#000000><b>{newName}</b></mark>";
         }
     }
 
