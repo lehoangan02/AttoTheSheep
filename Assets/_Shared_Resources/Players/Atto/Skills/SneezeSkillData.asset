@@ -19,7 +19,7 @@ MonoBehaviour:
     g\xE2y 150 DMG v\xE0 cho\xE1ng 1.5s."
   skillIcon: {fileID: 7554258346937021337, guid: 50451c505a5434d41bff6ae3361cff62, type: 3}
   cooldown: 5
-  damage: 300
+  damage: 5000
   manaCost: 100
   lambsRequired: 7
   vfxPrefab: {fileID: 0}
@@ -33,7 +33,7 @@ MonoBehaviour:
     clip: {fileID: 0}
     duration: 0
   projectilePrefab: {fileID: 5472383393138764189, guid: c7e11037152dd5d47b3bf4ac6de9c4e2, type: 3}
-  projectileCount: 5
+  projectileCount: 10
   spreadAngle: 150
   projectileSpeed: 15
   projectileMaxDistance: 8
