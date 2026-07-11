@@ -35,12 +35,19 @@ public class DialogueManager : MonoBehaviour
     [Tooltip("Characters revealed per second.")]
     public float charsPerSecond = 40f;
 
+    [Header("Fade")]
+    [Tooltip("CanvasGroup on panelRoot for fade transitions. Auto-added if missing.")]
+    [SerializeField] private CanvasGroup _canvasGroup;
+    [Tooltip("Duration of the dialogue panel fade in/out in seconds.")]
+    [SerializeField] private float _fadeDuration = 0.3f;
+
     // ── Private state ─────────────────────────────────────────────────────────
     private DialogueData _data;
     private int          _lineIndex;
     private bool         _isStreaming;
     private bool         _skipStreaming;
     private Coroutine    _streamCoroutine;
+    private Coroutine    _fadeCoroutine;
     private System.Action _currentOnDialogueEnd;
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -61,7 +68,17 @@ public class DialogueManager : MonoBehaviour
         // make DLG_Manager a root-level Canvas itself.
 
         Debug.Log($"[DialogueManager] Awake – Instance set. panelRoot={(panelRoot != null ? panelRoot.name : "NULL")}");
-        ShowPanel(false);
+
+        // Ensure CanvasGroup exists for fade transitions
+        if (panelRoot != null)
+        {
+            if (_canvasGroup == null)
+                _canvasGroup = panelRoot.GetComponent<CanvasGroup>();
+            if (_canvasGroup == null)
+                _canvasGroup = panelRoot.AddComponent<CanvasGroup>();
+            _canvasGroup.alpha = 0f;
+            panelRoot.SetActive(false);
+        }
     }
 
     private void Start()
@@ -183,8 +200,9 @@ public class DialogueManager : MonoBehaviour
             avatarImage.enabled = data.speakerAvatar != null;
         }
 
-        ShowPanel(true);
-        StreamLine(_lineIndex);
+        // Stop any in-progress fade, then fade in and start streaming
+        if (_fadeCoroutine != null) StopCoroutine(_fadeCoroutine);
+        _fadeCoroutine = StartCoroutine(FadeInAndStart());
 
         // Pause game khi hội thoại bắt đầu
         if (Stop.Instance != null)
@@ -263,6 +281,44 @@ public class DialogueManager : MonoBehaviour
         _isStreaming = false;
     }
 
+    // ── Fade ─────────────────────────────────────────────────────────────────
+    private IEnumerator FadeInAndStart()
+    {
+        panelRoot.SetActive(true);
+        if (_canvasGroup != null)
+        {
+            float elapsed = 0f;
+            while (elapsed < _fadeDuration)
+            {
+                _canvasGroup.alpha = Mathf.Lerp(0f, 1f, elapsed / _fadeDuration);
+                elapsed += Time.unscaledDeltaTime;
+                yield return null;
+            }
+            _canvasGroup.alpha = 1f;
+        }
+        _fadeCoroutine = null;
+        StreamLine(_lineIndex);
+    }
+
+    private IEnumerator FadeOutAndClose(System.Action onComplete)
+    {
+        if (_canvasGroup != null)
+        {
+            float startAlpha = _canvasGroup.alpha;
+            float elapsed = 0f;
+            while (elapsed < _fadeDuration)
+            {
+                _canvasGroup.alpha = Mathf.Lerp(startAlpha, 0f, elapsed / _fadeDuration);
+                elapsed += Time.unscaledDeltaTime;
+                yield return null;
+            }
+            _canvasGroup.alpha = 0f;
+        }
+        panelRoot.SetActive(false);
+        _fadeCoroutine = null;
+        onComplete?.Invoke();
+    }
+
     private string AppendChar(string shown, char c)
     {
         string candidate = shown + c;
@@ -286,10 +342,10 @@ public class DialogueManager : MonoBehaviour
     private void CloseDialogue()
     {
         if (_streamCoroutine != null) { StopCoroutine(_streamCoroutine); _streamCoroutine = null; }
+        if (_fadeCoroutine != null) { StopCoroutine(_fadeCoroutine); }
         _isStreaming  = false;
         _skipStreaming = false;
         _data         = null;
-        ShowPanel(false);
 
         // Resume game khi hội thoại kết thúc
         if (Stop.Instance != null)
@@ -297,19 +353,13 @@ public class DialogueManager : MonoBehaviour
             Stop.Instance.ResumeGame();
         }
 
-        if (_currentOnDialogueEnd != null)
+        // Fade out, then invoke the callback
+        _fadeCoroutine = StartCoroutine(FadeOutAndClose(() =>
         {
             var callback = _currentOnDialogueEnd;
             _currentOnDialogueEnd = null;
-            callback.Invoke();
-        }
+            callback?.Invoke();
+        }));
     }
 
-    private void ShowPanel(bool visible)
-    {
-        if (panelRoot != null)
-            panelRoot.SetActive(visible);
-        else
-            Debug.LogWarning($"[DialogueManager] ShowPanel({visible}) – panelRoot is NULL!");
-    }
 }
