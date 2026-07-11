@@ -124,7 +124,7 @@ public class PlayerController : NetworkBehaviour
         // FIX: Only do this in Multiplayer levels. In single-player, the pre-placed Atto is REQUIRED.
         string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
         
-        if (sceneName == "MultiplayerLevel" || sceneName == "SampleScene" || sceneName == "FTUE")
+        if (sceneName == "MultiplayerLevel" || sceneName == "SampleScene")
         {
             if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
             {
@@ -149,7 +149,7 @@ public class PlayerController : NetworkBehaviour
         {
             string currentScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
 
-            if (currentScene == "MultiplayerLevel" || currentScene == "SampleScene" || currentScene == "FTUE")
+            if (currentScene == "MultiplayerLevel" || currentScene == "SampleScene")
             {
                 Debug.Log($"[PlayerController] Destroying redundant pre-placed Atto in networked scene: {gameObject.name}");
                 NetworkObject.Despawn(true);
@@ -162,15 +162,21 @@ public class PlayerController : NetworkBehaviour
             // Automatically assign a random name upon spawning into the game
             TestSetRandomName();
             
-            // Ensure PlayerInput is enabled for the owner
+            // Ensure PlayerInput is enabled for the owner (but don't re-enable if already enabled to avoid losing devices on Mac)
             var playerInput = GetComponent<UnityEngine.InputSystem.PlayerInput>();
-            if (playerInput != null) playerInput.enabled = true;
+            if (playerInput != null && !playerInput.enabled) 
+            {
+                playerInput.enabled = true;
+            }
         }
         else
         {
             // Disable PlayerInput for non-owners so they don't steal the Gamepad/Keyboard from the local player
             var playerInput = GetComponent<UnityEngine.InputSystem.PlayerInput>();
-            if (playerInput != null) playerInput.enabled = false;
+            if (playerInput != null && playerInput.enabled) 
+            {
+                playerInput.enabled = false;
+            }
         }
 
         string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
