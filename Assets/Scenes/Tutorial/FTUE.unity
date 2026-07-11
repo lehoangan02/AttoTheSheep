@@ -14590,7 +14590,7 @@ MonoBehaviour:
     acceptedKeys: 
     enemyTarget: {fileID: 0}
   - stepName: "B\u01B0\u1EDBc 1 - Di chuy\u1EC3n"
-    instructionText: "S\u1EED d\u1EE5ng c\xE1c ph\xEDm W A S D \u0111\u1EC3 di chuy\u1EC3n."
+    instructionText: Use WASD to move
     onStepStart:
       m_PersistentCalls:
         m_Calls: []
@@ -14599,8 +14599,7 @@ MonoBehaviour:
     acceptedKeys: 250000000f0000002100000012000000
     enemyTarget: {fileID: 0}
   - stepName: "B\u01B0\u1EDBc 2 - B\u1ECB t\u1EA5n c\xF4ng"
-    instructionText: "C\u1EA9n th\u1EADn! K\u1EBB \u0111\u1ECBch xu\u1EA5t hi\u1EC7n
-      v\xE0 \u0111ang t\u1EA5n c\xF4ng b\u1EA1n!"
+    instructionText: Watch out! Enemies have appeared and are attacking you!
     onStepStart:
       m_PersistentCalls:
         m_Calls:
@@ -14621,8 +14620,7 @@ MonoBehaviour:
     acceptedKeys: 
     enemyTarget: {fileID: 0}
   - stepName: "B\u01B0\u1EDBc 3 - Ti\xEAu di\u1EC7t qu\xE1i"
-    instructionText: "Nh\u1EA5n n\xFAt J \u0111\u1EC3 \u0111\xE1nh tr\u1EA3 v\xE0
-      ti\xEAu di\u1EC7t k\u1EBB \u0111\u1ECBch!"
+    instructionText: Press J to attack and defeat the enemies!
     onStepStart:
       m_PersistentCalls:
         m_Calls: []
@@ -14631,8 +14629,7 @@ MonoBehaviour:
     acceptedKeys: 
     enemyTarget: {fileID: 1053043803}
   - stepName: "B\u01B0\u1EDBc 4 - \u0110i\u1EC1u khi\u1EC3n c\u1EEBu"
-    instructionText: "Click chu\u1ED9t tr\xE1i tr\xEAn m\xE0n h\xECnh \u0111\u1EC3
-      ra l\u1EC7nh \u0111i\u1EC1u khi\u1EC3n b\u1EA7y c\u1EEBu di chuy\u1EC3n."
+    instructionText: Left-click anywhere on the screen to command your flock to move.
     onStepStart:
       m_PersistentCalls:
         m_Calls:
@@ -14653,9 +14650,8 @@ MonoBehaviour:
     acceptedKeys: 
     enemyTarget: {fileID: 0}
   - stepName: "B\u01B0\u1EDBc 5 - \u0110i v\xE0o v\xF9ng h\u1ED3i m\xE1u"
-    instructionText: "B\u1EA1n \u0111ang b\u1ECB th\u01B0\u01A1ng! H\xE3y \u0111i
-      v\xE0o v\xF9ng v\xF2ng tr\xF2n c\u1EE7a b\u1EA7y c\u1EEBu \u0111\u1EC3 h\u1ED3i
-      m\xE1u."
+    instructionText: You're injured! Enter your flock's healing circle to restore
+      HP.
     onStepStart:
       m_PersistentCalls:
         m_Calls: []
@@ -14664,8 +14660,7 @@ MonoBehaviour:
     acceptedKeys: 
     enemyTarget: {fileID: 0}
   - stepName: "B\u01B0\u1EDBc 6 - K\u1EBFt th\xFAc"
-    instructionText: "Tuy\u1EC7t v\u1EDDi! B\u1EA1n \u0111\xE3 \u0111\u01B0\u1EE3c
-      h\u1ED3i m\xE1u v\xE0 ho\xE0n th\xE0nh b\xE0i h\u01B0\u1EDBng d\u1EABn."
+    instructionText: Great! You've recovered your health and completed the tutorial.
     onStepStart:
       m_PersistentCalls:
         m_Calls: []
