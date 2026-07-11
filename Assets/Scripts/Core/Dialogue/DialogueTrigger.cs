@@ -45,6 +45,8 @@ public class DialogueTrigger : MonoBehaviour
             if (canvas.renderMode == RenderMode.WorldSpace && canvas.worldCamera == null)
             {
                 canvas.worldCamera = Camera.main;
+                canvas.sortingLayerName = "UI";
+                canvas.sortingOrder = 31000; // Render over mobile joystick (10000) so it's clickable!
             }
         }
 

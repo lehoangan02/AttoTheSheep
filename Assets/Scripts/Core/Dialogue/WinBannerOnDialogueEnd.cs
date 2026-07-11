@@ -12,6 +12,13 @@ public class WinBannerOnDialogueEnd : MonoBehaviour
     /// </summary>
     public void ShowWinBanner()
     {
+        // Don't show the win banner if we are in the FTUE (tutorial) scene
+        if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "FTUE")
+        {
+            Debug.Log("[WinBannerOnDialogueEnd] FTUE scene detected. Skipping Win Banner.");
+            return;
+        }
+
         var uiManager = Object.FindFirstObjectByType<LevelUIManager>();
         if (uiManager != null)
         {

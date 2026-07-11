@@ -117,8 +117,6 @@ public class PlayerController : NetworkBehaviour
             bool hitValidUI = false;
             foreach (var result in raycastResults)
             {
-                Debug.Log($"[PlayerController] UI Raycast hit object: {result.gameObject.name}");
-                
                 // Ignore the joystick's giant invisible touch zone. 
                 if (result.gameObject.GetComponentInParent<UnityEngine.InputSystem.OnScreen.OnScreenStick>() != null)
                 {
@@ -126,6 +124,15 @@ public class PlayerController : NetworkBehaviour
                     continue; 
                 }
                 
+                // If we hit a valid Button underneath the joystick (like an NPC's E Button), click it manually!
+                var btn = result.gameObject.GetComponentInParent<UnityEngine.UI.Button>();
+                if (btn != null)
+                {
+                    Debug.Log($"[PlayerController] Manually triggering Button under joystick: {btn.gameObject.name}");
+                    btn.onClick.Invoke();
+                    return; // Don't move the herd
+                }
+
                 // If we hit any other UI element, block the click
                 hitValidUI = true;
                 Debug.Log($"[PlayerController] Herd movement BLOCKED by UI element: {result.gameObject.name}");
@@ -138,6 +145,22 @@ public class PlayerController : NetworkBehaviour
         if (Camera.main != null)
         {
             Vector2 pointerWorldPos = Camera.main.ScreenToWorldPoint(screenPos);
+            
+            // Check if we clicked near an interactive NPC (using a generous 1.5 unit radius)
+            // This ensures that even if you click the E-Button hovering above the NPC, 
+            // the physics circle will still overlap the NPC's actual body collider!
+            Collider2D[] hits = Physics2D.OverlapCircleAll(pointerWorldPos, 1.5f);
+            foreach (var hit in hits)
+            {
+                var dt = hit.GetComponent<DialogueTrigger>() ?? hit.GetComponentInParent<DialogueTrigger>();
+                if (dt != null)
+                {
+                    Debug.Log($"[PlayerController] Clicked near NPC {hit.name} (within 1.5 units), triggering dialogue!");
+                    dt.TriggerDialogue();
+                    return; // Don't move the herd
+                }
+            }
+
             Debug.Log($"[PlayerController] Successfully moving herd to: {pointerWorldPos}");
             OnMapClicked?.Invoke(pointerWorldPos);
         }
