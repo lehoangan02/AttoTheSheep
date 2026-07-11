@@ -147,9 +147,9 @@ public class PlayerController : NetworkBehaviour
         // otherwise they become a 3rd uncontrollable player that steals input or causes Game Over when killed.
         if (IsServer && !NetworkObject.IsPlayerObject)
         {
-            string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+            string currentScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
 
-            if (sceneName == "MultiplayerLevel" || sceneName == "SampleScene" || sceneName == "FTUE")
+            if (currentScene == "MultiplayerLevel" || currentScene == "SampleScene" || currentScene == "FTUE")
             {
                 Debug.Log($"[PlayerController] Destroying redundant pre-placed Atto in networked scene: {gameObject.name}");
                 NetworkObject.Despawn(true);
