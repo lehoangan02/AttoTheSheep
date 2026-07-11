@@ -91,10 +91,23 @@ public class PlayerMovement : NetworkBehaviour
         }
     }
 
+    private Vector2 lastSentMoveInput;
+    private float lastSendTime;
+
     private void SendInputToServer(Vector2 moveInput)
     {
         localMoveInput = moveInput; // Save locally on Client for immediate movement
-        if (IsSpawned) SetMoveInputServerRpc(moveInput);
+        if (IsSpawned) 
+        {
+            // Fix: Mobile joystick floods RPCs because OnMove triggers every frame.
+            // Throttle RPCs to significant changes, zero input (stops), or time interval.
+            if (moveInput == Vector2.zero || Vector2.Distance(lastSentMoveInput, moveInput) > 0.05f || Time.time - lastSendTime > 0.1f)
+            {
+                SetMoveInputServerRpc(moveInput);
+                lastSentMoveInput = moveInput;
+                lastSendTime = Time.time;
+            }
+        }
     }
 
     [ServerRpc]

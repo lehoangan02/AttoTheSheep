@@ -113,14 +113,18 @@ public class PlayerController : NetworkBehaviour
         NetworkVariableWritePermission.Server
     );
 
-    private void Start()
+    private System.Collections.IEnumerator Start()
     {
+        // Fix: PC vs Mac race condition where dynamically spawned players are destroyed before OnNetworkSpawn runs
+        yield return new WaitForSeconds(0.1f);
+
         // On clients, pre-placed scene objects that were despawned by the server 
         // will not have OnNetworkSpawn called and will remain unspawned.
         // We must destroy them to prevent them from becoming "extra" phantom players that steal input.
         // FIX: Only do this in Multiplayer levels. In single-player, the pre-placed Atto is REQUIRED.
         string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
-        if (sceneName == "MultiplayerLevel" || sceneName == "SampleScene")
+        
+        if (sceneName == "MultiplayerLevel" || sceneName == "SampleScene" || sceneName == "FTUE")
         {
             if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
             {
@@ -143,9 +147,11 @@ public class PlayerController : NetworkBehaviour
         // otherwise they become a 3rd uncontrollable player that steals input or causes Game Over when killed.
         if (IsServer && !NetworkObject.IsPlayerObject)
         {
-            if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "MultiplayerLevel")
+            string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+
+            if (sceneName == "MultiplayerLevel" || sceneName == "SampleScene" || sceneName == "FTUE")
             {
-                Debug.Log($"[PlayerController] Destroying redundant pre-placed Atto in multiplayer scene: {gameObject.name}");
+                Debug.Log($"[PlayerController] Destroying redundant pre-placed Atto in networked scene: {gameObject.name}");
                 NetworkObject.Despawn(true);
                 return;
             }
@@ -155,6 +161,16 @@ public class PlayerController : NetworkBehaviour
         {
             // Automatically assign a random name upon spawning into the game
             TestSetRandomName();
+            
+            // Ensure PlayerInput is enabled for the owner
+            var playerInput = GetComponent<UnityEngine.InputSystem.PlayerInput>();
+            if (playerInput != null) playerInput.enabled = true;
+        }
+        else
+        {
+            // Disable PlayerInput for non-owners so they don't steal the Gamepad/Keyboard from the local player
+            var playerInput = GetComponent<UnityEngine.InputSystem.PlayerInput>();
+            if (playerInput != null) playerInput.enabled = false;
         }
 
         string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
