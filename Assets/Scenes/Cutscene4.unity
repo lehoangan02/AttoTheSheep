@@ -460,7 +460,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 5837829297762069037, guid: 1ab9af5762220f15990db1b41916128e, type: 3}
+  m_Sprite: {fileID: 5837829297762069037, guid: c0c3b756834c9608cb80c84703812a74, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -596,14 +596,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CutsceneDirector
   _displayImage: {fileID: 247938019}
   _slides:
-  - image: {fileID: 5837829297762069037, guid: 1ab9af5762220f15990db1b41916128e, type: 3}
-    dialogueData: {fileID: 11400000, guid: 9187397bf0a68dde48896d2b11e9bce3, type: 2}
-  - image: {fileID: 3939686532758486491, guid: eb19ddd969b7a2e7b86a9a658bb9a3f9, type: 3}
-    dialogueData: {fileID: 11400000, guid: 7ad56ca433ceb3e3f9a932cf3ecd3a40, type: 2}
-  - image: {fileID: -6882685999089129373, guid: d5cf7e9ada226ad6d84c4889afb33e3d, type: 3}
-    dialogueData: {fileID: 11400000, guid: 48c300e86d01d91bfbcc1661e9b90711, type: 2}
-  - image: {fileID: 791556260891950957, guid: fc030754681cf991498c787a5bb017d6, type: 3}
-    dialogueData: {fileID: 11400000, guid: 389858beeb15d88e1aa2efb04c89cd91, type: 2}
+  - image: {fileID: 5837829297762069037, guid: c0c3b756834c9608cb80c84703812a74, type: 3}
+    dialogueData: {fileID: 11400000, guid: 70383698ec5ff0bb19151f28289ec9c3, type: 2}
+  - image: {fileID: 3939686532758486491, guid: 497d58bf8d483053ca7aad12f385ee67, type: 3}
+    dialogueData: {fileID: 11400000, guid: 1a565e7bb247d912b86cdadc342080ee, type: 2}
+  - image: {fileID: -6882685999089129373, guid: 1081203adfd6e0a879c5d1e7b8cd63a7, type: 3}
+    dialogueData: {fileID: 11400000, guid: fb9ed8216574a5c9cb6374457d9f8303, type: 2}
+  - image: {fileID: 791556260891950957, guid: cd10749cc8cffd034a5e0b4ad37aea86, type: 3}
+    dialogueData: {fileID: 11400000, guid: b71852ef987e614efbc0548f21395ee0, type: 2}
   _nextSceneName: 
   _autoStartDelay: 0
   _slideTransitionDelay: 0

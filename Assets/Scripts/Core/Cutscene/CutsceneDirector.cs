@@ -35,7 +35,7 @@ public class CutsceneDirector : MonoBehaviour
     [Tooltip("Seconds to wait after scene start before beginning the cutscene.")]
     [SerializeField] private float _autoStartDelay = 0.5f;
 
-    [Tooltip("Seconds to pause between slides (not applied after the last slide).")]
+    [Tooltip("Seconds to pause between slides (not applied after the last slide).\nThe dialogue panel uses its own fade-in/out, so this can be short or zero.")]
     [SerializeField] private float _slideTransitionDelay = 0.5f;
 
     private IEnumerator Start()
