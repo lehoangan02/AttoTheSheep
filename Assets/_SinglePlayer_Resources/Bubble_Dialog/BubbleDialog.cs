@@ -54,7 +54,23 @@ public class BubbleDialog : MonoBehaviour
     {                                                                                                                                                                                                               
         // Ensure we start hidden with scale 0                                                                                                                                                                      
         transform.localScale = Vector3.zero;                                                                                                                                                                        
-        gameObject.SetActive(false);                                                                                                                                                                                
+        gameObject.SetActive(false);
+        
+        // Force rendering on top of level elements and mobile UI (if they share the same camera/sorting space)
+        if (bubbleSprite != null)
+        {
+            bubbleSprite.sortingLayerName = "UI"; // Default high layer in most projects
+            bubbleSprite.sortingOrder = 32000;
+        }
+        if (textMeshPro != null)
+        {
+            var textRenderer = textMeshPro.GetComponent<MeshRenderer>();
+            if (textRenderer != null)
+            {
+                textRenderer.sortingLayerName = "UI";
+                textRenderer.sortingOrder = 32001; // Text must be exactly above the sprite
+            }
+        }
     }                                                                                                                                                                                                               
                                                                                                                                                                                                                     
     /// <summary>

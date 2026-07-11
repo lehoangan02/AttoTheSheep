@@ -79,13 +79,67 @@ public class PlayerController : NetworkBehaviour
     // ----------------------------------------------------
     // RECEIVE MOUSE CLICK INPUT (For Flock) - Matches action "Click" in PlayerInputActions
     // ----------------------------------------------------
+    private void Update()
+    {
+        // Extreme Fallback for Mobile: If PlayerInput "Click" action completely fails to fire 
+        // because of control scheme bugs, we manually check the raw touchscreen device every frame.
+        if (Application.isMobilePlatform && IsOwner && UnityEngine.InputSystem.Touchscreen.current != null)
+        {
+            if (UnityEngine.InputSystem.Touchscreen.current.primaryTouch.press.wasPressedThisFrame)
+            {
+                ProcessHerdMovementClick(UnityEngine.InputSystem.Touchscreen.current.primaryTouch.position.ReadValue());
+            }
+        }
+    }
+
     public void OnClick(InputValue value)
     {
+        Debug.Log($"[PlayerController] OnClick fired via PlayerInput! IsOwner: {IsOwner} | isPressed: {value.isPressed}");
         if (!IsOwner || !value.isPressed) return;
+        
+        if (UnityEngine.InputSystem.Pointer.current != null)
+        {
+            ProcessHerdMovementClick(UnityEngine.InputSystem.Pointer.current.position.ReadValue());
+        }
+    }
+
+    private void ProcessHerdMovementClick(Vector2 screenPos)
+    {
+        // Prevent clicking through actual mobile UI buttons, but DO NOT block clicks if they just hit the fullscreen Joystick background
+        if (UnityEngine.EventSystems.EventSystem.current != null)
+        {
+            var pointerEventData = new UnityEngine.EventSystems.PointerEventData(UnityEngine.EventSystems.EventSystem.current);
+            pointerEventData.position = screenPos;
+
+            var raycastResults = new System.Collections.Generic.List<UnityEngine.EventSystems.RaycastResult>();
+            UnityEngine.EventSystems.EventSystem.current.RaycastAll(pointerEventData, raycastResults);
+
+            bool hitValidUI = false;
+            foreach (var result in raycastResults)
+            {
+                Debug.Log($"[PlayerController] UI Raycast hit object: {result.gameObject.name}");
+                
+                // Ignore the joystick's giant invisible touch zone. 
+                if (result.gameObject.GetComponentInParent<UnityEngine.InputSystem.OnScreen.OnScreenStick>() != null)
+                {
+                    Debug.Log($"[PlayerController] Ignoring hit because it's part of OnScreenStick: {result.gameObject.name}");
+                    continue; 
+                }
+                
+                // If we hit any other UI element, block the click
+                hitValidUI = true;
+                Debug.Log($"[PlayerController] Herd movement BLOCKED by UI element: {result.gameObject.name}");
+                break;
+            }
+
+            if (hitValidUI) return;
+        }
+
         if (Camera.main != null)
         {
-            Vector2 mouseWorldPos = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
-            OnMapClicked?.Invoke(mouseWorldPos);
+            Vector2 pointerWorldPos = Camera.main.ScreenToWorldPoint(screenPos);
+            Debug.Log($"[PlayerController] Successfully moving herd to: {pointerWorldPos}");
+            OnMapClicked?.Invoke(pointerWorldPos);
         }
     }
 
@@ -117,6 +171,28 @@ public class PlayerController : NetworkBehaviour
     {
         // Fix: PC vs Mac race condition where dynamically spawned players are destroyed before OnNetworkSpawn runs
         yield return new WaitForSeconds(0.1f);
+
+        // Fix: Bubble Dialogs (SpriteRenderers) render behind Screen Space - Overlay canvases.
+        // On Mobile, we must convert the Mobile Controls Canvas to Camera Space so the dialogs (Order 32000) can render above the buttons.
+        if (Application.isMobilePlatform)
+        {
+            var canvases = FindObjectsByType<Canvas>(FindObjectsSortMode.None);
+            foreach (var canvas in canvases)
+            {
+                if (canvas.renderMode == RenderMode.ScreenSpaceOverlay)
+                {
+                    // Identify the Mobile UI Canvas by checking for on-screen controls
+                    if (canvas.GetComponentInChildren<UnityEngine.InputSystem.OnScreen.OnScreenControl>(true) != null)
+                    {
+                        canvas.renderMode = RenderMode.ScreenSpaceCamera;
+                        canvas.worldCamera = Camera.main;
+                        canvas.planeDistance = 5f;
+                        canvas.sortingLayerName = "UI";
+                        canvas.sortingOrder = 10000; // Dialogues are 32000, so they will be on top!
+                    }
+                }
+            }
+        }
 
         // On clients, pre-placed scene objects that were despawned by the server 
         // will not have OnNetworkSpawn called and will remain unspawned.

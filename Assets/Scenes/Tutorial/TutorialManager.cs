@@ -104,6 +104,19 @@ public class TutorialManager : MonoBehaviour
             ? AttoTheSheep.Core.LocalizationManager.Instance.GetText(message) 
             : message;
 
+        Debug.Log($"[TutorialManager] Original instruction text: '{localizedMessage}'. IsMobilePlatform: {Application.isMobilePlatform}");
+
+        // Special case: Replace PC controls with mobile controls dynamically if on mobile
+        if (Application.isMobilePlatform)
+        {
+            localizedMessage = System.Text.RegularExpressions.Regex.Replace(localizedMessage, @"\bwasd\b", "the Joystick", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            localizedMessage = System.Text.RegularExpressions.Regex.Replace(localizedMessage, @"\bj\b", "the Attack button", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            localizedMessage = System.Text.RegularExpressions.Regex.Replace(localizedMessage, @"\bleft click\b", "tap the screen", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            localizedMessage = System.Text.RegularExpressions.Regex.Replace(localizedMessage, @"\bleft-click\b", "tap the screen", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        }
+
+        Debug.Log($"[TutorialManager] Processed instruction text: '{localizedMessage}'");
+
         instructionBubble.SetText(localizedMessage, showPosition);
     }
 
@@ -132,16 +145,66 @@ public class TutorialManager : MonoBehaviour
                 case TutorialCondition.WaitKeyPress:
                     yield return new WaitUntil(() => 
                     {
-                        foreach (Key key in step.acceptedKeys)
+                        // Cross-platform Input check (Mobile & PC via PlayerInput)
+                        if (playerInstance != null)
                         {
-                            if (Keyboard.current[key].isPressed) return true;
+                            var playerInput = playerInstance.GetComponent<UnityEngine.InputSystem.PlayerInput>();
+                            if (playerInput != null && playerInput.actions != null)
+                            {
+                                // If the tutorial asks for WASD, they are waiting for Movement
+                                if (step.acceptedKeys.Contains(Key.W) || step.acceptedKeys.Contains(Key.A) || step.acceptedKeys.Contains(Key.UpArrow))
+                                {
+                                    var moveAction = playerInput.actions["Move"];
+                                    if (moveAction != null && moveAction.ReadValue<Vector2>().sqrMagnitude > 0.05f) return true;
+                                }
+                                // If the tutorial asks for J, they are waiting for Attack/Headbutt
+                                if (step.acceptedKeys.Contains(Key.J))
+                                {
+                                    var attackAction = playerInput.actions["Headbutt"];
+                                    if (attackAction != null && attackAction.triggered) return true;
+                                }
+                            }
+                        }
+
+                        // Fallback: Direct physical keyboard check for PC users
+                        if (Keyboard.current != null)
+                        {
+                            foreach (Key key in step.acceptedKeys)
+                            {
+                                if (Keyboard.current[key].isPressed) return true;
+                            }
                         }
                         return false;
                     });
                     break;
                 
                 case TutorialCondition.WaitMouseLeftClick:
-                    yield return new WaitUntil(() => Mouse.current.leftButton.wasPressedThisFrame);
+                    yield return new WaitUntil(() => 
+                    {
+                        // Cross-platform Input check for 'Click'
+                        if (playerInstance != null)
+                        {
+                            var playerInput = playerInstance.GetComponent<UnityEngine.InputSystem.PlayerInput>();
+                            if (playerInput != null && playerInput.actions != null)
+                            {
+                                var clickAction = playerInput.actions["Click"];
+                                // .triggered is the proper way to catch single-frame taps across all Input System versions
+                                if (clickAction != null && clickAction.triggered) return true;
+                            }
+                        }
+
+                        // Fallback: Direct physical device checks
+                        if (UnityEngine.InputSystem.Touchscreen.current != null)
+                        {
+                            if (UnityEngine.InputSystem.Touchscreen.current.primaryTouch.press.wasPressedThisFrame) return true;
+                        }
+
+                        if (Mouse.current != null)
+                        {
+                            return Mouse.current.leftButton.isPressed || Mouse.current.leftButton.wasPressedThisFrame;
+                        }
+                        return false;
+                    });
                     break;
 
                 case TutorialCondition.WaitEnemyDefeated:
