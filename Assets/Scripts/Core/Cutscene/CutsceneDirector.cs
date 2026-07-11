@@ -14,8 +14,8 @@ public class CutsceneSlide
     [Tooltip("The sprite to display for this slide.")]
     public Sprite image;
 
-    [Tooltip("All dialogue sequences to play while this slide is shown.")]
-    public DialogueData[] dialogueDataSet;
+    [Tooltip("The dialogue to play while this slide is shown.")]
+    public DialogueData dialogueData;
 }
 
 public class CutsceneDirector : MonoBehaviour
@@ -25,7 +25,7 @@ public class CutsceneDirector : MonoBehaviour
     [SerializeField] private Image _displayImage;
 
     [Header("Slides")]
-    [Tooltip("The ordered list of slides. Each slide has one image and one or more dialogues.")]
+    [Tooltip("The ordered list of slides. Each slide has one image and one dialogue.")]
     [SerializeField] private CutsceneSlide[] _slides;
 
     [Header("Transition")]
@@ -65,24 +65,19 @@ public class CutsceneDirector : MonoBehaviour
                 _displayImage.enabled = true;
             }
 
-            // Play all dialogues for this slide
-            if (slide.dialogueDataSet != null)
+            // Play the dialogue for this slide
+            if (slide.dialogueData != null)
             {
-                foreach (DialogueData dialogueData in slide.dialogueDataSet)
+                bool dialogueDone = false;
+
+                if (DialogueManager.Instance != null)
                 {
-                    if (dialogueData == null) continue;
-
-                    bool dialogueDone = false;
-
-                    if (DialogueManager.Instance != null)
-                    {
-                        DialogueManager.Instance.StartDialogue(dialogueData, () => dialogueDone = true);
-                        yield return new WaitUntil(() => dialogueDone);
-                    }
-                    else
-                    {
-                        Debug.LogWarning("[CutsceneDirector] DialogueManager.Instance is null. Skipping dialogue.");
-                    }
+                    DialogueManager.Instance.StartDialogue(slide.dialogueData, () => dialogueDone = true);
+                    yield return new WaitUntil(() => dialogueDone);
+                }
+                else
+                {
+                    Debug.LogWarning("[CutsceneDirector] DialogueManager.Instance is null. Skipping dialogue.");
                 }
             }
 
