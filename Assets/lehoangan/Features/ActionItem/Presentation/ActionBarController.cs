@@ -17,6 +17,28 @@ public class ActionBarController : MonoBehaviour
     {
         Debug.Log("[ActionBarController] Start running.");
         
+        if (Application.isMobilePlatform)
+        {
+            bool isMobileCanvas = false;
+            Transform current = transform;
+            while (current != null)
+            {
+                if (current.name.Contains("MobileControlsCanvas"))
+                {
+                    isMobileCanvas = true;
+                    break;
+                }
+                current = current.parent;
+            }
+
+            if (!isMobileCanvas)
+            {
+                Debug.Log($"[ActionBarController] Disabling outside action bar on mobile: {gameObject.name}");
+                gameObject.SetActive(false);
+                return;
+            }
+        }
+
         // Auto-assign actionSlots if they were not assigned in the inspector
         if (actionSlots == null || actionSlots.Length == 0)
         {
@@ -103,8 +125,6 @@ public class ActionBarController : MonoBehaviour
 
     private void HookActionBarInput()
     {
-        if (Application.isMobilePlatform) return; // Disabled on mobile
-
         if (actionBarActions == null || actionBarActions.Length == 0)
         {
             Debug.LogWarning("[ActionBarController] No actionBarActions assigned in Inspector!");
@@ -132,12 +152,6 @@ public class ActionBarController : MonoBehaviour
 
     private void TriggerSlot(int index)
     {
-        if (Application.isMobilePlatform)
-        {
-            Debug.Log("[ActionBarController] Item usage via this script is disabled on mobile (handled by another component).");
-            return;
-        }
-
         if (IsMultiplayerScene())
         {
             Debug.Log("[ActionBarController] Item usage (keys 1, 2, 3, 4) is disabled in multiplayer.");

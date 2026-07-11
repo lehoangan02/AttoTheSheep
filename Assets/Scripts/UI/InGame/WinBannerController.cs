@@ -39,7 +39,34 @@ namespace AttoTheSheep.UI.InGame
                 Unity.Netcode.NetworkManager.Singleton.Shutdown();
             }
 
-            SceneManager.LoadScene(nextLevelSceneName);
+            // Tự động tính toán màn tiếp theo nếu tên màn hiện tại có dạng "LevelX"
+            string currentScene = SceneManager.GetActiveScene().name;
+            string targetScene = nextLevelSceneName;
+
+            if (currentScene.StartsWith("Level") && int.TryParse(currentScene.Replace("Level", ""), out int currentLevelNum))
+            {
+                // Nếu là Level 3 (màn cuối), ép buộc về Main Menu
+                if (currentLevelNum >= 3)
+                {
+                    Debug.Log("[WinBanner] Đã hoàn thành Level 3, chuyển về Main Menu.");
+                    targetScene = mainMenuSceneName;
+                }
+                else
+                {
+                    string nextLevel = "Level" + (currentLevelNum + 1);
+                    if (Application.CanStreamedLevelBeLoaded(nextLevel))
+                    {
+                        targetScene = nextLevel;
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"[WinBanner] Không tìm thấy {nextLevel} trong Build Settings. Về Main Menu.");
+                        targetScene = mainMenuSceneName;
+                    }
+                }
+            }
+
+            SceneManager.LoadScene(targetScene);
         }
 
         private void OnMainMenuClicked()

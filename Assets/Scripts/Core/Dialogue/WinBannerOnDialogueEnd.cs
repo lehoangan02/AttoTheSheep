@@ -12,24 +12,15 @@ public class WinBannerOnDialogueEnd : MonoBehaviour
     /// </summary>
     public void ShowWinBanner()
     {
-        if (winBannerController == null)
+        var uiManager = Object.FindFirstObjectByType<LevelUIManager>();
+        if (uiManager != null)
         {
-            winBannerController = Object.FindFirstObjectByType<WinBannerController>(FindObjectsInactive.Include);
-        }
-
-        if (winBannerController != null)
-        {
-            Debug.Log("[WinBannerOnDialogueEnd] Mở Win Banner...");
-            int earnedCoins = 0;
-            if (PlayerSaveManager.Instance != null)
-            {
-                earnedCoins = PlayerSaveManager.Instance.CoinsEarnedThisSession;
-            }
-            winBannerController.ShowBanner(earnedCoins);
+            Debug.Log("[WinBannerOnDialogueEnd] Mở Win Banner thông qua LevelUIManager...");
+            uiManager.ShowWinBannerNow();
         }
         else
         {
-            Debug.LogError("[WinBannerOnDialogueEnd] Chưa tìm thấy WinBannerController trong Scene!");
+            Debug.LogError("[WinBannerOnDialogueEnd] Chưa tìm thấy LevelUIManager trong Scene!");
         }
     }
 }

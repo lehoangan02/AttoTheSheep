@@ -45,7 +45,24 @@ namespace AttoTheSheep.UI.InGame
 
         private void HandleWin()
         {
+            // Kiểm tra xem có NPC Spawner trong màn này không
+            var npcSpawner = Object.FindFirstObjectByType<LevelCompletionNPCSpawner>();
+            if (npcSpawner != null)
+            {
+                Debug.Log("[LevelUIManager] Nhận tín hiệu WIN! Nhưng có NPC Spawner, chờ Dialogue kết thúc...");
+                return; // WinBanner sẽ được gọi từ WinBannerOnDialogueEnd
+            }
+
             Debug.Log("[LevelUIManager] Nhận tín hiệu WIN! Đang bật WinBanner...");
+            ShowBanner(winBannerPrefab);
+        }
+
+        /// <summary>
+        /// Được gọi từ bên ngoài (ví dụ như sau khi kết thúc Dialogue) để ép mở WinBanner.
+        /// </summary>
+        public void ShowWinBannerNow()
+        {
+            Debug.Log("[LevelUIManager] Hiển thị WinBanner từ yêu cầu bên ngoài...");
             ShowBanner(winBannerPrefab);
         }
 
