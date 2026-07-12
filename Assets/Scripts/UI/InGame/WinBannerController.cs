@@ -43,28 +43,28 @@ namespace AttoTheSheep.UI.InGame
             string currentScene = SceneManager.GetActiveScene().name;
             string targetScene = nextLevelSceneName;
 
-            if (currentScene.StartsWith("Level") && int.TryParse(currentScene.Replace("Level", ""), out int currentLevelNum))
-            {
-                // Nếu là Level 3 (màn cuối), ép buộc về Main Menu
-                if (currentLevelNum >= 3)
-                {
-                    Debug.Log("[WinBanner] Đã hoàn thành Level 3, chuyển về Main Menu.");
-                    targetScene = mainMenuSceneName;
-                }
-                // else
-                // {
-                //     string nextLevel = "Level" + (currentLevelNum + 1);
-                //     if (Application.CanStreamedLevelBeLoaded(nextLevel))
-                //     {
-                //         targetScene = nextLevel;
-                //     }
-                //     else
-                //     {
-                //         Debug.LogWarning($"[WinBanner] Không tìm thấy {nextLevel} trong Build Settings. Về Main Menu.");
-                //         targetScene = mainMenuSceneName;
-                //     }
-                // }
-            }
+            // if (currentScene.StartsWith("Level") && int.TryParse(currentScene.Replace("Level", ""), out int currentLevelNum))
+            // {
+            //     // Nếu là Level 3 (màn cuối), ép buộc về Main Menu
+            //     if (currentLevelNum >= 3)
+            //     {
+            //         Debug.Log("[WinBanner] Đã hoàn thành Level 3, chuyển về Main Menu.");
+            //         targetScene = mainMenuSceneName;
+            //     }
+            //     else
+            //     {
+            //         string nextLevel = "Level" + (currentLevelNum + 1);
+            //         if (Application.CanStreamedLevelBeLoaded(nextLevel))
+            //         {
+            //             targetScene = nextLevel;
+            //         }
+            //         else
+            //         {
+            //             Debug.LogWarning($"[WinBanner] Không tìm thấy {nextLevel} trong Build Settings. Về Main Menu.");
+            //             targetScene = mainMenuSceneName;
+            //         }
+            //     }
+            // }
             Debug.Log($"[WinBanner] Chuyển sang scene: {targetScene}");
             SceneManager.LoadScene(targetScene);
         }
