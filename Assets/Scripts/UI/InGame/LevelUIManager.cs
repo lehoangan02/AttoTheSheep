@@ -86,17 +86,8 @@ namespace AttoTheSheep.UI.InGame
                 Destroy(_activeBanner);
             }
 
-            // Spawn Banner mới
-            if (canvasParent != null)
-            {
-                _activeBanner = Instantiate(bannerPrefab, canvasParent);
-            }
-            else 
-            {
-                _activeBanner = Instantiate(bannerPrefab);
-            }
-
             // Đảm bảo Banner được active
+            _activeBanner = bannerPrefab;
             _activeBanner.SetActive(true);
 
             // Pass the earned coins to the banner controller if it exists
