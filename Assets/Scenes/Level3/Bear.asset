@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 71538442a108cf245bf5b66c9780c8da, type: 3}
+  m_Name: Bear
+  m_EditorClassIdentifier: Assembly-CSharp::DialogueData
+  speakerName: Brown Bear
+  speakerNameVietnamese: "H\xF9ng T\xF4ng"
+  speakerAvatar: {fileID: 8580189074808014292, guid: 8979dffc0c933654fa16e8ab472a488b, type: 3}
+  lines:
+  - 'You have defeated him...
+
+    At long last, peace has returned to this forest.'
+  - 'I pray that you will find the Promised Land...
+
+    The place where you truly
+    belong.'
+  vietnameseLines:
+  - "Ng\u01B0\u01A1i \u0111\xE3 \u0111\xE1nh b\u1EA1i h\u1EAFn...\nKhu r\u1EEBng
+    n\xE0y cu\u1ED1i c\xF9ng c\u0169ng \u0111\u01B0\u1EE3c y\xEAn b\xECnh tr\u1EDF
+    l\u1EA1i."
+  - "Ta c\u1EA7u mong ng\u01B0\u01A1i s\u1EBD t\xECm th\u1EA5y mi\u1EC1n \u0111\u1EA5t
+    h\u1EE9a...\nN\u01A1i m\xE0 ng\u01B0\u01A1i th\u1EADt s\u1EF1 thu\u1ED9c v\u1EC1."

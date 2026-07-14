@@ -1,0 +1,166 @@
+using UnityEngine;
+using Unity.Netcode;
+using System.Collections;
+
+[RequireComponent(typeof(EnemyEntity))]
+public abstract class EnemyBrain : NetworkBehaviour
+{
+    [SerializeField] protected float scanRadius = 30f;
+    [SerializeField] protected string targetTag = "Player";
+    [SerializeField] protected LayerMask targetLayers = ~0;
+
+    [HideInInspector] public NetworkEntity target;
+    [HideInInspector] public float lastAttackTime;
+    [HideInInspector] public bool IsFrozen;
+
+    public EnemyState CurrentState { get; private set; } = EnemyState.Idle;
+
+    protected float stateTimer;
+
+    protected EnemyEntity entity;
+    protected EnemyMotor motor;
+    protected ContextSteering2D steering;
+    protected StatusEffectController effectController;
+    protected EnemyAudio enemyAudio;
+    protected Animator anim;
+
+    public EnemyEntity Entity => entity;
+    public EnemyMotor Motor => motor;
+    public StatusEffectController EffectController => effectController;
+
+    void Awake()
+    {
+        entity = GetComponent<EnemyEntity>();
+        motor = GetComponent<EnemyMotor>();
+        steering = GetComponent<ContextSteering2D>();
+        effectController = GetComponent<StatusEffectController>();
+        enemyAudio = GetComponent<EnemyAudio>();
+        anim = GetComponent<Animator>();
+        Init();
+    }
+
+    protected virtual void Init() { }
+
+    public Vector2 ColliderCenter => steering != null ? steering.SteeringOrigin : (Vector2)transform.position;
+
+    protected void SetState(EnemyState state)
+    {
+        if (CurrentState == state) return;
+        OnStateExit(CurrentState);
+        CurrentState = state;
+        stateTimer = 0f;
+        OnStateEnter(state);
+        PlayStateAudio(state);
+    }
+
+    protected virtual void OnStateEnter(EnemyState state) { }
+    protected virtual void OnStateExit(EnemyState state) { }
+
+    public virtual bool ShouldBlockDamage() => false;
+    public virtual bool HandlesOwnDeath => false;
+
+    protected float DistanceTo(NetworkEntity t) => Vector2.Distance(ColliderCenter, t.transform.position);
+
+    protected bool IsCCLocked() => IsFrozen || (effectController != null && effectController.IsMovementLocked());
+
+    protected bool IsAttackReady() => Time.time >= lastAttackTime + (entity.GetData<MeleeEnemyData>()?.attackCooldown ?? 0f);
+
+    public virtual void AcquireTarget()
+    {
+        if (IsValidTarget(target)) return;
+        target = FindTarget();
+    }
+
+    /// <summary>Context-steered chase move. If ContextSteering2D is attached, uses the
+    /// 8-way compass against obstacle/ally layers; otherwise falls back to pure seek
+    /// (identical to the old motor.MoveToward(target.position, speed)).</summary>
+    public void MoveChaseTarget()
+    {
+        if (target == null)
+        {
+            motor.Stop();
+            return;
+        }
+        if (IsCCLocked()) { motor.Stop(); return; }
+        float speed = entity.Data.moveSpeed * (effectController?.GetSpeedMultiplier() ?? 1f);
+        if (steering == null)
+        {
+            motor.MoveToward(target.transform.position, speed);
+            return;
+        }
+        Vector2 toTarget = (Vector2)(target.transform.position - (Vector3)ColliderCenter);
+        bool canStrafe = !IsAttackReady();
+        Vector2 dir = steering.ComputeDirection(toTarget.normalized, toTarget.magnitude, canStrafe);
+        if (dir == Vector2.zero)
+            motor.Stop();
+        else
+            motor.MoveWith(dir, speed);
+    }
+
+    protected virtual NetworkEntity FindTarget()
+    {
+        Collider2D[] hits = Physics2D.OverlapCircleAll(ColliderCenter, scanRadius, targetLayers);
+        NetworkEntity nearest = null;
+        float nearestDist = float.MaxValue;
+        foreach (var hit in hits)
+        {
+            NetworkEntity candidate = hit.GetComponentInParent<NetworkEntity>();
+            if (!IsValidTarget(candidate)) continue;
+            float d = ((Vector2)candidate.transform.position - ColliderCenter).sqrMagnitude;
+            if (d < nearestDist) { nearest = candidate; nearestDist = d; }
+        }
+        return nearest;
+    }
+
+    protected virtual bool IsValidTarget(NetworkEntity c)
+    {
+        if (c == null || c == entity || !c.IsAlive) return false;
+        return string.IsNullOrEmpty(targetTag) || c.CompareTag(targetTag);
+    }
+
+    public void SetTarget(NetworkEntity t) => target = t;
+    public void ClearTarget() => target = null;
+
+    protected abstract void DecideNextState();
+
+    private void PlayStateAudio(EnemyState state)
+    {
+        if (enemyAudio == null) return;
+
+        switch (state)
+        {
+            case EnemyState.Hurt:
+                enemyAudio.Play("Hurt");
+                break;
+            case EnemyState.Dead:
+                enemyAudio.Play("Death");
+                break;
+        }
+    }
+
+    [ClientRpc]
+    protected void TriggerAnimClientRpc(int hash)
+    {
+        if (IsServer) return; // Server already sets it locally
+        if (anim != null) anim.SetTrigger(hash);
+    }
+
+    [ClientRpc]
+    protected void SetAnimBoolClientRpc(int hash, bool value)
+    {
+        if (IsServer) return;
+        if (anim != null) anim.SetBool(hash, value);
+    }
+    
+    protected void SyncSetTrigger(string triggerName)
+    {
+        if (anim != null) anim.SetTrigger(triggerName);
+        if (IsServer) TriggerAnimClientRpc(Animator.StringToHash(triggerName));
+    }
+    
+    protected void SyncSetBool(string boolName, bool value)
+    {
+        if (anim != null) anim.SetBool(boolName, value);
+        if (IsServer) SetAnimBoolClientRpc(Animator.StringToHash(boolName), value);
+    }
+}

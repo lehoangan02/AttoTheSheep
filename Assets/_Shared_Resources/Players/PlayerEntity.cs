@@ -1,0 +1,191 @@
+using UnityEngine;
+using Unity.Netcode;
+using Unity.Cinemachine; 
+using System.Collections; 
+
+public class PlayerEntity : NetworkEntity
+{
+    // Cờ báo hiệu toàn cầu khi có bất kỳ người chơi nào chết (Dùng cho Game Over)
+    public static event System.Action OnAnyPlayerDied;
+
+    [Header("Damage Feedback (Hiệu ứng trúng đòn)")]
+    [SerializeField] private SpriteRenderer spriteRenderer;
+    [SerializeField] private Color damageColor = Color.red; 
+    [SerializeField] private float flashDuration = 0.2f;    
+    [SerializeField] private float knockbackForce = 15f; // Tăng lực lên chút để dễ thấy    
+    [SerializeField] private float knockbackDuration = 0.15f; 
+
+    private Color originalColor;
+    private Rigidbody2D rb;
+    private PlayerAudio playerAudio;
+    private PlayerMovement playerMovement; // Khai báo tham chiếu đến PlayerMovement
+
+    private void Awake()
+    {
+        if (spriteRenderer == null) spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+        rb = GetComponent<Rigidbody2D>();
+        
+        // Tìm PlayerMovement nằm ở Object con (giống cách bạn setup GetComponentInParent bên PlayerMovement)
+        playerMovement = GetComponentInChildren<PlayerMovement>();
+        playerAudio = GetComponent<PlayerAudio>();
+        if (playerAudio == null) playerAudio = gameObject.AddComponent<PlayerAudio>();
+        
+        if (spriteRenderer != null) 
+        {
+            originalColor = spriteRenderer.color;
+        }
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+        
+        if (IsOwner)
+        {
+            Debug.Log("Player Entity has been spawned!");
+            SetupVirtualCamera();
+        }
+
+        currentHealth.OnValueChanged += OnHealthChanged;
+    }
+
+    private float _multiplayerRegenTimer = 0f;
+
+    private void Update()
+    {
+        if (IsServer && IsAlive)
+        {
+            if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "MultiplayerLevel")
+            {
+                _multiplayerRegenTimer += Time.deltaTime;
+                if (_multiplayerRegenTimer >= 2f) // Every 2 seconds
+                {
+                    _multiplayerRegenTimer -= 2f;
+                    if (currentHealth.Value < baseMaxHealth)
+                    {
+                        currentHealth.Value = Mathf.Min(baseMaxHealth, currentHealth.Value + 3); // Recover 3 HP
+                    }
+                }
+            }
+        }
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        base.OnNetworkDespawn();
+        currentHealth.OnValueChanged -= OnHealthChanged;
+    }
+
+    private void SetupVirtualCamera()
+    {
+        CinemachineCamera vCam = FindAnyObjectByType<CinemachineCamera>();
+
+        if (vCam != null)
+        {
+            vCam.Follow = this.transform; 
+            
+            // Fix: Disable camera Lookahead to prevent violent camera warping during dashes.
+            var composer = vCam.GetComponent<Unity.Cinemachine.CinemachinePositionComposer>();
+            if (composer != null)
+            {
+                // When dash applies high velocity, Lookahead extrapolates it and jerks the camera.
+                composer.Lookahead.Enabled = false;
+                
+                // Tighten damping slightly to keep the camera focused on the player without sluggishness
+                composer.Damping = new Vector3(1f, 1f, 1f);
+            }
+
+            Debug.Log("🎥 [Camera] Đã setup Cinemachine focus vào Local Player!");
+        }
+        else
+        {
+            Debug.LogWarning("⚠️ [Camera] Không tìm thấy CinemachineCamera nào trong Scene!");
+        }
+    }
+
+    protected override void Die()
+    {
+        PlayDeathClientRpc();
+        base.Die();
+        Debug.Log("Player has been defeated! Showing Game Over screen...");
+        
+        // Phát tín hiệu cho các Manager biết Player vừa chết
+        OnAnyPlayerDied?.Invoke();
+    }
+
+    // ==========================================
+    // 1. HIỆU ỨNG ÁM ĐỎ KHI MẤT MÁU
+    // ==========================================
+    private void OnHealthChanged(int previousValue, int newValue)
+    {
+        if (newValue < previousValue)
+        {
+            if (spriteRenderer != null)
+            {
+                StopCoroutine(nameof(FlashRedRoutine));
+                StartCoroutine(FlashRedRoutine());
+            }
+
+            if (newValue > 0)
+            {
+                playerAudio?.PlayHurt();
+            }
+        }
+    }
+
+    [ClientRpc]
+    private void PlayDeathClientRpc()
+    {
+        playerAudio?.PlayDeath();
+    }
+
+    private IEnumerator FlashRedRoutine()
+    {
+        spriteRenderer.color = damageColor; 
+        yield return new WaitForSeconds(flashDuration);
+        spriteRenderer.color = originalColor; 
+    }
+
+    // ==========================================
+    // 2. HIỆU ỨNG LÙI LẠI (KNOCKBACK) 
+    // ==========================================
+    public override void TakeDamage(int damage, NetworkEntity source)
+    {
+        int healthBefore = currentHealth.Value; 
+
+        base.TakeDamage(damage, source);
+
+        if (IsServer && currentHealth.Value < healthBefore && source != null)
+        {
+            Vector2 knockbackDirection = (transform.position - source.transform.position).normalized;
+            Vector2 appliedForce = knockbackDirection * knockbackForce;
+
+            ApplyPlayerKnockbackClientRpc(appliedForce);
+        }
+    }
+
+    [ClientRpc]
+    private void ApplyPlayerKnockbackClientRpc(Vector2 force)
+    {
+        if (rb != null)
+        {
+            StartCoroutine(PlayerKnockbackRoutine(force));
+        }
+    }
+
+    private IEnumerator PlayerKnockbackRoutine(Vector2 force)
+    {
+        // 1. Kích hoạt cờ khóa di chuyển bên PlayerMovement để chặn FixedUpdate
+        if (playerMovement != null) playerMovement.isMovementLocked = true;
+
+        // 2. Ép vận tốc để đẩy lùi
+        rb.linearVelocity = force;
+
+        // 3. Đợi hết thời gian đẩy lùi
+        yield return new WaitForSeconds(knockbackDuration);
+
+        // 4. Dừng lại và trả lại quyền di chuyển cho người chơi
+        rb.linearVelocity = Vector2.zero; 
+        if (playerMovement != null) playerMovement.isMovementLocked = false;
+    }
+}

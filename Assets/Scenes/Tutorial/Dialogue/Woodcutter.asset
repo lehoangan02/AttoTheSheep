@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 71538442a108cf245bf5b66c9780c8da, type: 3}
+  m_Name: Woodcutter
+  m_EditorClassIdentifier: Assembly-CSharp::DialogueData
+  speakerName: Woodcutter
+  speakerNameVietnamese: 
+  speakerAvatar: {fileID: -1267550136445687439, guid: cf3be3dafe57b419e885340c0873aad0, type: 3}
+  lines:
+  - Gather more wood. We'll need it for the next battle.
+  vietnameseLines:
+  - "Thu th\u1EADp th\xEAm g\u1ED7 \u0111i.\nCh\xFAng ta s\u1EBD c\u1EA7n ch\xFAng
+    cho tr\u1EADn chi\u1EBFn ti\u1EBFp theo."

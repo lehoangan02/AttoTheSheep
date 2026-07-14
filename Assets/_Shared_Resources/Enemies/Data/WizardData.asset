@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc01b5315e4d7207a98bed1fa1fde23e, type: 3}
+  m_Name: WizardData
+  m_EditorClassIdentifier: Assembly-CSharp::WizardEnemyData
+  maxHealth: 150
+  moveSpeed: 3
+  prizeCoin: 50
+  throwRange: 8
+  throwCooldown: 1.5
+  throwDamage: 40
+  ballSpeed: 7
+  ballPrefab: {fileID: 4839114781525419965, guid: 2f57c81e57981d4cf9ef6cf83cd746ee, type: 3}
+  ballOnHitEffects:
+  - {fileID: 11400000, guid: 7b4e3ac689b3406880e0ab3dde76dba5, type: 2}
+  transformRange: 3
+  transformCooldown: 8
+  transformSpellVFXPrefab: {fileID: 7154831219701261189, guid: 2d908b937a60be8e08cf3442ce76f67a, type: 3}
+  pigPrefab: {fileID: 8651997999754049487, guid: 1c670ab539dae78c69978801aa376281, type: 3}

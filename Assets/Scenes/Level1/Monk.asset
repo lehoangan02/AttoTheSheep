@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 71538442a108cf245bf5b66c9780c8da, type: 3}
+  m_Name: Monk
+  m_EditorClassIdentifier: Assembly-CSharp::DialogueData
+  speakerName: Monk
+  speakerNameVietnamese: "Tu s\u0129"
+  speakerAvatar: {fileID: 21300000, guid: f846c6072ceb0445bbcb59c41b57a5cb, type: 3}
+  lines:
+  - Poor child...
+  - Look at what humanity has done to you.
+  - But do not hate them.
+  - For the path ahead is filled with nothing but monsters.
+  - I can only pray that, somehow, you will find peace.
+  vietnameseLines:
+  - "Th\u1EADt \u0111\xE1ng th\u01B0\u01A1ng... c\u1EADu b\xE9 t\u1ED9i nghi\u1EC7p."
+  - "H\xE3y nh\xECn xem lo\xE0i ng\u01B0\u1EDDi \u0111\xE3 \u0111\u1ED1i x\u1EED
+    v\u1EDBi ng\u01B0\u01A1i nh\u01B0 th\u1EBF n\xE0o."
+  - "Nh\u01B0ng con \u0111\u01B0\u1EDDng ph\xEDa tr\u01B0\u1EDBc c\xF2n t\xE0n kh\u1ED1c
+    h\u01A1n th\u1EBF."
+  - "N\u01A1i \u1EA5y ch\u1EC9 c\xF3 qu\xE1i v\u1EADt \u0111ang ch\u1EDD \u0111\u1EE3i."
+  - "C\u1EA7u mong s\u1ED1 ph\u1EADn s\u1EBD m\u1EC9m c\u01B0\u1EDDi v\u1EDBi ng\u01B0\u01A1i."

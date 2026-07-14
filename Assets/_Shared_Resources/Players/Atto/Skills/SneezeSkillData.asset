@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eaad3eef2673c44418ae5eee462aab32, type: 3}
+  m_Name: SneezeSkillData
+  m_EditorClassIdentifier: Assembly-CSharp::SneezeSkillData
+  skillId: 3
+  skillName: "H\u1EAFt X\xEC"
+  description: "Atto h\u1EAFt x\xEC th\u1EADt m\u1EA1nh, b\u1EAFn ra 5 tia n\u01B0\u1EDBc
+    m\u0169i theo h\xECnh qu\u1EA1t v\u1EC1 ph\xEDa tr\u01B0\u1EDBc. M\u1ED7i tia
+    g\xE2y 150 DMG v\xE0 cho\xE1ng 1.5s."
+  skillIcon: {fileID: 7554258346937021337, guid: 50451c505a5434d41bff6ae3361cff62, type: 3}
+  cooldown: 5
+  damage: 5000
+  manaCost: 100
+  lambsRequired: 7
+  vfxPrefab: {fileID: 0}
+  castSFX:
+    clip: {fileID: 0}
+    duration: 0
+  activeSFX:
+    clip: {fileID: 8300000, guid: 521e29927e2170f4fbe2170fb782db60, type: 3}
+    duration: 0
+  hitSFX:
+    clip: {fileID: 0}
+    duration: 0
+  projectilePrefab: {fileID: 5472383393138764189, guid: c7e11037152dd5d47b3bf4ac6de9c4e2, type: 3}
+  projectileCount: 10
+  spreadAngle: 150
+  projectileSpeed: 15
+  projectileMaxDistance: 8
+  puddlePrefab: {fileID: 8849798543113921564, guid: 8866c3ed94c78a64fa0fdf9a633ae376, type: 3}
+  puddleDuration: 5
+  slowEffect: {fileID: 11400000, guid: 6ed46aef80dfdf01287c162141ef10ae, type: 2}
+  hitLayer:
+    serializedVersion: 2
+    m_Bits: 64

@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a7142ddc9933daf1a21fe9f0ab9f3ee, type: 3}
+  m_Name: TrollData
+  m_EditorClassIdentifier: Assembly-CSharp::TrollEnemyData
+  maxHealth: 500
+  moveSpeed: 2
+  prizeCoin: 90
+  smashRange: 4
+  smashCooldown: 3
+  smashDamage: 20
+  smashEffects:
+  - {fileID: 11400000, guid: 2c306855809b745f0bb77edb8bad912e, type: 2}
+  smashKnockbackForce: 8
+  smashKnockbackDuration: 0.25
+  smashWindupTime: 1
+  smashMaxAttackTime: 2
+  chargeRange: 7
+  chargeCooldown: 6
+  chargeSpeed: 12
+  chargeMaxDistance: 10
+  chargeDamage: 35
+  chargeEffects:
+  - {fileID: 11400000, guid: 2c306855809b745f0bb77edb8bad912e, type: 2}
+  chargeKnockbackForce: 10
+  chargeKnockbackDuration: 0.2
+  chargeWindupTime: 1.5
+  chargeMaxAttackTime: 3
+  tornadoRange: 10
+  tornadoCooldown: 9
+  tornadoSpeed: 4
+  tornadoDuration: 5
+  tornadoTickInterval: 0.5
+  tornadoDamagePerTick: 20
+  tornadoWindupTime: 2
+  tornadoMaxAttackTime: 8
+  spikePrefab: {fileID: 4418561806473106449, guid: 2bdae8036da53e63aa5386fd0fbc64a8, type: 3}
+  spikeCount: 5
+  spikeSpacing: 1.2
+  spikeSpawnInterval: 0.12
+  recoveryInterval: 15
+  recoveryDuration: 3
