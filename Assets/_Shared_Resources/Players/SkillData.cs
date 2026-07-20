@@ -1,16 +1,13 @@
 using UnityEngine;
 
-// Đóng gói Clip và Duration thành một cấu trúc. 
-// [System.Serializable] giúp Unity hiểu và hiển thị nó lên Inspector.
-[System.Serializable] 
+[System.Serializable]
 public class SkillAudio
 {
     public AudioClip clip;
-    
+
     [Tooltip("Thời gian tối đa để phát âm thanh (Giây). Nếu bằng 0, sẽ phát hết toàn bộ file.")]
     public float duration = 0f;
 
-    // Viết sẵn một hàm tiện ích để check xem có âm thanh hay không cho code gọn gàng
     public bool HasAudio()
     {
         return clip != null;
@@ -30,7 +27,7 @@ public class SkillData : ScriptableObject
     public float cooldown = 5f;
     public float damage = 10f;
     public float manaCost = 0f;
-    public int lambsRequired = 0; 
+    public int lambsRequired = 0;
 
     [Header("Visual Effects")]
     public GameObject vfxPrefab;

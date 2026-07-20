@@ -8,7 +8,7 @@ namespace AttoTheSheep.UI.Shared
     {
         [Tooltip("Kéo các khung hình (sprites) của con cừu đang chạy vào đây")]
         public Sprite[] runFrames;
-        
+
         [Tooltip("Số khung hình trên mỗi giây (FPS)")]
         public float frameRate = 12f;
 
@@ -25,9 +25,8 @@ namespace AttoTheSheep.UI.Shared
         {
             if (_image == null || runFrames == null || runFrames.Length == 0) return;
 
-            // Dùng unscaledDeltaTime để animation vẫn chạy khi game bị pause (Time.timeScale = 0)
             _timer += Time.unscaledDeltaTime;
-            
+
             float timePerFrame = 1f / frameRate;
             if (_timer >= timePerFrame)
             {

@@ -6,8 +6,8 @@ using System;
 [System.Serializable]
 public class SkillSlot
 {
-    public string slotName = "New Skill"; 
-    public SkillData data;                
+    public string slotName = "New Skill";
+    public SkillData data;
     public BaseSkillComponent logicScript;
 }
 
@@ -17,7 +17,6 @@ public class PlayerSkills : NetworkBehaviour
     private PlayerController controller;
     private NetworkEntity entity;
 
-    // THAY ĐỔI: Lưu trực tiếp số lượng cừu thực tế đang có trên mạng thay vì lưu Tier
     public NetworkVariable<int> currentLambCount = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
     // Is the player standing within the flock's radius
@@ -35,7 +34,7 @@ public class PlayerSkills : NetworkBehaviour
     {
         controller = GetComponentInParent<PlayerController>();
         if (controller == null) controller = GetComponentInChildren<PlayerController>();
-        
+
         entity = GetComponentInParent<NetworkEntity>();
     }
 
@@ -45,43 +44,38 @@ public class PlayerSkills : NetworkBehaviour
         {
             if (controller != null) controller.OnSkillActivated += TryCastSkill;
 
-            // Tìm tất cả SkillBoardUI trên Scene và nạp dữ liệu
             SkillBoardUI[] boardUIs = FindObjectsByType<SkillBoardUI>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-            Debug.Log($"[PlayerSkills DEBUG] OnNetworkSpawn. IsOwner: {IsOwner}, IsServer: {IsServer}. Found {boardUIs.Length} SkillBoardUIs in scene.");
-            
+
             foreach (SkillBoardUI boardUI in boardUIs)
             {
-                // Bỏ qua SkillBoardUI của các Player khác (nếu nó được gắn trên Prefab của Player)
+
                 Unity.Netcode.NetworkObject parentNetObj = boardUI.GetComponentInParent<Unity.Netcode.NetworkObject>();
-                
-                Debug.Log($"[PlayerSkills DEBUG] Checking {boardUI.gameObject.name}. Parent NetObj: {(parentNetObj != null ? parentNetObj.name + " ID:" + parentNetObj.NetworkObjectId : "None")}. My ID: {this.NetworkObject.NetworkObjectId}");
-                
+
                 if (parentNetObj != null && parentNetObj != this.NetworkObject)
                 {
-                    Debug.Log($"[PlayerSkills DEBUG] Skipping {boardUI.gameObject.name} because it belongs to another player (ID: {parentNetObj.NetworkObjectId})");
-                    continue; 
+
+                    continue;
                 }
 
-                Debug.Log($"[PlayerSkills DEBUG] Calling InitializeSkillBoard on {boardUI.gameObject.name}");
                 boardUI.InitializeSkillBoard(this);
             }
         }
         else
         {
-            // Tắt UI màn hình của các người chơi khác (Remote Players) để không bị đè lên màn hình của Host/Local Player
+
             SkillBoardUI[] myBoardUIs = this.NetworkObject.GetComponentsInChildren<SkillBoardUI>(true);
-            Debug.Log($"[PlayerSkills DEBUG] Non-owner player spawned. Found {myBoardUIs.Length} SkillBoardUIs in children.");
+
             foreach (SkillBoardUI ui in myBoardUIs)
             {
                 Canvas parentCanvas = ui.GetComponentInParent<Canvas>();
                 if (parentCanvas != null && parentCanvas.renderMode != RenderMode.WorldSpace)
                 {
-                    Debug.Log($"[PlayerSkills DEBUG] Disabling remote player Canvas: {parentCanvas.gameObject.name}");
+
                     parentCanvas.gameObject.SetActive(false);
                 }
                 else
                 {
-                    Debug.Log($"[PlayerSkills DEBUG] Disabling remote player SkillBoardUI object directly: {ui.gameObject.name}");
+
                     ui.gameObject.SetActive(false);
                 }
             }
@@ -115,29 +109,25 @@ public class PlayerSkills : NetworkBehaviour
         // STEP 0: CHECK FLOCK RANGE — Base skills don't need flock
         if (!isMultiplayer && !IsBaseSkill(skillId) && !isInsideFlock.Value) return;
 
-        // THAY ĐỔI: So sánh trực tiếp số cừu yêu cầu với số cừu thực tế đang sở hữu
         if (!isMultiplayer && slot.data.lambsRequired > currentLambCount.Value) return;
 
         // STEP 2: CHECK COOLDOWN (Attack speed)
-        // Trong Multiplayer, dùng cooldown nhỏ (0.5s) để spam. Singleplayer thì xài cooldown gốc.
+
         float actualCooldown = isMultiplayer ? 0.5f : slot.data.cooldown;
-        
+
         if (lastCastTimes.TryGetValue(skillId, out float lastTime))
         {
-            if (Time.time < lastTime + actualCooldown) return; 
+            if (Time.time < lastTime + actualCooldown) return;
         }
 
-        // Cập nhật thời gian thi triển
         lastCastTimes[skillId] = Time.time;
 
-        // CHỈ BẮN EVENT NẾU LÀ LOCAL PLAYER
         if (IsOwner)
         {
             float visualCooldown = isMultiplayer ? 0f : slot.data.cooldown;
-            OnSkillCooldownStarted?.Invoke(skillId, visualCooldown); 
+            OnSkillCooldownStarted?.Invoke(skillId, visualCooldown);
         }
 
-        // Gọi logic lên Server
         CastSkillServerRpc(skillId);
     }
 
@@ -152,7 +142,6 @@ public class PlayerSkills : NetworkBehaviour
         // Check flock range on Server (Anti-hack) — Base skills bypass
         if (!isMultiplayer && !IsBaseSkill(skillId) && !isInsideFlock.Value) return;
 
-        // THAY ĐỔI: Kiểm tra chống hack trên Server bằng số cừu thực tế
         if (!isMultiplayer && slot.data.lambsRequired > currentLambCount.Value) return;
 
         // STEP 3: DEDUCT MANA (If skill has manaCost > 0)

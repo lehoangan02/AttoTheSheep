@@ -81,7 +81,7 @@ public class TrollBrain : EnemyBrain
         else if (recoveryTimer >= trollData.recoveryInterval && CurrentState == EnemyState.Attack)
         {
             recoveryPending = true;
-            if (logRecoveryState) Debug.Log($"[TrollRecovery] pending=true (timer={recoveryTimer:F1}, attacking)");
+            if (logRecoveryState)
         }
 
         if (CurrentState != EnemyState.Attack && CurrentState != EnemyState.Recovery)
@@ -118,7 +118,7 @@ public class TrollBrain : EnemyBrain
         if (CurrentState == EnemyState.Recovery && stateTimer >= trollData.recoveryDuration)
         {
             SetState(EnemyState.Idle);
-            if (logRecoveryState) Debug.Log("[TrollRecovery] Idle (recovery ended)");
+            if (logRecoveryState)
         }
 
         if (CurrentState == EnemyState.Attack && stateTimer > CurrentAttackMaxTime())
@@ -219,7 +219,7 @@ public class TrollBrain : EnemyBrain
                 SyncSetBool("IsRecovering", true);
                 recoveryTimer = 0f;
                 recoveryPending = false;
-                if (logRecoveryState) Debug.Log($"[TrollRecovery] Recovery (timer={trollData.recoveryInterval:F1})");
+                if (logRecoveryState)
                 break;
         }
     }
@@ -336,7 +336,7 @@ public class TrollBrain : EnemyBrain
     public void OnSmashEnd()
     {
         if (!IsServer) return;
-        
+
         if (trollData.spikePrefab != null && target != null)
         {
             Vector2 dir = ((Vector2)(target.transform.position - transform.position)).normalized;

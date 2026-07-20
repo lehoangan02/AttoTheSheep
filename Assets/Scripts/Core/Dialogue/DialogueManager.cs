@@ -56,7 +56,7 @@ public class DialogueManager : MonoBehaviour
         // Singleton – destroy duplicates, keep first.
         if (Instance != null && Instance != this)
         {
-            Debug.LogWarning("[DialogueManager] Duplicate found – destroying self.");
+
             Destroy(gameObject);
             return;
         }
@@ -66,8 +66,6 @@ public class DialogueManager : MonoBehaviour
         // DLG_Manager is a child of the Canvas and must stay in that hierarchy
         // so Unity can render it. If you later need cross-scene persistence,
         // make DLG_Manager a root-level Canvas itself.
-
-        Debug.Log($"[DialogueManager] Awake – Instance set. panelRoot={(panelRoot != null ? panelRoot.name : "NULL")}");
 
         // Ensure CanvasGroup exists for fade transitions
         if (panelRoot != null)
@@ -86,12 +84,11 @@ public class DialogueManager : MonoBehaviour
         if (nextButton != null)
             nextButton.onClick.AddListener(OnNextClicked);
         else
-            Debug.LogWarning("[DialogueManager] nextButton is NULL in Start.");
 
         if (skipButton != null)
             skipButton.onClick.AddListener(OnSkipClicked);
         else
-            Debug.LogWarning("[DialogueManager] skipButton is NULL in Start.");
+
     }
 
     private void OnEnable()
@@ -151,8 +148,7 @@ public class DialogueManager : MonoBehaviour
         if (btn == null || !btn.gameObject.activeInHierarchy) return false;
         RectTransform rt = btn.GetComponent<RectTransform>();
         if (rt == null) return false;
-        
-        // Hỗ trợ UI Canvas dạng Overlay (Camera = null)
+
         Camera cam = null;
         Canvas canvas = btn.GetComponentInParent<Canvas>();
         if (canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay)
@@ -172,11 +168,10 @@ public class DialogueManager : MonoBehaviour
     // ── Public API ────────────────────────────────────────────────────────────
     public void StartDialogue(DialogueData data, System.Action onDialogueEnd = null)
     {
-            Debug.Log($"[DialogueManager] StartDialogue called. data={(data != null ? data.speakerName : "NULL")}");
 
         if (data == null || data.lines == null || data.lines.Length == 0)
         {
-            Debug.LogWarning("[DialogueManager] StartDialogue – data is null or has no lines.");
+
             return;
         }
 
@@ -184,7 +179,7 @@ public class DialogueManager : MonoBehaviour
         _lineIndex = 0;
         _currentOnDialogueEnd = onDialogueEnd;
 
-        if (speakerNameText != null) 
+        if (speakerNameText != null)
         {
             string finalSpeakerName = data.speakerName;
             if (AttoTheSheep.Core.LocalizationManager.Instance != null && AttoTheSheep.Core.LocalizationManager.Instance.CurrentLanguageIndex == 1)
@@ -204,7 +199,6 @@ public class DialogueManager : MonoBehaviour
         if (_fadeCoroutine != null) StopCoroutine(_fadeCoroutine);
         _fadeCoroutine = StartCoroutine(FadeInAndStart());
 
-        // Pause game khi hội thoại bắt đầu
         if (Stop.Instance != null)
         {
             Stop.Instance.PauseGame();
@@ -234,7 +228,7 @@ public class DialogueManager : MonoBehaviour
     private void StreamLine(int index)
     {
         if (_streamCoroutine != null) StopCoroutine(_streamCoroutine);
-        
+
         string lineToStream = _data.lines[index];
         if (AttoTheSheep.Core.LocalizationManager.Instance != null && AttoTheSheep.Core.LocalizationManager.Instance.CurrentLanguageIndex == 1)
         {
@@ -243,7 +237,7 @@ public class DialogueManager : MonoBehaviour
                 lineToStream = _data.vietnameseLines[index];
             }
         }
-        
+
         _streamCoroutine = StartCoroutine(StreamCoroutine(lineToStream));
     }
 
@@ -347,7 +341,6 @@ public class DialogueManager : MonoBehaviour
         _skipStreaming = false;
         _data         = null;
 
-        // Resume game khi hội thoại kết thúc
         if (Stop.Instance != null)
         {
             Stop.Instance.ResumeGame();

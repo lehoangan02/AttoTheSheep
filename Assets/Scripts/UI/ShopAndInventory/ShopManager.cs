@@ -22,12 +22,11 @@ namespace AttoTheSheep.UI.ShopAndInventory
             if (InventoryManager.Instance.SpendGold(item.price))
             {
                 InventoryManager.Instance.AddItem(item, 1);
-                Debug.Log($"[ShopManager] Mua thành công {item.itemName} với giá {item.price} vàng.");
+
             }
             else
             {
-                Debug.LogWarning($"[ShopManager] Không đủ vàng để mua {item.itemName}!");
-                // TODO: Có thể gọi hiệu ứng UI rung lắc báo lỗi thiếu tiền ở đây
+
             }
         }
     }

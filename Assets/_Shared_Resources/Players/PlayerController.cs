@@ -10,7 +10,7 @@ public class PlayerController : NetworkBehaviour
     public event Action<Vector2> OnMoveInputChanged;
     public event Action<int> OnSkillActivated; // Returns Skill ID (0, 1, 2, 3, 4)
     public event Action<int> OnCheatActivated; // Returns Cheat ID (1, 2, 3, 4)
-    public event Action<Vector2> OnMapClicked; 
+    public event Action<Vector2> OnMapClicked;
 
     public void OnMove(InputValue value)
     {
@@ -81,7 +81,7 @@ public class PlayerController : NetworkBehaviour
     // ----------------------------------------------------
     private void Update()
     {
-        // Extreme Fallback for Mobile: If PlayerInput "Click" action completely fails to fire 
+        // Extreme Fallback for Mobile: If PlayerInput "Click" action completely fails to fire
         // because of control scheme bugs, we manually check the raw touchscreen device every frame.
         if (Application.isMobilePlatform && IsOwner && UnityEngine.InputSystem.Touchscreen.current != null)
         {
@@ -94,9 +94,9 @@ public class PlayerController : NetworkBehaviour
 
     public void OnClick(InputValue value)
     {
-        Debug.Log($"[PlayerController] OnClick fired via PlayerInput! IsOwner: {IsOwner} | isPressed: {value.isPressed}");
+
         if (!IsOwner || !value.isPressed) return;
-        
+
         if (UnityEngine.InputSystem.Pointer.current != null)
         {
             ProcessHerdMovementClick(UnityEngine.InputSystem.Pointer.current.position.ReadValue());
@@ -117,25 +117,25 @@ public class PlayerController : NetworkBehaviour
             bool hitValidUI = false;
             foreach (var result in raycastResults)
             {
-                // Ignore the joystick's giant invisible touch zone. 
+                // Ignore the joystick's giant invisible touch zone.
                 if (result.gameObject.GetComponentInParent<UnityEngine.InputSystem.OnScreen.OnScreenStick>() != null)
                 {
-                    Debug.Log($"[PlayerController] Ignoring hit because it's part of OnScreenStick: {result.gameObject.name}");
-                    continue; 
+
+                    continue;
                 }
-                
+
                 // If we hit a valid Button underneath the joystick (like an NPC's E Button), click it manually!
                 var btn = result.gameObject.GetComponentInParent<UnityEngine.UI.Button>();
                 if (btn != null)
                 {
-                    Debug.Log($"[PlayerController] Manually triggering Button under joystick: {btn.gameObject.name}");
+
                     btn.onClick.Invoke();
                     return; // Don't move the herd
                 }
 
                 // If we hit any other UI element, block the click
                 hitValidUI = true;
-                Debug.Log($"[PlayerController] Herd movement BLOCKED by UI element: {result.gameObject.name}");
+
                 break;
             }
 
@@ -145,9 +145,9 @@ public class PlayerController : NetworkBehaviour
         if (Camera.main != null)
         {
             Vector2 pointerWorldPos = Camera.main.ScreenToWorldPoint(screenPos);
-            
+
             // Check if we clicked near an interactive NPC (using a generous 1.5 unit radius)
-            // This ensures that even if you click the E-Button hovering above the NPC, 
+            // This ensures that even if you click the E-Button hovering above the NPC,
             // the physics circle will still overlap the NPC's actual body collider!
             Collider2D[] hits = Physics2D.OverlapCircleAll(pointerWorldPos, 1.5f);
             foreach (var hit in hits)
@@ -155,17 +155,15 @@ public class PlayerController : NetworkBehaviour
                 var dt = hit.GetComponent<DialogueTrigger>() ?? hit.GetComponentInParent<DialogueTrigger>();
                 if (dt != null)
                 {
-                    Debug.Log($"[PlayerController] Clicked near NPC {hit.name} (within 1.5 units), triggering dialogue!");
+
                     dt.TriggerDialogue();
                     return; // Don't move the herd
                 }
             }
 
-            Debug.Log($"[PlayerController] Successfully moving herd to: {pointerWorldPos}");
             OnMapClicked?.Invoke(pointerWorldPos);
         }
     }
-
 
     // section by lehoangan02
     // shared variables
@@ -185,8 +183,8 @@ public class PlayerController : NetworkBehaviour
     }
 
     public NetworkVariable<PlayerPublicData> netPlayerPublicData = new NetworkVariable<PlayerPublicData>(
-        new PlayerPublicData(), 
-        NetworkVariableReadPermission.Everyone, 
+        new PlayerPublicData(),
+        NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Server
     );
 
@@ -217,19 +215,19 @@ public class PlayerController : NetworkBehaviour
             }
         }
 
-        // On clients, pre-placed scene objects that were despawned by the server 
+        // On clients, pre-placed scene objects that were despawned by the server
         // will not have OnNetworkSpawn called and will remain unspawned.
         // We must destroy them to prevent them from becoming "extra" phantom players that steal input.
         // FIX: Only do this in Multiplayer levels. In single-player, the pre-placed Atto is REQUIRED.
         string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
-        
+
         if (sceneName == "MultiplayerLevel" || sceneName == "SampleScene")
         {
             if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
             {
                 if (!NetworkObject.IsSpawned)
                 {
-                    Debug.Log($"[PlayerController] Destroying unspawned pre-placed player object: {gameObject.name}");
+
                     Destroy(gameObject);
                 }
             }
@@ -240,8 +238,7 @@ public class PlayerController : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        Debug.Log($"[PlayerController] OnNetworkSpawn is running on: {gameObject.name}. IsOwner: {IsOwner}");
-        
+
         // Fix: In multiplayer scenes (MultiplayerLevel), we must destroy any manually pre-placed Atto objects
         // otherwise they become a 3rd uncontrollable player that steals input or causes Game Over when killed.
         if (IsServer && !NetworkObject.IsPlayerObject)
@@ -250,7 +247,7 @@ public class PlayerController : NetworkBehaviour
 
             if (currentScene == "MultiplayerLevel" || currentScene == "SampleScene")
             {
-                Debug.Log($"[PlayerController] Destroying redundant pre-placed Atto in networked scene: {gameObject.name}");
+
                 NetworkObject.Despawn(true);
                 return;
             }
@@ -260,10 +257,10 @@ public class PlayerController : NetworkBehaviour
         {
             // Automatically assign a random name upon spawning into the game
             TestSetRandomName();
-            
+
             // Ensure PlayerInput is enabled for the owner (but don't re-enable if already enabled to avoid losing devices on Mac)
             var playerInput = GetComponent<UnityEngine.InputSystem.PlayerInput>();
-            if (playerInput != null && !playerInput.enabled) 
+            if (playerInput != null && !playerInput.enabled)
             {
                 playerInput.enabled = true;
             }
@@ -272,7 +269,7 @@ public class PlayerController : NetworkBehaviour
         {
             // Disable PlayerInput for non-owners so they don't steal the Gamepad/Keyboard from the local player
             var playerInput = GetComponent<UnityEngine.InputSystem.PlayerInput>();
-            if (playerInput != null && playerInput.enabled) 
+            if (playerInput != null && playerInput.enabled)
             {
                 playerInput.enabled = false;
             }
@@ -302,7 +299,7 @@ public class PlayerController : NetworkBehaviour
         _nameTag.fontSize = 2.5f;
         _nameTag.color = IsOwner ? Color.yellow : Color.white;
         _nameTag.sortingOrder = 100;
-        
+
         UpdateNameTagText(netPlayerPublicData.Value.playerName.ToString());
     }
 
@@ -324,16 +321,16 @@ public class PlayerController : NetworkBehaviour
     [ContextMenu("Test Set Random Name")]
     public void TestSetRandomName()
     {
-        Debug.Log($"[PlayerController] Executing TestSetRandomName command. IsOwner of this object is: {IsOwner}");
+
         if (IsOwner)
         {
             FixedString64Bytes newName = $"Player {UnityEngine.Random.Range(1000, 9999)}";
             SetPlayerNameRpc(newName);
-            Debug.Log($"🟢 [LOCAL] Sent request to Server to change name to: {newName}");
+
         }
         else
         {
-            Debug.LogWarning("🟡 [PlayerController] You are not the Owner of this Player, cannot change name!");
+
         }
     }
 
@@ -341,6 +338,6 @@ public class PlayerController : NetworkBehaviour
     public void SetPlayerNameRpc(FixedString64Bytes newName)
     {
         netPlayerPublicData.Value = new PlayerPublicData { playerName = newName };
-        Debug.Log($"[SERVER] Approved and updated name to {newName}");
+
     }
 }

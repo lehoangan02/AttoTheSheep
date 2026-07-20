@@ -27,7 +27,7 @@ public class GameBootstrapper : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-        
+
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
@@ -68,30 +68,28 @@ public class GameBootstrapper : MonoBehaviour
             if (!AuthenticationService.Instance.IsSignedIn)
             {
                 await AuthenticationService.Instance.SignInAnonymouslyAsync();
-                Debug.Log($"[Bootstrapper] Signed in anonymously. Player ID: {AuthenticationService.Instance.PlayerId}");
+
             }
 
             PlayerRepository = new UnityCloudSaveRepository();
 
             CurrentProfile = await PlayerRepository.LoadAsync();
-            Debug.Log("[Bootstrapper] Player Profile successfully loaded from Cloud Save.");
+
         }
         catch (Exception ex)
         {
-            Debug.LogError($"[Bootstrapper] Failed to initialize game services (Online): {ex.Message}");
-            Debug.Log("[Bootstrapper] Falling back to OFFLINE mode.");
-            
+
             CurrentProfile = new PlayerProfile();
             CurrentProfile.RestoreState(
-                0, 0, 1, 
-                1, 1, 1, 
-                false, false, 
+                0, 0, 1,
+                1, 1, 1,
+                false, false,
                 15, 15, 15, 15
             );
         }
 
         // Validate items regardless of online or offline mode
-        try 
+        try
         {
             bool itemCountsModified = false;
             int flockShieldCount = CurrentProfile.FlockShieldCount;
@@ -112,21 +110,21 @@ public class GameBootstrapper : MonoBehaviour
                     CurrentProfile.HasArmor, CurrentProfile.HasHorn,
                     flockShieldCount, spawnMaxLambsCount, skillDamageBoostCount, speedBoostCount
                 );
-                
-                if (PlayerRepository != null) 
+
+                if (PlayerRepository != null)
                 {
                     await PlayerRepository.SaveAsync(CurrentProfile);
-                    Debug.Log("[Bootstrapper] Minimum item counts enforced and saved.");
+
                 }
             }
         }
         catch (Exception ex)
         {
-            Debug.LogError($"[Bootstrapper] Error during profile validation: {ex.Message}");
+
         }
 
         OnBootstrapped?.Invoke();
-        
+
         // Start the 30-minute auto-sync timer
         StartCoroutine(AutoSyncRoutine());
     }
@@ -135,13 +133,12 @@ public class GameBootstrapper : MonoBehaviour
     {
         while (true)
         {
-            // Đợi 30 phút (1800 giây)
+
             yield return new WaitForSecondsRealtime(1800f);
 
             if (CurrentProfile != null && PlayerRepository != null)
             {
-                Debug.Log("[Bootstrapper] Định kỳ 30 phút: Đang Auto-sync dữ liệu lên Cloud Save...");
-                // Gọi hàm lưu mà không chặn luồng chính
+
                 _ = PlayerRepository.SaveAsync(CurrentProfile);
             }
         }

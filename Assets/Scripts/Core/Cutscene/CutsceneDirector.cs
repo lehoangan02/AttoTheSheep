@@ -48,7 +48,7 @@ public class CutsceneDirector : MonoBehaviour
     {
         if (_slides == null || _slides.Length == 0)
         {
-            Debug.LogWarning("[CutsceneDirector] No slides configured. Loading next scene directly.");
+
             LoadNextScene();
             yield break;
         }
@@ -77,7 +77,7 @@ public class CutsceneDirector : MonoBehaviour
                 }
                 else
                 {
-                    Debug.LogWarning("[CutsceneDirector] DialogueManager.Instance is null. Skipping dialogue.");
+
                 }
             }
 
@@ -95,11 +95,10 @@ public class CutsceneDirector : MonoBehaviour
     {
         if (string.IsNullOrEmpty(_nextSceneName))
         {
-            Debug.LogWarning("[CutsceneDirector] No next scene name set. Staying in current scene.");
+
             return;
         }
 
-        Debug.Log($"[CutsceneDirector] Loading next scene: {_nextSceneName}");
         SceneManager.LoadScene(_nextSceneName);
     }
 }

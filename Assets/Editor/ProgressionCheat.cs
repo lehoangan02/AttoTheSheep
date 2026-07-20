@@ -8,7 +8,7 @@ public class ProgressionCheat : MonoBehaviour
     {
         PlayerPrefs.SetInt("MaxUnlockedLevel", 999);
         PlayerPrefs.Save();
-        Debug.Log("[Cheat] All levels unlocked! (MaxUnlockedLevel = 999)");
+
     }
 
     [MenuItem("Tools/Progression/Reset Level Progress")]
@@ -16,6 +16,6 @@ public class ProgressionCheat : MonoBehaviour
     {
         PlayerPrefs.DeleteKey("MaxUnlockedLevel");
         PlayerPrefs.Save();
-        Debug.Log("[Cheat] Level progress reset to default (Level 1).");
+
     }
 }

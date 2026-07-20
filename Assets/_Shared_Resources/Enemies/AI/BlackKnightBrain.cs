@@ -92,13 +92,13 @@ public class BlackKnightBrain : EnemyBrain
     // Animation events
     public void OnLeftAttackHitStart()
     {
-        if (leftHitbox == null) { Debug.LogWarning("[BlackKnightBrain] OnLeftAttackHitStart: leftHitbox is not assigned."); return; }
+        if (leftHitbox == null) {  return; }
         leftHitbox.Enable(knightData.attackDamage);
     }
     public void OnLeftAttackHitEnd() => leftHitbox?.Disable();
     public void OnRightAttackHitStart()
     {
-        if (rightHitbox == null) { Debug.LogWarning("[BlackKnightBrain] OnRightAttackHitStart: rightHitbox is not assigned."); return; }
+        if (rightHitbox == null) {  return; }
         rightHitbox.Enable(knightData.attackDamage);
     }
     public void OnRightAttackHitEnd() => rightHitbox?.Disable();

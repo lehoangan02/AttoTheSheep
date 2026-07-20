@@ -15,18 +15,17 @@ public class AddEButtonToLancer : MonoBehaviour
 
         if (turtlePrefab == null || lancerPrefab == null)
         {
-            Debug.LogError("Could not find Turtle or Lancer prefabs!");
+
             return;
         }
 
         GameObject lancerInstance = (GameObject)PrefabUtility.InstantiatePrefab(lancerPrefab);
-        
+
         InjectEButtonSystem(turtlePrefab, lancerInstance);
 
         PrefabUtility.SaveAsPrefabAsset(lancerInstance, lancerPath);
         DestroyImmediate(lancerInstance);
 
-        Debug.Log("✅ Successfully added E-Button and Dialogue Trigger to Lancer_Idle.prefab!");
     }
 
     [MenuItem("Tools/Add E-Button to Selected Object")]
@@ -37,19 +36,19 @@ public class AddEButtonToLancer : MonoBehaviour
 
         if (turtlePrefab == null)
         {
-            Debug.LogError("Could not find Turtle prefab!");
+
             return;
         }
 
         GameObject selectedObj = Selection.activeGameObject;
         if (selectedObj == null)
         {
-            Debug.LogError("Please select an object in the Scene Hierarchy first!");
+
             return;
         }
 
         InjectEButtonSystem(turtlePrefab, selectedObj);
-        Debug.Log($"✅ Successfully added E-Button and Dialogue Trigger to {selectedObj.name}!");
+
     }
 
     private static void InjectEButtonSystem(GameObject sourceTurtle, GameObject targetObj)
@@ -63,11 +62,11 @@ public class AddEButtonToLancer : MonoBehaviour
             {
                 targetTrigger = targetObj.AddComponent<DialogueTrigger>();
             }
-            
+
             // Copy basic properties
             targetTrigger.requireProximity = turtleTrigger.requireProximity;
             EditorUtility.CopySerialized(turtleTrigger, targetTrigger);
-            
+
             // Clear the old UnityEvents
             targetTrigger.onPlayerEnterRange = new UnityEngine.Events.UnityEvent();
             targetTrigger.onPlayerExitRange = new UnityEngine.Events.UnityEvent();
@@ -99,14 +98,14 @@ public class AddEButtonToLancer : MonoBehaviour
             if (newCanvas != null)
             {
                 UnityEditor.Events.UnityEventTools.AddBoolPersistentListener(
-                    targetTrigger.onPlayerEnterRange, 
-                    new UnityEngine.Events.UnityAction<bool>(newCanvas.SetActive), 
+                    targetTrigger.onPlayerEnterRange,
+                    new UnityEngine.Events.UnityAction<bool>(newCanvas.SetActive),
                     true
                 );
 
                 UnityEditor.Events.UnityEventTools.AddBoolPersistentListener(
-                    targetTrigger.onPlayerExitRange, 
-                    new UnityEngine.Events.UnityAction<bool>(newCanvas.SetActive), 
+                    targetTrigger.onPlayerExitRange,
+                    new UnityEngine.Events.UnityAction<bool>(newCanvas.SetActive),
                     false
                 );
             }

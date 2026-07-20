@@ -5,12 +5,12 @@ public class FlockRadiusVisualizer : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private FlockManager flockManager;
-    
+
     [Tooltip("Kéo LineRenderer làm NỀN vào đây (Nếu muốn có vành đai nền nổi bật chữ)")]
     [SerializeField] private LineRenderer backgroundLineRenderer;
 
     [Header("Line Settings")]
-    [SerializeField] private int segments = 60; 
+    [SerializeField] private int segments = 60;
 
     [Header("Skill Zone Settings (Cổ tự)")]
     [SerializeField] private float runeRotationSpeed = 0.2f;
@@ -24,8 +24,8 @@ public class FlockRadiusVisualizer : MonoBehaviour
         runeLineRenderer = GetComponent<LineRenderer>();
         runeLineRenderer.positionCount = segments;
         runeLineRenderer.useWorldSpace = true;
-        runeLineRenderer.loop = true; 
-        
+        runeLineRenderer.loop = true;
+
         if (runeLineRenderer.material != null)
         {
             runtimeMaterial = runeLineRenderer.material;
@@ -33,9 +33,9 @@ public class FlockRadiusVisualizer : MonoBehaviour
 
         if (backgroundLineRenderer != null)
         {
-            backgroundLineRenderer.positionCount = segments; 
+            backgroundLineRenderer.positionCount = segments;
             backgroundLineRenderer.useWorldSpace = true;
-            backgroundLineRenderer.loop = true; 
+            backgroundLineRenderer.loop = true;
         }
     }
 
@@ -43,13 +43,11 @@ public class FlockRadiusVisualizer : MonoBehaviour
     {
         if (flockManager == null) return;
 
-        // THAY ĐỔI TẠI ĐÂY: Hiển thị vòng kỹ năng nếu có ít nhất 1 con cừu 
-        // (Hoặc bạn có thể đổi thành > 2 nếu muốn có từ 3 con cừu trở lên mới hiện vòng)
         bool hasSkill = flockManager.activeLambs != null && flockManager.activeLambs.Count > 0;
-        
+
         runeLineRenderer.enabled = hasSkill;
         if (backgroundLineRenderer != null) backgroundLineRenderer.enabled = hasSkill;
-        
+
         if (!hasSkill) return;
 
         Vector2 center = flockManager.currentFlockCenter.Value;
@@ -71,18 +69,18 @@ public class FlockRadiusVisualizer : MonoBehaviour
         float theta = 0f;
 
         float adjustedRuneRadius = radius - (runeLineRenderer.startWidth / 2f);
-        
+
         float adjustedBgRadius = radius;
         if (backgroundLineRenderer != null)
         {
             adjustedBgRadius = radius - (backgroundLineRenderer.startWidth / 2f);
         }
 
-        for (int i = 0; i < segments; i++) 
+        for (int i = 0; i < segments; i++)
         {
             float xRune = adjustedRuneRadius * Mathf.Cos(theta);
             float yRune = adjustedRuneRadius * Mathf.Sin(theta);
-            Vector3 runePos = new Vector3(xRune, yRune, 0.1f) + (Vector3)center; 
+            Vector3 runePos = new Vector3(xRune, yRune, 0.1f) + (Vector3)center;
             runeLineRenderer.SetPosition(i, runePos);
 
             if (backgroundLineRenderer != null)

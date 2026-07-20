@@ -24,8 +24,8 @@ namespace AttoTheSheep.UI.Shared
         [Header("Language Settings")]
         [Tooltip("Kéo Dropdown Ngôn ngữ vào đây")]
         public TMP_Dropdown languageDropdown;
-        // Event bắn ra toàn bộ hệ thống khi ngôn ngữ thay đổi (0: English, 1: Vietnamese)
-        public static event Action<int> OnLanguageChanged; 
+
+        public static event Action<int> OnLanguageChanged;
 
         [Header("FPS Settings")]
         [Tooltip("Kéo Dropdown FPS vào đây")]
@@ -35,7 +35,6 @@ namespace AttoTheSheep.UI.Shared
         public TMP_InputField usernameInput;
         public Button saveUsernameButton;
 
-        // Keys lưu trữ cục bộ
         private const string PREF_SOUND = "Settings_SoundVol";
         private const string PREF_MUSIC = "Settings_MusicVol";
         private const string PREF_LANG = "Settings_Language";
@@ -73,24 +72,22 @@ namespace AttoTheSheep.UI.Shared
 
         private async void Start()
         {
-            // 1. Gắn sự kiện (Listener)
+
             if (soundSlider != null) soundSlider.onValueChanged.AddListener(OnSoundSliderChanged);
             if (musicSlider != null) musicSlider.onValueChanged.AddListener(OnMusicSliderChanged);
             if (languageDropdown != null) languageDropdown.onValueChanged.AddListener(SetLanguage);
             if (fpsDropdown != null) fpsDropdown.onValueChanged.AddListener(SetFPSFromDropdown);
             if (saveUsernameButton != null) saveUsernameButton.onClick.AddListener(OnSaveUsernameClicked);
 
-            // 2. Load thiết lập từ máy người chơi
             LoadSettings();
 
-            // 3. Kết nối Cloud lấy tên người chơi
             await LoadCloudUsername();
         }
 
         private void LoadSettings()
         {
             // --- SOUND ---
-            float soundVol = PlayerPrefs.GetFloat(PREF_SOUND, 0.8f); // Mặc định 80%
+            float soundVol = PlayerPrefs.GetFloat(PREF_SOUND, 0.8f);
             if (soundSlider != null)
             {
                 soundSlider.value = soundVol;
@@ -116,12 +113,12 @@ namespace AttoTheSheep.UI.Shared
             int fps;
             if (PlayerPrefs.HasKey(PREF_FPS))
             {
-                // Người chơi đã từng chỉnh setting, lấy từ bộ nhớ
+
                 fps = PlayerPrefs.GetInt(PREF_FPS);
             }
             else
             {
-                // Lần đầu vào game: Đồng bộ lấy giá trị mặc định từ Inspector của FPSLimiter
+
                 if (FPSLimiter.Instance != null)
                     fps = FPSLimiter.Instance.GetCurrentTargetFPS();
                 else
@@ -143,7 +140,7 @@ namespace AttoTheSheep.UI.Shared
         {
             if (mainAudioMixer != null)
             {
-                // Công thức chuẩn chuyển từ % sang decibel (dB)
+
                 float db = Mathf.Log10(Mathf.Clamp(sliderValue, 0.0001f, 1f)) * 20f;
                 mainAudioMixer.SetFloat("SFXVol", db);
             }
@@ -181,12 +178,11 @@ namespace AttoTheSheep.UI.Shared
             }
             else
             {
-                // Fallback nếu chưa gắn LocalizationManager
+
                 PlayerPrefs.SetInt(PREF_LANG, languageIndex);
                 OnLanguageChanged?.Invoke(languageIndex);
             }
-            
-            Debug.Log($"[Settings] Language changed to: {(languageIndex == 0 ? "English" : "Vietnamese")}");
+
         }
 
         // ================= FPS LOGIC =================
@@ -201,7 +197,6 @@ namespace AttoTheSheep.UI.Shared
                 case 3: targetFPS = -1; break; // Uncapped
             }
 
-            // Gọi logic của team
             if (FPSLimiter.Instance != null)
             {
                 FPSLimiter.Instance.SetTargetFPS(targetFPS);
@@ -220,31 +215,29 @@ namespace AttoTheSheep.UI.Shared
 
             try
             {
-                // Đảm bảo Unity Services đã chạy
+
                 if (UnityServices.State != ServicesInitializationState.Initialized)
                 {
                     await UnityServices.InitializeAsync();
                 }
 
-                // Đăng nhập ẩn danh nếu chưa đăng nhập
                 if (!AuthenticationService.Instance.IsSignedIn)
                 {
                     await AuthenticationService.Instance.SignInAnonymouslyAsync();
                 }
 
-                // Lấy tên từ Cloud
                 string currentName = await AuthenticationService.Instance.GetPlayerNameAsync();
                 if (usernameInput != null)
                 {
                     usernameInput.text = string.IsNullOrEmpty(currentName) ? "Guest" : currentName;
                 }
-                
+
                 if (locText != null) locText.SetTextID("btn_save");
                 else if (btnText != null) btnText.text = "Save";
             }
             catch (Exception ex)
             {
-                Debug.LogError("[Settings] Failed to fetch Cloud Username: " + ex.Message);
+
                 if (locText != null) locText.SetTextID("btn_save_offline");
                 else if (btnText != null) btnText.text = "Offline";
             }
@@ -253,10 +246,10 @@ namespace AttoTheSheep.UI.Shared
         private async void OnSaveUsernameClicked()
         {
             if (usernameInput == null || string.IsNullOrWhiteSpace(usernameInput.text)) return;
-            
+
             TextMeshProUGUI btnText = saveUsernameButton.GetComponentInChildren<TextMeshProUGUI>();
             LocalizedText locText = btnText != null ? btnText.GetComponent<LocalizedText>() : null;
-            
+
             saveUsernameButton.interactable = false;
 
             // Start spinner
@@ -266,29 +259,27 @@ namespace AttoTheSheep.UI.Shared
             try
             {
                 string newName = usernameInput.text.Trim();
-                
-                // Gọi API đẩy tên lên thẳng Unity Cloud Dashboard
+
                 await AuthenticationService.Instance.UpdatePlayerNameAsync(newName);
-                
+
                 if (spinner != null) StopCoroutine(spinner);
-                
+
                 if (locText != null) locText.SetTextID("btn_save_success");
                 else if (btnText != null) btnText.text = "Saved!";
-                
-                Debug.Log($"[Settings] Successfully saved cloud username: {newName}");
+
             }
             catch (Exception ex)
             {
-                Debug.LogError("[Settings] Failed to save Cloud Username: " + ex.Message);
+
                 if (spinner != null) StopCoroutine(spinner);
-                
+
                 if (locText != null) locText.SetTextID("btn_save_error");
                 else if (btnText != null) btnText.text = "Error!";
             }
             finally
             {
                 saveUsernameButton.interactable = true;
-                // Trả về chữ Save sau 2 giây
+
                 await Task.Delay(2000);
                 if (btnText != null && btnText.text != "Loading...")
                 {

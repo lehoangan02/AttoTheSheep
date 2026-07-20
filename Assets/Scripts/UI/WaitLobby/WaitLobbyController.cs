@@ -17,7 +17,7 @@ public class WaitLobbyController : MonoBehaviour
     [SerializeField] private TextMeshProUGUI lobbyNameText;
     [SerializeField] private TextMeshProUGUI playerCountText;
     [SerializeField] private TextMeshProUGUI gameModeText;
-    
+
     [SerializeField] private Transform playerListContent;
     [SerializeField] private GameObject playerRowPrefab;
 
@@ -53,7 +53,7 @@ public class WaitLobbyController : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("[WaitLobbyController] No LobbyManager found! UI will be empty.");
+
             RefreshUI();
         }
     }
@@ -70,7 +70,7 @@ public class WaitLobbyController : MonoBehaviour
     {
         if (lobby == null)
         {
-            Debug.Log("[WaitLobby] Lobby was deleted or left. Returning to MatchMaking.");
+
             SceneManager.LoadScene("MatchMaking");
             return;
         }
@@ -93,7 +93,7 @@ public class WaitLobbyController : MonoBehaviour
             bool isHost = (lobby.HostId == p.Id);
             bool isMe = (p.Id == Unity.Services.Authentication.AuthenticationService.Instance.PlayerId);
 
-            _players.Add(new AttoTheSheep.Core.PlayerData 
+            _players.Add(new AttoTheSheep.Core.PlayerData
             {
                 PlayerId = p.Id,
                 PlayerName = pName,
@@ -134,7 +134,7 @@ public class WaitLobbyController : MonoBehaviour
     }
 
     /// <summary>
-    /// Gọi hàm này từ Server/NetworkManager để cập nhật danh sách người chơi trong phòng
+
     /// </summary>
     public void PopulatePlayers(List<AttoTheSheep.Core.PlayerData> players)
     {
@@ -154,11 +154,11 @@ public class WaitLobbyController : MonoBehaviour
                 // Capture the current player for the lambda closure
                 var playerToKick = p;
                 rowUI.Setup(
-                    avatar: GetAvatarSprite(p.AvatarIndex), 
-                    playerName: p.PlayerName, 
-                    isHost: p.IsHost, 
-                    isLocalPlayerHost: AttoTheSheep.Core.LobbySession.IsHost, 
-                    isMe: p.IsLocalPlayer, 
+                    avatar: GetAvatarSprite(p.AvatarIndex),
+                    playerName: p.PlayerName,
+                    isHost: p.IsHost,
+                    isLocalPlayerHost: AttoTheSheep.Core.LobbySession.IsHost,
+                    isMe: p.IsLocalPlayer,
                     onKickClicked: () => OnKickPlayer(playerToKick)
                 );
             }
@@ -167,7 +167,7 @@ public class WaitLobbyController : MonoBehaviour
 
     private void OnKickPlayer(AttoTheSheep.Core.PlayerData p)
     {
-        Debug.Log($"[WaitLobby] Kicking player: {p.PlayerName}");
+
         if (OnRequestKickPlayer != null)
         {
             OnRequestKickPlayer.Invoke(p.PlayerId);
@@ -195,7 +195,6 @@ public class WaitLobbyController : MonoBehaviour
         if (_isTransitioning) return;
         _isTransitioning = true;
 
-        Debug.Log("[WaitLobby] Leaving lobby...");
         if (OnRequestLeaveLobby != null)
         {
             OnRequestLeaveLobby.Invoke();
@@ -217,9 +216,8 @@ public class WaitLobbyController : MonoBehaviour
         if (_isTransitioning) return;
         _isTransitioning = true;
 
-        Debug.Log("[WaitLobby] Ready clicked! Proceeding to Game...");
         AttoTheSheep.Core.LoadingManager.Instance?.Show("msg_loading_game");
-        
+
         if (OnRequestReady != null)
         {
             OnRequestReady.Invoke();

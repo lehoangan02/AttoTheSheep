@@ -47,6 +47,6 @@ public class WaveData : ScriptableObject
     void OnValidate()
     {
         if (enemyPrefabs != null && enemyPrefabs.Length == 0)
-            Debug.LogWarning($"WaveData '{name}': no enemy prefabs assigned.", this);
+
     }
 }

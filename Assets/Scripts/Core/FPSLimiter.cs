@@ -17,7 +17,7 @@ public class FPSLimiter : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
-        
+
         ApplyFPSLimit(_targetFPS);
     }
 
@@ -26,7 +26,7 @@ public class FPSLimiter : MonoBehaviour
     {
         _targetFPS = fps;
         ApplyFPSLimit(_targetFPS);
-        Debug.Log($"[FPSLimiter] Target FPS set to: {(_targetFPS > 0 ? _targetFPS.ToString() : "Uncapped")}");
+
     }
 
     private void ApplyFPSLimit(int fps)

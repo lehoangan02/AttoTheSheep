@@ -23,7 +23,7 @@ namespace AttoTheSheep.UI.ShopAndInventory
         [SerializeField] private TextMeshProUGUI detailDesc;
         [SerializeField] private Button useButton;
         [SerializeField] private Button dropButton;
-        
+
         [Header("Cloud Buttons")]
         [SerializeField] private Button uploadButton;
         [SerializeField] private Button fetchButton;
@@ -47,7 +47,7 @@ namespace AttoTheSheep.UI.ShopAndInventory
 
         private void Start()
         {
-            // Retry: InventoryManager có thể chưa Awake kịp lúc OnEnable chạy
+
             if (!_subscribed)
             {
                 TrySubscribe();
@@ -84,14 +84,12 @@ namespace AttoTheSheep.UI.ShopAndInventory
 
             var items = InventoryManager.Instance.GetAllItems().ToList();
 
-            // Đảm bảo đủ số slot UI
             while (_activeSlots.Count < Mathf.Max(20, items.Count))
             {
                 GameObject obj = Instantiate(slotPrefab, slotsParent);
                 _activeSlots.Add(obj.GetComponent<InventorySlotUI>());
             }
 
-            // Gán dữ liệu vào slot
             for (int i = 0; i < _activeSlots.Count; i++)
             {
                 if (i < items.Count)
@@ -111,7 +109,7 @@ namespace AttoTheSheep.UI.ShopAndInventory
             if (placeholderView != null) placeholderView.SetActive(false);
             if (detailView != null) detailView.SetActive(true);
 
-            if (detailIcon != null) 
+            if (detailIcon != null)
             {
                 detailIcon.sprite = item.icon;
                 detailIcon.gameObject.SetActive(true);
@@ -119,7 +117,7 @@ namespace AttoTheSheep.UI.ShopAndInventory
             string nameKey = string.IsNullOrEmpty(item.itemName) ? item.name : item.itemName;
             if (string.IsNullOrEmpty(nameKey)) nameKey = "Unknown Item";
             string descKey = string.IsNullOrEmpty(item.itemDescription) ? "Mysterious Item" : item.itemDescription;
-            
+
             string translatedName = AttoTheSheep.Core.LocalizationManager.Instance != null ? AttoTheSheep.Core.LocalizationManager.Instance.GetText(nameKey) : nameKey;
             string translatedDesc = AttoTheSheep.Core.LocalizationManager.Instance != null ? AttoTheSheep.Core.LocalizationManager.Instance.GetText(descKey) : descKey;
 
@@ -138,8 +136,7 @@ namespace AttoTheSheep.UI.ShopAndInventory
         {
             if (_selectedItem != null && InventoryManager.Instance != null)
             {
-                Debug.Log("[Inventory] Sử dụng item: " + _selectedItem.itemName);
-                // Tạm thời Use Item đồng nghĩa với việc tiêu thụ 1 cái
+
                 InventoryManager.Instance.RemoveItem(_selectedItem, 1);
 
                 if (InventoryManager.Instance.GetItemCount(_selectedItem) <= 0)

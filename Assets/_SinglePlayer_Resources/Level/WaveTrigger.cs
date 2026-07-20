@@ -19,7 +19,7 @@ public class WaveTrigger : MonoBehaviour
         col.isTrigger = true;
 
         if (targetWave == null)
-            Debug.LogWarning($"[WaveTrigger] {name} has no WaveController assigned.");
+
     }
 
     void OnTriggerEnter2D(Collider2D other)

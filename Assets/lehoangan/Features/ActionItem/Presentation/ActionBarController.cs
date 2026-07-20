@@ -15,8 +15,7 @@ public class ActionBarController : MonoBehaviour
 
     private async void Start()
     {
-        Debug.Log("[ActionBarController] Start running.");
-        
+
         if (Application.isMobilePlatform)
         {
             bool isMobileCanvas = false;
@@ -33,7 +32,7 @@ public class ActionBarController : MonoBehaviour
 
             if (!isMobileCanvas)
             {
-                Debug.Log($"[ActionBarController] Disabling outside action bar on mobile: {gameObject.name}");
+
                 gameObject.SetActive(false);
                 return;
             }
@@ -43,7 +42,7 @@ public class ActionBarController : MonoBehaviour
         if (actionSlots == null || actionSlots.Length == 0)
         {
             actionSlots = GetComponentsInChildren<ActionSlot>();
-            Debug.Log($"[ActionBarController] Auto-populated {actionSlots.Length} action slots.");
+
         }
 
         if (GameBootstrapper.Instance != null)
@@ -60,8 +59,6 @@ public class ActionBarController : MonoBehaviour
             _loadPlayerUseCase = new LoadPlayerUseCase(_playerRepository);
             _currentPlayerProfile = await _loadPlayerUseCase.ExecuteAsync();
         }
-        
-        Debug.Log($"[ActionBarController] Profile loaded. FlockShield: {_currentPlayerProfile?.FlockShieldCount}, SpeedBoost: {_currentPlayerProfile?.SpeedBoostCount}");
 
         if (_currentPlayerProfile != null)
         {
@@ -75,7 +72,7 @@ public class ActionBarController : MonoBehaviour
 
     private void HandleProfileUpdated()
     {
-        Debug.Log("[ActionBarController] HandleProfileUpdated triggered by event!");
+
         InitializeSlots(_currentPlayerProfile);
     }
     private void OnDestroy()
@@ -101,20 +98,19 @@ public class ActionBarController : MonoBehaviour
 
     private void InitializeSlots(PlayerProfile profile)
     {
-        Debug.Log($"[ActionBarController] InitializeSlots. Total slots in array: {actionSlots?.Length ?? -1}");
-        
+
         if (actionSlots == null) return;
 
         foreach (var slot in actionSlots)
         {
-            if (slot == null) 
+            if (slot == null)
             {
-                Debug.Log("[ActionBarController] Found a null slot in actionSlots array!");
+
                 continue;
             }
             if (slot.itemData == null)
             {
-                Debug.Log($"[ActionBarController] Slot {slot.gameObject.name} has NULL itemData!");
+
                 continue;
             }
 
@@ -127,7 +123,7 @@ public class ActionBarController : MonoBehaviour
     {
         if (actionBarActions == null || actionBarActions.Length == 0)
         {
-            Debug.LogWarning("[ActionBarController] No actionBarActions assigned in Inspector!");
+
             return;
         }
 
@@ -154,7 +150,7 @@ public class ActionBarController : MonoBehaviour
     {
         if (IsMultiplayerScene())
         {
-            Debug.Log("[ActionBarController] Item usage (keys 1, 2, 3, 4) is disabled in multiplayer.");
+
             return;
         }
 
@@ -182,13 +178,13 @@ public class ActionBarController : MonoBehaviour
 
         if (cheatId == 0)
         {
-            Debug.LogWarning($"[ActionBar] Unrecognized item name for skill invocation: {itemName}");
+
             return;
         }
 
         GameObject localPlayer = null;
 
-        if (Unity.Netcode.NetworkManager.Singleton != null && 
+        if (Unity.Netcode.NetworkManager.Singleton != null &&
             Unity.Netcode.NetworkManager.Singleton.LocalClient != null &&
             Unity.Netcode.NetworkManager.Singleton.LocalClient.PlayerObject != null)
         {
@@ -209,16 +205,16 @@ public class ActionBarController : MonoBehaviour
             if (playerCheats != null)
             {
                 playerCheats.ActivateCheat(cheatId);
-                Debug.Log($"[ActionBar] Triggered Atto Skill '{itemName}' (Cheat ID: {cheatId}) on player.");
+
             }
             else
             {
-                Debug.LogWarning("[ActionBar] Local player does not have a PlayerCheats component!");
+
             }
         }
         else
         {
-            Debug.LogWarning("[ActionBar] Could not find local player to invoke skill!");
+
         }
     }
 }

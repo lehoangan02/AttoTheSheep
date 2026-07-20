@@ -2,8 +2,7 @@ using UnityEngine;
 using Unity.Netcode;
 using System.Collections;
 
-// Kế thừa trực tiếp từ NetworkEntity
-public class LambAI : NetworkEntity 
+public class LambAI : NetworkEntity
 {
     [Header("Shield / Invulnerability Settings")]
     public NetworkVariable<bool> isShielded = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
@@ -23,9 +22,9 @@ public class LambAI : NetworkEntity
     [SerializeField] private ParticleSystem reviveSpawnParticles;
 
     [Header("Movement Settings")]
-    [SerializeField] private float stoppingDistance = 0.1f; 
-    [SerializeField] private float slowingRadius = 2f; 
-    [SerializeField] private float accelerationRate = 5f; 
+    [SerializeField] private float stoppingDistance = 0.1f;
+    [SerializeField] private float slowingRadius = 2f;
+    [SerializeField] private float accelerationRate = 5f;
 
     [Header("Noise Settings")]
     [Range(0f, 0.9f)]
@@ -34,11 +33,11 @@ public class LambAI : NetworkEntity
     [Header("Damage Feedback (Hiệu ứng)")]
     [SerializeField] private Color damageColor = Color.red;
     [SerializeField] private float flashDuration = 0.15f;
-    [SerializeField] private float knockbackForce = 10f; 
+    [SerializeField] private float knockbackForce = 10f;
     [SerializeField] private float knockbackDuration = 0.15f;
 
     // ==========================================
-    // TÍNH NĂNG MỚI: CẤU HÌNH HOẢNG LOẠN & QUAY LẠI BẦY
+
     // ==========================================
     [Header("Panic & Out of Bounds Settings")]
     [Tooltip("Tốc độ bầy cừu nhân thêm khi hoảng loạn (VD: 1.6 = nhanh hơn 60%)")]
@@ -66,9 +65,9 @@ public class LambAI : NetworkEntity
     private float stuckTimer = 0f;
     private Vector2 lastStuckCheckPosition;
 
-    private float personalSpeedMultiplier = 1f; 
+    private float personalSpeedMultiplier = 1f;
     private Color originalColor;
-    private bool isMovementLocked = false; 
+    private bool isMovementLocked = false;
 
     private Rigidbody2D rb;
     private Animator animator;
@@ -78,7 +77,7 @@ public class LambAI : NetworkEntity
 
     private Vector2 flockCenter;
     private float flockRadius;
-    private Vector2 localOffset; 
+    private Vector2 localOffset;
     private bool hasTarget = false;
 
     void Awake()
@@ -121,7 +120,7 @@ public class LambAI : NetworkEntity
 
     public override void OnNetworkSpawn()
     {
-        base.OnNetworkSpawn(); 
+        base.OnNetworkSpawn();
         currentHealth.OnValueChanged += OnHealthChanged;
     }
 
@@ -145,11 +144,10 @@ public class LambAI : NetworkEntity
         flockCenter = center;
         flockRadius = radius;
         hasTarget = true;
-        
-        // Nếu không hoảng loạn hoặc đang bị ép quay về bầy thì mới đổi offset ngẫu nhiên mới
+
         if (!isPanicking && !isForceReturning)
         {
-            PickNewOffset(); 
+            PickNewOffset();
         }
     }
 
@@ -159,14 +157,14 @@ public class LambAI : NetworkEntity
     }
 
     // ==========================================
-    // TÍNH NĂNG MỚI: NHẬN LỆNH TỪ FLOCK MANAGER
+
     // ==========================================
     public void TriggerPanic(float duration)
     {
         if (!IsServer) return;
 
         isPanicking = true;
-        isForceReturning = false; // Ưu tiên hoảng loạn cao hơn quay về bầy
+        isForceReturning = false;
         panicTimer = duration;
         PickRandomPanicTarget();
     }
@@ -175,7 +173,6 @@ public class LambAI : NetworkEntity
     {
         if (!IsServer) return;
 
-        // Nếu đang bận hoảng loạn chạy trốn quái thì cứ để nó chạy xong đã
         if (isPanicking) return;
 
         flockCenter = center;
@@ -184,7 +181,7 @@ public class LambAI : NetworkEntity
 
     private void PickRandomPanicTarget()
     {
-        // Chọn ngẫu nhiên một hướng trong phạm vi ngắn (2 đến 3 mét) quanh vị trí hiện tại
+
         panicTargetPos = (Vector2)transform.position + Random.insideUnitCircle * 2.5f;
     }
 
@@ -193,34 +190,31 @@ public class LambAI : NetworkEntity
         if (!IsSpawned || !IsServer || isMovementLocked) return;
         if (effectController != null && effectController.IsMovementLocked()) return;
 
-        // 1. CẬP NHẬT TIMER HOẢNG LOẠN
         if (isPanicking)
         {
             panicTimer -= Time.fixedDeltaTime;
             if (panicTimer <= 0f)
             {
                 isPanicking = false;
-                PickNewOffset(); // Hết hoảng loạn, hồi phục và chọn vị trí trong bầy
+                PickNewOffset();
             }
         }
 
-        // 2. PHÂN CẤP ƯU TIÊN DI CHUYỂN (STATE MACHINE)
         Vector2 actualTarget = Vector2.zero;
         float effectMult = effectController != null ? effectController.GetSpeedMultiplier() : 1f;
         float maxSpeedWithNoise = currentMoveSpeed.Value * personalSpeedMultiplier * effectMult;
         float targetSpeed = maxSpeedWithNoise;
-        
+
         bool shouldMove = false;
         bool applySlowingRadius = false;
 
         if (isPanicking)
         {
-            // Trạng thái 1: Hoảng loạn chạy loạn xạ
+
             actualTarget = panicTargetPos;
             targetSpeed = maxSpeedWithNoise * panicSpeedMultiplier;
             shouldMove = true;
 
-            // Nếu chạy gần tới điểm loạn xạ hiện tại, đổi điểm loạn xạ mới lập tức để tạo cảm giác "giãy giụa"
             if (Vector2.Distance(transform.position, panicTargetPos) < 0.4f)
             {
                 PickRandomPanicTarget();
@@ -228,27 +222,25 @@ public class LambAI : NetworkEntity
         }
         else if (isForceReturning)
         {
-            // Trạng thái 2: Bị đẩy văng ra ngoài -> Bỏ qua offset, đâm thẳng trực diện về tâm bầy cừu
+
             actualTarget = flockCenter;
             targetSpeed = maxSpeedWithNoise * returnSpeedMultiplier;
             shouldMove = true;
 
-            // Khi đã chui sâu lại vào vùng an toàn của bầy (nằm trong 60% bán kính bầy)
             if (Vector2.Distance(transform.position, flockCenter) < flockRadius * 0.6f)
             {
                 isForceReturning = false;
-                PickNewOffset(); // Trở lại trạng thái phân tán bình thường
+                PickNewOffset();
             }
         }
         else if (hasTarget)
         {
-            // Trạng thái 3: Di chuyển tụ họp quanh bầy bình thường
+
             actualTarget = flockCenter + localOffset;
             shouldMove = true;
-            applySlowingRadius = true; // Chỉ bầy bình thường mới cần giảm tốc khi đến gần
+            applySlowingRadius = true;
         }
 
-        // 3. THỰC THI DI CHUYỂN RIGIDBODY2D
         if (shouldMove)
         {
             float distToTarget = Vector2.Distance(transform.position, actualTarget);
@@ -261,11 +253,11 @@ public class LambAI : NetworkEntity
                 applySlowingRadius = false;
                 distToTarget = Vector2.Distance(transform.position, actualTarget);
             }
-            
+
             if (distToTarget > stoppingDistance)
             {
                 Vector2 direction = (actualTarget - (Vector2)transform.position).normalized;
-                
+
                 if (applySlowingRadius && distToTarget < slowingRadius)
                 {
                     targetSpeed = maxSpeedWithNoise * (distToTarget / slowingRadius);
@@ -277,18 +269,18 @@ public class LambAI : NetworkEntity
             }
             else
             {
-                // Nếu là trạng thái bình thường mà tới đích rồi thì đứng im
+
                 if (!isPanicking && !isForceReturning)
                 {
                     rb.linearVelocity = Vector2.zero;
-                    hasTarget = false; 
+                    hasTarget = false;
                     UpdateAnimationLocal(false);
                 }
             }
         }
         else
         {
-            // Không có mục tiêu nào -> Giảm tốc về 0
+
             isRecoveringFromStuck = false;
             ResetStuckTracking();
             rb.linearVelocity = Vector2.Lerp(rb.linearVelocity, Vector2.zero, accelerationRate * Time.fixedDeltaTime);
@@ -406,7 +398,7 @@ public class LambAI : NetworkEntity
     }
 
     // ==========================================
-    // SỬA ĐỔI LOGIC: BÁO CÁO LÊN FLOCKMANAGER KHI TRÚNG ĐÒN
+
     // ==========================================
     // ==========================================
     // SHIELD / INVULNERABILITY SYSTEM
@@ -541,7 +533,7 @@ public class LambAI : NetworkEntity
         // BLOCK DAMAGE IF SHIELDED
         if (isShielded.Value)
         {
-            Debug.Log($"🛡️ [Shield] Lamb '{name}' blocked {damage} damage!");
+
             // Still play a little visual feedback to show the shield absorbed hit
             if (spriteRenderer != null)
             {
@@ -551,13 +543,13 @@ public class LambAI : NetworkEntity
             return; // NO DAMAGE TAKEN
         }
 
-        int healthBefore = currentHealth.Value; 
+        int healthBefore = currentHealth.Value;
 
         base.TakeDamage(damage, source);
 
         if (IsServer && currentHealth.Value < healthBefore)
         {
-            // TÍNH NĂNG MỚI: Báo cáo bầy trưởng để kích hoạt hoảng loạn diện rộng
+
             if (myManager != null)
             {
                 myManager.ReportLambAttacked(this);
@@ -629,7 +621,7 @@ public class LambAI : NetworkEntity
         {
             if (spriteRenderer != null)
             {
-                StopCoroutine(nameof(FlashRedRoutine)); 
+                StopCoroutine(nameof(FlashRedRoutine));
                 StartCoroutine(nameof(FlashRedRoutine));
             }
         }

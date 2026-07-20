@@ -40,7 +40,7 @@ public class ActionSlot : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("ActionSlot is missing Item Data or Icon Display reference!", this);
+
         }
     }
 
@@ -52,7 +52,7 @@ public class ActionSlot : MonoBehaviour
 
     public void InitializeUI()
     {
-        Debug.Log($"[ActionSlot] InitializeUI called for {itemData?.itemName}. Profile is null? {_playerProfile == null}. GetCurrentAmount(): {GetCurrentAmount()}");
+
         UpdateUI();
     }
 
@@ -60,17 +60,17 @@ public class ActionSlot : MonoBehaviour
     public bool UseItem()
     {
         // Safety check to ensure there is an item assigned to this slot
-        if (itemData == null) 
+        if (itemData == null)
         {
-            Debug.LogWarning("No ActionItem assigned to this slot!");
-            return false; 
+
+            return false;
         }
 
         bool isMultiplayer = IsMultiplayerScene();
 
         if (!isMultiplayer && _playerProfile == null)
         {
-            Debug.LogWarning("PlayerProfile not loaded yet!");
+
             return false;
         }
 
@@ -79,8 +79,6 @@ public class ActionSlot : MonoBehaviour
         {
             // Update the visual UI directly from the new profile state
             UpdateUI();
-            
-            Debug.Log($"Used {assetName}! Remaining: {GetCurrentAmount()}");
 
             // Save the updated profile to the cloud
             if (!isMultiplayer && _playerRepository != null)
@@ -92,7 +90,7 @@ public class ActionSlot : MonoBehaviour
         }
         else
         {
-            Debug.Log($"{itemData.itemName} is empty!");
+
             return false;
         }
     }
@@ -108,9 +106,9 @@ public class ActionSlot : MonoBehaviour
         if (IsMultiplayerScene()) return 99;
 
         if (_playerProfile == null || itemData == null) return 0;
-        
+
         string assetName = ((UnityEngine.Object)itemData).name;
-        
+
         int amount = 0;
         switch (assetName)
         {
@@ -121,7 +119,6 @@ public class ActionSlot : MonoBehaviour
             default: amount = 0; break;
         }
 
-        Debug.Log($"[ActionSlot] itemData.name = {assetName}, returned amount = {amount}. Profile has: Shield={_playerProfile.FlockShieldCount}, Totem={_playerProfile.SpawnMaxLambsCount}, Meat={_playerProfile.SkillDamageBoostCount}, Shroom={_playerProfile.SpeedBoostCount}");
         return amount;
     }
 
@@ -129,7 +126,7 @@ public class ActionSlot : MonoBehaviour
     {
         int amount = GetCurrentAmount();
         amountText.text = amount.ToString();
-        
+
         // Visual feedback: Dim the icon and counter if we run out of items
         if (amount <= 0)
         {

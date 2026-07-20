@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.Events; 
+using UnityEngine.Events;
 
 public enum TutorialCondition
 {
@@ -18,8 +18,8 @@ public enum TutorialCondition
 public class TutorialStep
 {
     [Header("Step Info")]
-    public string stepName; 
-    
+    public string stepName;
+
     [TextArea(2, 4)]
     public string instructionText;
 
@@ -45,8 +45,7 @@ public class TutorialManager : MonoBehaviour
     [Header("Teleport Logic Settings")]
     [Tooltip("Vị trí giấu object ở rất xa khung hình")]
     public Vector3 hiddenPosition = new Vector3(9999f, 9999f, 0f);
-    
-    // Biến để nhớ vị trí gốc
+
     private Vector3 originalEnemyPos;
     private Vector3 originalFlockPos;
 
@@ -57,7 +56,7 @@ public class TutorialManager : MonoBehaviour
 
     private IEnumerator Start()
     {
-        // QUAN TRỌNG: FTUE là màn chơi đơn (offline tutorial), cần tự động khởi chạy Host để spawn Player!
+
         if (Unity.Netcode.NetworkManager.Singleton != null && !Unity.Netcode.NetworkManager.Singleton.IsListening)
         {
             Unity.Netcode.NetworkManager.Singleton.StartHost();
@@ -67,15 +66,13 @@ public class TutorialManager : MonoBehaviour
 
         yield return null;
 
-        // --- ĐỔI LOGIC TẠI ĐÂY ---
-        // Lưu vị trí gốc và ném ra xa thay vì dùng SetActive(false)
-        if (existingEnemy != null) 
+        if (existingEnemy != null)
         {
             originalEnemyPos = existingEnemy.transform.position;
             existingEnemy.transform.position = hiddenPosition;
         }
-        
-        if (flockManager != null) 
+
+        if (flockManager != null)
         {
             originalFlockPos = flockManager.transform.position;
             flockManager.transform.position = hiddenPosition;
@@ -99,12 +96,10 @@ public class TutorialManager : MonoBehaviour
 
         instructionBubble.SetBubbleActive(false);
         instructionBubble.SetBubbleActive(true);
-        
-        string localizedMessage = AttoTheSheep.Core.LocalizationManager.Instance != null 
-            ? AttoTheSheep.Core.LocalizationManager.Instance.GetText(message) 
-            : message;
 
-        Debug.Log($"[TutorialManager] Original instruction text: '{localizedMessage}'. IsMobilePlatform: {Application.isMobilePlatform}");
+        string localizedMessage = AttoTheSheep.Core.LocalizationManager.Instance != null
+            ? AttoTheSheep.Core.LocalizationManager.Instance.GetText(message)
+            : message;
 
         // Special case: Replace PC controls with mobile controls dynamically if on mobile
         if (Application.isMobilePlatform)
@@ -115,8 +110,6 @@ public class TutorialManager : MonoBehaviour
             localizedMessage = System.Text.RegularExpressions.Regex.Replace(localizedMessage, @"\bleft-click\b", "tap the screen", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
         }
 
-        Debug.Log($"[TutorialManager] Processed instruction text: '{localizedMessage}'");
-
         instructionBubble.SetText(localizedMessage, showPosition);
     }
 
@@ -126,7 +119,7 @@ public class TutorialManager : MonoBehaviour
 
         foreach (TutorialStep step in tutorialSteps)
         {
-            // Gọi sự kiện đầu bước (Bạn sẽ gọi hàm Teleport tại đây)
+
             step.onStepStart?.Invoke();
             ShowInstruction(step.instructionText);
 
@@ -143,7 +136,7 @@ public class TutorialManager : MonoBehaviour
                     break;
 
                 case TutorialCondition.WaitKeyPress:
-                    yield return new WaitUntil(() => 
+                    yield return new WaitUntil(() =>
                     {
                         // Cross-platform Input check (Mobile & PC via PlayerInput)
                         if (playerInstance != null)
@@ -177,9 +170,9 @@ public class TutorialManager : MonoBehaviour
                         return false;
                     });
                     break;
-                
+
                 case TutorialCondition.WaitMouseLeftClick:
-                    yield return new WaitUntil(() => 
+                    yield return new WaitUntil(() =>
                     {
                         // Cross-platform Input check for 'Click'
                         if (playerInstance != null)
@@ -220,14 +213,12 @@ public class TutorialManager : MonoBehaviour
             }
         }
 
-        if (instructionBubble != null) instructionBubble.SetBubbleActive(false); 
+        if (instructionBubble != null) instructionBubble.SetBubbleActive(false);
     }
 
-    // --- CÁC HÀM PUBLIC ĐỂ GỌI TRONG UNITY EVENT (INSPECTOR) ---
-    
     public void TeleportEnemyBack()
     {
-        if (existingEnemy != null) 
+        if (existingEnemy != null)
         {
             existingEnemy.transform.position = originalEnemyPos;
         }
@@ -235,7 +226,7 @@ public class TutorialManager : MonoBehaviour
 
     public void TeleportFlockBack()
     {
-        if (flockManager != null) 
+        if (flockManager != null)
         {
             flockManager.transform.position = originalFlockPos;
         }

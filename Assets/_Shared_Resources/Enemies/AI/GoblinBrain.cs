@@ -79,13 +79,13 @@ public class GoblinBrain : EnemyBrain
     // Animation events
     public void OnFastAttackHitStart()
     {
-        if (fastHitbox == null) { Debug.LogWarning("GoblinBrain: fastHitbox not assigned.", this); return; }
+        if (fastHitbox == null) {  return; }
         fastHitbox.Enable(meleeData.attackDamage);
     }
     public void OnFastAttackHitEnd() => fastHitbox?.Disable();
     public void OnStrongAttackHitStart()
     {
-        if (strongHitbox == null) { Debug.LogWarning("GoblinBrain: strongHitbox not assigned.", this); return; }
+        if (strongHitbox == null) {  return; }
         strongHitbox.Enable(meleeData.attackDamage * 2);
     }
     public void OnStrongAttackHitEnd() => strongHitbox?.Disable();

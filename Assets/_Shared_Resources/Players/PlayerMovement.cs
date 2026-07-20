@@ -11,12 +11,12 @@ public class PlayerMovement : NetworkBehaviour
     private PlayerAudio playerAudio;
     private Coroutine speedBoostRoutine;
 
-    public bool isMovementLocked = false; 
+    public bool isMovementLocked = false;
 
     private NetworkVariable<Vector2> netMoveInput = new NetworkVariable<Vector2>(
         Vector2.zero, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server
     );
-    
+
     private Vector2 localMoveInput;
 
     void Awake()
@@ -37,8 +37,8 @@ public class PlayerMovement : NetworkBehaviour
         }
 
         // Automatic error trapping for quick Inspector checks
-        if (rb == null) Debug.LogError($"[{gameObject.name}]: Missing Rigidbody2D on Parent Object!");
-        if (entity == null) Debug.LogError($"[{gameObject.name}]: Missing NetworkEntity on Parent Object!");
+        if (rb == null)
+        if (entity == null)
     }
 
     public override void OnNetworkSpawn()
@@ -55,7 +55,7 @@ public class PlayerMovement : NetworkBehaviour
         Vector2 currentInput = IsOwner ? localMoveInput : netMoveInput.Value;
         bool isMoving = currentInput.sqrMagnitude > 0.01f && !isMovementLocked;
         if (animator != null) animator.SetBool("IsMoving", isMoving);
-        
+
         if (spriteRenderer != null)
         {
             if (currentInput.x > 0 && !isMovementLocked) spriteRenderer.flipX = false;
@@ -80,7 +80,7 @@ public class PlayerMovement : NetworkBehaviour
         // Get speed from parent's NetworkEntity, apply status effect speed multiplier
         float effectMult = (entity != null && entity.effectController != null) ? entity.effectController.GetSpeedMultiplier() : 1f;
         float currentSpeed = (entity != null) ? entity.currentMoveSpeed.Value * effectMult : 5f;
-        
+
         if (IsOwner)
         {
             rb.linearVelocity = localMoveInput * currentSpeed;
@@ -97,7 +97,7 @@ public class PlayerMovement : NetworkBehaviour
     private void SendInputToServer(Vector2 moveInput)
     {
         localMoveInput = moveInput; // Save locally on Client for immediate movement
-        if (IsSpawned) 
+        if (IsSpawned)
         {
             // Fix: Mobile joystick floods RPCs because OnMove triggers every frame.
             // Throttle RPCs to significant changes, zero input (stops), or time interval.

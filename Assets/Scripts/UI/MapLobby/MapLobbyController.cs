@@ -32,7 +32,6 @@ public class MapLobbyController : MonoBehaviour
         // Force all levels to be unlocked by default
         maxUnlockedLevel = 999;
 
-        // Tự động tìm và liên kết các nút Node_1, Node_2... nếu bạn chưa kéo thả vào Inspector
         if (levelNodes == null || levelNodes.Count == 0)
         {
             levelNodes = new List<Button>();
@@ -47,7 +46,7 @@ public class MapLobbyController : MonoBehaviour
                 }
                 else
                 {
-                    break; // Không tìm thấy Node tiếp theo, dừng vòng lặp
+                    break;
                 }
                 nodeIndex++;
             }
@@ -60,7 +59,7 @@ public class MapLobbyController : MonoBehaviour
 
             int levelIndex = i + 1; // 1-based level
             var img = levelNodes[i].GetComponent<Image>();
-            
+
             if (levelIndex <= maxUnlockedLevel)
             {
                 // Unlocked
@@ -88,24 +87,23 @@ public class MapLobbyController : MonoBehaviour
 
     private void OnBagClicked()
     {
-        Debug.Log("[MapLobby] Bag icon clicked! (Open Inventory)");
+
     }
 
     private void OnShopClicked()
     {
-        Debug.Log("[MapLobby] Shop icon clicked! (Open Shop UI)");
+
     }
 
     private void OnUpgradeClicked()
     {
-        Debug.Log("[MapLobby] Upgrade icon clicked! (Open Upgrades)");
+
     }
 
     private void OnLevelClicked(int levelIndex)
     {
         string sceneName = "Level" + levelIndex;
-        Debug.Log($"[MapLobby] Entering {sceneName}...");
-        
+
         if (SceneTransitionManager.Instance != null)
             SceneTransitionManager.Instance.TransitionTo(sceneName);
         else
@@ -114,7 +112,7 @@ public class MapLobbyController : MonoBehaviour
 
     private void OnBackClicked()
     {
-        Debug.Log("[MapLobby] Back clicked! Returning to MainMenu...");
+
         if (SceneTransitionManager.Instance != null)
             SceneTransitionManager.Instance.TransitionTo("MainMenu");
         else
@@ -129,9 +127,9 @@ public class MapLobbyController : MonoBehaviour
         {
             PlayerPrefs.SetInt("MaxUnlockedLevel", current + 1);
             PlayerPrefs.Save();
-            Debug.Log($"[MapLobby] Unlocked Level {current + 1}");
+
             // Reload scene to refresh UI
-            if (SceneTransitionManager.Instance != null) 
+            if (SceneTransitionManager.Instance != null)
                 SceneTransitionManager.Instance.TransitionTo(gameObject.scene.name);
         }
     }

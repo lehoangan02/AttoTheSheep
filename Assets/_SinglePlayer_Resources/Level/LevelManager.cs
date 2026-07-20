@@ -50,7 +50,7 @@ public class LevelManager : MonoBehaviour
     {
         if (Instance != null && Instance != this)
         {
-            Debug.LogWarning("[LevelManager] Duplicate instance destroyed.");
+
             Destroy(gameObject);
             return;
         }
@@ -92,14 +92,14 @@ public class LevelManager : MonoBehaviour
     {
         if (wave == null)
         {
-            Debug.LogError("[LevelManager] TryStartWave called with null wave.");
+
             return false;
         }
 
         if (_currentState != LevelState.Idle)
         {
             if (logStateChanges)
-                Debug.Log($"[LevelManager] Rejected start of '{wave.name}' — state is {_currentState}.");
+
             return false;
         }
 
@@ -111,14 +111,14 @@ public class LevelManager : MonoBehaviour
             if (requestedIndex != expectedIndex)
             {
                 if (logStateChanges)
-                    Debug.Log($"[LevelManager] Rejected start of '{wave.name}' — expected wave at index {expectedIndex}, got index {requestedIndex}.");
+
                 return false;
             }
 
             if (_clearedWaves.Contains(wave))
             {
                 if (logStateChanges)
-                    Debug.Log($"[LevelManager] Rejected start of '{wave.name}' — already cleared this round.");
+
                 return false;
             }
         }
@@ -127,7 +127,7 @@ public class LevelManager : MonoBehaviour
             if (_clearedWaves.Contains(wave))
             {
                 if (logStateChanges)
-                    Debug.Log($"[LevelManager] Rejected start of '{wave.name}' — already cleared.");
+
                 return false;
             }
         }
@@ -140,7 +140,7 @@ public class LevelManager : MonoBehaviour
     /// <summary>Resets the entire level. All waves refill, all state cleared.</summary>
     public void ResetLevel()
     {
-        if (logStateChanges) Debug.Log("[LevelManager] Resetting level.");
+        if (logStateChanges)
 
         _clearedWaves.Clear();
         _currentWaveIndex = 0;
@@ -167,13 +167,12 @@ public class LevelManager : MonoBehaviour
             _currentWaveIndex++;
 
             if (logStateChanges)
-                Debug.Log($"[LevelManager] Wave cleared: '{wave.name}'. {_clearedWaves.Count}/{allWaves.Count}.");
 
             if (_clearedWaves.Count >= allWaves.Count)
             {
-                Debug.Log("[LevelManager] Round complete! Restarting wave cycle with higher difficulty.");
+
                 _infiniteRoundCount++;
-                
+
                 // Collect all enemies to inject into later rounds
                 if (_allEnemyPrefabsInLevel.Count == 0)
                 {
@@ -188,7 +187,7 @@ public class LevelManager : MonoBehaviour
                     }
                     _allEnemyPrefabsInLevel.AddRange(uniqueEnemies);
                 }
-                
+
                 foreach (WaveController w in allWaves)
                 {
                     if (w != null)
@@ -197,7 +196,7 @@ public class LevelManager : MonoBehaviour
                         w.ResetWave();
                     }
                 }
-                
+
                 _clearedWaves.Clear();
                 _currentWaveIndex = 0;
                 SetState(LevelState.Idle);
@@ -212,13 +211,12 @@ public class LevelManager : MonoBehaviour
         else
         {
             if (logStateChanges)
-                Debug.Log($"[LevelManager] Wave cleared: '{wave.name}'. {_clearedWaves.Count}/{allWaves.Count}.");
 
             if (_clearedWaves.Count >= allWaves.Count)
             {
                 SetState(LevelState.LevelComplete);
                 OnLevelComplete?.Invoke();
-                Debug.Log("[LevelManager] Level Complete!");
+
             }
             else
             {
@@ -242,6 +240,6 @@ public class LevelManager : MonoBehaviour
     {
         if (_currentState == newState) return;
         _currentState = newState;
-        if (logStateChanges) Debug.Log($"[LevelManager] State → {newState}");
+        if (logStateChanges)
     }
 }

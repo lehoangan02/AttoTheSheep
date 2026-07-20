@@ -15,7 +15,7 @@ namespace AttoTheSheep.UI.InGame
         [SerializeField] private Button pauseButton;
         [SerializeField] private Button toggleAutoButton;
         [SerializeField] private TMPro.TextMeshProUGUI toggleAutoText;
-        
+
         private bool _isAutoMode = false;
 
         [Header("Scene Settings")]
@@ -26,13 +26,13 @@ namespace AttoTheSheep.UI.InGame
 
         [Header("Pause Panel")]
         [Tooltip("Kéo Panel chứa nền đen mờ và giao diện Pause vào đây")]
-        [SerializeField] private GameObject pausePanel; 
-        
+        [SerializeField] private GameObject pausePanel;
+
         private bool _isPauseMenuOpen = false;
 
         private void Awake()
         {
-            // Tự động tích hợp Stop.cs vào chính Prefab này nếu chưa có
+
             if (GetComponent<Stop>() == null && Stop.Instance == null)
             {
                 gameObject.AddComponent<Stop>();
@@ -64,7 +64,7 @@ namespace AttoTheSheep.UI.InGame
             if (mainMenuButton != null) mainMenuButton.onClick.AddListener(OnMainMenuClicked);
             if (pauseButton != null) pauseButton.onClick.AddListener(OnPauseClicked);
             if (toggleAutoButton != null) toggleAutoButton.onClick.AddListener(OnToggleAutoClicked);
-            
+
             // Sync with FlockManager
             var flockManager = Object.FindFirstObjectByType<FlockManager>();
             if (flockManager != null)
@@ -74,7 +74,6 @@ namespace AttoTheSheep.UI.InGame
             }
             UpdateToggleAutoUI();
 
-            // Mặc định ẩn giao diện Pause (Overlay) khi mới vào game
             if (pausePanel != null) pausePanel.SetActive(false);
         }
 
@@ -89,28 +88,27 @@ namespace AttoTheSheep.UI.InGame
 
         private void HandlePauseInput(InputAction.CallbackContext ctx)
         {
-            // Lắng nghe Input Action để bật/tắt bảng Pause
+
             TogglePauseMenu();
         }
 
         private void TogglePauseMenu()
         {
             _isPauseMenuOpen = !_isPauseMenuOpen;
-            
-            if (pausePanel != null) 
+
+            if (pausePanel != null)
                 pausePanel.SetActive(_isPauseMenuOpen);
 
             if (_isPauseMenuOpen)
             {
-                // Khi bật Pause Menu, luôn ép game dừng lại
+
                 if (Stop.Instance != null) Stop.Instance.PauseGame();
             }
             else
             {
-                // Khi tắt Pause Menu, kiểm tra xem DLG có đang mở không
+
                 bool isDialogueActive = (DialogueManager.Instance != null && DialogueManager.Instance.panelRoot != null && DialogueManager.Instance.panelRoot.activeInHierarchy);
-                
-                // CHỈ Resume game nếu không vướng hội thoại
+
                 if (!isDialogueActive)
                 {
                     if (Stop.Instance != null) Stop.Instance.ResumeGame();
@@ -130,20 +128,19 @@ namespace AttoTheSheep.UI.InGame
 
         private void OnOptionsClicked()
         {
-            Debug.Log("[PauseUI] Mở menu Cài Đặt (Feature sẽ được thêm sau)");
+
         }
 
         private void OnMainMenuClicked()
         {
-            Debug.Log("[PauseUI] Thoát về Main Menu...");
-            // Nhớ Resume Game để Time.timeScale quay lại 1, tránh lỗi khựng hình ở Main Menu
-            if (Stop.Instance != null) Stop.Instance.ResumeGame(); 
-            
+
+            if (Stop.Instance != null) Stop.Instance.ResumeGame();
+
             if (Unity.Netcode.NetworkManager.Singleton != null)
             {
                 Unity.Netcode.NetworkManager.Singleton.Shutdown();
             }
-            
+
             SceneManager.LoadScene(mainMenuSceneName);
         }
 
@@ -171,7 +168,7 @@ namespace AttoTheSheep.UI.InGame
         {
             if (toggleAutoText != null)
             {
-                // Lúc Auto thì hiện chữ A, lúc Thủ công thì hiện chữ M
+
                 toggleAutoText.text = _isAutoMode ? "A" : "M";
             }
         }
