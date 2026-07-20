@@ -31,7 +31,7 @@ public class RelayManager : MonoBehaviour
     {
         if (GameBootstrapper.Instance == null)
         {
-            Debug.LogWarning("[LobbyManager] GameBootstrapper Instance not found. Lobby might not work correctly if services aren't initialized.");
+
         }
     }
 
@@ -41,11 +41,11 @@ public class RelayManager : MonoBehaviour
         try
         {
             await Presenter.CreateRelay(playerCount);
-            Debug.Log($"Relay created successfully with join code: {Presenter.HostData.JoinCode}");
+
         }
         catch (Exception e)
         {
-            Debug.LogError($"Failed to create relay: {e.Message}");
+
         }
     }
 
@@ -54,13 +54,13 @@ public class RelayManager : MonoBehaviour
     {
         try
         {
-            Debug.Log($"Joining relay with code: {joinCode}");
+
             await Presenter.JoinRelay(joinCode);
-            Debug.Log("Relay joined successfully!");
+
         }
         catch (Exception e)
         {
-            Debug.LogError($"Failed to join relay: {e.Message}");
+
         }
     }
 }

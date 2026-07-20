@@ -50,7 +50,7 @@ public class LobbyManager : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("[LobbyManager] GameBootstrapper Instance not found. Lobby might not work correctly if services aren't initialized.");
+
         }
     }
 
@@ -63,8 +63,8 @@ public class LobbyManager : MonoBehaviour
     private async void HandleLobbyRefresh()
     {
         // Only refresh if we haven't joined a lobby yet AND we are authenticated
-        if (Presenter.JoinedLobby == null && 
-            UnityServices.State == ServicesInitializationState.Initialized && 
+        if (Presenter.JoinedLobby == null &&
+            UnityServices.State == ServicesInitializationState.Initialized &&
             AuthenticationService.Instance.IsSignedIn)
         {
             listRefreshTimer -= Time.deltaTime;
@@ -93,7 +93,7 @@ public class LobbyManager : MonoBehaviour
     public async void CreateLobby(string playerName, bool isPrivate)
     {
         await Presenter.CreateLobby("MyLobby", 5, isPrivate, playerName);
-        Debug.Log($"Created lobby: {Presenter.JoinedLobby.Name} | ID: {Presenter.JoinedLobby.Id} | Code: {Presenter.JoinedLobby.LobbyCode}");
+
         await Presenter.SubscribeToCurrentLobby();
     }
 
@@ -107,10 +107,10 @@ public class LobbyManager : MonoBehaviour
         }
 
         await Presenter.RefreshLobbyList();
-        Debug.Log($"Number of lobbies found: {Presenter.AvailableLobbies.Count}");
+
         foreach (var lobby in Presenter.AvailableLobbies)
         {
-            Debug.Log($"Lobby name: {lobby.Name} | Lobby ID: {lobby.Id} | Lobby Code: {lobby.LobbyCode}");
+
         }
     }
 
@@ -118,7 +118,7 @@ public class LobbyManager : MonoBehaviour
     public async void JoinPrivateLobby(string lobbyCode, string playerName)
     {
         await Presenter.JoinLobbyByCode(lobbyCode, playerName);
-        Debug.Log($"Successfully joined lobby with code: {lobbyCode}");
+
         await Presenter.SubscribeToCurrentLobby();
     }
 
@@ -126,7 +126,7 @@ public class LobbyManager : MonoBehaviour
     public async void JoinLobby(string lobbyId, string playerName)
     {
         await Presenter.JoinLobby(lobbyId, playerName);
-        Debug.Log($"Successfully joined lobby with id: {lobbyId}");
+
         await Presenter.SubscribeToCurrentLobby();
     }
 
@@ -134,14 +134,14 @@ public class LobbyManager : MonoBehaviour
     public async void LeaveLobby()
     {
         await Presenter.LeaveLobby();
-        Debug.Log("Successfully left lobby");
+
     }
 
     [Command]
     public async void KickPlayer(string playerId)
     {
         await Presenter.KickPlayer(playerId);
-        Debug.Log($"Successfully kicked player {playerId} from lobby");
+
     }
 
     [Command]
@@ -149,21 +149,18 @@ public class LobbyManager : MonoBehaviour
     {
         if (Presenter.JoinedLobby == null)
         {
-            Debug.Log("You are not in any lobby.");
+
             return;
         }
 
-        Debug.Log($"--- Players in {Presenter.JoinedLobby.Name} ({Presenter.JoinedLobby.Players.Count}/{Presenter.JoinedLobby.MaxPlayers}) ---");
         foreach (var player in Presenter.JoinedLobby.Players)
         {
-            string name = player.Data != null && player.Data.TryGetValue("PlayerName", out var dataObj) 
-                ? dataObj.Value 
+            string name = player.Data != null && player.Data.TryGetValue("PlayerName", out var dataObj)
+                ? dataObj.Value
                 : "Unknown Player";
-            
-            Debug.Log($"- {name} (ID: {player.Id})");
+
         }
     }
-
 
     private async void OnRelayJoinCodeReceived(string joinCode)
     {
@@ -171,11 +168,9 @@ public class LobbyManager : MonoBehaviour
 
         if (RelayManager.Instance == null)
         {
-            Debug.LogError("[LobbyManager] RelayManager.Instance is null! Clients cannot connect without an active RelayManager in the scene.");
+
             return;
         }
-
-        Debug.Log($"[Client] Received Relay Join Code: {joinCode}. Connecting to game session...");
 
         // Connect Client via Relay
         await RelayManager.Instance.Presenter.JoinRelay(joinCode);
@@ -194,19 +189,19 @@ public class LobbyManager : MonoBehaviour
 
         if (RelayManager.Instance == null)
         {
-            Debug.LogError("[LobbyManager] RelayManager.Instance is null! Ensure RelayManager is attached to a GameObject in your active scene.");
+
             return;
         }
 
         try
         {
             // 1. Create Relay Allocation using standard Relay Use Case
-            Debug.Log("[Host] Allocating Relay session...");
+
             await RelayManager.Instance.Presenter.CreateRelay(Presenter.JoinedLobby.MaxPlayers);
             string joinCode = RelayManager.Instance.Presenter.HostData.JoinCode;
 
             // 2. Share Relay Join Code with Lobby
-            Debug.Log($"[Host] Relay created. Sharing Join Code {joinCode} with Lobby members...");
+
             await Presenter.ShareRelayJoinCode(joinCode);
 
             // Register Scene Load Complete
@@ -216,12 +211,12 @@ public class LobbyManager : MonoBehaviour
             }
 
             // 3. Initiate Unity Netcode Scene loading
-            Debug.Log("[Host] Starting game scene load...");
+
             NetworkManager.Singleton.SceneManager.LoadScene("MultiplayerLevel", UnityEngine.SceneManagement.LoadSceneMode.Single);
         }
         catch (Exception e)
         {
-            Debug.LogError($"[Host] Failed to transition to game: {e.Message}");
+
         }
     }
 
@@ -240,20 +235,20 @@ public class LobbyManager : MonoBehaviour
 
         if (NetworkManager.Singleton.IsServer)
         {
-            Debug.Log("[Host] Scene load completed for all clients. We will not terminate the Lobby immediately to allow clients to join.");
+
             // We just let the lobby expire naturally or keep it for late joiners
 
             // Ensure PlayerSpawnManager exists in MultiplayerLevel
             if (UnityEngine.Object.FindFirstObjectByType<PlayerSpawnManager>() == null)
             {
-                Debug.Log("[LobbyManager] PlayerSpawnManager missing in scene! Spawning one dynamically.");
+
                 var smGo = new GameObject("PlayerSpawnManager");
                 smGo.AddComponent<PlayerSpawnManager>();
             }
         }
         else
         {
-            Debug.Log("[Client] Scene load completed. We are in the game.");
+
         }
     }
 

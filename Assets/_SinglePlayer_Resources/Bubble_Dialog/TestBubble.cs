@@ -16,10 +16,10 @@ public class TestBubble : MonoBehaviour
     {
         if (bubbleDialog == null)
         {
-            Debug.LogError("TestBubble: bubbleDialog reference is MISSING! Please drag the BubbleDialog into the Inspector.");
+
             return;
         }
-        Debug.Log("TestBubble: 'Show Bubble' context menu activated.");
+
         bubbleDialog.SetBubbleActive(true);
         bubbleDialog.SetText(textToTest, transform.position);
     }
@@ -29,7 +29,7 @@ public class TestBubble : MonoBehaviour
     {
         if (bubbleDialog != null)
         {
-            Debug.Log("TestBubble: 'Hide Bubble' context menu activated.");
+
             bubbleDialog.SetBubbleActive(false);
         }
     }

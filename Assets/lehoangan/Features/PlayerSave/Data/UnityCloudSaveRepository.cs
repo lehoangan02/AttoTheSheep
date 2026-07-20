@@ -14,8 +14,8 @@ public class UnityCloudSaveRepository : IPlayerRepository
     private const string KEY_UNLOCKED_STAGE = "unlocked_stage_index";
     private const string KEY_DAMAGE_LEVEL = "damage_level";
     private const string KEY_HP_LEVEL = "hp_level";
-    private const string KEY_HERD_HP_LEVEL = "heard_hp_level"; 
-    private const string KEY_HAS_AMOR = "has_amor"; 
+    private const string KEY_HERD_HP_LEVEL = "heard_hp_level";
+    private const string KEY_HAS_AMOR = "has_amor";
     private const string KEY_HAS_HORN = "has_horn";
     private const string KEY_FLOCK_SHIELD_COUNT = "flock_shield_count";
     private const string KEY_SPAWN_MAX_LAMBS_COUNT = "spawn_max_lambs_count";
@@ -69,9 +69,9 @@ public class UnityCloudSaveRepository : IPlayerRepository
         }
         catch (System.Exception e)
         {
-            Debug.LogError($"Failed to initialize Unity Services in Repository: {e.Message}");
+
             // Reset task so it can be retried if it failed completely
-            _initializationTask = null; 
+            _initializationTask = null;
         }
     }
 
@@ -121,7 +121,7 @@ public class UnityCloudSaveRepository : IPlayerRepository
         }
         catch (System.Exception ex)
         {
-            Debug.LogError($"[LocalSave] Failed to save locally: {ex.Message}");
+
         }
 
         try
@@ -130,7 +130,7 @@ public class UnityCloudSaveRepository : IPlayerRepository
         }
         catch (System.Exception e)
         {
-            Debug.LogWarning($"[CloudSave] Failed to save to Cloud Save: {e.Message}. Data is cached locally and will be saved later.");
+
         }
     }
 
@@ -151,8 +151,8 @@ public class UnityCloudSaveRepository : IPlayerRepository
         }
         catch (System.Exception cloudEx)
         {
-            Debug.LogError($"[CloudSave] Failed to load from Cloud Save: {cloudEx.Message}. Attempting to load local fallback.");
-            try 
+
+            try
             {
                 if (File.Exists(LocalSavePath))
                 {
@@ -160,33 +160,32 @@ public class UnityCloudSaveRepository : IPlayerRepository
                     var localSave = JsonUtility.FromJson<LocalSaveData>(json);
                     _cachedProfile = new PlayerProfile();
                     _cachedProfile.RestoreState(
-                        localSave.Coins, localSave.Exp, localSave.UnlockedStage, 
-                        localSave.DamageLevel, localSave.HpLevel, localSave.HerdHpLevel, 
-                        localSave.HasArmor, localSave.HasHorn, localSave.FlockShieldCount, 
+                        localSave.Coins, localSave.Exp, localSave.UnlockedStage,
+                        localSave.DamageLevel, localSave.HpLevel, localSave.HerdHpLevel,
+                        localSave.HasArmor, localSave.HasHorn, localSave.FlockShieldCount,
                         localSave.SpawnMaxLambsCount, localSave.SkillDamageBoostCount, localSave.SpeedBoostCount
                     );
-                    Debug.Log("[LocalSave] Loaded profile from local storage.");
+
                     return _cachedProfile;
                 }
             }
             catch (System.Exception ex)
             {
-                Debug.LogError($"[LocalSave] Failed to load local fallback: {ex.Message}");
+
             }
 
-            Debug.Log("[LocalSave] No local fallback found. Proceeding with a default profile.");
             _cachedProfile = new PlayerProfile();
             return _cachedProfile;
         }
-        
-        if (loadedData == null || loadedData.Count == 0) 
+
+        if (loadedData == null || loadedData.Count == 0)
         {
             _cachedProfile = new PlayerProfile();
             return _cachedProfile;
         }
 
         long cloudTimestamp = loadedData.TryGetValue(KEY_LAST_UPDATED, out var t) ? t.Value.GetAs<long>() : 0;
-        
+
         LocalSaveData existingLocalSave = null;
         if (File.Exists(LocalSavePath))
         {
@@ -195,16 +194,16 @@ public class UnityCloudSaveRepository : IPlayerRepository
 
         if (existingLocalSave != null && existingLocalSave.LastUpdated > cloudTimestamp)
         {
-            Debug.Log("[CloudSave] Local cache is newer than Cloud Save. Preferring local data and syncing to Cloud.");
+
             var localProfile = new PlayerProfile();
             localProfile.RestoreState(
-                existingLocalSave.Coins, existingLocalSave.Exp, existingLocalSave.UnlockedStage, 
-                existingLocalSave.DamageLevel, existingLocalSave.HpLevel, existingLocalSave.HerdHpLevel, 
-                existingLocalSave.HasArmor, existingLocalSave.HasHorn, existingLocalSave.FlockShieldCount, 
+                existingLocalSave.Coins, existingLocalSave.Exp, existingLocalSave.UnlockedStage,
+                existingLocalSave.DamageLevel, existingLocalSave.HpLevel, existingLocalSave.HerdHpLevel,
+                existingLocalSave.HasArmor, existingLocalSave.HasHorn, existingLocalSave.FlockShieldCount,
                 existingLocalSave.SpawnMaxLambsCount, existingLocalSave.SkillDamageBoostCount, existingLocalSave.SpeedBoostCount
             );
             _cachedProfile = localProfile;
-            
+
             // Upload to cloud asynchronously
             _ = SaveAsync(localProfile);
             return localProfile;
@@ -224,9 +223,9 @@ public class UnityCloudSaveRepository : IPlayerRepository
         int speedBoostCount = loadedData.TryGetValue(KEY_SPEED_BOOST_COUNT, out var sbc) ? sbc.Value.GetAs<int>() : 0;
 
         var profile = new PlayerProfile();
-        profile.RestoreState(coins, exp, unlockedStage, damageLevel, hpLevel, herdHpLevel, hasArmor, hasHorn, 
+        profile.RestoreState(coins, exp, unlockedStage, damageLevel, hpLevel, herdHpLevel, hasArmor, hasHorn,
             flockShieldCount, spawnMaxLambsCount, skillDamageBoostCount, speedBoostCount);
-        
+
         // Save the freshly loaded cloud data to local disk to keep them in sync
         try
         {

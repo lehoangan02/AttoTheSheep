@@ -75,7 +75,7 @@ public class LobbyPresenter
         }
         catch (Exception e)
         {
-            Debug.LogError($"[LobbyPresenter] Failed to fetch lobby list: {e.Message}");
+
         }
         finally
         {
@@ -153,11 +153,11 @@ public class LobbyPresenter
             try
             {
                 await _heartbeatLobbyUseCase.ExecuteAsync(JoinedLobby.Id);
-                Debug.Log($"[LobbyPresenter] Heartbeat successfully sent for Lobby {JoinedLobby.Id}");
+
             }
             catch (Exception e)
             {
-                Debug.LogError($"[LobbyPresenter] Failed to send heartbeat: {e}");
+
             }
         }
     }

@@ -20,7 +20,7 @@ public class MobileContextButton : MonoBehaviour
     private void Awake()
     {
         if (headbuttButton == null && interactButton == null)
-            Debug.LogWarning($"[{nameof(MobileContextButton)}] Both headbuttButton and interactButton are null — component will have no effect.", this);
+
     }
 
     private void OnEnable()

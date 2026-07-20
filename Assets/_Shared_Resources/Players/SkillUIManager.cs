@@ -8,9 +8,9 @@ public class SkillUIManager : MonoBehaviour
     [Header("UI References")]
     public Image iconImage;
     public Image cooldownOverlay;
-    public GameObject lockedOverlay; 
-    public TextMeshProUGUI lambsReqText;        
-    
+    public GameObject lockedOverlay;
+    public TextMeshProUGUI lambsReqText;
+
     [Header("Skill Binding")]
     public int boundSkillId;
 
@@ -22,13 +22,11 @@ public class SkillUIManager : MonoBehaviour
         skillData = data;
         boundSkillId = data.skillId;
         iconImage.sprite = data.skillIcon;
-        Debug.Log($"[SkillUIManager DEBUG] SetupSlot for skill {data.skillId} '{data.skillName}'. Icon is null? {data.skillIcon == null}. Setting onto {gameObject.name}");
+
         cooldownOverlay.fillAmount = 0f;
-        
-        // Cố tình ép màu trắng và alpha = 1 để tránh bị đen
+
         iconImage.color = Color.white;
 
-        // THAY ĐỔI: Đăng ký lắng nghe biến số lượng cừu mới
         if (playerSkills != null) playerSkills.currentLambCount.OnValueChanged -= OnLambCountChanged;
         playerSkills = pSkills;
         if (playerSkills != null) playerSkills.currentLambCount.OnValueChanged += OnLambCountChanged;
@@ -43,7 +41,6 @@ public class SkillUIManager : MonoBehaviour
             lambsReqText.gameObject.SetActive(false);
         }
 
-        // Kiểm tra trạng thái Khóa/Mở ngay lập tức bằng số cừu thực tế
         CheckLockState(playerSkills.currentLambCount.Value);
     }
 
@@ -55,11 +52,10 @@ public class SkillUIManager : MonoBehaviour
     private void OnDisable()
     {
         PlayerSkills.OnSkillCooldownStarted -= HandleSkillCooldown;
-        // THAY ĐỔI: Hủy đăng ký an toàn bằng biến đếm cừu mới
+
         if (playerSkills != null) playerSkills.currentLambCount.OnValueChanged -= OnLambCountChanged;
     }
 
-    // THAY ĐỔI: Hàm tự động chạy khi số cừu của Player thay đổi trên Server
     private void OnLambCountChanged(int previousValue, int newValue)
     {
         CheckLockState(newValue);
@@ -74,15 +70,15 @@ public class SkillUIManager : MonoBehaviour
     private void CheckLockState(int currentSheepValue)
     {
         if (skillData == null) return;
-        
+
         // Force unlock cho Multiplayer, normal lock for Singleplayer
         bool isMultiplayer = IsMultiplayerScene();
-        bool isLocked = !isMultiplayer && (currentSheepValue < skillData.lambsRequired); 
-        
-        if (lockedOverlay != null) 
+        bool isLocked = !isMultiplayer && (currentSheepValue < skillData.lambsRequired);
+
+        if (lockedOverlay != null)
         {
             lockedOverlay.SetActive(isLocked);
-            Debug.Log($"[SkillUIManager DEBUG] CheckLockState: {skillData.skillName} | isLocked = {isLocked} | lockedOverlay active self: {lockedOverlay.activeSelf}");
+
         }
 
         // Add greyed-out visual effect using the cooldown overlay
@@ -99,7 +95,7 @@ public class SkillUIManager : MonoBehaviour
         }
         else
         {
-            Debug.Log($"[SkillUIManager DEBUG] CheckLockState: {skillData.skillName} | lockedOverlay is NULL!");
+
         }
     }
 

@@ -7,7 +7,7 @@ public class UnityNetworkConnectionService : INetworkConnectionService
     {
         if (NetworkManager.Singleton == null)
         {
-            UnityEngine.Debug.LogError("[UnityNetworkConnectionService] NetworkManager.Singleton is null! Make sure a NetworkManager GameObject exists in your active scene.");
+            UnityEngine.
             return;
         }
 
@@ -25,7 +25,7 @@ public class UnityNetworkConnectionService : INetworkConnectionService
     {
         if (NetworkManager.Singleton == null)
         {
-            UnityEngine.Debug.LogError("[UnityNetworkConnectionService] NetworkManager.Singleton is null! Make sure a NetworkManager GameObject exists in your active scene.");
+            UnityEngine.
             return;
         }
 

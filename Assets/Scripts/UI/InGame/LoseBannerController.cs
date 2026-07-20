@@ -20,28 +20,27 @@ namespace AttoTheSheep.UI.InGame
         {
             if (retryButton != null)
                 retryButton.onClick.AddListener(OnRetryClicked);
-            
+
             if (mainMenuButton != null)
                 mainMenuButton.onClick.AddListener(OnMainMenuClicked);
         }
 
         private void OnRetryClicked()
         {
-            Debug.Log("[LoseBanner] Đang chơi lại Level hiện tại...");
-            Time.timeScale = 1f; // Bỏ trạng thái pause trước khi load lại
-            
+
+            Time.timeScale = 1f;
+
             if (Unity.Netcode.NetworkManager.Singleton != null)
             {
                 Unity.Netcode.NetworkManager.Singleton.Shutdown();
             }
 
-            // Load lại chính scene hiện tại
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
 
         private void OnMainMenuClicked()
         {
-            Debug.Log("[LoseBanner] Về Main Menu...");
+
             Time.timeScale = 1f;
 
             if (Unity.Netcode.NetworkManager.Singleton != null)
@@ -57,8 +56,7 @@ namespace AttoTheSheep.UI.InGame
             if (earnedGoldText != null)
             {
                 earnedGoldText.text = $"<color=red>+{earnedGold}</color>";
-                
-                // Nếu muốn Banner này TỰ ĐỘNG cộng tiền luôn, mở comment dòng dưới:
+
                 // if (AttoTheSheep.UI.ShopAndInventory.InventoryManager.Instance != null)
                 //     AttoTheSheep.UI.ShopAndInventory.InventoryManager.Instance.AddGold(earnedGold);
             }

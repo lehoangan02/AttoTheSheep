@@ -20,7 +20,7 @@ namespace AttoTheSheep.UI.Shared
         private void OnEnable()
         {
             LocalizationManager.OnLanguageChanged += UpdateText;
-            UpdateText(); // Cập nhật ngay khi được bật lên
+            UpdateText();
         }
 
         private void OnDisable()

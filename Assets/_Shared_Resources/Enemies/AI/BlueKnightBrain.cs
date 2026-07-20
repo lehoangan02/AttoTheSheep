@@ -87,7 +87,7 @@ public class BlueKnightBrain : EnemyBrain
     // Animation events
     public void OnAttackHitStart()
     {
-        if (hitbox == null) { Debug.LogWarning($"[{GetType().Name}] hitbox not wired on {gameObject.name}"); return; }
+        if (hitbox == null) {  return; }
         hitbox?.Enable(knightData.attackDamage);
     }
     public void OnAttackHitEnd() => hitbox?.Disable();

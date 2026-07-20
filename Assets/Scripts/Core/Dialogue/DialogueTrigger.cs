@@ -14,7 +14,7 @@ public class DialogueTrigger : MonoBehaviour
     [Header("Dialogue Content")]
     [Tooltip("The dialogue asset to play when triggered.")]
     public DialogueData dialogueData;
-    
+
     [Tooltip("Event triggered when this dialogue finishes playing.")]
     public UnityEngine.Events.UnityEvent onDialogueEnded;
 
@@ -25,7 +25,7 @@ public class DialogueTrigger : MonoBehaviour
     [Header("Proximity Events (Optional)")]
     [Tooltip("Fired when the player enters the trigger collider.")]
     public UnityEngine.Events.UnityEvent onPlayerEnterRange;
-    
+
     [Tooltip("Fired when the player exits the trigger collider.")]
     public UnityEngine.Events.UnityEvent onPlayerExitRange;
 
@@ -94,7 +94,7 @@ public class DialogueTrigger : MonoBehaviour
             {
                 bool isLocal = true;
                 if (pc.NetworkObject != null && pc.NetworkObject.IsSpawned) isLocal = pc.IsOwner;
-                
+
                 if (isLocal)
                 {
                     _playerInRange = true;
@@ -114,7 +114,7 @@ public class DialogueTrigger : MonoBehaviour
             {
                 bool isLocal = true;
                 if (pc.NetworkObject != null && pc.NetworkObject.IsSpawned) isLocal = pc.IsOwner;
-                
+
                 if (isLocal)
                 {
                     _playerInRange = false;
@@ -130,15 +130,14 @@ public class DialogueTrigger : MonoBehaviour
     /// </summary>
     public void TriggerDialogue()
     {
-        Debug.Log("[DialogueTrigger] TriggerDialogue() called! By button or keypress.");
-        
+
         if (DialogueManager.Instance != null && dialogueData != null)
         {
             DialogueManager.Instance.StartDialogue(dialogueData, () => onDialogueEnded?.Invoke());
         }
         else
         {
-            Debug.LogWarning("[DialogueTrigger] Missing DialogueManager or DialogueData!");
+
         }
     }
 }

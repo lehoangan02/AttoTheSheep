@@ -39,24 +39,24 @@ public class WaveController : MonoBehaviour
     {
         if (_spawnRoutine != null)
         {
-            Debug.LogWarning($"[WaveController] {name} already spawning.");
+
             return;
         }
 
         if (waveData == null)
         {
-            Debug.LogError($"[WaveController] {name} has no WaveData assigned.");
+
             return;
         }
 
-        if (logEvents) Debug.Log($"[WaveController] {name} wave started.");
+        if (logEvents)
         _spawnRoutine = StartCoroutine(SpawnRoutine());
     }
 
     /// <summary>Called by LevelManager on level restart.</summary>
     public void ResetWave()
     {
-        if (logEvents) Debug.Log($"[WaveController] {name} resetting.");
+        if (logEvents)
 
         if (_spawnRoutine != null)
         {
@@ -101,17 +101,17 @@ public class WaveController : MonoBehaviour
     private IEnumerator SpawnRoutine()
     {
         int totalToSpawn = waveData.TotalEnemyCount * _difficultyMultiplier;
-        
+
         while (_spawnedCount < totalToSpawn)
         {
             SpawnOneEnemy();
-            
+
             // Speed up spawn interval as rounds increase so it doesn't take forever
             float currentInterval = Mathf.Max(0.5f, waveData.SpawnInterval / (1f + (_difficultyMultiplier - 1) * 0.25f));
             yield return new WaitForSeconds(currentInterval);
         }
 
-        if (logEvents) Debug.Log($"[WaveController] {name}: all {_spawnedCount} enemies spawned.");
+        if (logEvents)
     }
 
     private void SpawnOneEnemy()
@@ -130,7 +130,7 @@ public class WaveController : MonoBehaviour
 
         if (prefab == null)
         {
-            Debug.LogWarning($"[WaveController] {name}: no enemy prefab available.");
+
             return;
         }
 
@@ -140,7 +140,7 @@ public class WaveController : MonoBehaviour
         NetworkObject netObj = instance.GetComponent<NetworkObject>();
         if (netObj == null)
         {
-            Debug.LogError($"[WaveController] {prefab.name} has no NetworkObject component.");
+
             Destroy(instance);
             return;
         }
@@ -157,7 +157,7 @@ public class WaveController : MonoBehaviour
                 {
                     // Scale enemy health based on round multiplier (optional, but requested increasing difficulty)
                     int scaledHealth = enemyEntity.Data.maxHealth;
-                    if (_difficultyMultiplier > 1) 
+                    if (_difficultyMultiplier > 1)
                     {
                         scaledHealth = Mathf.CeilToInt(scaledHealth * (1f + (_difficultyMultiplier - 1) * 0.5f));
                     }
@@ -174,7 +174,7 @@ public class WaveController : MonoBehaviour
 
         netObj.Spawn(true);
 
-        if (logEvents) Debug.Log($"[WaveController] Spawned {prefab.name} at {position}. alive={_aliveCount}");
+        if (logEvents)
     }
 
     private Transform GetRandomSpawnPoint()
@@ -190,7 +190,7 @@ public class WaveController : MonoBehaviour
         _aliveCount--;
 
         // Clean up dead enemies from the tracker next frame (or lazily in ResetWave).
-        if (logEvents) Debug.Log($"[WaveController] Enemy died. alive={_aliveCount}");
+        if (logEvents)
 
         CheckCleared();
     }
@@ -204,7 +204,7 @@ public class WaveController : MonoBehaviour
             _isCleared = true;
             _spawnRoutine = null;
 
-            if (logEvents) Debug.Log($"[WaveController] {name} wave cleared!");
+            if (logEvents)
             OnWaveCleared?.Invoke(this);
         }
     }

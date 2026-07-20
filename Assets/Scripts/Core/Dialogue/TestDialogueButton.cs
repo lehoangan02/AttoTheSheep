@@ -19,7 +19,6 @@ public class TestDialogueButton : MonoBehaviour
 
     private void OpenDialogue()
     {
-        Debug.Log("[TestDialogueButton] Clicked.");
 
         var mgr = DialogueManager.Instance;
         if (mgr == null)
@@ -28,14 +27,14 @@ public class TestDialogueButton : MonoBehaviour
             mgr = FindFirstObjectByType<DialogueManager>();
             if (mgr == null)
             {
-                Debug.LogError("[TestDialogueButton] No DialogueManager found in scene!");
+
                 return;
             }
         }
 
         if (dialogueData == null)
         {
-            Debug.LogError("[TestDialogueButton] dialogueData is not assigned!");
+
             return;
         }
 

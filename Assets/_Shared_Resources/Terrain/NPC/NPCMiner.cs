@@ -2,8 +2,8 @@ using UnityEngine;
 
 public class MinerNPC : MonoBehaviour
 {
-    public enum MinerState 
-    { 
+    public enum MinerState
+    {
         Mining,
         RunningToHouse,
         InHouse,
@@ -11,26 +11,25 @@ public class MinerNPC : MonoBehaviour
     }
 
     [Header("References")]
-    public Transform goldMine;          // Kéo Transform của Mỏ Vàng vào đây để xác định hướng đào
-    public Transform house;             // Kéo Transform của Nhà vào đây
-    public Animator animator;           // Kéo Animator của NPC vào đây
-    public Renderer npcRenderer;        // Kéo SpriteRenderer của NPC vào đây
+    public Transform goldMine;
+    public Transform house;
+    public Animator animator;
+    public Renderer npcRenderer;
 
     [Header("Stats")]
     public float moveSpeed = 3f;
-    public float miningDuration = 5f;   // Thời gian đào tại mỏ
-    public float houseStayDuration = 3f; // Thời gian ở trong nhà
+    public float miningDuration = 5f;
+    public float houseStayDuration = 3f;
 
     private MinerState currentState;
-    private Vector3 initialPosition;    // Vị trí mỏ ban đầu
+    private Vector3 initialPosition;
     private float currentTimer = 0f;
 
     void Start()
     {
-        // Lưu vị trí xuất phát làm điểm đào cố định
+
         initialPosition = transform.position;
-        
-        // Bắt đầu bằng việc đào
+
         ChangeState(MinerState.Mining);
     }
 
@@ -39,7 +38,7 @@ public class MinerNPC : MonoBehaviour
         switch (currentState)
         {
             case MinerState.Mining:
-                // Ép NPC luôn quay mặt về hướng mỏ vàng khi đang đào
+
                 FaceTarget(goldMine.position);
 
                 currentTimer += Time.deltaTime;
@@ -75,25 +74,22 @@ public class MinerNPC : MonoBehaviour
         }
     }
 
-    // Hàm di chuyển tịnh tiến 2D và tự động lật mặt theo hướng đi
     void MoveTo(Vector3 destination)
     {
         Vector3 targetPosition = new Vector3(destination.x, destination.y, transform.position.z);
         transform.position = Vector3.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
 
-        // Lật mặt theo hướng di chuyển
         FaceTarget(destination);
     }
 
-    // Hàm bổ trợ xử lý lật mặt (Flip) trong Game 2D dựa trên tọa độ X
     void FaceTarget(Vector3 targetPosition)
     {
-        // Nếu mục tiêu ở bên phải NPC -> nhìn sang phải (scale x = 1 hoặc giá trị dương ban đầu)
+
         if (targetPosition.x > transform.position.x)
         {
             transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
         }
-        // Nếu mục tiêu ở bên trái NPC -> nhìn sang trái (scale x = số âm)
+
         else if (targetPosition.x < transform.position.x)
         {
             transform.localScale = new Vector3(-Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
@@ -105,18 +101,15 @@ public class MinerNPC : MonoBehaviour
         currentState = newState;
         currentTimer = 0f;
 
-        // Xử lý ẩn/hiện hình ảnh khi vào/ra nhà
         if (npcRenderer != null)
         {
             npcRenderer.enabled = (currentState != MinerState.InHouse);
         }
 
-        // Reset toàn bộ animation booleans
         animator.SetBool("IsMining", false);
         animator.SetBool("IsCarrying", false);
         animator.SetBool("IsRunning", false);
 
-        // Kích hoạt animation mới khớp với trạng thái
         switch (currentState)
         {
             case MinerState.Mining:

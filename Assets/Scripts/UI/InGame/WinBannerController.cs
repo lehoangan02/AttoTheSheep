@@ -12,7 +12,7 @@ namespace AttoTheSheep.UI.InGame
 
         [Header("Scene Settings")]
         [SerializeField] private string mainMenuSceneName = "MainMenu";
-        [SerializeField] private string nextLevelSceneName = "Level2"; // Thay đổi tên scene màn tiếp theo nếu cần
+        [SerializeField] private string nextLevelSceneName = "Level2";
 
         [Header("Reward UI")]
         [SerializeField] private TMPro.TextMeshProUGUI earnedGoldText;
@@ -21,34 +21,32 @@ namespace AttoTheSheep.UI.InGame
         {
             if (nextLevelButton != null)
                 nextLevelButton.onClick.AddListener(OnNextLevelClicked);
-            
+
             if (mainMenuButton != null)
                 mainMenuButton.onClick.AddListener(OnMainMenuClicked);
 
-            // TODO: Bạn có thể play animation popup ở đây bằng Animator hoặc DOTween
             // GetComponent<Animator>()?.Play("PopUp");
         }
 
         private void OnNextLevelClicked()
         {
-            Debug.Log("[WinBanner] Chuyển sang màn tiếp theo...");
-            Time.timeScale = 1f; // Đảm bảo game không bị khựng khi sang màn mới
-            
+
+            Time.timeScale = 1f;
+
             if (Unity.Netcode.NetworkManager.Singleton != null)
             {
                 Unity.Netcode.NetworkManager.Singleton.Shutdown();
             }
 
-            // Tự động tính toán màn tiếp theo nếu tên màn hiện tại có dạng "LevelX"
             string currentScene = SceneManager.GetActiveScene().name;
             string targetScene = nextLevelSceneName;
 
             // if (currentScene.StartsWith("Level") && int.TryParse(currentScene.Replace("Level", ""), out int currentLevelNum))
             // {
-            //     // Nếu là Level 3 (màn cuối), ép buộc về Main Menu
+
             //     if (currentLevelNum >= 3)
             //     {
-            //         Debug.Log("[WinBanner] Đã hoàn thành Level 3, chuyển về Main Menu.");
+            //
             //         targetScene = mainMenuSceneName;
             //     }
             //     else
@@ -60,20 +58,20 @@ namespace AttoTheSheep.UI.InGame
             //         }
             //         else
             //         {
-            //             Debug.LogWarning($"[WinBanner] Không tìm thấy {nextLevel} trong Build Settings. Về Main Menu.");
+            //
             //             targetScene = mainMenuSceneName;
             //         }
             //     }
             // }
-            Debug.Log($"[WinBanner] Chuyển sang scene: {targetScene}");
+
             SceneManager.LoadScene(targetScene);
         }
 
         private void OnMainMenuClicked()
         {
-            Debug.Log("[WinBanner] Về Main Menu...");
+
             Time.timeScale = 1f;
-            
+
             if (Unity.Netcode.NetworkManager.Singleton != null)
             {
                 Unity.Netcode.NetworkManager.Singleton.Shutdown();
@@ -87,8 +85,7 @@ namespace AttoTheSheep.UI.InGame
             if (earnedGoldText != null)
             {
                 earnedGoldText.text = $"<color=green>+{earnedGold}</color>";
-                
-                // Nếu muốn Banner này TỰ ĐỘNG cộng tiền luôn, mở comment dòng dưới:
+
                 // if (AttoTheSheep.UI.ShopAndInventory.InventoryManager.Instance != null)
                 //     AttoTheSheep.UI.ShopAndInventory.InventoryManager.Instance.AddGold(earnedGold);
             }

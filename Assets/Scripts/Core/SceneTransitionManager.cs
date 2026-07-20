@@ -31,11 +31,10 @@ namespace AttoTheSheep.Core
         {
             if (string.IsNullOrEmpty(sceneName))
             {
-                Debug.LogWarning("Scene name to load is empty!");
+
                 return;
             }
 
-            Debug.Log($"[SceneTransitionManager] Loading scene: {sceneName}");
             // In the future, we could start a coroutine here to fade the screen to black before loading.
             SceneManager.LoadScene(sceneName);
         }

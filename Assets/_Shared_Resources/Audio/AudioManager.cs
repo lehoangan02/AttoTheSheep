@@ -10,7 +10,7 @@ public class AudioManager : MonoBehaviour
 
     [Header("Pool Settings")]
     [Tooltip("Số lượng loa chuẩn bị sẵn trong kho")]
-    public int poolSize = 20; 
+    public int poolSize = 20;
     private List<AudioSource> audioPool = new List<AudioSource>();
 
     public enum MusicType
@@ -29,7 +29,7 @@ public class AudioManager : MonoBehaviour
     public AudioClip level1Music;
     public AudioClip level2Music;
     public AudioClip level3Music;
-    
+
     [Header("UI SFX")]
     [Tooltip("Âm thanh mặc định khi click vào bất kỳ UI Button nào")]
     public AudioClip defaultUIButtonClickSFX;
@@ -60,17 +60,16 @@ public class AudioManager : MonoBehaviour
         bgmVolume = 1.0f;
         sfxVolume = 0.7f;
 
-        // Setup Singleton và giữ cho nó sống xuyên suốt các Scene
-        if (Instance == null) 
+        if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject); // Không bị hủy khi load màn mới
-            InitializePool(); // Khởi tạo kho loa ngay khi game chạy
+            DontDestroyOnLoad(gameObject);
+            InitializePool();
             InitializeBGM();
         }
-        else 
+        else
         {
-            // Nếu lỡ có 2 cái AudioManager sinh ra, hủy cái mới đi
+
             Destroy(gameObject);
         }
     }
@@ -87,7 +86,7 @@ public class AudioManager : MonoBehaviour
         bgmSource.loop = true; // Loop the music
         bgmSource.playOnAwake = false;
         bgmSource.spatialBlend = 0f; // 2D sound for BGM
-        bgmSource.volume = bgmVolume; 
+        bgmSource.volume = bgmVolume;
     }
 
     private AudioClip GetClipFromType(MusicType type)
@@ -107,20 +106,17 @@ public class AudioManager : MonoBehaviour
     {
         AudioClip clipToPlay = GetClipFromType(targetType);
 
-        // Nếu chọn None thì tắt nhạc
         if (clipToPlay == null)
         {
             bgmSource.Stop();
             return;
         }
 
-        // Nếu bài nhạc đó ĐANG PHÁT rồi, thì KHÔNG RESTART LẠI (rất quan trọng cho UI scenes)
         if (bgmSource.isPlaying && bgmSource.clip == clipToPlay)
         {
             return;
         }
 
-        // Nếu là bài mới thì đổi qua bài đó và phát
         bgmSource.clip = clipToPlay;
         bgmSource.Play();
     }
@@ -130,13 +126,12 @@ public class AudioManager : MonoBehaviour
         for (int i = 0; i < poolSize; i++)
         {
             GameObject speakerObj = new GameObject("Speaker_" + i);
-            speakerObj.transform.SetParent(this.transform); // Gom các loa làm con của AudioManager
-            
+            speakerObj.transform.SetParent(this.transform);
+
             AudioSource source = speakerObj.AddComponent<AudioSource>();
             source.playOnAwake = false;
             source.volume = sfxVolume;
-            
-            // Cài đặt âm thanh 3D giả lập cho Game 2D
+
             source.spatialBlend = 1f;
             source.minDistance = 15f;
             source.maxDistance = 30f;
@@ -150,51 +145,43 @@ public class AudioManager : MonoBehaviour
     {
         foreach (AudioSource source in audioPool)
         {
-            if (!source.isPlaying) return source; 
+            if (!source.isPlaying) return source;
         }
-        
-        // Nếu tất cả các loa đều đang phát (quá tải), lấy đại loa đầu tiên
-        return audioPool[0]; 
+
+        return audioPool[0];
     }
 
-    // Hàm gọi để phát âm thanh từ BaseSkillComponent
-    // Cập nhật hàm này: Thêm tham số float duration
     public void PlaySFX_Directional2D(AudioClip clip, Vector2 spawnPosition, float duration = 0f)
     {
         if (clip == null) return;
 
         AudioSource speaker = GetAvailableSpeaker();
-        speaker.spatialBlend = 1f; // Trả lại 3D cho âm thanh trong game
+        speaker.spatialBlend = 1f;
         speaker.transform.position = new Vector3(spawnPosition.x, spawnPosition.y, 0f);
         speaker.clip = clip;
-        speaker.pitch = Random.Range(0.95f, 1.05f); 
+        speaker.pitch = Random.Range(0.95f, 1.05f);
         speaker.Play();
 
-        // NẾU CÓ CÀI ĐẶT THỜI GIAN ÉP BUỘC TẮT (DURATION > 0)
         if (duration > 0f)
         {
             StartCoroutine(ForceStopSpeaker(speaker, clip, duration));
         }
     }
 
-    // Hàm phát âm thanh 2D toàn cục (dùng cho UI không gian phẳng)
     public void PlaySFX_2D(AudioClip clip)
     {
         if (clip == null) return;
         AudioSource speaker = GetAvailableSpeaker();
         speaker.spatialBlend = 0f; // Force 2D
         speaker.clip = clip;
-        speaker.pitch = Random.Range(0.95f, 1.05f); 
+        speaker.pitch = Random.Range(0.95f, 1.05f);
         speaker.Play();
     }
 
-    // Coroutine canh giờ tắt loa
     private IEnumerator ForceStopSpeaker(AudioSource speaker, AudioClip originalClip, float delay)
     {
         yield return new WaitForSeconds(delay);
-        
-        // Kiểm tra an toàn: Đảm bảo loa đang phát và file âm thanh vẫn là file cũ 
-        // (Phòng trường hợp loa vừa tắt đã bị thằng khác mượn)
+
         if (speaker != null && speaker.isPlaying && speaker.clip == originalClip)
         {
             speaker.Stop();

@@ -65,16 +65,16 @@ namespace AttoTheSheep.UI.ShopAndInventory
         public void ShowItemDetails(ActionItem item)
         {
             _selectedItem = item;
-            if (detailIcon != null) 
+            if (detailIcon != null)
             {
                 detailIcon.sprite = item.icon;
                 detailIcon.gameObject.SetActive(true);
             }
-            
+
             string nameKey = string.IsNullOrEmpty(item.itemName) ? item.name : item.itemName;
             if (string.IsNullOrEmpty(nameKey)) nameKey = "Unknown Item";
             string descKey = string.IsNullOrEmpty(item.itemDescription) ? "Mysterious Item" : item.itemDescription;
-            
+
             string translatedName = AttoTheSheep.Core.LocalizationManager.Instance != null ? AttoTheSheep.Core.LocalizationManager.Instance.GetText(nameKey) : nameKey;
             string translatedDesc = AttoTheSheep.Core.LocalizationManager.Instance != null ? AttoTheSheep.Core.LocalizationManager.Instance.GetText(descKey) : descKey;
 

@@ -59,14 +59,13 @@ public class PlayerCheats : NetworkBehaviour
     [SerializeField] private Renderer[] playerRenderers;
     [Tooltip("Màu chớp sáng (Nên bật HDR để có hiệu ứng Glow/Bloom)")]
     [ColorUsage(true, true)] [SerializeField] private Color flashColor = new Color(2f, 2f, 2f, 1f);
-    [SerializeField] private float flashDuration = 0.2f; // Tăng nhẹ một chút để thấy rõ nhịp đập
+    [SerializeField] private float flashDuration = 0.2f;
 
     [Tooltip("Kéo Object chứa đồ họa/hình ảnh của nhân vật vào đây để phóng to thu nhỏ mà không lỗi vật lý.")]
     [SerializeField] private Transform visualTransform;
     [Tooltip("Độ phóng to tối đa khi kích hoạt (Ví dụ: 1.25 là phóng to thêm 25%)")]
     [SerializeField] private float pulseScaleMultiplier = 1.25f;
 
-    // Lưu trữ Coroutine để tránh việc spam cheat làm tắt hạt sai thời điểm
     private Coroutine damageAuraCoroutine;
     private Coroutine speedWindCoroutine;
     private Coroutine flashCoroutine;
@@ -192,7 +191,7 @@ public class PlayerCheats : NetworkBehaviour
         CheatSlotConfig slot = FindSlot(cheatId);
         if (slot == null)
         {
-            Debug.LogWarning($"[Cheats] No slot configured for Cheat ID {cheatId}.");
+
             return;
         }
 
@@ -207,13 +206,13 @@ public class PlayerCheats : NetworkBehaviour
         CheatSlotConfig slot = FindSlot(cheatId);
         if (slot == null)
         {
-            Debug.LogWarning($"[Cheats] Server missing slot config for Cheat ID {cheatId}.");
+
             return;
         }
 
         if (slot.buffs == null || slot.buffs.Count == 0)
         {
-            Debug.LogWarning($"[Cheats] Slot '{slot.cheatName}' has no buffs configured.");
+
             return;
         }
 
@@ -285,11 +284,11 @@ public class PlayerCheats : NetworkBehaviour
 
         float finalMultiplier = Mathf.Max(0f, multiplier);
         float finalDuration = Mathf.Max(0f, duration);
-        
+
         playerSkills.damageMultiplier.Value = finalMultiplier;
 
         PlayDamageAuraClientRpc(finalDuration);
-        PlayActivationFXClientRpc(); 
+        PlayActivationFXClientRpc();
     }
 
     private void ApplySpeedBoost(float multiplier, float duration, float accelerationDuration)
@@ -304,7 +303,7 @@ public class PlayerCheats : NetworkBehaviour
         }
 
         PlaySpeedWindClientRpc(finalDuration);
-        PlayActivationFXClientRpc(); 
+        PlayActivationFXClientRpc();
 
         FlockManager fm = GetFlockManager();
         if (fm != null)
@@ -326,14 +325,13 @@ public class PlayerCheats : NetworkBehaviour
     [ClientRpc]
     private void PlayActivationFXClientRpc()
     {
-        // 1. Phát hạt sóng xung kích
+
         if (shockwaveParticles != null)
         {
             shockwaveParticles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
             shockwaveParticles.Play(true);
         }
 
-        // 2. Chớp nháy nhân vật kết hợp Co Giãn (Glow Up + Pulse Scale)
         if (flashCoroutine != null) StopCoroutine(flashCoroutine);
         flashCoroutine = StartCoroutine(FlashAndPulseRoutine());
     }
@@ -377,48 +375,41 @@ public class PlayerCheats : NetworkBehaviour
     private IEnumerator FlashAndPulseRoutine()
     {
         MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
-        
-        // Xác định đối tượng cần Scale (Ưu tiên visualTransform, nếu trống thì dùng chính nó)
+
         Transform targetTransform = visualTransform != null ? visualTransform : transform;
         Vector3 originalScale = targetTransform.localScale;
 
         float elapsed = 0f;
 
-        // Bắt đầu áp màu chớp sáng lên tất cả Renderer
         foreach (var r in playerRenderers)
         {
             if (r == null) continue;
             r.GetPropertyBlock(propBlock);
             propBlock.SetColor("_Color", flashColor);
             propBlock.SetColor("_BaseColor", flashColor);
-            propBlock.SetColor("_EmissionColor", flashColor); 
+            propBlock.SetColor("_EmissionColor", flashColor);
             r.SetPropertyBlock(propBlock);
         }
 
-        // Vòng lặp nội suy mượt mà hiệu ứng tim đập (Pulse Scale)
         while (elapsed < flashDuration)
         {
             elapsed += Time.deltaTime;
             float pct = elapsed / flashDuration;
 
-            // Sử dụng hàm Sin từ 0 -> PI để tạo đồ thị hình parabol (0 tăng lên 1 rồi hạ xuống 0)
             float pulseCurve = Mathf.Sin(pct * Mathf.PI);
 
-            // Nội suy kích thước dựa trên nhịp đập hình Sin
             targetTransform.localScale = originalScale * Mathf.Lerp(1f, pulseScaleMultiplier, pulseCurve);
 
             yield return null;
         }
 
-        // Đảm bảo trả kích thước về chuẩn xác ban đầu
         targetTransform.localScale = originalScale;
 
-        // Khôi phục lại trạng thái vật liệu ban đầu (Xóa màu flash)
         foreach (var r in playerRenderers)
         {
             if (r == null) continue;
             r.GetPropertyBlock(propBlock);
-            propBlock.Clear(); 
+            propBlock.Clear();
             r.SetPropertyBlock(propBlock);
         }
     }
@@ -433,8 +424,7 @@ public class PlayerCheats : NetworkBehaviour
     }
     public void ActivateCheat(int cheatId)
     {
-        // Gọi thẳng vào hàm xử lý hiện tại của bạn để đảm bảo
-        // hiệu ứng mạng (ServerRpc) và các check IsOwner vẫn hoạt động bình thường
+
         HandleCheatActivated(cheatId);
     }
 }

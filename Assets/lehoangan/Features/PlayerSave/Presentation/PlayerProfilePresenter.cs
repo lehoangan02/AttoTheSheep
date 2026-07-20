@@ -36,15 +36,13 @@ public class PlayerProfilePresenter : MonoBehaviour
 
     private async Task LoadPlayerData()
     {
-        Debug.Log("Loading player data...");
-        
+
         // Execute the Use Case to get the profile
         _currentPlayerProfile = await _loadPlayerUseCase.ExecuteAsync();
 
         // Update the UI
         UpdateUI();
-        
-        Debug.Log("Player data loaded successfully!");
+
     }
 
     private void UpdateUI()
@@ -60,9 +58,9 @@ public class PlayerProfilePresenter : MonoBehaviour
     private void OnAddCoinsClicked()
     {
         if (_currentPlayerProfile == null) return;
-        
+
         _currentPlayerProfile.AddExp(50); // Using the existing AddExp method from your PlayerProfile
-        
+
         UpdateUI();
     }
 
@@ -71,12 +69,10 @@ public class PlayerProfilePresenter : MonoBehaviour
         if (_currentPlayerProfile == null) return;
 
         if (saveButton != null) saveButton.interactable = false; // Prevent spamming
-        Debug.Log("Saving player data...");
 
         // Save using the repository (Alternatively, create a SavePlayerUseCase to encapsulate this)
         await _playerRepository.SaveAsync(_currentPlayerProfile);
 
-        Debug.Log("Player data saved successfully!");
         if (saveButton != null) saveButton.interactable = true;
     }
 }

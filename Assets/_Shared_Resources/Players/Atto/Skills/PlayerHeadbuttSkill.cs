@@ -2,24 +2,24 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
-using Unity.Cinemachine; // THÊM THƯ VIỆN NÀY
+using Unity.Cinemachine;
 
 public class PlayerHeadbuttSkill : BaseSkillComponent
 {
     [Header("References - Set in Inspector")]
-    [SerializeField] private Animator animator;          
-    [SerializeField] private LayerMask enemyLayer;       
-    
-    [SerializeField] private SpriteRenderer playerSprite; 
-    
+    [SerializeField] private Animator animator;
+    [SerializeField] private LayerMask enemyLayer;
+
+    [SerializeField] private SpriteRenderer playerSprite;
+
     [Header("Visual Effects")]
-    [SerializeField] private ParticleSystem impactParticle; 
+    [SerializeField] private ParticleSystem impactParticle;
 
     [Header("Camera Shake Settings")]
-    [SerializeField] private CinemachineImpulseSource impulseSource; // THÊM BIẾN NÀY
+    [SerializeField] private CinemachineImpulseSource impulseSource;
 
     private HeadbuttSkillData currentHeadbuttData;
-    
+
     private float nextAttackTimeServer = 0f;
     private float nextAttackTimeClient = 0f;
 
@@ -48,8 +48,8 @@ public class PlayerHeadbuttSkill : BaseSkillComponent
             nextAttackTimeClient = Time.time + headbuttData.attackDelay + headbuttData.recoveryTime;
         }
 
-        base.ClientPlayVisual(data); 
-        
+        base.ClientPlayVisual(data);
+
         Animator anim = animator;
         if (anim == null) anim = GetComponentInParent<Animator>();
         if (anim == null) anim = GetComponentInChildren<Animator>();
@@ -62,7 +62,7 @@ public class PlayerHeadbuttSkill : BaseSkillComponent
                 anim.SetTrigger("Headbutt");
             }
         }
-        
+
         if (data is HeadbuttSkillData hbData)
         {
             if (clientLockRoutine != null) StopCoroutine(clientLockRoutine);
@@ -77,7 +77,7 @@ public class PlayerHeadbuttSkill : BaseSkillComponent
 
         PlayerMovement movement = controller.GetComponentInChildren<PlayerMovement>();
         if (movement == null) movement = controller.GetComponentInParent<PlayerMovement>();
-        
+
         if (movement != null)
         {
             movement.isMovementLocked = true;
@@ -100,7 +100,7 @@ public class PlayerHeadbuttSkill : BaseSkillComponent
         yield return new WaitForSeconds(data.attackDelay);
 
         Vector2 facingDir = Vector2.right;
-        if (playerSprite != null && playerSprite.flipX) 
+        if (playerSprite != null && playerSprite.flipX)
         {
             facingDir = Vector2.left;
         }
@@ -111,14 +111,14 @@ public class PlayerHeadbuttSkill : BaseSkillComponent
         Collider2D[] hits = Physics2D.OverlapCircleAll(hitCenter, data.hitRadius, layer);
 
         HashSet<Collider2D> damagedEnemies = new HashSet<Collider2D>();
-        bool hasPlayedParticle = false; 
+        bool hasPlayedParticle = false;
 
         foreach (var hit in hits)
         {
             if (damagedEnemies.Add(hit))
             {
                 NetworkEntity enemyEntity = hit.GetComponent<NetworkEntity>();
-                if (enemyEntity != null) 
+                if (enemyEntity != null)
                 {
                     int finalDamage = Mathf.RoundToInt(data.damage * damageMultiplier);
                     enemyEntity.TakeDamage(finalDamage);
@@ -150,7 +150,7 @@ public class PlayerHeadbuttSkill : BaseSkillComponent
             Gizmos.color = Color.red;
             float facingX = 1f;
             if (playerSprite != null && playerSprite.flipX) facingX = -1f;
-            
+
             Vector2 hitCenter = (Vector2)transform.position + new Vector2(currentHeadbuttData.hitboxOffset.x * facingX, currentHeadbuttData.hitboxOffset.y);
             Gizmos.DrawWireSphere(hitCenter, currentHeadbuttData.hitRadius);
         }

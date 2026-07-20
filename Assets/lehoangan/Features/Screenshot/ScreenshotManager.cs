@@ -9,9 +9,9 @@ public class ScreenshotManager : MonoBehaviour
     [Header("Settings")]
     [Tooltip("Input Action Reference for screenshot (Keyboard 9). Assign in inspector or leave empty for auto-bind.")]
     public InputActionReference screenshotAction;
-    
+
     [Tooltip("Size multiplier. 1 is normal screen resolution. 2 is double, etc.")]
-    public int superSize = 1; 
+    public int superSize = 1;
 
     private void Awake()
     {
@@ -54,11 +54,11 @@ public class ScreenshotManager : MonoBehaviour
             if (action != null)
             {
                 screenshotAction = InputActionReference.Create(action);
-                Debug.Log("[ScreenshotManager] Auto-bound Screenshot action.");
+
                 return;
             }
         }
-        Debug.LogWarning("[ScreenshotManager] No Screenshot action found in loaded InputActionAssets. Assign manually.");
+
     }
 
     private void OnScreenshot(InputAction.CallbackContext ctx)
@@ -69,7 +69,7 @@ public class ScreenshotManager : MonoBehaviour
     public void TakeScreenshot()
     {
         string directoryPath;
-        
+
 #if UNITY_EDITOR
         directoryPath = Path.Combine(Application.dataPath, "../Screenshots");
 #else
@@ -82,8 +82,8 @@ public class ScreenshotManager : MonoBehaviour
 
         string fileName = "Screenshot_" + System.DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss") + ".png";
         string filePath = Path.Combine(directoryPath, fileName);
-        
+
         ScreenCapture.CaptureScreenshot(filePath, superSize);
-        Debug.Log($"[ScreenshotManager] 📸 Screenshot saved to: {filePath}");
+
     }
 }

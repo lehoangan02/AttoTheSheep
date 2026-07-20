@@ -27,7 +27,7 @@ namespace AttoTheSheep.UI.Mobile
             }
             else
             {
-                Debug.LogWarning($"[OnScreenControlsBinder] No OnScreenControl component found on {gameObject.name}. Expected OnScreenStick or OnScreenButton.");
+
             }
         }
     }

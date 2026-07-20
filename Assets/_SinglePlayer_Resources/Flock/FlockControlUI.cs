@@ -1,20 +1,20 @@
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro; // Nếu dùng Text thường của Unity cũ thì đổi thành UnityEngine.UI.Text
+using TMPro;
 
 public class FlockControlUI : MonoBehaviour
 {
     [Header("Components")]
     [SerializeField] private Button toggleButton;
-    [SerializeField] private TextMeshProUGUI buttonText; 
+    [SerializeField] private TextMeshProUGUI buttonText;
 
     [Header("Settings - Auto Mode")]
     [SerializeField] private string autoModeText = "AUTO";
-    [SerializeField] private float autoFontSize = 18f; // Kích thước chữ khi ở chế độ Auto
+    [SerializeField] private float autoFontSize = 18f;
 
     [Header("Settings - Manual Mode")]
     [SerializeField] private string manualModeText = "MANUAL";
-    [SerializeField] private float manualFontSize = 14f; // Kích thước chữ khi ở chế độ Manual
+    [SerializeField] private float manualFontSize = 14f;
 
     private FlockManager flockManager;
 
@@ -26,13 +26,12 @@ public class FlockControlUI : MonoBehaviour
         {
             toggleButton.onClick.AddListener(OnButtonClicked);
             flockManager.OnControlModeChanged += UpdateUI;
-            
-            // Cập nhật giao diện ban đầu
+
             UpdateUI(flockManager.currentControlMode);
         }
         else
         {
-            Debug.Log("[FlockControlUI] Không tìm thấy FlockManager trong Scene. Đang vô hiệu hóa giao diện.");
+
             gameObject.SetActive(false);
         }
     }
@@ -53,13 +52,13 @@ public class FlockControlUI : MonoBehaviour
         {
             buttonText.text = autoModeText;
             buttonText.color = Color.red;
-            buttonText.fontSize = autoFontSize; // Đổi kích thước chữ cho Auto
+            buttonText.fontSize = autoFontSize;
         }
         else
         {
             buttonText.text = manualModeText;
             buttonText.color = Color.yellow;
-            buttonText.fontSize = manualFontSize; // Đổi kích thước chữ cho Manual
+            buttonText.fontSize = manualFontSize;
         }
     }
 

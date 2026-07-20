@@ -2,22 +2,22 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
-using Unity.Cinemachine; // THÊM THƯ VIỆN NÀY
+using Unity.Cinemachine;
 
 public class PlayerFartSkill : BaseSkillComponent
 {
     [Header("References")]
     [SerializeField] private List<TrailRenderer> dashTrails;
-    [SerializeField] private Collider2D parentCollider; 
+    [SerializeField] private Collider2D parentCollider;
     [SerializeField] private Rigidbody2D parentRb;
-    [SerializeField] private SpriteRenderer playerSprite; 
+    [SerializeField] private SpriteRenderer playerSprite;
 
     [Header("Camera Shake Settings")]
-    [SerializeField] private CinemachineImpulseSource impulseSource; // THÊM BIẾN NÀY
+    [SerializeField] private CinemachineImpulseSource impulseSource;
 
     private FartSkillData currentFartData;
     private PlayerController fartController;
-    private bool isDashing = false; 
+    private bool isDashing = false;
     private List<Vector3> originalTrailLocalPositions;
 
     private void Start()
@@ -33,7 +33,7 @@ public class PlayerFartSkill : BaseSkillComponent
             if (trail != null)
             {
                 originalTrailLocalPositions.Add(trail.transform.localPosition);
-                trail.emitting = false; 
+                trail.emitting = false;
             }
             else
             {
@@ -53,7 +53,7 @@ public class PlayerFartSkill : BaseSkillComponent
     }
 
     public override void ClientPlayVisual(SkillData data)
-    {        
+    {
         base.ClientPlayVisual(data);
         if (data is FartSkillData fartData)
         {
@@ -75,7 +75,7 @@ public class PlayerFartSkill : BaseSkillComponent
         if (parentRb == null || parentCollider == null) yield break;
 
         Vector2 dashDir = transform.root.GetComponentInChildren<SpriteRenderer>().flipX ? Vector2.left : Vector2.right;
-        
+
         if (parentRb.linearVelocity.magnitude > 0.1f)
         {
             dashDir = parentRb.linearVelocity.normalized;
@@ -101,7 +101,7 @@ public class PlayerFartSkill : BaseSkillComponent
 
             if (hitCount > 0)
             {
-                hasCollided = true; 
+                hasCollided = true;
             }
 
             elapsed += Time.fixedDeltaTime;
@@ -115,9 +115,9 @@ public class PlayerFartSkill : BaseSkillComponent
     {
         PlayerMovement movement = transform.root.GetComponentInChildren<PlayerMovement>();
         if (movement != null) movement.isMovementLocked = true;
-        
+
         yield return new WaitForSeconds(duration);
-        
+
         if (movement != null) movement.isMovementLocked = false;
     }
 
@@ -155,7 +155,7 @@ public class PlayerFartSkill : BaseSkillComponent
     {
         if (parentRb == null || parentCollider == null)
         {
-            Debug.LogError("❌ [LOGIC LỖI] Bạn chưa kéo thả Rigidbody hoặc Collider của Object Cha vào Inspector!");
+
             yield break;
         }
 
@@ -196,10 +196,9 @@ public class PlayerFartSkill : BaseSkillComponent
 
             if (hitCount > 0)
             {
-                RaycastHit2D hit = hits[0]; 
-                Debug.Log($"🛑 [PHYSICS CAST] Tông trúng: {hit.collider.gameObject.name}. Dừng lướt!");
+                RaycastHit2D hit = hits[0];
 
-                hasCollided = true; 
+                hasCollided = true;
 
                 if (skills != null)
                 {
@@ -228,21 +227,18 @@ public class PlayerFartSkill : BaseSkillComponent
 
         currentFartData = null;
     }
-    
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (!isDashing || currentFartData == null || fartController == null) return;
 
-        Debug.Log($"🛑 [PHYSICS] Tông trúng Collider: {collision.gameObject.name}. Dừng lướt ngay lập tức!");
-        
-        isDashing = false; 
+        isDashing = false;
         Rigidbody2D rb = fartController.GetComponent<Rigidbody2D>();
         if (rb != null) rb.linearVelocity = Vector2.zero;
 
         if (((1 << collision.gameObject.layer) & currentFartData.enemyLayer) != 0)
         {
-            Debug.Log($"💥 [PHYSICS] Xác nhận mục tiêu là Enemy: {collision.gameObject.name}. Kích hoạt Knockback!");
-            
+
             NetworkEntity enemyEntity = collision.gameObject.GetComponent<NetworkEntity>();
             if (enemyEntity != null)
             {
@@ -252,7 +248,7 @@ public class PlayerFartSkill : BaseSkillComponent
                     PlayerSkills skills = fartController.GetComponentInChildren<PlayerSkills>();
                     if (skills == null) skills = fartController.GetComponentInParent<PlayerSkills>();
                     if (skills != null) damageMultiplier = skills.damageMultiplier.Value;
-                    
+
                     if (skills != null && collision.contactCount > 0)
                     {
                         skills.PlaySkillHitVisualClientRpc(currentFartData.skillId, collision.GetContact(0).point);
@@ -262,8 +258,8 @@ public class PlayerFartSkill : BaseSkillComponent
                 enemyEntity.TakeDamage(finalDamage);
 
                 float dirX = collision.transform.position.x > fartController.transform.position.x ? 1f : -1f;
-                Vector2 knockbackDir = new Vector2(dirX, 0f).normalized; 
-                
+                Vector2 knockbackDir = new Vector2(dirX, 0f).normalized;
+
                 enemyEntity.ApplyKnockback(knockbackDir * currentFartData.knockupForce, 0.3f);
             }
         }
@@ -272,7 +268,7 @@ public class PlayerFartSkill : BaseSkillComponent
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, 1f); 
+        Gizmos.DrawWireSphere(transform.position, 1f);
     }
 
     public override void ClientPlayHitEffect(SkillData data, Vector2 hitPosition)

@@ -8,9 +8,9 @@ namespace AttoTheSheep.UI.ShopAndInventory
     {
         public static InventoryManager Instance { get; private set; }
 
-        public int Gold 
-        { 
-            get 
+        public int Gold
+        {
+            get
             {
                 if (GameBootstrapper.Instance != null && GameBootstrapper.Instance.CurrentProfile != null)
                     return GameBootstrapper.Instance.CurrentProfile.Coins;
@@ -19,7 +19,6 @@ namespace AttoTheSheep.UI.ShopAndInventory
         }
         private int _localGoldFallback = 0;
 
-        // Dữ liệu item và số lượng đang có
         private Dictionary<ActionItem, int> _inventory = new Dictionary<ActionItem, int>();
 
         public delegate void OnInventoryUpdated();
@@ -35,25 +34,25 @@ namespace AttoTheSheep.UI.ShopAndInventory
         {
             if (GameBootstrapper.Instance == null)
             {
-                // Không có Bootstrapper (chạy test scene trực tiếp) → dùng local fallback
+
                 return;
             }
 
             if (GameBootstrapper.Instance.CurrentProfile != null)
             {
-                // Cloud đã load xong trước khi Start() chạy → fetch ngay
+
                 FetchInventoryFromCloud();
             }
             else
             {
-                // Cloud chưa xong → đăng ký chờ event OnBootstrapped
+
                 GameBootstrapper.Instance.OnBootstrapped += FetchInventoryFromCloud;
             }
         }
 
         private void OnDestroy()
         {
-            // Cleanup event để tránh memory leak
+
             if (GameBootstrapper.Instance != null)
                 GameBootstrapper.Instance.OnBootstrapped -= FetchInventoryFromCloud;
         }
@@ -72,7 +71,7 @@ namespace AttoTheSheep.UI.ShopAndInventory
                 _inventory[item] += amount;
             else
                 _inventory[item] = amount;
-                
+
             onInventoryUpdated?.Invoke();
             UploadInventoryToCloud();
         }
@@ -142,15 +141,14 @@ namespace AttoTheSheep.UI.ShopAndInventory
         }
 
         // =========================================
-        // HÀM DÀNH CHO TEAM CALL CLOUD API
+
         // =========================================
         public void FetchInventoryFromCloud()
         {
             if (GameBootstrapper.Instance == null || GameBootstrapper.Instance.CurrentProfile == null) return;
-            
-            Debug.Log("[InventoryManager] Fetching data from Cloud Save profile...");
+
             var profile = GameBootstrapper.Instance.CurrentProfile;
-            
+
             if (ShopManager.Instance != null)
             {
                 _inventory.Clear();
@@ -162,7 +160,7 @@ namespace AttoTheSheep.UI.ShopAndInventory
                     else if (assetName == "DeathTotem") count = profile.SpawnMaxLambsCount;
                     else if (assetName == "Meat") count = profile.SkillDamageBoostCount;
                     else if (assetName == "MushShroom") count = profile.SpeedBoostCount;
-                    
+
                     if (count > 0)
                     {
                         _inventory[item] = count;
@@ -176,9 +174,8 @@ namespace AttoTheSheep.UI.ShopAndInventory
         {
             if (GameBootstrapper.Instance == null || GameBootstrapper.Instance.CurrentProfile == null) return;
 
-            Debug.Log("[InventoryManager] Syncing to Cloud Save...");
             var profile = GameBootstrapper.Instance.CurrentProfile;
-            
+
             int shieldCount = 0;
             int deathTotemCount = 0;
             int meatCount = 0;

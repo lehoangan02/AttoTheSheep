@@ -5,7 +5,7 @@ using TMPro;
 using AttoTheSheep.UI.ShopAndInventory;
 
 /// <summary>
-/// Editor Tool: Tạo PlayerLobbyHUD cho màn Lobby
+
 /// Menu bar -> Tools -> Build Player Lobby HUD
 /// </summary>
 public class BuildPlayerLobbyHUD : EditorWindow
@@ -64,7 +64,7 @@ public class BuildPlayerLobbyHUD : EditorWindow
 
     private void BuildHUD()
     {
-        // ── Root — Canvas tự chứa, không phụ thuộc gì trong Scene ────────
+
         var rootGO = new GameObject("PlayerLobbyHUD");
         Undo.RegisterCreatedObjectUndo(rootGO, "Build PlayerLobbyHUD");
 
@@ -163,7 +163,7 @@ public class BuildPlayerLobbyHUD : EditorWindow
         so.ApplyModifiedProperties();
 
         Selection.activeGameObject = rootGO;
-        Debug.Log("[BuildPlayerLobbyHUD] ✅ Done!");
+
         EditorUtility.DisplayDialog("✅ Hoàn tất!",
             "PlayerLobbyHUD đã được tạo!\n\nKéo từ Hierarchy vào Project/Prefabs để lưu.", "OK");
     }

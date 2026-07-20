@@ -71,7 +71,7 @@ public class PlayerSpawnManager : MonoBehaviour
 
         if (playerPrefab == null)
         {
-            Debug.LogError("[PlayerSpawnManager] playerPrefab is null and could not be found in NetworkConfig!");
+
             return;
         }
 
@@ -84,12 +84,12 @@ public class PlayerSpawnManager : MonoBehaviour
         NetworkObject netObj = instance.GetComponent<NetworkObject>();
         if (netObj == null)
         {
-            Debug.LogError($"[PlayerSpawnManager] playerPrefab has no NetworkObject component!");
+
             return;
         }
 
         netObj.SpawnAsPlayerObject(clientId, destroyWithScene: true);
-        Debug.Log($"[PlayerSpawnManager] Spawned player for clientId={clientId} at {pos}");
+
     }
 
     private bool GetValidSpawnPosition(out Vector3 position)
@@ -132,7 +132,6 @@ public class PlayerSpawnManager : MonoBehaviour
             }
         }
 
-        Debug.LogWarning($"[PlayerSpawnManager] Could not find non-overlapping position after {maxSpawnAttempts} attempts. Using last candidate.");
         position = lastCandidate;
         return true;
     }

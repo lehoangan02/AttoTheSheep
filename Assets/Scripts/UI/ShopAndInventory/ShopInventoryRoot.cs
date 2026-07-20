@@ -14,19 +14,19 @@ namespace AttoTheSheep.UI.ShopAndInventory
 
         private void Start()
         {
-            // Ưu tiên SerializedField, fallback về Find() nếu chưa kéo tay
+
             if (bagButton == null)
             {
                 var go = GameObject.Find("BagButton");
                 if (go != null) bagButton = go.GetComponent<Button>();
-                else Debug.LogWarning("[ShopInventoryRoot] Không tìm thấy 'BagButton'. Hãy kéo vào Inspector!");
+                else
             }
 
             if (shopButton == null)
             {
                 var go = GameObject.Find("ShopButton");
                 if (go != null) shopButton = go.GetComponent<Button>();
-                else Debug.LogWarning("[ShopInventoryRoot] Không tìm thấy 'ShopButton'. Hãy kéo vào Inspector!");
+                else
             }
 
             if (bagButton != null)
@@ -41,7 +41,6 @@ namespace AttoTheSheep.UI.ShopAndInventory
                 shopButton.onClick.AddListener(() => shopPanel.SetActive(true));
             }
 
-            // Gắn sự kiện cho các nút CloseBtn bên trong Panel
             if (shopPanel != null)
             {
                 Transform closeBtn = shopPanel.transform.Find("ShopPanel/CloseBtn");

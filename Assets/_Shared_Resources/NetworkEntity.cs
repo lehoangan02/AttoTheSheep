@@ -12,7 +12,7 @@ public class NetworkEntity : NetworkBehaviour, IStatusTarget
 
     [SerializeField] protected float baseAttackRange = 1f;
     [SerializeField] protected float baseAttackDamage = 10f;
-    
+
     [Header("Damage Popup")]
     [SerializeField] protected TMPro.TMP_FontAsset damageFont;
 
@@ -25,9 +25,6 @@ public class NetworkEntity : NetworkBehaviour, IStatusTarget
 
     [HideInInspector] public StatusEffectController effectController;
 
-
-
-    // Biến mạng đồng bộ cho mọi người chơi thấy
     public NetworkVariable<float> currentMoveSpeed = new NetworkVariable<float>(
         0f, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server
     );
@@ -40,7 +37,6 @@ public class NetworkEntity : NetworkBehaviour, IStatusTarget
         0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server
     );
 
-    // Invulnerability flag: khi true, TakeDamage bị bỏ qua (dùng cho Rolling Skill)
     public NetworkVariable<bool> isInvulnerable = new NetworkVariable<bool>(
         false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server
     );
@@ -118,14 +114,11 @@ public class NetworkEntity : NetworkBehaviour, IStatusTarget
     {
         if (!IsServer || currentHealth.Value <= 0) return;
 
-        // Nếu đang miễn nhiễm, bỏ qua toàn bộ sát thương
         if (isInvulnerable.Value) return;
 
         int previousHealth = currentHealth.Value;
         currentHealth.Value = Mathf.Max(0, currentHealth.Value - damage);
         int actualDamage = previousHealth - currentHealth.Value;
-
-        Debug.Log($"[TakeDamage] {name} nhận {actualDamage} sát thương (gốc: {damage}). Máu: {previousHealth} → {currentHealth.Value}");
 
         if (currentHealth.Value <= 0)
         {
@@ -143,7 +136,6 @@ public class NetworkEntity : NetworkBehaviour, IStatusTarget
         int actualDamage = previousHealth - currentHealth.Value;
 
         string sourceName = (source != null) ? source.name : "Unknown";
-        Debug.Log($"[TakeDamage] {name} nhận {actualDamage} sát thương (gốc: {damage}) from {sourceName}. Máu: {previousHealth} → {currentHealth.Value}");
 
         if (currentHealth.Value <= 0)
             Die();
@@ -159,7 +151,7 @@ public class NetworkEntity : NetworkBehaviour, IStatusTarget
             currentMana.Value -= amount;
             return true;
         }
-        
+
         // If not enough mana, return false
         return false;
     }
@@ -170,8 +162,6 @@ public class NetworkEntity : NetworkBehaviour, IStatusTarget
         if (!IsServer || currentHealth.Value <= 0) return;
         currentMana.Value = Mathf.Min(baseMaxMana, currentMana.Value + amount);
     }
-
-    
 
     public virtual void Heal(int amount)
     {

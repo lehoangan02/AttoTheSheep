@@ -14,12 +14,12 @@ public class SneezeProjectile : NetworkBehaviour
     private NetworkEntity sourceEntity;
 
     private Vector2 startPosition;
-    private bool hasTriggeredPuddle = false; // Ngăn chặn việc sinh ra nhiều vũng nước cùng lúc
+    private bool hasTriggeredPuddle = false;
 
     public void Initialize(Vector2 direction, SneezeSkillData data, int overrideDamage = 0, bool flipX = false, NetworkEntity source = null)
     {
-        // QUAN TRỌNG: Reset lại trạng thái để tránh lỗi khi Object được tái sử dụng (Pooling)
-        hasTriggeredPuddle = false; 
+
+        hasTriggeredPuddle = false;
         sourceEntity = source;
 
         skillData = data;
@@ -34,11 +34,9 @@ public class SneezeProjectile : NetworkBehaviour
             rb.linearVelocity = direction * speed;
         }
 
-        // Xoay hướng đạn
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.Euler(0, 0, angle);
 
-        // Lật trục để bóng đổ luôn đúng
         Vector3 localScale = transform.localScale;
         if (direction.x < 0)
         {
@@ -51,7 +49,7 @@ public class SneezeProjectile : NetworkBehaviour
             localScale.x = Mathf.Abs(localScale.x);
         }
         transform.localScale = localScale;
-        
+
         if (IsServer)
         {
             InitializeVisualsClientRpc(direction, speed, flipX);
@@ -89,28 +87,23 @@ public class SneezeProjectile : NetworkBehaviour
     {
         if (!IsServer || hasTriggeredPuddle) return;
 
-        // --- BỘ LỌC AN TOÀN ---
-        // Bỏ qua nếu đụng trúng chính Player (người cast), các tia đạn khác, hoặc Bầy cừu
-        if (other.gameObject.CompareTag("Player") || 
-            other.GetComponent<SneezeProjectile>() != null || 
-            other.GetComponent<LambAI>() != null) 
+        if (other.gameObject.CompareTag("Player") ||
+            other.GetComponent<SneezeProjectile>() != null ||
+            other.GetComponent<LambAI>() != null)
         {
             return;
         }
 
-        // Kiểm tra xem có đụng trúng quái / tường theo Layer Mask không
         if ((skillData.hitLayer.value & (1 << other.gameObject.layer)) == 0) return;
 
-        // --- 1. CƠ CHẾ GÂY SÁT THƯƠNG ---
         NetworkEntity enemyEntity = other.GetComponent<NetworkEntity>() ?? other.GetComponentInParent<NetworkEntity>();
 
-        if (enemyEntity != null) 
+        if (enemyEntity != null)
         {
-            enemyEntity.TakeDamage(damage); 
-            Debug.Log($"💥 [SneezeProjectile] Đã gây {damage} sát thương cho {other.name}!");
+            enemyEntity.TakeDamage(damage);
+
         }
 
-        // --- 2. TẠO VŨNG NƯỚC VÀ BIẾN MẤT ---
         CreatePuddleAndDespawn();
     }
 
@@ -118,7 +111,6 @@ public class SneezeProjectile : NetworkBehaviour
     {
         if (!IsServer || hasTriggeredPuddle) return;
 
-        // Nếu bay hết tầm tối đa -> Tạo vũng nước tại đây
         float distanceTraveled = Vector2.Distance(startPosition, transform.position);
         if (distanceTraveled >= maxDistance)
         {
@@ -132,14 +124,12 @@ public class SneezeProjectile : NetworkBehaviour
 
         if (skillData.puddlePrefab != null)
         {
-            // Sinh vũng nước ra
+
             GameObject puddleObj = Instantiate(skillData.puddlePrefab, transform.position, Quaternion.identity);
-            
-            // Đồng bộ qua mạng
+
             NetworkObject netObj = puddleObj.GetComponent<NetworkObject>();
             if (netObj != null) netObj.Spawn();
 
-            // Khởi tạo thông số làm chậm
             SlowPuddle puddleScript = puddleObj.GetComponent<SlowPuddle>();
             if (puddleScript != null)
             {
@@ -147,7 +137,6 @@ public class SneezeProjectile : NetworkBehaviour
             }
         }
 
-        // Tiêu hủy viên đạn
         DespawnProjectile();
     }
 

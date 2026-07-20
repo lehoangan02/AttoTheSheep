@@ -13,16 +13,15 @@ public struct FlockLevelConfig
 public enum FlockControlMode
 {
     Manual,
-    Auto   
+    Auto
 }
 
 public class FlockManager : NetworkBehaviour
 {
     [Header("=== HARDCODED SETTINGS (CHỈNH SỬA TẠI ĐÂY) ===")]
     [Tooltip("SỬA SỐ NÀY TRONG CODE ĐỂ ĐỔI LEVEL KHỞI ĐẦU KHI RUN: 1, 2 hoặc 3")]
-    [SerializeField] private int HARDCODED_STARTING_LEVEL = 3; 
-    
-    // Hardcode các mốc kích hoạt Kỹ năng (Skill Milestones)
+    [SerializeField] private int HARDCODED_STARTING_LEVEL = 3;
+
     [SerializeField] private int lambsForSkill1 = 5;
     [SerializeField] private int lambsForSkill2 = 7;
     [SerializeField] private int lambsForSkill3 = 10;
@@ -37,15 +36,15 @@ public class FlockManager : NetworkBehaviour
 
     [Header("Flock Settings")]
     [SerializeField] private GameObject lambPrefab;
-    [SerializeField] private float radiusMultiplier = 0.5f; 
+    [SerializeField] private float radiusMultiplier = 0.5f;
 
     [Header("Skill Zone (Radius 2 - Lớn hơn)")]
-    [SerializeField] private float skillZoneRadiusMultiplier = 1.5f; 
+    [SerializeField] private float skillZoneRadiusMultiplier = 1.5f;
 
     [Header("Auto Spawn Settings")]
     [SerializeField] private bool enableAutoSpawn = true;
     [SerializeField] private float autoSpawnInterval = 10f;
-    private float spawnTimer = 0f; 
+    private float spawnTimer = 0f;
 
     [Header("Spawn Validation (Chống kẹt tường/quái)")]
     [SerializeField] private LayerMask obstacleLayer;
@@ -64,16 +63,15 @@ public class FlockManager : NetworkBehaviour
     [Header("Debug Settings")]
     [SerializeField] private bool showDebugRadius = true;
 
-    // Các biến đồng bộ Network và dữ liệu Runtime
     [HideInInspector]
     public NetworkVariable<int> currentLevel = new NetworkVariable<int>(1, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
-    
+
     public List<LambAI> activeLambs { get; private set; } = new List<LambAI>();
-    
-    public NetworkVariable<Vector2> currentFlockCenter = new NetworkVariable<Vector2>(Vector2.zero, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server); 
-        
-    public float currentFlockRadius { get; private set; } 
-    public float currentSkillZoneRadius { get; private set; } 
+
+    public NetworkVariable<Vector2> currentFlockCenter = new NetworkVariable<Vector2>(Vector2.zero, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+
+    public float currentFlockRadius { get; private set; }
+    public float currentSkillZoneRadius { get; private set; }
 
     [Header("Flock Buff Settings")]
     [SerializeField] private float healScale = 1f;
@@ -83,13 +81,13 @@ public class FlockManager : NetworkBehaviour
 
     public event Action<int> OnFlockTierChanged;
 
-    private PlayerController currentPlayer; 
-    private Vector2 lastPlayerAnchorPos; 
+    private PlayerController currentPlayer;
+    private Vector2 lastPlayerAnchorPos;
     private Vector2 flockDestination;
-    private PlayerSkills currentPlayerSkills; 
+    private PlayerSkills currentPlayerSkills;
 
     // ==========================================
-    // LOGIC HARDCODE CẤU HÌNH LEVEL
+
     // ==========================================
     public FlockLevelConfig GetCurrentLevelConfig()
     {
@@ -126,9 +124,9 @@ public class FlockManager : NetworkBehaviour
             {
                 currentPlayer.OnMapClicked += HandleMapClicked;
                 lastPlayerAnchorPos = currentPlayer.transform.position;
-                
+
                 currentPlayerSkills = currentPlayer.GetComponent<PlayerSkills>();
-                if (currentPlayerSkills == null) 
+                if (currentPlayerSkills == null)
                     currentPlayerSkills = currentPlayer.GetComponentInChildren<PlayerSkills>();
             }
         }
@@ -142,13 +140,12 @@ public class FlockManager : NetworkBehaviour
 
             UpdateActualFlockCenter();
 
-            // CHỖ THAY ĐỔI: Đồng bộ số lượng cừu thực tế sang PlayerSkills mới
             if (currentPlayerSkills != null)
             {
-                int currentLambsCount = activeLambs.Count; // Lấy tổng số cừu thực tế hiện tại
+                int currentLambsCount = activeLambs.Count;
                 if (currentPlayerSkills.currentLambCount.Value != currentLambsCount)
                 {
-                    currentPlayerSkills.currentLambCount.Value = currentLambsCount; // Gán vào biến mới
+                    currentPlayerSkills.currentLambCount.Value = currentLambsCount;
                 }
 
                 bool isInside = IsPositionInsideSkillZone(currentPlayer.transform.position);
@@ -167,10 +164,10 @@ public class FlockManager : NetworkBehaviour
 
             if (enableAutoSpawn)
             {
-                spawnTimer += Time.deltaTime; 
+                spawnTimer += Time.deltaTime;
                 if (spawnTimer >= autoSpawnInterval)
                 {
-                    spawnTimer = 0f; 
+                    spawnTimer = 0f;
                     SpawnLamb(currentFlockCenter.Value);
                 }
             }
@@ -237,7 +234,7 @@ public class FlockManager : NetworkBehaviour
                 float dist = Vector2.Distance(attackedLamb.transform.position, lamb.transform.position);
                 if (dist <= panicAlertRadius)
                 {
-                    lamb.TriggerPanic(panicDuration * 0.7f); 
+                    lamb.TriggerPanic(panicDuration * 0.7f);
                 }
             }
         }
@@ -252,7 +249,7 @@ public class FlockManager : NetworkBehaviour
         {
             Vector2 randomOffset = UnityEngine.Random.insideUnitCircle * randomOffsetRadius;
             Vector2 newFlockDestination = playerPos + randomOffset;
-            
+
             CommandFlock(newFlockDestination);
             lastPlayerAnchorPos = playerPos;
         }
@@ -264,7 +261,7 @@ public class FlockManager : NetworkBehaviour
         if (newMode == FlockControlMode.Auto && currentPlayer != null)
         {
             lastPlayerAnchorPos = currentPlayer.transform.position;
-            HandleAutoFollow(); 
+            HandleAutoFollow();
         }
     }
 
@@ -308,12 +305,12 @@ public class FlockManager : NetworkBehaviour
 
         if (!TryGetValidSpawnPosition(centerPosition, currentFlockRadius, out Vector2 spawnPos))
         {
-            Debug.LogWarning("⚠️ [FlockManager] Không tìm được vị trí trống để spawn cừu!");
-            return null; 
+
+            return null;
         }
 
         GameObject lambObj = Instantiate(lambPrefab, spawnPos, Quaternion.identity);
-        
+
         NetworkObject netObj = lambObj.GetComponent<NetworkObject>();
         if (netObj != null) netObj.Spawn(true);
 
@@ -362,7 +359,7 @@ public class FlockManager : NetworkBehaviour
         float dynamicBaseRadius = GetCurrentLevelConfig().baseRadius;
         currentFlockRadius = dynamicBaseRadius + (radiusMultiplier * Mathf.Sqrt(activeLambs.Count));
         currentSkillZoneRadius = currentFlockRadius * skillZoneRadiusMultiplier;
-        
+
         CommandFlock(flockDestination);
     }
 
@@ -405,7 +402,7 @@ public class FlockManager : NetworkBehaviour
         if (activeLambs.Count >= lambsForSkill3) return 3;
         if (activeLambs.Count >= lambsForSkill2) return 2;
         if (activeLambs.Count >= lambsForSkill1) return 1;
-        return 0; 
+        return 0;
     }
 
     private void OnDrawGizmos()
@@ -423,7 +420,7 @@ public class FlockManager : NetworkBehaviour
 
             if (Application.isPlaying && currentPlayer != null && currentControlMode == FlockControlMode.Auto)
             {
-                Gizmos.color = new Color(1f, 0f, 0f, 0.2f); 
+                Gizmos.color = new Color(1f, 0f, 0f, 0.2f);
                 Gizmos.DrawWireSphere(lastPlayerAnchorPos, playerDeadzoneRadius);
             }
         }

@@ -112,7 +112,7 @@ public class WizardBrain : EnemyBrain
                 enemyAudio.Play("ThrowStart");
                 break;
             case EnemyState.Cast:
-                Debug.Log("[WizardBrain] Transforming lamb: " + target.name);
+
                 SyncSetTrigger("Transform");
                 motor.Stop();
                 lastTransformTime = Time.time;

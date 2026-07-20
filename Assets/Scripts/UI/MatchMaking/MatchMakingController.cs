@@ -15,12 +15,12 @@ public class MatchMakingController : MonoBehaviour
 
     [Header("Scene References")]
     [SerializeField] private string mainMenuSceneName = "MainMenu";
-    
+
     [Header("UI Buttons")]
     [SerializeField] private Button backButton;
     [SerializeField] private Button createLobbyButton;
     [SerializeField] private Button joinPrivateButton;
-    
+
     [Header("Modals Shared Overlay")]
     [SerializeField] private GameObject modalOverlay;
 
@@ -75,13 +75,13 @@ public class MatchMakingController : MonoBehaviour
         {
             var fadeImg = fadeOverlay.GetComponent<UnityEngine.UI.Image>();
             var bgObj = GameObject.Find("Background");
-            
+
             // If we have a sharp background sprite, use it for the overlay
             Sprite sharpBg = null;
             #if UNITY_EDITOR
             sharpBg = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Tiny Swords/bg.png");
             #endif
-            
+
             if (fadeImg != null && sharpBg != null)
             {
                 fadeImg.sprite = sharpBg;
@@ -115,10 +115,10 @@ public class MatchMakingController : MonoBehaviour
     private void OnRealLobbyListUpdated()
     {
         var realLobbies = new System.Collections.Generic.List<AttoTheSheep.Core.LobbyData>();
-        
+
         if (LobbyManager.Instance.Presenter.AvailableLobbies != null)
         {
-            Debug.Log($"[MatchMaking] Auto-Refresh: Found {LobbyManager.Instance.Presenter.AvailableLobbies.Count} lobbies from server.");
+
             foreach (var unityLobby in LobbyManager.Instance.Presenter.AvailableLobbies)
             {
                 string customCode = "Hidden";
@@ -135,7 +135,7 @@ public class MatchMakingController : MonoBehaviour
                     MaxPlayers = unityLobby.MaxPlayers,
                     GameMode = "Multiplayer", // Always Multiplayer
                     IsPrivate = unityLobby.IsPrivate,
-                    LobbyCode = customCode 
+                    LobbyCode = customCode
                 });
             }
         }
@@ -163,19 +163,18 @@ public class MatchMakingController : MonoBehaviour
     }
 
     /// <summary>
-    /// Gọi hàm này từ Server/NetworkManager để cập nhật danh sách các phòng chờ
+
     /// </summary>
     public void PopulateLobbies(System.Collections.Generic.List<AttoTheSheep.Core.LobbyData> lobbies)
     {
         if (lobbyRowPrefab != null && lobbyContent != null)
         {
-            // Xóa các row tĩnh hoặc row cũ đi
+
             foreach (Transform child in lobbyContent)
             {
                 Destroy(child.gameObject);
             }
 
-            // Render các row mới từ data truyền vào
             foreach (var lobby in lobbies)
             {
                 var rowObj = Instantiate(lobbyRowPrefab, lobbyContent);
@@ -259,18 +258,18 @@ public class MatchMakingController : MonoBehaviour
         if (createNameInput != null && !string.IsNullOrEmpty(createNameInput.text))
         {
             _isTransitioning = true;
-            Debug.Log($"[MatchMaking] Creating lobby: {createNameInput.text}");
+
             CloseAllModals();
 
             if (LobbyManager.Instance != null)
             {
                 AttoTheSheep.Core.LoadingManager.Instance?.Show("msg_creating_lobby");
                 string defaultPlayerName = await GetCloudPlayerName();
-                try 
+                try
                 {
                     await LobbyManager.Instance.Presenter.CreateLobby(createNameInput.text, 10, false, defaultPlayerName);
                     await LobbyManager.Instance.Presenter.SubscribeToCurrentLobby();
-                    
+
                     AttoTheSheep.Core.LobbySession.CurrentLobbyName = createNameInput.text;
                     AttoTheSheep.Core.LobbySession.MaxPlayers = 10;
                     AttoTheSheep.Core.LobbySession.IsHost = true;
@@ -281,7 +280,7 @@ public class MatchMakingController : MonoBehaviour
                 {
                     _isTransitioning = false;
                     AttoTheSheep.Core.LoadingManager.Instance?.Hide();
-                    Debug.LogError($"[MatchMaking] Failed to create lobby: {e}");
+
                 }
             }
             else if (OnRequestCreateLobby != null)
@@ -305,14 +304,14 @@ public class MatchMakingController : MonoBehaviour
         if (joinCodeInput != null && !string.IsNullOrEmpty(joinCodeInput.text))
         {
             _isTransitioning = true;
-            Debug.Log($"[MatchMaking] Joining private lobby code: {joinCodeInput.text}");
+
             CloseAllModals();
 
             if (LobbyManager.Instance != null)
             {
                 AttoTheSheep.Core.LoadingManager.Instance?.Show("msg_joining_lobby");
                 string defaultPlayerName = await GetCloudPlayerName();
-                try 
+                try
                 {
                     await LobbyManager.Instance.Presenter.JoinLobbyByCode(joinCodeInput.text, defaultPlayerName);
                     await LobbyManager.Instance.Presenter.SubscribeToCurrentLobby();
@@ -327,7 +326,7 @@ public class MatchMakingController : MonoBehaviour
                 {
                     _isTransitioning = false;
                     AttoTheSheep.Core.LoadingManager.Instance?.Hide();
-                    Debug.LogError($"[MatchMaking] Failed to join private lobby: {e}");
+
                 }
             }
             else if (OnRequestJoinPrivateLobby != null)
@@ -349,15 +348,14 @@ public class MatchMakingController : MonoBehaviour
     {
         if (_isTransitioning) return;
         _isTransitioning = true;
-        
-        Debug.Log($"[MatchMaking] Joining public lobby ID: {_selectedLobbyId}");
+
         CloseAllModals();
 
         if (LobbyManager.Instance != null)
         {
             AttoTheSheep.Core.LoadingManager.Instance?.Show("msg_joining_lobby");
             string defaultPlayerName = await GetCloudPlayerName();
-            try 
+            try
             {
                 await LobbyManager.Instance.Presenter.JoinLobby(_selectedLobbyId, defaultPlayerName);
                 await LobbyManager.Instance.Presenter.SubscribeToCurrentLobby();
@@ -372,7 +370,7 @@ public class MatchMakingController : MonoBehaviour
             {
                 _isTransitioning = false;
                 AttoTheSheep.Core.LoadingManager.Instance?.Hide();
-                Debug.LogError($"[MatchMaking] Failed to join public lobby: {e}");
+
             }
         }
         else if (OnRequestJoinPublicLobby != null)
@@ -409,12 +407,12 @@ public class MatchMakingController : MonoBehaviour
         {
             fadeOverlay.blocksRaycasts = true;
             var fadeImage = fadeOverlay.GetComponent<UnityEngine.UI.Image>();
-            
+
             Sprite sharpBg = null;
             #if UNITY_EDITOR
             sharpBg = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Tiny Swords/bg.png");
             #endif
-            
+
             if (fadeImage != null && sharpBg != null)
             {
                 fadeImage.sprite = sharpBg;
@@ -433,7 +431,7 @@ public class MatchMakingController : MonoBehaviour
         SceneManager.LoadScene(sceneName);
     }
 
-    public void Setup(Button back, Button create, Button joinPrivate, 
+    public void Setup(Button back, Button create, Button joinPrivate,
                       GameObject overlay,
                       GameObject createModal, Button createCancel, Button createOk, TMP_InputField createName,
                       GameObject joinModal, Button joinCancel, Button joinOk, TMP_InputField joinCode,
@@ -443,24 +441,24 @@ public class MatchMakingController : MonoBehaviour
         backButton = back;
         createLobbyButton = create;
         this.joinPrivateButton = joinPrivate;
-        
+
         modalOverlay = overlay;
-        
+
         createLobbyModal = createModal;
         createCancelButton = createCancel;
         createOkButton = createOk;
         createNameInput = createName;
-        
+
         joinPrivateModal = joinModal;
         joinCancelButton = joinCancel;
         joinOkButton = joinOk;
         joinCodeInput = joinCode;
-        
+
         confirmJoinModal = confirmModal;
         confirmCancelButton = confirmCancel;
         confirmOkButton = confirmOk;
         confirmJoinText = confirmText;
-        
+
         lobbyContent = content;
         lobbyRowPrefab = rowPrefab;
         fadeOverlay = fade;
@@ -471,7 +469,7 @@ public class MatchMakingController : MonoBehaviour
         string defaultName = "Player_" + Random.Range(1000, 9999);
         try
         {
-            if (Unity.Services.Core.UnityServices.State == Unity.Services.Core.ServicesInitializationState.Initialized 
+            if (Unity.Services.Core.UnityServices.State == Unity.Services.Core.ServicesInitializationState.Initialized
                 && Unity.Services.Authentication.AuthenticationService.Instance.IsSignedIn)
             {
                 string cloudName = await Unity.Services.Authentication.AuthenticationService.Instance.GetPlayerNameAsync();
